@@ -290,86 +290,122 @@ function ToolWorkspace({ tools }: { readonly tools: unknown[] }): React.JSX.Elem
               </h2>
             </div>
 
+            <div className="px-5 pt-5 pb-1 flex items-center justify-between shrink-0">
+              <h3 className="text-sm font-semibold">{t('modelsPage.logs.detail.toolDescription', '工具描述')}</h3>
+            </div>
+
             {toolDesc != null && toolDesc !== '' && (
               <div className="border-b bg-muted/5 shrink-0 flex flex-col">
                 <SmartContentViewer content={toolDesc} exportFileName="tool-description" />
               </div>
             )}
 
-            {toolDesc == null ||
-              (toolDesc === '' && (
-                <div className="p-5 border-b bg-muted/5 shrink-0">
-                  <div className="text-sm text-muted-foreground leading-relaxed italic opacity-50">无描述</div>
+            {(toolDesc == null || toolDesc === '') && (
+              <div className="p-5 border-b bg-muted/5 shrink-0">
+                <div className="text-sm text-muted-foreground leading-relaxed italic opacity-50">
+                  {t('modelsPage.logs.detail.noDescription', '无描述')}
                 </div>
-              ))}
+              </div>
+            )}
 
             <div className="flex-1 p-5 flex flex-col gap-4 shrink-0">
-              <div className="flex items-center justify-between shrink-0">
+              <div className="flex items-center justify-between shrink-0 mb-1">
                 <h3 className="text-sm font-semibold">{t('modelsPage.logs.detail.toolParameters', '参数列表')}</h3>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowRaw(!showRaw);
-                  }}
-                  className="text-xs text-muted-foreground hover:text-foreground hover:underline"
-                >
-                  {showRaw ? '隐藏原始 JSON' : '查看原始 JSON'}
-                </button>
+                <div className="flex items-center bg-muted/40 p-0.5 rounded-md border text-xs font-medium">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowRaw(false);
+                    }}
+                    className={cn(
+                      'px-3 py-1.5 rounded-sm transition-colors',
+                      showRaw
+                        ? 'text-muted-foreground hover:text-foreground'
+                        : 'bg-background shadow-sm text-foreground',
+                    )}
+                  >
+                    {t('modelsPage.logs.detail.structuredTable', '结构化表格')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowRaw(true);
+                    }}
+                    className={cn(
+                      'px-3 py-1.5 rounded-sm transition-colors',
+                      showRaw
+                        ? 'bg-background shadow-sm text-foreground'
+                        : 'text-muted-foreground hover:text-foreground',
+                    )}
+                  >
+                    {t('modelsPage.logs.detail.rawJson', '原始 JSON')}
+                  </button>
+                </div>
               </div>
 
-              {properties.length > 0 ? (
-                <div className="rounded-md border bg-card overflow-hidden">
-                  <Table className="table-fixed w-full">
-                    <TableHeader className="bg-muted/40">
-                      <TableRow>
-                        <TableHead className="w-[180px]">字段 (Field)</TableHead>
-                        <TableHead className="w-[150px]">类型 (Type)</TableHead>
-                        <TableHead>描述 (Description)</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {properties.map((prop) => (
-                        <TableRow key={prop.field}>
-                          <TableCell className="font-mono text-sm font-medium">
-                            <span className={cn(prop.isRequired ? 'text-primary font-bold' : '')}>{prop.field}</span>
-                            {prop.isRequired && <span className="ml-1 text-primary font-bold">*</span>}
-                          </TableCell>
-                          <TableCell className="font-mono text-xs text-muted-foreground whitespace-normal break-all sm:break-words">
-                            {prop.type}
-                          </TableCell>
-                          <TableCell className="text-sm text-foreground whitespace-normal break-all sm:break-words leading-relaxed">
-                            {prop.description === '' ? <span className="italic opacity-30">-</span> : prop.description}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              ) : (
-                <div className="p-4 border border-dashed rounded-md text-sm text-muted-foreground text-center bg-muted/10">
-                  无参数定义或无法解析为标准属性列表
-                </div>
-              )}
-
-              {showRaw && (
-                <div className="border rounded-md bg-muted/20 flex flex-col">
-                  <div className="flex items-center justify-between px-4 py-2 border-b">
+              {showRaw ? (
+                <div className="border rounded-md bg-muted/10 flex flex-col w-full min-w-0">
+                  <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/20">
                     <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      原始 Schema JSON
+                      Schema JSON
                     </span>
                     <button
                       type="button"
                       onClick={() => void copy(schemaText)}
-                      className="flex items-center gap-1 rounded px-2 py-0.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                      className="flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium bg-background border shadow-sm text-foreground hover:bg-muted transition-colors"
                     >
-                      {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                      {copied ? '已复制' : '复制 JSON'}
+                      {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
+                      {copied ? '已复制' : '复制代码'}
                     </button>
                   </div>
-                  <pre className="p-4 font-mono text-xs leading-relaxed text-foreground overflow-x-auto max-w-full">
-                    {schemaText}
-                  </pre>
+                  <div className="w-full min-w-0 overflow-x-auto bg-card rounded-b-md">
+                    <pre className="p-5 font-mono text-[13px] leading-relaxed text-foreground min-w-max">
+                      {schemaText}
+                    </pre>
+                  </div>
                 </div>
+              ) : (
+                <>
+                  {properties.length > 0 ? (
+                    <div className="rounded-md border bg-card flex flex-col overflow-hidden">
+                      <Table className="table-fixed w-full">
+                        <TableHeader className="bg-muted/40">
+                          <TableRow>
+                            <TableHead className="w-[180px]">字段 (Field)</TableHead>
+                            <TableHead className="w-[150px]">类型 (Type)</TableHead>
+                            <TableHead>描述 (Description)</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {properties.map((prop) => (
+                            <TableRow key={prop.field}>
+                              <TableCell className="font-mono text-sm font-medium">
+                                <span className={cn(prop.isRequired ? 'text-primary font-bold' : '')}>
+                                  {prop.field}
+                                </span>
+                                {prop.isRequired && <span className="ml-1 text-primary font-bold">*</span>}
+                              </TableCell>
+                              <TableCell className="font-mono text-xs text-muted-foreground whitespace-normal break-all sm:break-words">
+                                {prop.type}
+                              </TableCell>
+                              <TableCell className="text-sm text-foreground whitespace-normal break-all sm:break-words leading-relaxed">
+                                {prop.description === '' ? (
+                                  <span className="italic opacity-30">-</span>
+                                ) : (
+                                  prop.description
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  ) : (
+                    <div className="p-4 border border-dashed rounded-md text-sm text-muted-foreground text-center bg-muted/10">
+                      无参数定义或无法解析为标准属性列表
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
