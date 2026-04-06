@@ -59,19 +59,26 @@ export function SystemBanner({ msg }: { readonly msg: ChatItem }): React.JSX.Ele
         showCloseButton={false}
         className="flex flex-col h-[85vh] max-h-[850px] min-h-[540px] w-[95vw] sm:max-w-[960px] overflow-hidden p-0 gap-0"
       >
-        <DialogHeader className="flex flex-row items-start justify-between shrink-0 border-b px-8 py-5 bg-background">
-          <div className="flex flex-col gap-1.5 text-left">
-            <DialogTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
-              <Settings2 className="h-4 w-4" />
-              系统提示词 / System Prompt
-            </DialogTitle>
-            <DialogDescription>模型请求在发起时被注入的核心骨架设定。</DialogDescription>
+        <DialogHeader className="flex flex-row items-center justify-between shrink-0 border-b px-8 py-5 bg-background relative min-h-[72px]">
+          <div className="flex items-center gap-3 z-10 w-full min-w-0 pr-8">
+            <Settings2 className="h-5 w-5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
+            <div className="flex flex-col gap-1.5 text-left justify-center min-w-0 flex-1">
+              <DialogTitle className="leading-tight flex items-center break-all sm:break-normal truncate sm:whitespace-normal sm:line-clamp-2 text-[15px] text-amber-700 dark:text-amber-400">
+                系统提示词 / System Prompt
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground/80 text-[11px] truncate">
+                模型请求在发起时被注入的核心骨架设定。
+              </DialogDescription>
+            </div>
           </div>
-          <DialogClose asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground -mr-2 mt-0.5 border-0">
-              <X className="h-4 w-4" />
-            </Button>
-          </DialogClose>
+
+          <div className="flex items-center z-10 h-full shrink-0">
+            <DialogClose asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground -mr-2 border-0">
+                <X className="h-4 w-4" />
+              </Button>
+            </DialogClose>
+          </div>
         </DialogHeader>
         <div className="flex-1 min-h-0 overflow-y-auto px-8 py-6 bg-muted/10">
           <MarkdownViewer content={msg.content ?? ''} className="text-[13px] leading-relaxed" />
