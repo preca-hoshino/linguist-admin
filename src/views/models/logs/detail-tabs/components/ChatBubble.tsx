@@ -1,6 +1,6 @@
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { Blocks, ChevronDown, FileText, Image as ImageIcon, Settings2, Wrench, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { MarkdownViewer } from '@/components/MarkdownViewer';
 import { Button } from '@/components/ui/Button';
 import {
@@ -81,6 +81,97 @@ export function SystemBanner({ msg }: { readonly msg: ChatItem }): React.JSX.Ele
   );
 }
 
+function formatBytes(bytes: number): string {
+  if (bytes === 0) {
+    return '0 B';
+  }
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const unit = sizes[i] ?? 'GB';
+  return `${Number.parseFloat((bytes / k ** i).toFixed(2))} ${unit}`;
+}
+
+function getBase64SizeBytes(base64Str: string): number {
+  let padding = 0;
+  if (base64Str.endsWith('==')) {
+    padding = 2;
+  } else if (base64Str.endsWith('=')) {
+    padding = 1;
+  }
+  return Math.floor((base64Str.length * 3) / 4) - padding;
+}
+
+function BubbleMeta({ item }: { readonly item: ChatItem }): React.JSX.Element | null {
+  const [imgDim, setImgDim] = useState<string>('');
+
+  const sizeText = useMemo(() => {
+    if (item.imageUrl != null && item.imageUrl !== '') {
+      const src = item.imageUrl;
+      if (src.startsWith('data:')) {
+        const base64Str = src.split(',')[1];
+        if (base64Str !== undefined && base64Str !== '') {
+          return formatBytes(getBase64SizeBytes(base64Str));
+        }
+      }
+      return 'URL';
+    }
+
+    let combinedText = '';
+    if (item.content != null) {
+      combinedText += item.content;
+    }
+    if (item.reasoning_content != null) {
+      combinedText += item.reasoning_content;
+    }
+
+    if (combinedText !== '') {
+      const bytes = new globalThis.Blob([combinedText]).size;
+      const charCount = combinedText.length;
+      return `${charCount} 字 • ${formatBytes(bytes)}`;
+    }
+    return '';
+  }, [item]);
+
+  useEffect(() => {
+    let unmounted = false;
+    if (item.imageUrl != null && item.imageUrl !== '') {
+      const img = new globalThis.Image();
+      img.addEventListener('load', (): void => {
+        if (unmounted) {
+          return;
+        }
+        setImgDim(`${img.naturalWidth}x${img.naturalHeight}`);
+      });
+      img.src = item.imageUrl;
+    }
+    return (): void => {
+      unmounted = true;
+    };
+  }, [item]);
+
+  if (!sizeText && !imgDim) {
+    return null;
+  }
+
+  let finalStr = '';
+  if (imgDim !== '') {
+    finalStr = sizeText !== '' && sizeText !== 'URL' ? `${imgDim} • ${sizeText}` : imgDim;
+  } else if (sizeText === 'URL') {
+    finalStr = 'URL';
+  } else {
+    finalStr = sizeText;
+  }
+
+  if (!finalStr) {
+    return null;
+  }
+
+  return (
+    <div className="text-[11px] text-muted-foreground/60 font-mono tracking-tight shrink-0 mt-0.5">{finalStr}</div>
+  );
+}
+
 function getBubbleType(item: ChatItem): { TypeIcon: React.ElementType; typeLabel: string; typeColor: string } {
   if (item.role === 'tool') {
     return {
@@ -137,7 +228,11 @@ export function ChatBubble({
     </div>
   );
 
-  const isPureImage = item.role === 'user' && item.imageUrl != null && item.imageUrl !== '' && (item.content == null || item.content === '');
+  const isPureImage =
+    item.role === 'user' &&
+    item.imageUrl != null &&
+    item.imageUrl !== '' &&
+    (item.content == null || item.content === '');
   const bubbleBg = 'bg-card border border-border/60 shadow-sm text-foreground';
   const paddingClass = isPureImage ? 'p-1.5' : 'px-3 py-2';
   const borderRadius = 'rounded-xl';
@@ -176,7 +271,10 @@ export function ChatBubble({
           </div>
         )}
 
-        <div className="mb-1.5 flex items-center">{TypeBadge}</div>
+        <div className={cn('mb-1.5 flex items-center gap-2', isRight ? 'flex-row-reverse' : 'flex-row')}>
+          {TypeBadge}
+          <BubbleMeta item={item} />
+        </div>
 
         <div
           className={cn(
@@ -219,9 +317,9 @@ export function ChatBubble({
               alt="Message content"
               className={cn(
                 'max-w-full object-contain',
-                isPureImage 
-                  ? 'rounded-lg max-h-[500px]' 
-                  : 'rounded-md border border-border/50 shadow-sm max-h-[400px] my-2 bg-muted/20'
+                isPureImage
+                  ? 'rounded-lg max-h-[500px]'
+                  : 'rounded-md border border-border/50 shadow-sm max-h-[400px] my-2 bg-muted/20',
               )}
             />
           )}
