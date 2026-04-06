@@ -121,14 +121,14 @@ function ToolResponseTab({
   readonly t: (k: string, f: string) => string;
 }): React.JSX.Element {
   return (
-    <TabsContent value="response" className="flex-1 min-h-0 m-0 overflow-y-auto scrollbar-thin">
+    <TabsContent value="response" className="flex-1 min-h-0 m-0 flex flex-col overflow-hidden">
       {toolResponse == null || toolResponse === '' ? (
         <div className="flex h-full items-center justify-center text-sm text-muted-foreground/50 italic">
           {t('modelsPage.logs.detail.noToolResult', '暂无工具返回结果')}
         </div>
       ) : (
-        <div className="flex flex-col gap-3 min-h-full">
-          <div className="flex items-center gap-3 shrink-0">
+        <>
+          <div className="flex items-center gap-3 shrink-0 mb-3">
             <Badge
               variant="outline"
               className={cn(
@@ -163,25 +163,31 @@ function ToolResponseTab({
               })()}
             </span>
           </div>
-          <div className="w-full rounded-md border border-border/40 bg-card px-6 py-4">
-            {responseType === 'json' && parsedJson !== undefined ? (
-              <JsonView
-                src={parsedJson}
-                collapsed={2}
-                enableClipboard
-                displaySize
-                theme={resolvedTheme === 'dark' ? 'a11y' : 'default'}
-                style={{ fontSize: '13px', lineHeight: '1.6', fontFamily: 'var(--font-mono, ui-monospace, monospace)' }}
-              />
-            ) : (
-              <MarkdownViewer
-                content={toolResponse}
-                enableXmlHighlight={responseType === 'xml'}
-                className="text-[13px] leading-relaxed"
-              />
-            )}
+          <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin">
+            <div className="w-full rounded-md border border-border/40 bg-card px-6 py-4">
+              {responseType === 'json' && parsedJson !== undefined ? (
+                <JsonView
+                  src={parsedJson}
+                  collapsed={2}
+                  enableClipboard
+                  displaySize
+                  theme={resolvedTheme === 'dark' ? 'a11y' : 'default'}
+                  style={{
+                    fontSize: '13px',
+                    lineHeight: '1.6',
+                    fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+                  }}
+                />
+              ) : (
+                <MarkdownViewer
+                  content={toolResponse}
+                  enableXmlHighlight={responseType === 'xml'}
+                  className="text-[13px] leading-relaxed"
+                />
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </TabsContent>
   );

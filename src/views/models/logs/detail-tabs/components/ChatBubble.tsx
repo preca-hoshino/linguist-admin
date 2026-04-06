@@ -96,14 +96,14 @@ export function SystemBanner({ msg }: { readonly msg: ChatItem }): React.JSX.Ele
             </DialogClose>
           </div>
         </DialogHeader>
-        <div className="flex-1 min-h-0 overflow-y-auto px-8 py-6 bg-muted/10">
+        <div className="flex-1 min-h-0 flex flex-col overflow-hidden bg-muted/10">
           {msg.content == null || msg.content === '' ? (
             <div className="flex h-full items-center justify-center text-sm text-muted-foreground/50 italic">
               暂无内容
             </div>
           ) : (
-            <div className="flex flex-col gap-3 min-h-full">
-              <div className="flex items-center gap-3 shrink-0">
+            <>
+              <div className="px-8 pt-6 pb-3 flex items-center gap-3 shrink-0">
                 <Badge
                   variant="outline"
                   className={cn(
@@ -141,29 +141,31 @@ export function SystemBanner({ msg }: { readonly msg: ChatItem }): React.JSX.Ele
                 </span>
               </div>
 
-              <div className="w-full rounded-md border border-border/40 bg-card px-6 py-4">
-                {responseType === 'json' && parsedJson !== undefined ? (
-                  <JsonView
-                    src={parsedJson}
-                    collapsed={2}
-                    enableClipboard
-                    displaySize
-                    theme={resolvedTheme === 'dark' ? 'a11y' : 'default'}
-                    style={{
-                      fontSize: '13px',
-                      lineHeight: '1.6',
-                      fontFamily: 'var(--font-mono, ui-monospace, monospace)',
-                    }}
-                  />
-                ) : (
-                  <MarkdownViewer
-                    content={msg.content}
-                    enableXmlHighlight={responseType === 'xml'}
-                    className="text-[13px] leading-relaxed"
-                  />
-                )}
+              <div className="flex-1 min-h-0 overflow-y-auto px-8 pb-6 scrollbar-thin">
+                <div className="w-full rounded-md border border-border/40 bg-card px-6 py-4">
+                  {responseType === 'json' && parsedJson !== undefined ? (
+                    <JsonView
+                      src={parsedJson}
+                      collapsed={2}
+                      enableClipboard
+                      displaySize
+                      theme={resolvedTheme === 'dark' ? 'a11y' : 'default'}
+                      style={{
+                        fontSize: '13px',
+                        lineHeight: '1.6',
+                        fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+                      }}
+                    />
+                  ) : (
+                    <MarkdownViewer
+                      content={msg.content}
+                      enableXmlHighlight={responseType === 'xml'}
+                      className="text-[13px] leading-relaxed"
+                    />
+                  )}
+                </div>
               </div>
-            </div>
+            </>
           )}
         </div>
       </DialogContent>
