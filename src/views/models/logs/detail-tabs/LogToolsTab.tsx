@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/Input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import type { AuditToolDefinition, AuditUserChatRequest, AuditUserChatResponse, GatewayContextSnapshot } from '@/types';
 import { cn } from '@/utils/utils';
+import { SmartContentViewer } from './components/SmartContentViewer';
 
 // ── 辅助
 
@@ -248,7 +249,7 @@ function ToolWorkspace({ tools }: { readonly tools: unknown[] }): React.JSX.Elem
                   setSelectedIdx(idx);
                 }}
                 className={cn(
-                  'w-full text-left px-3 py-3 rounded-md transition-colors text-sm flex items-start gap-3',
+                  'w-full text-left px-3 py-3 rounded-md transition-colors text-sm flex items-center gap-3',
                   isSelected
                     ? 'bg-accent text-accent-foreground shadow-sm border border-border/50'
                     : 'text-foreground hover:bg-muted/50 border border-transparent',
@@ -282,15 +283,25 @@ function ToolWorkspace({ tools }: { readonly tools: unknown[] }): React.JSX.Elem
       {selectedToolInfo != null && (
         <div className="flex-1 min-w-0 bg-background overflow-y-auto scrollbar-thin h-full relative">
           <div className="flex flex-col min-h-full">
-            <div className="p-5 border-b bg-muted/5 shrink-0 flex flex-col gap-2">
+            <div className="p-5 border-b bg-muted/5 flex flex-col gap-2 shrink-0">
               <h2 className="text-lg font-bold font-mono tracking-tight flex items-center gap-2">
                 <Wrench className="h-5 w-5 text-primary shrink-0" />
                 <span className="truncate">{toolName}</span>
               </h2>
-              <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap break-all sm:break-words">
-                {toolDesc != null && toolDesc !== '' ? toolDesc : <span className="italic opacity-50">无描述</span>}
-              </div>
             </div>
+
+            {toolDesc != null && toolDesc !== '' && (
+              <div className="border-b bg-muted/5 shrink-0 flex flex-col">
+                <SmartContentViewer content={toolDesc} exportFileName="tool-description" />
+              </div>
+            )}
+
+            {toolDesc == null ||
+              (toolDesc === '' && (
+                <div className="p-5 border-b bg-muted/5 shrink-0">
+                  <div className="text-sm text-muted-foreground leading-relaxed italic opacity-50">无描述</div>
+                </div>
+              ))}
 
             <div className="flex-1 p-5 flex flex-col gap-4 shrink-0">
               <div className="flex items-center justify-between shrink-0">
@@ -308,37 +319,31 @@ function ToolWorkspace({ tools }: { readonly tools: unknown[] }): React.JSX.Elem
 
               {properties.length > 0 ? (
                 <div className="rounded-md border bg-card overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader className="bg-muted/40 whitespace-nowrap">
-                        <TableRow>
-                          <TableHead className="w-[180px]">字段 (Field)</TableHead>
-                          <TableHead className="w-[150px]">类型 (Type)</TableHead>
-                          <TableHead>描述 (Description)</TableHead>
+                  <Table className="table-fixed w-full">
+                    <TableHeader className="bg-muted/40">
+                      <TableRow>
+                        <TableHead className="w-[180px]">字段 (Field)</TableHead>
+                        <TableHead className="w-[150px]">类型 (Type)</TableHead>
+                        <TableHead>描述 (Description)</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {properties.map((prop) => (
+                        <TableRow key={prop.field}>
+                          <TableCell className="font-mono text-sm font-medium">
+                            <span className={cn(prop.isRequired ? 'text-primary font-bold' : '')}>{prop.field}</span>
+                            {prop.isRequired && <span className="ml-1 text-primary font-bold">*</span>}
+                          </TableCell>
+                          <TableCell className="font-mono text-xs text-muted-foreground whitespace-normal break-all sm:break-words">
+                            {prop.type}
+                          </TableCell>
+                          <TableCell className="text-sm text-foreground whitespace-normal break-all sm:break-words leading-relaxed">
+                            {prop.description === '' ? <span className="italic opacity-30">-</span> : prop.description}
+                          </TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {properties.map((prop) => (
-                          <TableRow key={prop.field}>
-                            <TableCell className="font-mono text-sm font-medium">
-                              <span className={cn(prop.isRequired ? 'text-primary font-bold' : '')}>{prop.field}</span>
-                              {prop.isRequired && <span className="ml-1 text-primary font-bold">*</span>}
-                            </TableCell>
-                            <TableCell className="font-mono text-xs text-muted-foreground whitespace-nowrap">
-                              {prop.type}
-                            </TableCell>
-                            <TableCell className="text-sm text-foreground break-all sm:break-normal">
-                              {prop.description === '' ? (
-                                <span className="italic opacity-30">-</span>
-                              ) : (
-                                prop.description
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
               ) : (
                 <div className="p-4 border border-dashed rounded-md text-sm text-muted-foreground text-center bg-muted/10">
