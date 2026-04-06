@@ -1,0 +1,80 @@
+import { render } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { SidebarProvider } from '@/components/ui/Sidebar';
+import { Header } from '../Header';
+
+vi.mock('@/providers/ThemeProvider', () => ({
+  useTheme: (): { theme: string; setTheme: ReturnType<typeof vi.fn> } => ({ theme: 'dark', setTheme: vi.fn() }),
+}));
+
+vi.mock('@/providers/LocaleProvider', () => ({
+  useLocale: (): { locale: string; setLocale: ReturnType<typeof vi.fn> } => ({ locale: 'en', setLocale: vi.fn() }),
+}));
+
+vi.mock('react-i18next', () => ({
+  useTranslation: (): { t: (k: string) => string } => ({ t: (k: string): string => k }),
+  initReactI18next: { type: '3rdParty', init: vi.fn() },
+}));
+
+vi.mock('@/stores/authStore', () => ({
+  useAuthStore: (): { auth: { user: { username: string; email: string }; reset: ReturnType<typeof vi.fn> } } => ({
+    auth: { user: { username: 'testuser', email: 'test@example.com' }, reset: vi.fn() },
+  }),
+}));
+
+vi.mock('@/providers/SearchProvider', () => ({
+  useSearch: (): { setOpen: ReturnType<typeof vi.fn> } => ({ setOpen: vi.fn() }),
+}));
+
+vi.mock('@tanstack/react-router', () => ({
+  useRouter: (): { state: { location: { pathname: string } } } => ({ state: { location: { pathname: '/' } } }),
+  Link: ({
+    children,
+    to,
+    ...props
+  }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { to: string }): React.ReactNode => (
+    <a href={to} {...props}>
+      {children}
+    </a>
+  ),
+  useNavigate: (): ReturnType<typeof vi.fn> => vi.fn(),
+}));
+
+vi.stubGlobal(
+  'ResizeObserver',
+  class {
+    public observe(): void {
+      /* mock */
+    }
+    public unobserve(): void {
+      /* mock */
+    }
+    public disconnect(): void {
+      /* mock */
+    }
+  },
+);
+
+describe('Header Component', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should render without crashing', () => {
+    const { container } = render(
+      <SidebarProvider>
+        <Header />
+      </SidebarProvider>,
+    );
+    expect(container).toBeInTheDocument();
+  });
+
+  it('should match snapshot', () => {
+    const { container } = render(
+      <SidebarProvider>
+        <Header />
+      </SidebarProvider>,
+    );
+    expect(container).toMatchSnapshot();
+  });
+});

@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Alias */
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
+    /* Strict Mode */
+    "strict": true,
+
+    /* Extra Strictness */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": false, // Align with Linguist: Express-style index signature handling
+    "declaration": false,
+    "isolatedDeclarations": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "incremental": true,
+
+    "noUncheckedSideEffectImports": true,
+    "verbatimModuleSyntax": true
+  },
+  "include": ["src"]
+}
