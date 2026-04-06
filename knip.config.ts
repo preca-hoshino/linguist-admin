@@ -3,7 +3,7 @@ import type { KnipConfig } from 'knip';
 const config: KnipConfig = {
   project: ['src/**/*.{ts,tsx}'],
   ignore: ['src/components/ui/**'],
-  ignoreDependencies: ["tailwindcss", "tw-animate-css", "@radix-ui/react-switch", "input-otp", "react-day-picker", "react18-json-view"],
+  ignoreDependencies: ["tailwindcss", "tw-animate-css", "@radix-ui/react-switch", "input-otp", "react-day-picker", "@tailwindcss/typography"],
   rules: {
     files: 'off',
     exports: 'off',
