@@ -1,43 +1,45 @@
-# Shadcn Admin Dashboard
+# Linguist Admin
 
-Admin Dashboard UI crafted with Shadcn and Vite. Built with responsiveness and accessibility in mind.
+Modern administration dashboard for the Linguist ecosystem. Built with React 19, Vite, and Shadcn UI.
 
-![alt text](public/images/shadcn-admin.png)
+![Linguist Admin](public/images/shadcn-admin.png)
 
-[![Sponsored by Clerk](https://img.shields.io/badge/Sponsored%20by-Clerk-5b6ee1?logo=clerk)](https://go.clerk.com/GttUAaK)
+## 🚀 Features
 
-I've been creating dashboard UIs at work and for my personal projects. I always wanted to make a reusable collection of dashboard UI for future projects; and here it is now. While I've created a few custom components, some of the code is directly adapted from ShadcnUI examples.
+- **Dashboard**: Real-time overview of system status and usage.
+- **API Keys**: Secure management of your translation and model API keys.
+- **Models**: Comprehensive tools to manage and configure translation models.
+- **MCPs**: Support for Model Context Protocol (MCP) integrations.
+- **Users**: System-wide user and administrator management.
+- **Settings**: Flexible account and preference settings.
+- **I18n & RTL**: Seamless internationalization with full Right-to-Left (RTL) support.
+- **Themes**: Modern aesthetics with built-in Light and Dark modes.
+- **Responsive**: Fully optimized for mobile, tablet, and desktop.
 
-> This is not a starter project (template) though. I'll probably make one in the future.
+## 🛠️ Tech Stack
 
-## Features
-
-- Light/dark mode
-- Responsive
-- Accessible
-- With built-in Sidebar component
-- Global search command
-- 10+ pages
-- Extra custom components
-- RTL support
+- **Framework**: [React 19](https://react.dev/)
+- **Build Tool**: [Vite 7](https://vitejs.dev/)
+- **Styling**: [TailwindCSS 4](https://tailwindcss.com/)
+- **Components**: [Shadcn UI](https://ui.shadcn.com/) (Radix UI)
+- **Routing**: [TanStack Router](https://tanstack.com/router)
+- **Data Fetching**: [TanStack Query](https://tanstack.com/query)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+- **Form Handling**: [React Hook Form](https://react-hook-form.com/) & [Zod](https://zod.dev/)
+- **Quality Control**: [Biome](https://biomejs.dev/) & [ESLint](https://eslint.org/)
+- **Testing**: [Vitest](https://vitest.dev/) & [Testing Library](https://testing-library.com/)
 
 <details>
-<summary>Customized Components (click to expand)</summary>
+<summary>Customized UI Components (click to expand)</summary>
 
-This project uses Shadcn UI components, but some have been slightly modified for better RTL (Right-to-Left) support and other improvements. These customized components differ from the original Shadcn UI versions.
-
-If you want to update components using the Shadcn CLI (e.g., `npx shadcn@latest add <component>`), it's generally safe for non-customized components. For the listed customized ones, you may need to manually merge changes to preserve the project's modifications and avoid overwriting RTL support or other updates.
-
-> If you don't require RTL support, you can safely update the 'RTL Updated Components' via the Shadcn CLI, as these changes are primarily for RTL compatibility. The 'Modified Components' may have other customizations to consider.
+This project uses Shadcn UI components, but some have been slightly modified for better RTL support and specific project needs.
 
 ### Modified Components
-
 - scroll-area
 - sonner
 - separator
 
 ### RTL Updated Components
-
 - alert-dialog
 - calendar
 - command
@@ -49,71 +51,52 @@ If you want to update components using the Shadcn CLI (e.g., `npx shadcn@latest 
 - sidebar
 - switch
 
-**Notes:**
-
-- **Modified Components**: These have general updates, potentially including RTL adjustments.
-- **RTL Updated Components**: These have specific changes for RTL language support (e.g., layout, positioning).
-- For implementation details, check the source files in `src/components/ui/`.
-- All other Shadcn UI components in the project are standard and can be safely updated via the CLI.
-
 </details>
 
-## Tech Stack
+## 📦 Getting Started
 
-**UI:** [ShadcnUI](https://ui.shadcn.com) (TailwindCSS + RadixUI)
+### Prerequisites
 
-**Build Tool:** [Vite](https://vitejs.dev/)
+- [Node.js](https://nodejs.org/) (Latest LTS recommended)
+- [npm](https://www.npmjs.com/)
 
-**Routing:** [TanStack Router](https://tanstack.com/router/latest)
+### Run Locally
 
-**Type Checking:** [TypeScript](https://www.typescriptlang.org/)
+1. Clone the project
+   ```bash
+   git clone https://github.com/your-org/linguist-admin.git
+   ```
 
-**Linting/Formatting:** [Biome](https://biomejs.dev/) & [ESLint](https://eslint.org/) (Synchronized with Linguist)
+2. Go to the project directory
+   ```bash
+   cd linguist-admin
+   ```
 
-**Icons:** [Lucide Icons](https://lucide.dev/icons/), [Tabler Icons](https://tabler.io/icons) (Brand icons only)
+3. Install dependencies
+   ```bash
+   npm install
+   ```
 
-**Auth (partial):** [Clerk](https://go.clerk.com/GttUAaK)
+4. Start the development server
+   ```bash
+   npm run dev
+   ```
 
-## Run Locally
+## 🧪 Development Workflow
 
-Clone the project
-
-```bash
-  git clone https://github.com/satnaing/shadcn-admin.git
-```
-
-Go to the project directory
-
-```bash
-  cd shadcn-admin
-```
-
-Install dependencies
-
-```bash
-  pnpm install
-```
-
-Start the server
+To ensure code quality, please run the following command before submitting any changes:
 
 ```bash
-  pnpm run dev
+# Full check: Format, Lint, Types, Dependencies, and Tests
+npm run check
 ```
 
-## Sponsoring this project ❤️
+For more details, please refer to the [Contributing Guide](CONTRIBUTING.md).
 
-If you find this project helpful or use this in your own work, consider [sponsoring me](https://github.com/sponsors/satnaing) to support development and maintenance. You can [buy me a coffee](https://buymeacoffee.com/satnaing) as well. Don’t worry, every penny helps. Thank you! 🙏
+## 📄 License
 
-For questions or sponsorship inquiries, feel free to reach out at [satnaingdev@gmail.com](mailto:satnaingdev@gmail.com).
+Licensed under the [MIT License](LICENSE).
 
-### Current Sponsor
+---
 
-- [Clerk](https://go.clerk.com/GttUAaK) - authentication and user management for the modern web
-
-## Author
-
-Crafted with 🤍 by [@satnaing](https://github.com/satnaing)
-
-## License
-
-Licensed under the [MIT License](https://choosealicense.com/licenses/mit/)
+*Based on [shadcn-admin](https://github.com/satnaing/shadcn-admin) by [@satnaing](https://github.com/satnaing).*
