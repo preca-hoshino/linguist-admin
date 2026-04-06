@@ -237,8 +237,14 @@ const getMarkdownComponents = (isDark: boolean): React.ComponentProps<typeof Rea
     }
     const codeString = childrenStr.replace(/\n$/, '');
 
-    if (match !== null && match[1] !== undefined) {
-      const lang = match[1];
+    const isBlock = match !== null || codeString.includes('\n');
+    let lang = match?.[1] ?? '';
+
+    if (isBlock && !lang) {
+      lang = 'text';
+    }
+
+    if (lang) {
       const customStyle: CSSProperties = {
         margin: 0,
         padding: '1rem',
@@ -286,11 +292,8 @@ const getMarkdownComponents = (isDark: boolean): React.ComponentProps<typeof Rea
   },
 
   pre({ children }): React.JSX.Element {
-    return (
-      <pre className="not-prose my-3 overflow-x-auto rounded-md border border-border/50 bg-muted/40 p-4 text-[13px] leading-relaxed">
-        {children}
-      </pre>
-    );
+    // Simply render children to let our enhanced `code` block completely manage layout and backgrounds, eliminating the nested double background block problem.
+    return <>{children}</>;
   },
 
   h1({ children }): React.JSX.Element {
