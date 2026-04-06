@@ -241,21 +241,24 @@ const getMarkdownComponents = (isDark: boolean): React.ComponentProps<typeof Rea
       const lang = match[1];
       const customStyle: CSSProperties = {
         margin: 0,
-        borderTopLeftRadius: 0,
-        borderTopRightRadius: 0,
-        borderBottomLeftRadius: '0.375rem',
-        borderBottomRightRadius: '0.375rem',
-        border: '1px solid hsl(var(--border) / 0.5)',
+        padding: '1rem',
+        background: 'transparent',
+        backgroundColor: 'transparent',
         fontSize: '13px',
         lineHeight: '1.6',
       };
 
       return (
-        <div className="group not-prose relative my-3">
-          <div className="flex items-center justify-between rounded-t-md border border-b-0 border-border/50 bg-muted/60 px-3 py-1.5 text-[11px] font-medium text-muted-foreground">
+        <div
+          className={cn(
+            'group not-prose relative my-3 flex flex-col rounded-md border border-border/50 overflow-hidden',
+            isDark ? 'bg-[#282c34]' : 'bg-muted/30',
+          )}
+        >
+          <div className="flex z-10 items-center justify-between border-b border-border/50 bg-muted/60 px-3 py-1.5 text-[11px] font-medium text-muted-foreground">
             <span>{lang.toUpperCase()}</span>
           </div>
-          <div className="relative">
+          <div className="relative overflow-x-auto">
             <SyntaxHighlighter
               // @ts-expect-error react-syntax-highlighter typings mismatch
               style={isDark ? oneDark : oneLight}
