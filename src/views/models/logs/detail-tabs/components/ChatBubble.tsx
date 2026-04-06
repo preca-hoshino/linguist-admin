@@ -14,7 +14,7 @@ import {
 import type { AuditToolCall } from '@/types';
 import { cn } from '@/utils/utils';
 import type { ChatItem } from '../utils';
-import { ToolInteractionDialog, ToolInteractionTrigger } from './ToolInteractionDialog';
+import { ToolInteractionButton, ToolInteractionDialog, ToolInteractionTrigger } from './ToolInteractionDialog';
 
 // ── 组件：思维链推理块
 export function ReasoningBlock({ content }: { readonly content: string }): React.JSX.Element {
@@ -194,13 +194,16 @@ function BubbleContent({
       )}
       {item.role === 'tool' && (
         <Dialog>
-          <DialogTrigger asChild>
+          <div className="flex w-full items-center justify-between">
             <ToolInteractionTrigger
               toolName={item.toolName ?? '工具响应'}
               callId={item.tool_call_id}
               defaultTab="response"
             />
-          </DialogTrigger>
+            <DialogTrigger asChild>
+              <ToolInteractionButton defaultTab="response" className="ml-2 shrink-0" />
+            </DialogTrigger>
+          </div>
           <ToolInteractionDialog
             toolName={item.toolName ?? '工具响应'}
             toolCall={item.tool_call_id == null ? undefined : toolCallMap.get(item.tool_call_id)}
@@ -229,9 +232,12 @@ function BubbleContent({
         <div className={cn('flex flex-col gap-1', hasExtraContent ? 'mt-1' : 'mt-0')}>
           {item.tool_calls.map((tc) => (
             <Dialog key={tc.id}>
-              <DialogTrigger asChild>
+              <div className="flex w-full items-center justify-between">
                 <ToolInteractionTrigger toolName={tc.function.name} callId={tc.id} defaultTab="request" />
-              </DialogTrigger>
+                <DialogTrigger asChild>
+                  <ToolInteractionButton defaultTab="request" className="ml-2 shrink-0" />
+                </DialogTrigger>
+              </div>
               <ToolInteractionDialog
                 toolName={tc.function.name}
                 toolCall={tc}

@@ -1,4 +1,4 @@
-import { Wrench, X } from 'lucide-react';
+import { ChevronRight, Wrench, X } from 'lucide-react';
 import { forwardRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import JsonView from 'react18-json-view';
@@ -290,6 +290,35 @@ export function ToolInteractionDialog({
   );
 }
 
+// ── 工具交互弹窗的图标触发按钮（单独导出，独立于信息展示块）
+export const ToolInteractionButton = forwardRef<
+  HTMLButtonElement,
+  React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    readonly defaultTab: 'request' | 'response';
+  }
+>(({ defaultTab, className, ...props }, ref) => {
+  const { t } = useTranslation();
+  return (
+    <button
+      ref={ref}
+      type="button"
+      title={
+        defaultTab === 'request'
+          ? t('modelsPage.logs.detail.viewParams', '查看参数')
+          : t('modelsPage.logs.detail.viewResult', '查看结果')
+      }
+      className={cn(
+        'group flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border/40 bg-muted/30 text-muted-foreground/80 transition-all duration-200 hover:bg-accent hover:text-accent-foreground hover:border-accent-foreground/10 active:scale-95 cursor-pointer',
+        className,
+      )}
+      {...props}
+    >
+      <ChevronRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5" />
+    </button>
+  );
+});
+ToolInteractionButton.displayName = 'ToolInteractionButton';
+
 // ── 工具交互弹窗的触发元素（在气泡中使用）
 export const ToolInteractionTrigger = forwardRef<
   HTMLDivElement,
@@ -298,50 +327,26 @@ export const ToolInteractionTrigger = forwardRef<
     readonly callId?: string | undefined;
     readonly defaultTab: 'request' | 'response';
   }
->(({ toolName, callId, defaultTab, className, ...props }, ref) => {
-  const { t } = useTranslation();
+>(({ toolName, callId, className, ...props }, ref) => {
   const displayId = callId != null && callId !== '' ? callId : 'Unknown ID';
   return (
-    // biome-ignore lint/a11y/useSemanticElements: Outer trigger needs to be a div because inner elements may be buttons, which HTML prevents nesting.
     <div
       ref={ref}
-      role="button"
-      tabIndex={0}
       className={cn(
-        'flex w-full items-center justify-between pt-1 pb-0 opacity-80 hover:opacity-100 transition-opacity cursor-pointer font-sans text-foreground mb-1 last:-mb-1',
+        'flex w-full items-center justify-between pt-1 pb-0 font-sans text-foreground mb-1 last:-mb-1',
         className,
       )}
       {...props}
     >
-      <div className="flex items-center gap-3 w-full min-w-0 pl-1 my-0.5">
-        <Wrench className="h-5 w-5 shrink-0" />
-        <div className="flex flex-col text-left justify-center min-w-0 w-full gap-1">
-          <span className="font-mono text-[15px] font-bold leading-none truncate pt-0.5">{toolName}</span>
+      <div className="flex items-center gap-2 w-full min-w-0 overflow-hidden pl-1 my-0.5">
+        <Wrench className="h-4 w-4 shrink-0 text-muted-foreground" />
+        <div className="flex flex-col text-left justify-center min-w-0 flex-1 gap-1.5 overflow-hidden">
+          <span className="font-mono text-[14px] font-bold leading-none truncate pt-0.5">{toolName}</span>
           {displayId !== 'Unknown ID' && (
-            // biome-ignore lint/a11y/useSemanticElements: Inner clickable element must be purely visual div
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.stopPropagation();
-                }
-              }}
-              role="button"
-              tabIndex={0}
-              className="max-w-full flex items-center"
-            >
-              <CopyableId id={displayId} prefix="" />
-            </div>
+            <CopyableId id={displayId} prefix="" className="text-[10px] self-start" />
           )}
         </div>
       </div>
-      <span className="text-[10px] text-muted-foreground shrink-0 ml-2 opacity-60">
-        {defaultTab === 'request'
-          ? t('modelsPage.logs.detail.viewParams', '查看参数')
-          : t('modelsPage.logs.detail.viewResult', '查看结果')}
-      </span>
     </div>
   );
 });
