@@ -1,41 +1,43 @@
-import { useState } from 'react'
-import { cn } from '@/utils/utils'
-import { MarkdownViewer } from '@/components/MarkdownViewer'
-import { ChevronDown, Settings2, FileText, Wrench, Image as ImageIcon, Blocks, MessageSquare, X } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+import { DialogTrigger } from '@radix-ui/react-dialog';
+import { Blocks, ChevronDown, FileText, Image as ImageIcon, MessageSquare, Settings2, Wrench, X } from 'lucide-react';
+import { useState } from 'react';
+import { MarkdownViewer } from '@/components/MarkdownViewer';
+import { Button } from '@/components/ui/Button';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-  DialogClose,
-} from '@/components/ui/Dialog'
-import { DialogTrigger } from '@radix-ui/react-dialog'
-import type { AuditToolCall } from '@/types'
-import type { ChatItem } from '../utils'
-import { ToolInteractionDialog, ToolInteractionTrigger } from './ToolInteractionDialog'
+} from '@/components/ui/Dialog';
+import type { AuditToolCall } from '@/types';
+import { cn } from '@/utils/utils';
+import type { ChatItem } from '../utils';
+import { ToolInteractionDialog, ToolInteractionTrigger } from './ToolInteractionDialog';
 
 // ── 组件：思维链推理块
 export function ReasoningBlock({ content }: { readonly content: string }): React.JSX.Element {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
   return (
-    <div className='mb-3 overflow-hidden rounded-lg border border-amber-200/60 bg-amber-50/50 dark:border-amber-500/20 dark:bg-amber-500/5 text-foreground'>
+    <div className="mb-3 overflow-hidden rounded-lg border border-amber-200/60 bg-amber-50/50 dark:border-amber-500/20 dark:bg-amber-500/5 text-foreground">
       <button
-        type='button'
-        onClick={() => { setOpen((v) => !v); }}
-        className='flex w-full items-center gap-1.5 px-3 py-2 text-[11px] font-medium text-amber-700 dark:text-amber-400 hover:bg-black/5 dark:hover:bg-white/5 transition-colors'
+        type="button"
+        onClick={() => {
+          setOpen((v) => !v);
+        }}
+        className="flex w-full items-center gap-1.5 px-3 py-2 text-[11px] font-medium text-amber-700 dark:text-amber-400 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
       >
         <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', open && 'rotate-180')} />
         <span>思维链 / Reasoning</span>
       </button>
       {open && (
-        <div className='px-3 pb-3 pt-1 max-h-80 overflow-y-auto scrollbar-thin'>
-          <MarkdownViewer content={content} className='text-[13px] text-amber-900 dark:text-amber-200' />
+        <div className="px-3 pb-3 pt-1 max-h-80 overflow-y-auto scrollbar-thin">
+          <MarkdownViewer content={content} className="text-[13px] text-amber-900 dark:text-amber-200" />
         </div>
       )}
     </div>
-  )
+  );
 }
 
 // ── 组件：系统提示词横幅（弹窗）
@@ -43,55 +45,72 @@ export function SystemBanner({ msg }: { readonly msg: ChatItem }): React.JSX.Ele
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className='mb-4 overflow-hidden rounded-xl border border-amber-200/60 bg-amber-50/50 dark:border-amber-500/20 dark:bg-amber-500/5 shadow-sm cursor-pointer hover:bg-amber-100/40 dark:hover:bg-amber-500/10 transition-colors'>
-          <div className='flex w-full items-center justify-between px-4 py-3 text-amber-700 dark:text-amber-400'>
-            <div className='flex items-center gap-2 font-mono text-[13px] font-semibold tracking-wide uppercase'>
-              <Settings2 className='h-4 w-4' />
+        <div className="mb-4 overflow-hidden rounded-xl border border-amber-200/60 bg-amber-50/50 dark:border-amber-500/20 dark:bg-amber-500/5 shadow-sm cursor-pointer hover:bg-amber-100/40 dark:hover:bg-amber-500/10 transition-colors">
+          <div className="flex w-full items-center justify-between px-4 py-3 text-amber-700 dark:text-amber-400">
+            <div className="flex items-center gap-2 font-mono text-[13px] font-semibold tracking-wide uppercase">
+              <Settings2 className="h-4 w-4" />
               System Prompt
             </div>
-            <span className='text-[10px] opacity-60'>点击查看</span>
+            <span className="text-[10px] opacity-60">点击查看</span>
           </div>
         </div>
       </DialogTrigger>
-      <DialogContent showCloseButton={false} className='flex flex-col h-[85vh] max-h-[850px] min-h-[540px] w-[95vw] sm:max-w-[960px] overflow-hidden p-0 gap-0'>
-        <DialogHeader className='flex flex-row items-start justify-between shrink-0 border-b px-8 py-5 bg-background'>
-          <div className='flex flex-col gap-1.5 text-left'>
-            <DialogTitle className='flex items-center gap-2 text-amber-700 dark:text-amber-400'>
-              <Settings2 className='h-4 w-4' />
+      <DialogContent
+        showCloseButton={false}
+        className="flex flex-col h-[85vh] max-h-[850px] min-h-[540px] w-[95vw] sm:max-w-[960px] overflow-hidden p-0 gap-0"
+      >
+        <DialogHeader className="flex flex-row items-start justify-between shrink-0 border-b px-8 py-5 bg-background">
+          <div className="flex flex-col gap-1.5 text-left">
+            <DialogTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+              <Settings2 className="h-4 w-4" />
               系统提示词 / System Prompt
             </DialogTitle>
-            <DialogDescription>
-              模型请求在发起时被注入的核心骨架设定。
-            </DialogDescription>
+            <DialogDescription>模型请求在发起时被注入的核心骨架设定。</DialogDescription>
           </div>
           <DialogClose asChild>
-            <Button variant='ghost' size='icon' className='h-8 w-8 text-muted-foreground -mr-2 mt-0.5 border-0'>
-              <X className='h-4 w-4' />
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground -mr-2 mt-0.5 border-0">
+              <X className="h-4 w-4" />
             </Button>
           </DialogClose>
         </DialogHeader>
-        <div className='flex-1 min-h-0 overflow-y-auto px-8 py-6 bg-muted/10'>
-          <MarkdownViewer content={msg.content ?? ''} className='text-[13px] leading-relaxed' />
+        <div className="flex-1 min-h-0 overflow-y-auto px-8 py-6 bg-muted/10">
+          <MarkdownViewer content={msg.content ?? ''} className="text-[13px] leading-relaxed" />
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
-function getBubbleType(item: ChatItem): { TypeIcon: React.ElementType, typeLabel: string, typeColor: string } {
+function getBubbleType(item: ChatItem): { TypeIcon: React.ElementType; typeLabel: string; typeColor: string } {
   if (item.role === 'tool') {
-    return { TypeIcon: Wrench, typeLabel: '执行结果', typeColor: 'text-amber-600 dark:text-amber-500 bg-amber-500/10 border-amber-500/20' }
+    return {
+      TypeIcon: Wrench,
+      typeLabel: '执行结果',
+      typeColor: 'text-amber-600 dark:text-amber-500 bg-amber-500/10 border-amber-500/20',
+    };
   }
   if (item.role === 'assistant' && item.tool_calls && item.tool_calls.length > 0) {
-    return { TypeIcon: Blocks, typeLabel: '工具调用', typeColor: 'text-purple-600 dark:text-purple-500 bg-purple-500/10 border-purple-500/20' }
+    return {
+      TypeIcon: Blocks,
+      typeLabel: '工具调用',
+      typeColor: 'text-purple-600 dark:text-purple-500 bg-purple-500/10 border-purple-500/20',
+    };
   }
   if (item.role === 'user' && typeof item.content === 'string' && item.content.includes('[image_url]')) {
-    return { TypeIcon: ImageIcon, typeLabel: '图片', typeColor: 'text-blue-600 dark:text-blue-500 bg-blue-500/10 border-blue-500/20' }
+    return {
+      TypeIcon: ImageIcon,
+      typeLabel: '图片',
+      typeColor: 'text-blue-600 dark:text-blue-500 bg-blue-500/10 border-blue-500/20',
+    };
   }
   if (item.reasoning_content != null && item.reasoning_content !== '') {
-    return { TypeIcon: MessageSquare, typeLabel: '思考过程', typeColor: 'text-indigo-600 dark:text-indigo-500 bg-indigo-500/10 border-indigo-500/20' }
+    return {
+      TypeIcon: MessageSquare,
+      typeLabel: '思考过程',
+      typeColor: 'text-indigo-600 dark:text-indigo-500 bg-indigo-500/10 border-indigo-500/20',
+    };
   }
-  return { TypeIcon: FileText, typeLabel: '文本', typeColor: 'text-muted-foreground bg-muted/30 border-border/50' }
+  return { TypeIcon: FileText, typeLabel: '文本', typeColor: 'text-muted-foreground bg-muted/30 border-border/50' };
 }
 
 // ── 组件：IM 聊天气泡
@@ -108,20 +127,25 @@ export function ChatBubble({
   readonly toolCallMap: Map<string, AuditToolCall>;
   readonly toolResponseMap: Map<string, string>;
 }): React.JSX.Element {
-  const Icon = item.icon
-  const isRight = item.isRight
+  const Icon = item.icon;
+  const isRight = item.isRight;
 
-  const { TypeIcon, typeLabel, typeColor } = getBubbleType(item)
+  const { TypeIcon, typeLabel, typeColor } = getBubbleType(item);
 
   const TypeBadge = (
-    <div className={cn('flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-medium shadow-sm transition-colors', typeColor)}>
-      <TypeIcon className='h-3 w-3' />
+    <div
+      className={cn(
+        'flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-medium shadow-sm transition-colors',
+        typeColor,
+      )}
+    >
+      <TypeIcon className="h-3 w-3" />
       <span>{typeLabel}</span>
     </div>
-  )
+  );
 
-  const bubbleBg = 'bg-card border border-border/60 shadow-sm text-foreground'
-  const borderRadius = 'rounded-xl'
+  const bubbleBg = 'bg-card border border-border/60 shadow-sm text-foreground';
+  const borderRadius = 'rounded-xl';
 
   let marginTopStr = '40px';
   if (isMerged) {
@@ -136,12 +160,12 @@ export function ChatBubble({
       style={{ marginTop: marginTopStr }}
     >
       {!isRight && (
-        <div className='flex flex-col items-center mt-1 shrink-0'>
+        <div className="flex flex-col items-center mt-1 shrink-0">
           {isMerged ? (
-            <div className='w-8 h-8' />
+            <div className="w-8 h-8" />
           ) : (
-            <div className='flex h-8 w-8 items-center justify-center rounded-full bg-background border shadow-sm text-foreground overflow-hidden'>
-              <Icon className='h-4 w-4 text-muted-foreground' />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-background border shadow-sm text-foreground overflow-hidden">
+              <Icon className="h-4 w-4 text-muted-foreground" />
             </div>
           )}
         </div>
@@ -152,23 +176,23 @@ export function ChatBubble({
         style={{ width: '70%' }}
       >
         {!isMerged && (
-          <div className='mb-1.5 flex items-center'>
-            <span className='text-xs font-semibold text-foreground opacity-80 pl-1 pr-1'>{item.nameLabel}</span>
+          <div className="mb-1.5 flex items-center">
+            <span className="text-xs font-semibold text-foreground opacity-80 pl-1 pr-1">{item.nameLabel}</span>
           </div>
         )}
 
-        <div className='mb-1.5 flex items-center'>
-          {TypeBadge}
-        </div>
+        <div className="mb-1.5 flex items-center">{TypeBadge}</div>
 
         <div
           className={cn(
             'px-3 py-2 text-[13px] text-left leading-relaxed break-words transition-all w-full flex-none',
             bubbleBg,
-            borderRadius
+            borderRadius,
           )}
         >
-          {item.reasoning_content != null && item.reasoning_content !== '' && <ReasoningBlock content={item.reasoning_content} />}
+          {item.reasoning_content != null && item.reasoning_content !== '' && (
+            <ReasoningBlock content={item.reasoning_content} />
+          )}
 
           {item.role === 'tool' && (
             <Dialog>
@@ -176,7 +200,7 @@ export function ChatBubble({
                 <ToolInteractionTrigger
                   toolName={item.toolName ?? '工具响应'}
                   callId={item.tool_call_id}
-                  defaultTab='response'
+                  defaultTab="response"
                 />
               </DialogTrigger>
               <ToolInteractionDialog
@@ -184,31 +208,35 @@ export function ChatBubble({
                 toolCall={item.tool_call_id == null ? undefined : toolCallMap.get(item.tool_call_id)}
                 toolResponse={item.content}
                 callId={item.tool_call_id}
-                defaultTab='response'
+                defaultTab="response"
               />
             </Dialog>
           )}
           {item.role !== 'tool' && item.content != null && item.content !== '' && (
-            <MarkdownViewer content={item.content} className='text-[13px] leading-relaxed' />
+            <MarkdownViewer content={item.content} className="text-[13px] leading-relaxed" />
           )}
 
           {item.tool_calls != null && item.tool_calls.length > 0 && (
-            <div className={cn('flex flex-col gap-1', (item.content != null && item.content !== '' || item.reasoning_content != null && item.reasoning_content !== '') ? 'mt-1' : 'mt-0')}>
+            <div
+              className={cn(
+                'flex flex-col gap-1',
+                (item.content != null && item.content !== '') ||
+                  (item.reasoning_content != null && item.reasoning_content !== '')
+                  ? 'mt-1'
+                  : 'mt-0',
+              )}
+            >
               {item.tool_calls.map((tc) => (
                 <Dialog key={tc.id}>
                   <DialogTrigger asChild>
-                    <ToolInteractionTrigger
-                      toolName={tc.function.name}
-                      callId={tc.id}
-                      defaultTab='request'
-                    />
+                    <ToolInteractionTrigger toolName={tc.function.name} callId={tc.id} defaultTab="request" />
                   </DialogTrigger>
                   <ToolInteractionDialog
                     toolName={tc.function.name}
                     toolCall={tc}
                     toolResponse={toolResponseMap.get(tc.id)}
                     callId={tc.id}
-                    defaultTab='request'
+                    defaultTab="request"
                   />
                 </Dialog>
               ))}
@@ -218,16 +246,16 @@ export function ChatBubble({
       </div>
 
       {isRight && (
-        <div className='flex flex-col items-center mt-1 shrink-0'>
+        <div className="flex flex-col items-center mt-1 shrink-0">
           {isMerged ? (
-            <div className='w-8 h-8' />
+            <div className="w-8 h-8" />
           ) : (
-            <div className='flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm overflow-hidden'>
-              <Icon className='h-4 w-4' />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm overflow-hidden">
+              <Icon className="h-4 w-4" />
             </div>
           )}
         </div>
       )}
     </div>
-  )
+  );
 }

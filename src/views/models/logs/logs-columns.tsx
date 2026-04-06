@@ -1,35 +1,34 @@
-import { type ColumnDef } from '@tanstack/react-table'
-import { useTranslation } from 'react-i18next'
-import { Badge } from '@/components/ui/Badge'
-import { DataTableColumnHeader } from '@/components/data-table'
-import { ProviderIcon, Gemini, DeepSeek, Volcengine, Anthropic, OpenAI } from '@lobehub/icons'
-import type { RequestLog } from '@/types'
-import { LogsRowActions } from './logs-row-actions'
-import { Checkbox } from '@/components/ui/Checkbox'
+import { Anthropic, DeepSeek, Gemini, OpenAI, ProviderIcon, Volcengine } from '@lobehub/icons';
+import type { ColumnDef } from '@tanstack/react-table';
+import { useTranslation } from 'react-i18next';
+import { DataTableColumnHeader } from '@/components/data-table';
+import { Badge } from '@/components/ui/Badge';
+import { Checkbox } from '@/components/ui/Checkbox';
+import type { RequestLog } from '@/types';
+import { LogsRowActions } from './logs-row-actions';
 
 function formatDateTime(dateStr: string): React.JSX.Element {
-  const d = new Date(dateStr)
+  const d = new Date(dateStr);
   return (
-    <div className='flex flex-col text-[11px] font-mono leading-tight text-muted-foreground'>
+    <div className="flex flex-col text-[11px] font-mono leading-tight text-muted-foreground">
       <span>{d.toLocaleDateString()}</span>
       <span>{d.toLocaleTimeString()}</span>
     </div>
-  )
+  );
 }
 
 export function useLogsColumns(): ColumnDef<RequestLog>[] {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   const columns: ColumnDef<RequestLog>[] = [
     {
       id: 'select',
       header: ({ table }) => (
         <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() ? 'indeterminate' : false)
-          }
-          onCheckedChange={(value) => { table.toggleAllPageRowsSelected(value === true) }}
+          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() ? 'indeterminate' : false)}
+          onCheckedChange={(value) => {
+            table.toggleAllPageRowsSelected(value === true);
+          }}
           aria-label={t('common.selectAll', 'Select all')}
         />
       ),
@@ -37,7 +36,9 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
-          onCheckedChange={(value) => { row.toggleSelected(value === true) }}
+          onCheckedChange={(value) => {
+            row.toggleSelected(value === true);
+          }}
           aria-label={t('common.selectRow', 'Select row')}
         />
       ),
@@ -46,11 +47,9 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
     },
     {
       accessorKey: 'id',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('modelsPage.logs.id', 'ID')} />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.id', 'ID')} />,
       cell: ({ row }) => (
-        <div className='w-[70px] truncate font-mono text-xs text-muted-foreground' title={row.original.id}>
+        <div className="w-[70px] truncate font-mono text-xs text-muted-foreground" title={row.original.id}>
           {row.original.id.slice(0, 8)}
         </div>
       ),
@@ -59,153 +58,175 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
     },
     {
       id: 'request_model',
-      accessorFn: (row) => (row.gateway_context?.requestModel != null && row.gateway_context.requestModel !== '' ? row.gateway_context.requestModel : '-'),
+      accessorFn: (row) =>
+        row.gateway_context?.requestModel != null && row.gateway_context.requestModel !== ''
+          ? row.gateway_context.requestModel
+          : '-',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.requestModel', 'Virtual Model')} />
       ),
       meta: { className: 'ps-1', tdClassName: 'ps-4' },
       cell: ({ row }): React.JSX.Element => {
-        const val = row.original.gateway_context?.requestModel
-        return <span className='truncate font-mono font-bold text-xs'>{val != null && val !== '' ? val : '-'}</span>
+        const val = row.original.gateway_context?.requestModel;
+        return <span className="truncate font-mono font-bold text-xs">{val != null && val !== '' ? val : '-'}</span>;
       },
       enableSorting: true,
       enableColumnFilter: false,
     },
     {
       id: 'mode',
-      accessorFn: (row) => row.gateway_context?.stream === true ? 'stream' : 'non-stream',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('modelsPage.logs.mode', 'Mode')} />
-      ),
+      accessorFn: (row) => (row.gateway_context?.stream === true ? 'stream' : 'non-stream'),
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.mode', 'Mode')} />,
       meta: { className: 'ps-1', tdClassName: 'ps-4' },
       cell: ({ row }): React.JSX.Element => {
-        const isStream = row.original.gateway_context?.stream === true
+        const isStream = row.original.gateway_context?.stream === true;
         return (
-          <Badge variant='outline' className={isStream ? 'border-blue-200 text-blue-600 bg-blue-50/50 dark:bg-blue-500/10 dark:border-blue-500/20 dark:text-blue-400' : 'text-muted-foreground'}>
+          <Badge
+            variant="outline"
+            className={
+              isStream
+                ? 'border-blue-200 text-blue-600 bg-blue-50/50 dark:bg-blue-500/10 dark:border-blue-500/20 dark:text-blue-400'
+                : 'text-muted-foreground'
+            }
+          >
             {isStream ? t('modelsPage.logs.stream', 'Stream') : t('modelsPage.logs.nonStream', 'Non-Stream')}
           </Badge>
-        )
+        );
       },
       enableSorting: true,
     },
     {
       id: 'source',
-      accessorFn: (row) => (row.gateway_context?.userFormat != null && row.gateway_context.userFormat !== '' ? row.gateway_context.userFormat : '-'),
+      accessorFn: (row) =>
+        row.gateway_context?.userFormat != null && row.gateway_context.userFormat !== ''
+          ? row.gateway_context.userFormat
+          : '-',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.userFormat', 'Client Format')} />
       ),
       meta: { className: 'ps-1 w-32', tdClassName: 'ps-4' },
       cell: ({ row }): React.JSX.Element => {
-        const fmt = row.original.gateway_context?.userFormat
-        if (fmt == null || fmt === '') return <span className='text-muted-foreground'>-</span>
-        
+        const fmt = row.original.gateway_context?.userFormat;
+        if (fmt == null || fmt === '') {
+          return <span className="text-muted-foreground">-</span>;
+        }
+
         let label = fmt;
         switch (fmt) {
-        case 'openaicompat': {
-        label = 'OpenAI Compat';
-        break;
-        }
-        case 'anthropic': {
-        label = 'Anthropic';
-        break;
-        }
-        case 'gemini': { {
-        label = 'Gemini';
-        // No default
-        }
-        break;
-        }
+          case 'openaicompat': {
+            label = 'OpenAI Compat';
+            break;
+          }
+          case 'anthropic': {
+            label = 'Anthropic';
+            break;
+          }
+          case 'gemini': {
+            label = 'Gemini';
+            break;
+          }
         }
         let iconNode: React.ReactNode;
         switch (fmt) {
           case 'anthropic': {
-            iconNode = <Anthropic size={12} className='fill-current' />;
+            iconNode = <Anthropic size={12} className="fill-current" />;
             break;
           }
           case 'openaicompat': {
-            iconNode = <OpenAI size={12} className='fill-current' />;
+            iconNode = <OpenAI size={12} className="fill-current" />;
             break;
           }
           case 'gemini': {
-            iconNode = <Gemini size={12} className='fill-current' />;
+            iconNode = <Gemini size={12} className="fill-current" />;
             break;
           }
           default: {
-
-            iconNode = <ProviderIcon provider={fmt} size={12} type='mono' className='fill-current' />;
+            iconNode = <ProviderIcon provider={fmt} size={12} type="mono" className="fill-current" />;
             break;
           }
         }
 
         return (
-          <div className='flex items-center gap-1.5'>
-            <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] border bg-background text-muted-foreground shadow-sm'>
+          <div className="flex items-center gap-1.5">
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] border bg-background text-muted-foreground shadow-sm">
               {iconNode}
             </span>
-            <span className='truncate text-xs text-foreground max-w-[110px]' title={label}>{label}</span>
+            <span className="truncate text-xs text-foreground max-w-[110px]" title={label}>
+              {label}
+            </span>
           </div>
-        )
+        );
       },
       enableSorting: true,
     },
     {
       id: 'ip',
       accessorKey: 'ip',
-      accessorFn: (row) => (row.gateway_context?.ip != null && row.gateway_context.ip !== '' ? row.gateway_context.ip : '-'),
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('modelsPage.logs.ip', 'IP')} />
-      ),
+      accessorFn: (row) =>
+        row.gateway_context?.ip != null && row.gateway_context.ip !== '' ? row.gateway_context.ip : '-',
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.ip', 'IP')} />,
       meta: { className: 'ps-1 w-24', tdClassName: 'ps-4' },
       cell: ({ row }): React.JSX.Element => {
-        const ip = row.original.gateway_context?.ip
-        return <span className='font-mono text-[11px] text-muted-foreground'>{ip != null && ip !== '' ? ip : '-'}</span>
+        const ip = row.original.gateway_context?.ip;
+        return (
+          <span className="font-mono text-[11px] text-muted-foreground">{ip != null && ip !== '' ? ip : '-'}</span>
+        );
       },
       enableSorting: false,
     },
     {
       id: 'provider_id',
-      accessorFn: (row) => (row.gateway_context?.route?.providerId != null && row.gateway_context.route.providerId !== '' ? row.gateway_context.route.providerId : '-'),
+      accessorFn: (row) =>
+        row.gateway_context?.route?.providerId != null && row.gateway_context.route.providerId !== ''
+          ? row.gateway_context.route.providerId
+          : '-',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.providerKind', 'Provider')} />
       ),
       meta: { className: 'ps-1 w-32', tdClassName: 'ps-4' },
       cell: ({ row }): React.JSX.Element => {
-        const route = row.original.gateway_context?.route
-        const kindValue = route?.providerKind
+        const route = row.original.gateway_context?.route;
+        const kindValue = route?.providerKind;
         let providerName = kindValue;
-        if (route?.providerName != null && route.providerName !== '') providerName = route.providerName;
-        else if (route?.providerId != null && route.providerId !== '') providerName = route.providerId;
+        if (route?.providerName != null && route.providerName !== '') {
+          providerName = route.providerName;
+        } else if (route?.providerId != null && route.providerId !== '') {
+          providerName = route.providerId;
+        }
 
-        if (kindValue == null || kindValue === '') return <span className='text-muted-foreground'>-</span>
+        if (kindValue == null || kindValue === '') {
+          return <span className="text-muted-foreground">-</span>;
+        }
         let iconNode: React.ReactNode;
         switch (kindValue) {
           case 'gemini': {
-            iconNode = <Gemini size={12} className='fill-current' />;
+            iconNode = <Gemini size={12} className="fill-current" />;
             break;
           }
           case 'deepseek': {
-            iconNode = <DeepSeek size={12} className='fill-current' />;
+            iconNode = <DeepSeek size={12} className="fill-current" />;
             break;
           }
           case 'volcengine': {
-            iconNode = <Volcengine size={12} className='fill-current' />;
+            iconNode = <Volcengine size={12} className="fill-current" />;
             break;
           }
           default: {
-
-            iconNode = <ProviderIcon provider={kindValue} size={12} type='mono' className='fill-current' />;
+            iconNode = <ProviderIcon provider={kindValue} size={12} type="mono" className="fill-current" />;
             break;
           }
         }
 
         return (
-          <div className='flex items-center gap-1.5'>
-            <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] border bg-background text-muted-foreground shadow-sm'>
+          <div className="flex items-center gap-1.5">
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] border bg-background text-muted-foreground shadow-sm">
               {iconNode}
             </span>
-            <span className='truncate text-xs text-foreground max-w-[110px]' title={providerName}>{providerName}</span>
+            <span className="truncate text-xs text-foreground max-w-[110px]" title={providerName}>
+              {providerName}
+            </span>
           </div>
-        )
+        );
       },
       enableSorting: true,
     },
@@ -213,87 +234,102 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       id: 'api_key',
       accessorFn: (row): string => {
         const ctx = row.gateway_context;
-        if (ctx?.apiKeyName != null && ctx.apiKeyName !== '') return ctx.apiKeyName;
-        if (ctx?.apiKeyPrefix != null && ctx.apiKeyPrefix !== '') return ctx.apiKeyPrefix;
+        if (ctx?.apiKeyName != null && ctx.apiKeyName !== '') {
+          return ctx.apiKeyName;
+        }
+        if (ctx?.apiKeyPrefix != null && ctx.apiKeyPrefix !== '') {
+          return ctx.apiKeyPrefix;
+        }
         return '-';
       },
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('modelsPage.logs.apiKey', 'API Key')} />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.apiKey', 'API Key')} />,
       meta: { className: 'ps-1', tdClassName: 'ps-4' },
       cell: ({ row }): React.JSX.Element => {
-        const ctx = row.original.gateway_context
-        const name = ctx?.apiKeyName
-        return <span className='text-[11px] font-medium'>{name != null && name !== '' ? name : '-'}</span>
+        const ctx = row.original.gateway_context;
+        const name = ctx?.apiKeyName;
+        return <span className="text-[11px] font-medium">{name != null && name !== '' ? name : '-'}</span>;
       },
       enableSorting: false,
     },
     {
       id: 'status',
       accessorFn: (row) => row.status,
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('modelsPage.logs.status', 'Status')} />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.status', 'Status')} />,
       meta: { className: 'ps-1 w-20', tdClassName: 'ps-4' },
       cell: ({ row }): React.JSX.Element => {
-        const status = row.original.status
-        let variant: 'outline' | 'destructive' | 'secondary' = 'secondary'
-        if (status === 'completed') variant = 'outline'
-        else if (status === 'error') variant = 'destructive'
-        let label = t('modelsPage.logs.statusProcessing', '处理')
-        if (status === 'completed') label = t('modelsPage.logs.statusCompleted', '成功');
-        else if (status === 'error') label = t('modelsPage.logs.statusError', '失败');
+        const status = row.original.status;
+        let variant: 'outline' | 'destructive' | 'secondary' = 'secondary';
+        if (status === 'completed') {
+          variant = 'outline';
+        } else if (status === 'error') {
+          variant = 'destructive';
+        }
+        let label = t('modelsPage.logs.statusProcessing', '处理');
+        if (status === 'completed') {
+          label = t('modelsPage.logs.statusCompleted', '成功');
+        } else if (status === 'error') {
+          label = t('modelsPage.logs.statusError', '失败');
+        }
 
         return (
-          <Badge variant={variant} className={status === 'completed' ? 'border-green-300 text-green-700 bg-green-50/50 dark:border-green-900 dark:text-green-400 dark:bg-green-900/20' : ''}>
+          <Badge
+            variant={variant}
+            className={
+              status === 'completed'
+                ? 'border-green-300 text-green-700 bg-green-50/50 dark:border-green-900 dark:text-green-400 dark:bg-green-900/20'
+                : ''
+            }
+          >
             {label}
           </Badge>
-        )
+        );
       },
       enableSorting: true,
     },
     {
       id: 'tokens',
       accessorFn: (row) => row.gateway_context?.response?.usage?.total_tokens ?? 0,
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('modelsPage.logs.tokens', 'Token')} />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.tokens', 'Token')} />,
       meta: { className: 'ps-1 w-24', tdClassName: 'ps-4' },
       cell: ({ row }): React.JSX.Element => {
-        const usage = row.original.gateway_context?.response?.usage
-        if (usage == null || usage.total_tokens === 0) return <span className='text-muted-foreground'>-</span>
-        const total = usage.total_tokens
-        const p = usage.prompt_tokens
-        const c = usage.completion_tokens
+        const usage = row.original.gateway_context?.response?.usage;
+        if (usage == null || usage.total_tokens === 0) {
+          return <span className="text-muted-foreground">-</span>;
+        }
+        const total = usage.total_tokens;
+        const p = usage.prompt_tokens;
+        const c = usage.completion_tokens;
         return (
-          <div className='flex flex-col text-[11px] font-mono'>
-            <span className='font-bold text-foreground'>{total}</span>
-            <span className='text-muted-foreground whitespace-nowrap tracking-tighter'>
+          <div className="flex flex-col text-[11px] font-mono">
+            <span className="font-bold text-foreground">{total}</span>
+            <span className="text-muted-foreground whitespace-nowrap tracking-tighter">
               ↑{p} | ↓{c}
             </span>
           </div>
-        )
+        );
       },
       enableSorting: true,
     },
     {
       id: 'cacheMode',
       accessorFn: (row): number => {
-        const usage = row.gateway_context?.response?.usage
-        if (usage == null || usage.prompt_tokens === 0) return 0
-        return (usage.cached_tokens ?? 0) / usage.prompt_tokens
+        const usage = row.gateway_context?.response?.usage;
+        if (usage == null || usage.prompt_tokens === 0) {
+          return 0;
+        }
+        return (usage.cached_tokens ?? 0) / usage.prompt_tokens;
       },
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('modelsPage.logs.cacheRate', 'Cache')} />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.cacheRate', 'Cache')} />,
       meta: { className: 'ps-1 w-16', tdClassName: 'ps-4' },
       cell: ({ row }): React.JSX.Element => {
-        const usage = row.original.gateway_context?.response?.usage
-        const p = usage?.prompt_tokens ?? 0
-        const cached = usage?.cached_tokens ?? 0
-        if (p === 0 || cached === 0) return <span className='text-muted-foreground'>-</span>
-        const rate = Math.round((cached / p) * 100)
-        return <span className='font-mono text-[11px]'>{rate}%</span>
+        const usage = row.original.gateway_context?.response?.usage;
+        const p = usage?.prompt_tokens ?? 0;
+        const cached = usage?.cached_tokens ?? 0;
+        if (p === 0 || cached === 0) {
+          return <span className="text-muted-foreground">-</span>;
+        }
+        const rate = Math.round((cached / p) * 100);
+        return <span className="font-mono text-[11px]">{rate}%</span>;
       },
       enableSorting: true,
     },
@@ -305,36 +341,34 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       ),
       meta: { className: 'ps-1 w-20', tdClassName: 'ps-4' },
       cell: ({ row }): React.JSX.Element => {
-        const isStream = row.original.gateway_context?.stream === true
-        const ttft = row.original.gateway_context?.timing.ttft
-        const start = row.original.gateway_context?.timing.start
-        const duration = row.original.duration_ms
+        const isStream = row.original.gateway_context?.stream === true;
+        const ttft = row.original.gateway_context?.timing.ttft;
+        const start = row.original.gateway_context?.timing.start;
+        const duration = row.original.duration_ms;
         if (isStream && ttft != null && start != null) {
-          const ttftMs = Math.round(ttft - start)
+          const ttftMs = Math.round(ttft - start);
           return (
-            <div className='flex items-baseline gap-1.5'>
-              <span className='text-[11px] text-muted-foreground/80 tracking-tight'>TTFT</span>
-              <span className='font-mono text-[11px]'>{ttftMs}ms</span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-[11px] text-muted-foreground/80 tracking-tight">TTFT</span>
+              <span className="font-mono text-[11px]">{ttftMs}ms</span>
             </div>
-          )
+          );
         }
         if (duration != null) {
           return (
-            <div className='flex items-baseline gap-1.5'>
-              <span className='text-[11px] text-muted-foreground/80 tracking-tight'>E2E</span>
-              <span className='font-mono text-[11px]'>{duration}ms</span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-[11px] text-muted-foreground/80 tracking-tight">E2E</span>
+              <span className="font-mono text-[11px]">{duration}ms</span>
             </div>
-          )
+          );
         }
-        return <span className='text-muted-foreground'>-</span>
+        return <span className="text-muted-foreground">-</span>;
       },
       enableSorting: false,
     },
     {
       accessorKey: 'created_at',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('modelsPage.logs.createdAt', 'Time')} />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.createdAt', 'Time')} />,
       meta: { className: 'ps-1', tdClassName: 'ps-4' },
       cell: ({ row }): React.JSX.Element => formatDateTime(String(row.getValue('created_at') ?? '')),
       enableSorting: false,
@@ -343,7 +377,7 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       id: 'actions',
       cell: ({ row }) => <LogsRowActions row={row} />,
     },
-  ]
+  ];
 
-  return columns
+  return columns;
 }

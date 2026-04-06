@@ -1,6 +1,6 @@
 import { BadgeDollarSign, Plus, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo } from 'react';
-import type { UseFormReturn, UseFormSetValue, Path, PathValue } from 'react-hook-form';
+import type { Path, PathValue, UseFormReturn, UseFormSetValue } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { FormLabel } from '@/components/ui/Form';
