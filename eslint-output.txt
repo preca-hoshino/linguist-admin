@@ -1,0 +1,27 @@
+
+D:\Code Library\Linguist-Admin\src\views\models\logs\detail-tabs\components\ChatBubble.tsx
+   23:9   error  Unsafe assignment of an error typed value                                                   @typescript-eslint/no-unsafe-assignment
+   23:27  error  Unsafe call of a type that could not be resolved                                            @typescript-eslint/no-unsafe-call
+   29:11  error  Unsafe call of a type that could not be resolved                                            @typescript-eslint/no-unsafe-call
+   29:27  error  Unexpected any value in conditional. An explicit comparison or type conversion is required  @typescript-eslint/strict-boolean-expressions
+   33:72  error  Unsafe argument of type error typed assigned to a parameter of type `ClassValue`            @typescript-eslint/no-unsafe-argument
+   33:72  error  Unexpected any value in conditional. An explicit comparison or type conversion is required  @typescript-eslint/strict-boolean-expressions
+   36:8   error  Unexpected any value in conditional. An explicit comparison or type conversion is required  @typescript-eslint/strict-boolean-expressions
+  117:9   error  Unsafe assignment of an error typed value                                                   @typescript-eslint/no-unsafe-assignment
+  117:31  error  Unsafe call of a type that could not be resolved                                            @typescript-eslint/no-unsafe-call
+  119:9   error  Unsafe assignment of an error typed value                                                   @typescript-eslint/no-unsafe-assignment
+  119:20  error  Unsafe call of a type that could not be resolved                                            @typescript-eslint/no-unsafe-call
+  147:3   error  Unsafe call of a type that could not be resolved                                            @typescript-eslint/no-unsafe-call
+  155:9   error  Unsafe call of a type that could not be resolved                                            @typescript-eslint/no-unsafe-call
+  164:8   error  Unexpected any value in conditional. An explicit comparison or type conversion is required  @typescript-eslint/strict-boolean-expressions
+  164:21  error  Unexpected any value in conditional. An explicit comparison or type conversion is required  @typescript-eslint/strict-boolean-expressions
+  170:5   error  Unsafe assignment of an error typed value                                                   @typescript-eslint/no-unsafe-assignment
+  170:59  error  Invalid type "any" of template literal expression                                           @typescript-eslint/restrict-template-expressions
+  170:71  error  Invalid type "any" of template literal expression                                           @typescript-eslint/restrict-template-expressions
+  174:5   error  Unsafe assignment of an error typed value                                                   @typescript-eslint/no-unsafe-assignment
+
+D:\Code Library\Linguist-Admin\src\views\models\logs\detail-tabs\components\SmartContentViewer.tsx
+  121:24  error  Unsafe assignment of an error typed value  @typescript-eslint/no-unsafe-assignment
+
+鉁?20 problems (20 errors, 0 warnings)
+

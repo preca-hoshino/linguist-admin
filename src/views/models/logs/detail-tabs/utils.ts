@@ -1,26 +1,29 @@
 import { Bot, Settings2, User, Wrench } from 'lucide-react';
 import type { AuditMessage, AuditToolCall } from '@/types';
 
-// ── 响应格式嗅探
-export type ResponseType = 'json' | 'xml' | 'markdown';
-
-export function detectResponseType(raw: string): { type: ResponseType; parsed?: unknown } {
+export function detectJsonContent(raw: string): { isJson: boolean; parsed?: unknown } {
   const s = raw.trim();
-  // 1. JSON：尝试解析，成功且是对象/数组则判定
   try {
     const parsed: unknown = JSON.parse(s);
     if (parsed !== null && typeof parsed === 'object') {
-      return { type: 'json', parsed };
+      return { isJson: true, parsed };
     }
   } catch {
     /* not JSON */
   }
-  // 2. XML：首个非空字符是 `<`，且含有匹配的闭合标签
-  if (s.startsWith('<') && /<\/\w|\/>/.test(s)) {
-    return { type: 'xml' };
-  }
-  // 3. 兜底 Markdown
-  return { type: 'markdown' };
+  return { isJson: false };
+}
+
+export function exportContent(content: string, fileName: string): void {
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 // ── 聊天消息数据结构

@@ -1,18 +1,13 @@
-import { ChevronRight, Wrench, X, Code, Eye, Download } from 'lucide-react';
-import { forwardRef, useMemo, useState } from 'react';
+import { ChevronRight, Wrench, X } from 'lucide-react';
+import { forwardRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import JsonView from 'react18-json-view';
 import { CopyableId } from '@/components/CopyableId';
-import { MarkdownViewer } from '@/components/MarkdownViewer';
-import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
-import { useTheme } from '@/providers/ThemeProvider';
-import 'react18-json-view/src/style.css';
 import type { AuditToolCall } from '@/types';
 import { cn } from '@/utils/utils';
-import { detectResponseType, type ResponseType } from '../utils';
+import { SmartContentViewer } from './SmartContentViewer';
 
 // ── 内部组件：请求与响应 Tab
 function ToolRequestTab({
@@ -107,149 +102,13 @@ function ToolRequestTab({
   );
 }
 
-function ToolResponseTab({
-  toolResponse,
-  responseType,
-  parsedJson,
-  resolvedTheme,
-  t,
-}: {
-  readonly toolResponse?: string | undefined;
-  readonly responseType: ResponseType;
-  readonly parsedJson: unknown;
-  readonly resolvedTheme: string;
-  readonly t: (k: string, f: string) => string;
-}): React.JSX.Element {
-  const [isRawView, setIsRawView] = useState(false);
-
-  const handleExport = (): void => {
-    if (toolResponse == null || toolResponse === '') {
-      return;
-    }
-    const blob = new Blob([toolResponse], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    let ext = '.md';
-    if (responseType === 'json') {
-      ext = '.json';
-    }
-    if (responseType === 'xml') {
-      ext = '.xml';
-    }
-    link.download = `tool-response${ext}`;
-    document.body.append(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
-
+function ToolResponseTab({ toolResponse }: { readonly toolResponse?: string | undefined }): React.JSX.Element {
   return (
-    <TabsContent value="response" className="flex-1 min-h-0 m-0 flex flex-col overflow-hidden">
-      {toolResponse == null || toolResponse === '' ? (
-        <div className="flex h-full items-center justify-center text-sm text-muted-foreground/50 italic">
-          {t('modelsPage.logs.detail.noToolResult', '暂无工具返回结果')}
-        </div>
-      ) : (
-        <>
-          <div className="flex items-center gap-3 shrink-0 mb-3">
-            <Badge
-              variant="outline"
-              className={cn(
-                'font-mono text-[11px] px-2 py-0 h-5 gap-1.5',
-                responseType === 'json' && 'border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/5',
-                responseType === 'xml' && 'border-violet-500/30 text-violet-600 dark:text-violet-400 bg-violet-500/5',
-                responseType === 'markdown' && 'border-blue-500/30 text-blue-600 dark:text-blue-400 bg-blue-500/5',
-              )}
-            >
-              <span
-                className={cn(
-                  'h-1.5 w-1.5 rounded-full shrink-0',
-                  responseType === 'json' && 'bg-amber-500',
-                  responseType === 'xml' && 'bg-violet-500',
-                  responseType === 'markdown' && 'bg-blue-500',
-                )}
-              />
-              {responseType.toUpperCase()}
-            </Badge>
-            <span className="text-[11px] text-muted-foreground/60 tabular-nums">
-              {((): string => {
-                const len = toolResponse.length;
-                const cjk = (toolResponse.match(/[\u4E00-\u9FFF\u3400-\u4DBF\u{20000}-\u{2A6DF}]/gu) ?? []).length;
-                const words = cjk + Math.round((len - cjk) / 5);
-                let sizeStr = `${len} B`;
-                if (len >= 1024 * 1024) {
-                  sizeStr = `${(len / 1024 / 1024).toFixed(2)} MB`;
-                } else if (len >= 1024) {
-                  sizeStr = `${(len / 1024).toFixed(1)} KB`;
-                }
-                return `~${words.toLocaleString()} ${t('common.words', '词')} · ${sizeStr}`;
-              })()}
-            </span>
-            <div className="flex-1" />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6 text-muted-foreground hover:text-foreground shrink-0"
-              onClick={() => {
-                setIsRawView(!isRawView);
-              }}
-              title={
-                isRawView
-                  ? t('modelsPage.logs.detail.markdownView', '预览视图')
-                  : t('modelsPage.logs.detail.rawView', '原始视图')
-              }
-            >
-              {isRawView ? <Eye className="h-3.5 w-3.5" /> : <Code className="h-3.5 w-3.5" />}
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6 text-muted-foreground hover:text-foreground shrink-0"
-              onClick={handleExport}
-              title={t('modelsPage.logs.detail.export', '导出')}
-            >
-              <Download className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-          <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin">
-            <div className="w-full rounded-md border border-border/40 bg-card px-6 py-4">
-              {((): React.JSX.Element => {
-                if (isRawView) {
-                  return (
-                    <pre className="text-[13px] font-mono leading-relaxed whitespace-pre-wrap break-words text-foreground/90 overflow-x-auto">
-                      {toolResponse}
-                    </pre>
-                  );
-                }
-                if (responseType === 'json' && parsedJson !== undefined) {
-                  return (
-                    <JsonView
-                      src={parsedJson}
-                      collapsed={2}
-                      enableClipboard
-                      displaySize
-                      theme={resolvedTheme === 'dark' ? 'a11y' : 'default'}
-                      style={{
-                        fontSize: '13px',
-                        lineHeight: '1.6',
-                        fontFamily: 'var(--font-mono, ui-monospace, monospace)',
-                      }}
-                    />
-                  );
-                }
-                return (
-                  <MarkdownViewer
-                    content={toolResponse}
-                    enableXmlHighlight={responseType === 'xml'}
-                    className="text-[13px] leading-relaxed"
-                  />
-                );
-              })()}
-            </div>
-          </div>
-        </>
-      )}
+    <TabsContent
+      value="response"
+      className="flex-1 min-h-0 m-0 flex flex-col overflow-hidden bg-background border rounded-md"
+    >
+      <SmartContentViewer content={toolResponse} exportFileName="tool-response" />
     </TabsContent>
   );
 }
@@ -290,14 +149,7 @@ export function ToolInteractionDialog({
     return { parsedArgs: null, isJsonArgs: false };
   }, [toolCall]);
 
-  const { resolvedTheme } = useTheme();
-  const { responseType, parsedJson } = useMemo(() => {
-    if (toolResponse == null || toolResponse === '') {
-      return { responseType: 'markdown' as ResponseType, parsedJson: undefined };
-    }
-    const result = detectResponseType(toolResponse);
-    return { responseType: result.type, parsedJson: result.parsed };
-  }, [toolResponse]);
+  // removed unused useTheme and detectResponseType
 
   return (
     <DialogContent
@@ -344,13 +196,7 @@ export function ToolInteractionDialog({
           </div>
 
           <ToolRequestTab toolCall={toolCall} isJsonArgs={isJsonArgs} parsedArgs={parsedArgs} t={t} />
-          <ToolResponseTab
-            toolResponse={toolResponse}
-            responseType={responseType}
-            parsedJson={parsedJson}
-            resolvedTheme={resolvedTheme}
-            t={t}
-          />
+          <ToolResponseTab toolResponse={toolResponse} />
         </div>
       </Tabs>
     </DialogContent>
