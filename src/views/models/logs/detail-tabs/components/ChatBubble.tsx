@@ -1,5 +1,5 @@
 import { DialogTrigger } from '@radix-ui/react-dialog';
-import { Blocks, ChevronDown, FileText, Image as ImageIcon, MessageSquare, Settings2, Wrench, X } from 'lucide-react';
+import { Blocks, ChevronDown, FileText, Image as ImageIcon, Settings2, Wrench, X } from 'lucide-react';
 import { useState } from 'react';
 import { MarkdownViewer } from '@/components/MarkdownViewer';
 import { Button } from '@/components/ui/Button';
@@ -101,13 +101,6 @@ function getBubbleType(item: ChatItem): { TypeIcon: React.ElementType; typeLabel
       TypeIcon: ImageIcon,
       typeLabel: '图片',
       typeColor: 'text-blue-600 dark:text-blue-500 bg-blue-500/10 border-blue-500/20',
-    };
-  }
-  if (item.reasoning_content != null && item.reasoning_content !== '') {
-    return {
-      TypeIcon: MessageSquare,
-      typeLabel: '思考过程',
-      typeColor: 'text-indigo-600 dark:text-indigo-500 bg-indigo-500/10 border-indigo-500/20',
     };
   }
   return { TypeIcon: FileText, typeLabel: '文本', typeColor: 'text-muted-foreground bg-muted/30 border-border/50' };
