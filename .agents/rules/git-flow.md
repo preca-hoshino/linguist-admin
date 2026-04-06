@@ -22,3 +22,4 @@ trigger: always_on
 
 ## 4. 合并规范 (Merging)
 - 代码通过所有本地验证后，需在获得用户明确同意的前提下，才能根据 [CONTRIBUTING.md](../CONTRIBUTING.md) 的标准流程（建议通过 PR 流程）合并入目标分支。
+- **发起 PR 请求时，PR 标题也必须严格遵循提交规范。**
