@@ -34,6 +34,38 @@ interface TagPair {
   endLength: number;
 }
 
+const COMMON_HTML_TAGS = new Set([
+  'a',
+  'b',
+  'blockquote',
+  'br',
+  'code',
+  'div',
+  'em',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'hr',
+  'i',
+  'img',
+  'li',
+  'ol',
+  'p',
+  'pre',
+  'span',
+  'strong',
+  'table',
+  'tbody',
+  'td',
+  'th',
+  'thead',
+  'tr',
+  'ul',
+]);
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function parseSegments(raw: string): Segment[] {
   const segments: Segment[] = [];
@@ -60,6 +92,11 @@ function parseSegments(raw: string): Segment[] {
     const isClosing = tagStr.startsWith('</');
     const isSelfClosing = tagStr.endsWith('/>');
     const tagName = match[3] as string;
+
+    // 忽略标准 HTML 标签，只把未知的自定义标记/大段 XML 提取为折叠块
+    if (COMMON_HTML_TAGS.has(tagName.toLowerCase())) {
+      continue;
+    }
 
     if (isSelfClosing) {
       continue;
