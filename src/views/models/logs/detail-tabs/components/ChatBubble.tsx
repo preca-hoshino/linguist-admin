@@ -1,7 +1,10 @@
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { Blocks, ChevronDown, FileText, Image as ImageIcon, Settings2, Wrench, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import JsonView from 'react18-json-view';
 import { MarkdownViewer } from '@/components/MarkdownViewer';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import {
   Dialog,
@@ -11,10 +14,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
+import { useTheme } from '@/providers/ThemeProvider';
 import type { AuditToolCall } from '@/types';
 import { cn } from '@/utils/utils';
-import type { ChatItem } from '../utils';
+import { detectResponseType, type ChatItem } from '../utils';
 import { ToolInteractionButton, ToolInteractionDialog, ToolInteractionTrigger } from './ToolInteractionDialog';
+import 'react18-json-view/src/style.css';
 
 // ── 组件：思维链推理块
 export function ReasoningBlock({ content }: { readonly content: string }): React.JSX.Element {
@@ -42,6 +47,17 @@ export function ReasoningBlock({ content }: { readonly content: string }): React
 
 // ── 组件：系统提示词横幅（弹窗）
 export function SystemBanner({ msg }: { readonly msg: ChatItem }): React.JSX.Element {
+  const { t } = useTranslation();
+  const { resolvedTheme } = useTheme();
+
+  const { responseType, parsedJson } = useMemo(() => {
+    if (msg.content == null || msg.content === '') {
+      return { responseType: 'markdown' as const, parsedJson: undefined };
+    }
+    const result = detectResponseType(msg.content);
+    return { responseType: result.type, parsedJson: result.parsed };
+  }, [msg.content]);
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -81,7 +97,74 @@ export function SystemBanner({ msg }: { readonly msg: ChatItem }): React.JSX.Ele
           </div>
         </DialogHeader>
         <div className="flex-1 min-h-0 overflow-y-auto px-8 py-6 bg-muted/10">
-          <MarkdownViewer content={msg.content ?? ''} className="text-[13px] leading-relaxed" />
+          {msg.content == null || msg.content === '' ? (
+            <div className="flex h-full items-center justify-center text-sm text-muted-foreground/50 italic">
+              暂无内容
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3 min-h-full">
+              <div className="flex items-center gap-3 shrink-0">
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    'font-mono text-[11px] px-2 py-0 h-5 gap-1.5',
+                    responseType === 'json' && 'border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/5',
+                    responseType === 'xml' &&
+                      'border-violet-500/30 text-violet-600 dark:text-violet-400 bg-violet-500/5',
+                    responseType === 'markdown' && 'border-blue-500/30 text-blue-600 dark:text-blue-400 bg-blue-500/5',
+                  )}
+                >
+                  <span
+                    className={cn(
+                      'h-1.5 w-1.5 rounded-full shrink-0',
+                      responseType === 'json' && 'bg-amber-500',
+                      responseType === 'xml' && 'bg-violet-500',
+                      responseType === 'markdown' && 'bg-blue-500',
+                    )}
+                  />
+                  {responseType.toUpperCase()}
+                </Badge>
+                <span className="text-[11px] text-muted-foreground/60 tabular-nums">
+                  {((): string => {
+                    const content = msg.content ?? '';
+                    const len = content.length;
+                    const cjk = (content.match(/[\u4E00-\u9FFF\u3400-\u4DBF\u{20000}-\u{2A6DF}]/gu) ?? []).length;
+                    const words = cjk + Math.round((len - cjk) / 5);
+                    let sizeStr = `${len} B`;
+                    if (len >= 1024 * 1024) {
+                      sizeStr = `${(len / 1024 / 1024).toFixed(2)} MB`;
+                    } else if (len >= 1024) {
+                      sizeStr = `${(len / 1024).toFixed(1)} KB`;
+                    }
+                    return `~${words.toLocaleString()} ${t('common.words', '词')} · ${sizeStr}`;
+                  })()}
+                </span>
+              </div>
+
+              <div className="w-full rounded-md border border-border/40 bg-card px-6 py-4">
+                {responseType === 'json' && parsedJson !== undefined ? (
+                  <JsonView
+                    src={parsedJson}
+                    collapsed={2}
+                    enableClipboard
+                    displaySize
+                    theme={resolvedTheme === 'dark' ? 'a11y' : 'default'}
+                    style={{
+                      fontSize: '13px',
+                      lineHeight: '1.6',
+                      fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+                    }}
+                  />
+                ) : (
+                  <MarkdownViewer
+                    content={msg.content}
+                    enableXmlHighlight={responseType === 'xml'}
+                    className="text-[13px] leading-relaxed"
+                  />
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
