@@ -1,5 +1,5 @@
-import { Check, ChevronDown, Copy, Wrench, X, Zap } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { Check, Copy, Wrench, X, Zap, Search } from 'lucide-react';
+import { useCallback, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -12,6 +12,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/Dialog';
+import { Input } from '@/components/ui/Input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import type { AuditToolDefinition, AuditUserChatRequest, AuditUserChatResponse, GatewayContextSnapshot } from '@/types';
 import { cn } from '@/utils/utils';
 
@@ -116,59 +118,237 @@ function getToolInfo(tool: unknown): { name: string; desc?: string | undefined; 
   return { name, desc, schema };
 }
 
-// ── 单个工具卡片
-function ToolCard({ tool, index }: { readonly tool: unknown; readonly index: number }): React.JSX.Element {
-  const [open, setOpen] = useState(false);
+// ── Schema 解析
+function parseToolProperties(schemaObj: unknown): {
+  properties: Array<{ field: string; type: string; description: string; isRequired: boolean }>;
+  required: string[];
+} {
+  if (typeof schemaObj !== 'object' || schemaObj === null) {
+    return { properties: [], required: [] };
+  }
+  const s = schemaObj as Record<string, unknown>;
+  const properties =
+    s.properties != null && typeof s.properties === 'object' ? (s.properties as Record<string, unknown>) : {};
+  const required = (Array.isArray(s.required) ? s.required : []) as string[];
+
+  const resultList = Object.keys(properties).map((key) => {
+    const propVal = properties[key];
+    const prop = propVal != null && typeof propVal === 'object' ? (propVal as Record<string, unknown>) : {};
+    const typeStr = typeof prop.type === 'string' ? prop.type : 'any';
+    const descStr = typeof prop.description === 'string' ? prop.description : '';
+    const enumVal = prop.enum;
+    const enumList = (Array.isArray(enumVal) ? enumVal : []) as unknown[];
+
+    let finalType = typeStr;
+    if (enumList.length > 0) {
+      finalType = `${typeStr} (enum: ${enumList.map(String).join(' | ')})`;
+    }
+
+    // 如果有深层 properties，这里做个简单标记
+    if (prop.properties != null && typeof prop.properties === 'object') {
+      finalType += ' (object)';
+    }
+    if (prop.items != null && typeof prop.items === 'object') {
+      finalType += ' (array)';
+    }
+
+    return {
+      field: key,
+      type: finalType,
+      description: descStr,
+      isRequired: required.includes(key),
+    };
+  });
+  return { properties: resultList, required };
+}
+
+// ── 工具展示工作区（左右分栏）
+function ToolWorkspace({ tools }: { readonly tools: unknown[] }): React.JSX.Element {
+  const { t } = useTranslation();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedIdx, setSelectedIdx] = useState<number>(0);
+
+  const toolsInfo = useMemo(() => {
+    return tools.map((tool) => {
+      const { name, desc, schema } = getToolInfo(tool);
+      return { tool, name, desc, schema };
+    });
+  }, [tools]);
+
+  const filteredTools = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    if (q === '') {
+      return toolsInfo;
+    }
+    return toolsInfo.filter((tInfo) => {
+      return tInfo.name.toLowerCase().includes(q) || (tInfo.desc?.toLowerCase().includes(q) ?? false);
+    });
+  }, [toolsInfo, searchQuery]);
+
+  const selectedToolInfo = filteredTools[selectedIdx] ?? filteredTools[0];
   const { copied, copy } = useCopy();
+  const [showRaw, setShowRaw] = useState(false);
 
-  const { name: toolName, desc: toolDesc, schema: schemaObj } = getToolInfo(tool);
+  if (filteredTools.length === 0 && searchQuery !== '') {
+    return (
+      <div className="flex h-64 flex-col border rounded-lg bg-card overflow-hidden">
+        <div className="p-3 border-b bg-muted/20">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder={t('common.search', '搜索')}
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+              }}
+              className="pl-9 h-9"
+            />
+          </div>
+        </div>
+        <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+          {t('common.noResults', '未搜到相关内容')}
+        </div>
+      </div>
+    );
+  }
 
-  const schemaText = JSON.stringify(schemaObj ?? {}, null, 2);
+  const { name: toolName, desc: toolDesc, schema: schemaObj } = selectedToolInfo ?? {};
+  const schemaText = schemaObj == null ? '{}' : JSON.stringify(schemaObj, null, 2);
+  const { properties } = parseToolProperties(schemaObj);
+
+  // 保留全量复制与原始模式的展开状态
 
   return (
-    <div className="rounded-lg border bg-card overflow-hidden">
-      <button
-        type="button"
-        onClick={() => {
-          setOpen((v) => !v);
-        }}
-        className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-muted/30 transition-colors"
-      >
-        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-amber-50 border border-amber-200/60 text-amber-600 dark:bg-amber-500/10 dark:border-amber-500/20 dark:text-amber-400 font-mono text-[10px] font-bold">
-          {index + 1}
-        </span>
-        <span className="flex-1 min-w-0">
-          <span className="block font-mono text-sm font-semibold text-foreground truncate">{toolName}</span>
-          {toolDesc != null && toolDesc !== '' && (
-            <span className="block text-xs text-muted-foreground mt-0.5 truncate">{toolDesc}</span>
-          )}
-          {(toolDesc == null || toolDesc === '') && (
-            <span className="block text-xs text-muted-foreground/50 italic mt-0.5">无描述</span>
-          )}
-        </span>
-        <ChevronDown
-          className={cn('h-4 w-4 text-muted-foreground shrink-0 transition-transform', open && 'rotate-180')}
-        />
-      </button>
-
-      {open && (
-        <div className="border-t bg-muted/20">
-          <div className="flex items-center justify-between px-4 py-2">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-              参数 Schema
-            </span>
-            <button
-              type="button"
-              onClick={() => void copy(schemaText)}
-              className="flex items-center gap-1 rounded px-2 py-0.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            >
-              {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-              {copied ? '已复制' : '复制'}
-            </button>
+    <div className="flex flex-col sm:flex-row h-full max-h-[600px] border rounded-lg bg-card overflow-hidden">
+      {/* 左侧列表 */}
+      <div className="w-full sm:w-[280px] shrink-0 border-r flex flex-col bg-muted/10 h-[300px] sm:h-[600px]">
+        <div className="p-3 border-b bg-background sticky top-0 z-10">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder={t('common.search', '搜索')}
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setSelectedIdx(0); // 重置选择
+              }}
+              className="pl-9 h-9"
+            />
           </div>
-          <pre className="px-4 pb-4 font-mono text-xs leading-relaxed text-foreground overflow-auto max-h-80">
-            {schemaText}
-          </pre>
+        </div>
+        <div className="flex-1 overflow-y-auto scrollbar-thin p-2 space-y-1">
+          {filteredTools.map((tInfo, idx) => {
+            const isSelected = selectedIdx === idx;
+            return (
+              <button
+                // biome-ignore lint/suspicious/noArrayIndexKey: array elements might not be unique
+                key={`${tInfo.name}-${idx}`}
+                type="button"
+                onClick={() => {
+                  setSelectedIdx(idx);
+                }}
+                className={cn(
+                  'w-full text-left px-3 py-2.5 rounded-md transition-colors text-sm flex items-center gap-2',
+                  isSelected
+                    ? 'bg-amber-100 text-amber-900 font-semibold dark:bg-amber-500/20 dark:text-amber-100'
+                    : 'text-foreground hover:bg-muted/50',
+                )}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="truncate font-mono">{tInfo.name}</div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 右侧详情 */}
+      {selectedToolInfo != null && (
+        <div className="flex-1 flex flex-col min-w-0 bg-background overflow-hidden h-[400px] sm:h-auto">
+          <div className="p-5 border-b bg-muted/5 shrink-0 flex flex-col gap-2">
+            <h2 className="text-lg font-bold font-mono tracking-tight flex items-center gap-2">
+              <Wrench className="h-5 w-5 text-amber-500 shrink-0" />
+              <span className="truncate">{toolName}</span>
+            </h2>
+            <div className="text-sm text-muted-foreground leading-relaxed">
+              {toolDesc != null && toolDesc !== '' ? toolDesc : <span className="italic opacity-50">无描述</span>}
+            </div>
+          </div>
+
+          <div className="flex-1 overflow-y-auto scrollbar-thin p-5 flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold">{t('modelsPage.logs.detail.toolParameters', '参数列表')}</h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowRaw(!showRaw);
+                }}
+                className="text-xs text-muted-foreground hover:text-foreground hover:underline"
+              >
+                {showRaw ? '隐藏原始 JSON' : '查看原始 JSON'}
+              </button>
+            </div>
+
+            {properties.length > 0 ? (
+              <div className="rounded-md border bg-card overflow-hidden">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader className="bg-muted/40 whitespace-nowrap">
+                      <TableRow>
+                        <TableHead className="w-[180px]">字段 (Field)</TableHead>
+                        <TableHead className="w-[150px]">类型 (Type)</TableHead>
+                        <TableHead>描述 (Description)</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {properties.map((prop) => (
+                        <TableRow key={prop.field}>
+                          <TableCell className="font-mono text-sm font-medium">
+                            <span className={cn(prop.isRequired ? 'text-amber-600 dark:text-amber-400 font-bold' : '')}>
+                              {prop.field}
+                            </span>
+                            {prop.isRequired && <span className="ml-1 text-amber-500 font-bold">*</span>}
+                          </TableCell>
+                          <TableCell className="font-mono text-xs text-muted-foreground whitespace-nowrap">
+                            {prop.type}
+                          </TableCell>
+                          <TableCell className="text-sm text-foreground break-all sm:break-normal">
+                            {prop.description === '' ? <span className="italic opacity-30">-</span> : prop.description}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 border border-dashed rounded-md text-sm text-muted-foreground text-center bg-muted/10">
+                无参数定义或无法解析为标准属性列表
+              </div>
+            )}
+
+            {showRaw && (
+              <div className="border rounded-md bg-muted/20 flex flex-col">
+                <div className="flex items-center justify-between px-4 py-2 border-b">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    原始 Schema JSON
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => void copy(schemaText)}
+                    className="flex items-center gap-1 rounded px-2 py-0.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  >
+                    {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                    {copied ? '已复制' : '复制 JSON'}
+                  </button>
+                </div>
+                <pre className="p-4 font-mono text-xs leading-relaxed text-foreground overflow-auto max-h-[300px] scrollbar-thin">
+                  {schemaText}
+                </pre>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -376,20 +556,8 @@ export function LogToolsTab({ ctx }: LogToolsTabProps): React.JSX.Element {
           <span>{t('modelsPage.logs.detail.noToolsDefined', '本次请求未携带工具定义')}</span>
         </div>
       ) : (
-        /* 工具列表 */
-        <div className="flex flex-col gap-2">
-          {tools.map((tool: unknown, i) => {
-            const obj = typeof tool === 'object' && tool !== null ? (tool as Record<string, unknown>) : {};
-            const funcObj =
-              typeof obj.function === 'object' && obj.function !== null
-                ? (obj.function as Record<string, unknown>)
-                : null;
-            const isFunc = obj.type === 'function' && funcObj != null;
-            const toolName = extractToolName(isFunc, obj, funcObj);
-            // biome-ignore lint/suspicious/noArrayIndexKey: Array values might not be unique
-            return <ToolCard key={`${toolName}-${i}`} tool={tool} index={i} />;
-          })}
-        </div>
+        /* 工具列表工作区 */
+        <ToolWorkspace tools={tools} />
       )}
 
       {/* 本次调用结果区 */}
