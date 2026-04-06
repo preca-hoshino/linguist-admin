@@ -277,12 +277,52 @@ const getMarkdownComponents = (isDark: boolean): React.ComponentProps<typeof Rea
 
     return (
       <code
-        className="rounded-sm bg-muted/60 px-1.5 py-0.5 font-mono text-[13px] text-foreground ring-1 ring-border/30 ring-inset"
+        className="rounded-sm bg-muted px-1.5 py-0.5 font-mono text-[13px] text-foreground ring-1 ring-border/30 ring-inset"
         {...rest}
       >
         {children}
       </code>
     );
+  },
+
+  pre({ children }): React.JSX.Element {
+    return (
+      <pre className="not-prose my-3 overflow-x-auto rounded-md border border-border/50 bg-muted/40 p-4 text-[13px] leading-relaxed">
+        {children}
+      </pre>
+    );
+  },
+
+  h1({ children }): React.JSX.Element {
+    return <h1 className="text-xl font-bold text-foreground mt-4 mb-2 first:mt-0">{children}</h1>;
+  },
+  h2({ children }): React.JSX.Element {
+    return <h2 className="text-lg font-semibold text-foreground mt-3.5 mb-1.5 first:mt-0">{children}</h2>;
+  },
+  h3({ children }): React.JSX.Element {
+    return <h3 className="text-base font-semibold text-foreground mt-3 mb-1 first:mt-0">{children}</h3>;
+  },
+
+  hr(): React.JSX.Element {
+    return <hr className="my-4 border-border/50" />;
+  },
+
+  ul({ children }): React.JSX.Element {
+    return <ul className="my-2 list-disc pl-5 text-foreground space-y-1">{children}</ul>;
+  },
+  ol({ children }): React.JSX.Element {
+    return <ol className="my-2 list-decimal pl-5 text-foreground space-y-1">{children}</ol>;
+  },
+  li({ children }): React.JSX.Element {
+    return <li className="text-foreground">{children}</li>;
+  },
+
+  p({ children }): React.JSX.Element {
+    return <p className="my-1.5 text-foreground leading-relaxed first:mt-0 last:mb-0">{children}</p>;
+  },
+
+  strong({ children }): React.JSX.Element {
+    return <strong className="font-semibold text-foreground">{children}</strong>;
   },
 
   table({ children }): React.JSX.Element {

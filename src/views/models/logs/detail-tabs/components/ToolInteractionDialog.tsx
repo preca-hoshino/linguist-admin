@@ -163,7 +163,7 @@ function ToolResponseTab({
               })()}
             </span>
           </div>
-          <div className="w-full rounded-md border border-border/40 bg-background/60 px-6 py-4">
+          <div className="w-full rounded-md border border-border/40 bg-card px-6 py-4">
             {responseType === 'json' && parsedJson !== undefined ? (
               <JsonView
                 src={parsedJson}
