@@ -104,10 +104,7 @@ function ToolRequestTab({
 
 function ToolResponseTab({ toolResponse }: { readonly toolResponse?: string | undefined }): React.JSX.Element {
   return (
-    <TabsContent
-      value="response"
-      className="flex-1 min-h-0 m-0 flex flex-col overflow-hidden bg-background border rounded-md"
-    >
+    <TabsContent value="response" className="flex-1 min-h-0 m-0 flex flex-col overflow-hidden">
       <SmartContentViewer content={toolResponse} exportFileName="tool-response" />
     </TabsContent>
   );
