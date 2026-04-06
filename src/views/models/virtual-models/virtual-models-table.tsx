@@ -98,10 +98,7 @@ export function VirtualModelsTable(): React.JSX.Element {
             {row.getVisibleCells().map((cell) => (
               <TableCell
                 key={cell.id}
-                className={cn(
-                  cell.column.columnDef.meta?.className,
-                  cell.column.columnDef.meta?.tdClassName,
-                )}
+                className={cn(cell.column.columnDef.meta?.className, cell.column.columnDef.meta?.tdClassName)}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </TableCell>
@@ -145,10 +142,7 @@ export function VirtualModelsTable(): React.JSX.Element {
                   <TableHead
                     key={header.id}
                     colSpan={header.colSpan}
-                    className={cn(
-                      header.column.columnDef.meta?.className,
-                      header.column.columnDef.meta?.thClassName,
-                    )}
+                    className={cn(header.column.columnDef.meta?.className, header.column.columnDef.meta?.thClassName)}
                   >
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>

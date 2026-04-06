@@ -184,8 +184,7 @@ function BubbleContent({
   readonly toolResponseMap: Map<string, string>;
 }): React.JSX.Element {
   const hasExtraContent =
-    (item.content != null && item.content !== '') ||
-    (item.reasoning_content != null && item.reasoning_content !== '');
+    (item.content != null && item.content !== '') || (item.reasoning_content != null && item.reasoning_content !== '');
 
   return (
     <>
