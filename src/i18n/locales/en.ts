@@ -516,6 +516,9 @@ export default {
         reasoning: 'Reasoning',
         clickToView: 'Click to view',
         noContent: 'No content',
+        export: 'Export',
+        rawView: 'Raw View',
+        markdownView: 'Preview',
 
         timingStart: 'Request Received',
         timingAdapted: 'Request Adapted',

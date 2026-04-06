@@ -1,5 +1,16 @@
 import { DialogTrigger } from '@radix-ui/react-dialog';
-import { Blocks, ChevronDown, FileText, Image as ImageIcon, Settings2, Wrench, X } from 'lucide-react';
+import {
+  Blocks,
+  ChevronDown,
+  FileText,
+  Image as ImageIcon,
+  Settings2,
+  Wrench,
+  X,
+  Code,
+  Eye,
+  Download,
+} from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import JsonView from 'react18-json-view';
@@ -50,6 +61,7 @@ export function ReasoningBlock({ content }: { readonly content: string }): React
 export function SystemBanner({ msg }: { readonly msg: ChatItem }): React.JSX.Element {
   const { t } = useTranslation();
   const { resolvedTheme } = useTheme();
+  const [isRawView, setIsRawView] = useState(false);
 
   const { responseType, parsedJson } = useMemo(() => {
     if (msg.content == null || msg.content === '') {
@@ -58,6 +70,28 @@ export function SystemBanner({ msg }: { readonly msg: ChatItem }): React.JSX.Ele
     const result = detectResponseType(msg.content);
     return { responseType: result.type, parsedJson: result.parsed };
   }, [msg.content]);
+
+  const handleExport = (): void => {
+    if (msg.content == null || msg.content === '') {
+      return;
+    }
+    const blob = new Blob([msg.content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    let ext = '.md';
+    if (responseType === 'json') {
+      ext = '.json';
+    }
+    if (responseType === 'xml') {
+      ext = '.xml';
+    }
+    link.download = `system-prompt${ext}`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <Dialog>
@@ -140,30 +174,67 @@ export function SystemBanner({ msg }: { readonly msg: ChatItem }): React.JSX.Ele
                     return `~${words.toLocaleString()} ${t('common.words', '词')} · ${sizeStr}`;
                   })()}
                 </span>
+                <div className="flex-1" />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 text-muted-foreground hover:text-foreground shrink-0"
+                  onClick={() => {
+                    setIsRawView(!isRawView);
+                  }}
+                  title={
+                    isRawView
+                      ? t('modelsPage.logs.detail.markdownView', '预览视图')
+                      : t('modelsPage.logs.detail.rawView', '原始视图')
+                  }
+                >
+                  {isRawView ? <Eye className="h-3.5 w-3.5" /> : <Code className="h-3.5 w-3.5" />}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 text-muted-foreground hover:text-foreground shrink-0"
+                  onClick={handleExport}
+                  title={t('modelsPage.logs.detail.export', '导出')}
+                >
+                  <Download className="h-3.5 w-3.5" />
+                </Button>
               </div>
 
               <div className="flex-1 min-h-0 overflow-y-auto px-8 pb-6 scrollbar-thin">
                 <div className="w-full rounded-md border border-border/40 bg-card px-6 py-4">
-                  {responseType === 'json' && parsedJson !== undefined ? (
-                    <JsonView
-                      src={parsedJson}
-                      collapsed={2}
-                      enableClipboard
-                      displaySize
-                      theme={resolvedTheme === 'dark' ? 'a11y' : 'default'}
-                      style={{
-                        fontSize: '13px',
-                        lineHeight: '1.6',
-                        fontFamily: 'var(--font-mono, ui-monospace, monospace)',
-                      }}
-                    />
-                  ) : (
-                    <MarkdownViewer
-                      content={msg.content}
-                      enableXmlHighlight={responseType === 'xml'}
-                      className="text-[13px] leading-relaxed"
-                    />
-                  )}
+                  {((): React.JSX.Element => {
+                    if (isRawView) {
+                      return (
+                        <pre className="text-[13px] font-mono leading-relaxed whitespace-pre-wrap break-words text-foreground/90 overflow-x-auto">
+                          {msg.content}
+                        </pre>
+                      );
+                    }
+                    if (responseType === 'json' && parsedJson !== undefined) {
+                      return (
+                        <JsonView
+                          src={parsedJson}
+                          collapsed={2}
+                          enableClipboard
+                          displaySize
+                          theme={resolvedTheme === 'dark' ? 'a11y' : 'default'}
+                          style={{
+                            fontSize: '13px',
+                            lineHeight: '1.6',
+                            fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+                          }}
+                        />
+                      );
+                    }
+                    return (
+                      <MarkdownViewer
+                        content={msg.content}
+                        enableXmlHighlight={responseType === 'xml'}
+                        className="text-[13px] leading-relaxed"
+                      />
+                    );
+                  })()}
                 </div>
               </div>
             </>

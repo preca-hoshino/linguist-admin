@@ -1,5 +1,5 @@
-import { ChevronRight, Wrench, X } from 'lucide-react';
-import { forwardRef, useMemo } from 'react';
+import { ChevronRight, Wrench, X, Code, Eye, Download } from 'lucide-react';
+import { forwardRef, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import JsonView from 'react18-json-view';
 import { CopyableId } from '@/components/CopyableId';
@@ -120,6 +120,30 @@ function ToolResponseTab({
   readonly resolvedTheme: string;
   readonly t: (k: string, f: string) => string;
 }): React.JSX.Element {
+  const [isRawView, setIsRawView] = useState(false);
+
+  const handleExport = (): void => {
+    if (toolResponse == null || toolResponse === '') {
+      return;
+    }
+    const blob = new Blob([toolResponse], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    let ext = '.md';
+    if (responseType === 'json') {
+      ext = '.json';
+    }
+    if (responseType === 'xml') {
+      ext = '.xml';
+    }
+    link.download = `tool-response${ext}`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <TabsContent value="response" className="flex-1 min-h-0 m-0 flex flex-col overflow-hidden">
       {toolResponse == null || toolResponse === '' ? (
@@ -162,29 +186,66 @@ function ToolResponseTab({
                 return `~${words.toLocaleString()} ${t('common.words', '词')} · ${sizeStr}`;
               })()}
             </span>
+            <div className="flex-1" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-muted-foreground hover:text-foreground shrink-0"
+              onClick={() => {
+                setIsRawView(!isRawView);
+              }}
+              title={
+                isRawView
+                  ? t('modelsPage.logs.detail.markdownView', '预览视图')
+                  : t('modelsPage.logs.detail.rawView', '原始视图')
+              }
+            >
+              {isRawView ? <Eye className="h-3.5 w-3.5" /> : <Code className="h-3.5 w-3.5" />}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-muted-foreground hover:text-foreground shrink-0"
+              onClick={handleExport}
+              title={t('modelsPage.logs.detail.export', '导出')}
+            >
+              <Download className="h-3.5 w-3.5" />
+            </Button>
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin">
             <div className="w-full rounded-md border border-border/40 bg-card px-6 py-4">
-              {responseType === 'json' && parsedJson !== undefined ? (
-                <JsonView
-                  src={parsedJson}
-                  collapsed={2}
-                  enableClipboard
-                  displaySize
-                  theme={resolvedTheme === 'dark' ? 'a11y' : 'default'}
-                  style={{
-                    fontSize: '13px',
-                    lineHeight: '1.6',
-                    fontFamily: 'var(--font-mono, ui-monospace, monospace)',
-                  }}
-                />
-              ) : (
-                <MarkdownViewer
-                  content={toolResponse}
-                  enableXmlHighlight={responseType === 'xml'}
-                  className="text-[13px] leading-relaxed"
-                />
-              )}
+              {((): React.JSX.Element => {
+                if (isRawView) {
+                  return (
+                    <pre className="text-[13px] font-mono leading-relaxed whitespace-pre-wrap break-words text-foreground/90 overflow-x-auto">
+                      {toolResponse}
+                    </pre>
+                  );
+                }
+                if (responseType === 'json' && parsedJson !== undefined) {
+                  return (
+                    <JsonView
+                      src={parsedJson}
+                      collapsed={2}
+                      enableClipboard
+                      displaySize
+                      theme={resolvedTheme === 'dark' ? 'a11y' : 'default'}
+                      style={{
+                        fontSize: '13px',
+                        lineHeight: '1.6',
+                        fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+                      }}
+                    />
+                  );
+                }
+                return (
+                  <MarkdownViewer
+                    content={toolResponse}
+                    enableXmlHighlight={responseType === 'xml'}
+                    className="text-[13px] leading-relaxed"
+                  />
+                );
+              })()}
             </div>
           </div>
         </>

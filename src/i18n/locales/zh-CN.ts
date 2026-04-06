@@ -511,6 +511,9 @@ export default {
         reasoning: '思维链',
         clickToView: '点击查看',
         noContent: '暂无内容',
+        export: '导出',
+        rawView: '原始视图',
+        markdownView: '预览视图',
 
         timingStart: '请求到达',
         timingAdapted: '请求适配',
