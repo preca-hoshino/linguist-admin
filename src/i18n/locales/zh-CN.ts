@@ -506,6 +506,11 @@ export default {
         tabMetadata: '元数据',
         noContext: '暂无上下文数据',
         userFormat: '来源',
+        systemPrompt: '系统提示词',
+        systemPromptDesc: '模型请求在发起时被注入的核心骨架设定。',
+        reasoning: '思维链',
+        clickToView: '点击查看',
+        noContent: '暂无内容',
 
         timingStart: '请求到达',
         timingAdapted: '请求适配',

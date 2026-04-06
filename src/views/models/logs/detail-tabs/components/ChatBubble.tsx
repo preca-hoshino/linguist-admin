@@ -23,6 +23,7 @@ import 'react18-json-view/src/style.css';
 
 // ── 组件：思维链推理块
 export function ReasoningBlock({ content }: { readonly content: string }): React.JSX.Element {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   return (
     <div className="mb-3 overflow-hidden rounded-lg border border-amber-200/60 bg-amber-50/50 dark:border-amber-500/20 dark:bg-amber-500/5 text-foreground">
@@ -34,7 +35,7 @@ export function ReasoningBlock({ content }: { readonly content: string }): React
         className="flex w-full items-center gap-1.5 px-3 py-2 text-[11px] font-medium text-amber-700 dark:text-amber-400 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
       >
         <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', open && 'rotate-180')} />
-        <span>思维链 / Reasoning</span>
+        <span>{t('modelsPage.logs.detail.reasoning', '思维链')}</span>
       </button>
       {open && (
         <div className="px-3 pb-3 pt-1 max-h-80 overflow-y-auto scrollbar-thin">
@@ -65,9 +66,9 @@ export function SystemBanner({ msg }: { readonly msg: ChatItem }): React.JSX.Ele
           <div className="flex w-full items-center justify-between px-4 py-3 text-amber-700 dark:text-amber-400">
             <div className="flex items-center gap-2 font-mono text-[13px] font-semibold tracking-wide uppercase">
               <Settings2 className="h-4 w-4" />
-              System Prompt
+              {t('modelsPage.logs.detail.systemPrompt', '系统提示词')}
             </div>
-            <span className="text-[10px] opacity-60">点击查看</span>
+            <span className="text-[10px] opacity-60">{t('modelsPage.logs.detail.clickToView', '点击查看')}</span>
           </div>
         </div>
       </DialogTrigger>
@@ -80,10 +81,10 @@ export function SystemBanner({ msg }: { readonly msg: ChatItem }): React.JSX.Ele
             <Settings2 className="h-5 w-5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
             <div className="flex flex-col gap-1.5 text-left justify-center min-w-0 flex-1">
               <DialogTitle className="leading-tight flex items-center break-all sm:break-normal truncate sm:whitespace-normal sm:line-clamp-2 text-[15px] text-amber-700 dark:text-amber-400">
-                系统提示词 / System Prompt
+                {t('modelsPage.logs.detail.systemPrompt', '系统提示词')}
               </DialogTitle>
               <DialogDescription className="text-muted-foreground/80 text-[11px] truncate">
-                模型请求在发起时被注入的核心骨架设定。
+                {t('modelsPage.logs.detail.systemPromptDesc', '模型请求在发起时被注入的核心骨架设定。')}
               </DialogDescription>
             </div>
           </div>
@@ -99,7 +100,7 @@ export function SystemBanner({ msg }: { readonly msg: ChatItem }): React.JSX.Ele
         <div className="flex-1 min-h-0 flex flex-col overflow-hidden bg-muted/10">
           {msg.content == null || msg.content === '' ? (
             <div className="flex h-full items-center justify-center text-sm text-muted-foreground/50 italic">
-              暂无内容
+              {t('modelsPage.logs.detail.noContent', '暂无内容')}
             </div>
           ) : (
             <>

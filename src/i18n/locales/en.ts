@@ -511,6 +511,11 @@ export default {
         tabMetadata: 'Metadata',
         noContext: 'No context data available',
         userFormat: 'Source',
+        systemPrompt: 'System Prompt',
+        systemPromptDesc: 'Core instructions injected when the model request is initiated.',
+        reasoning: 'Reasoning',
+        clickToView: 'Click to view',
+        noContent: 'No content',
 
         timingStart: 'Request Received',
         timingAdapted: 'Request Adapted',
