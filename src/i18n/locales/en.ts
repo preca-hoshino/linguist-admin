@@ -519,6 +519,8 @@ export default {
         export: 'Export',
         rawView: 'Raw View',
         markdownView: 'Preview',
+        field: 'Field',
+        value: 'Value',
 
         timingStart: 'Request Received',
         timingAdapted: 'Request Adapted',

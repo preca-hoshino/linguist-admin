@@ -38,10 +38,10 @@ function ToolRequestTab({
                       <thead>
                         <tr className="bg-muted/40 dark:bg-muted/20 border-b border-border/40 text-[12px] font-medium text-muted-foreground">
                           <th className="px-6 py-4 font-medium whitespace-nowrap w-fit min-w-[160px] sm:min-w-[200px] border-r border-border/40 tracking-wider">
-                            {t('modelsPage.logs.detail.field', '字段 (Field)')}
+                            {t('modelsPage.logs.detail.field', '字段')}
                           </th>
                           <th className="px-6 py-4 font-medium w-full tracking-wider">
-                            {t('modelsPage.logs.detail.value', '值 (Value)')}
+                            {t('modelsPage.logs.detail.value', '值')}
                           </th>
                         </tr>
                       </thead>

@@ -514,6 +514,8 @@ export default {
         export: '导出',
         rawView: '原始视图',
         markdownView: '预览视图',
+        field: '字段',
+        value: '值',
 
         timingStart: '请求到达',
         timingAdapted: '请求适配',
