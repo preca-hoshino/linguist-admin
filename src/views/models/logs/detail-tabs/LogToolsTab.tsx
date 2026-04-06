@@ -1,5 +1,5 @@
-import { Check, Copy, Wrench, X, Zap, Search } from 'lucide-react';
-import { useCallback, useState, useMemo } from 'react';
+import { Wrench, X, Zap, Search, Eye, Code, Download } from 'lucide-react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -17,6 +17,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import type { AuditToolDefinition, AuditUserChatRequest, AuditUserChatResponse, GatewayContextSnapshot } from '@/types';
 import { cn } from '@/utils/utils';
 import { SmartContentViewer } from './components/SmartContentViewer';
+import JsonView from 'react18-json-view';
+import 'react18-json-view/src/style.css';
+import { useTheme } from '@/providers/ThemeProvider';
 
 // ── 辅助
 
@@ -71,23 +74,6 @@ function formatToolChoice(tc: unknown): string | undefined {
     return formatToolChoiceObject(tc as Record<string, unknown>);
   }
   return undefined;
-}
-
-// ── 一键复制
-function useCopy(): { copied: boolean; copy: (text: string) => Promise<void> } {
-  const [copied, setCopied] = useState(false);
-  const copy = useCallback(async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => {
-        setCopied(false);
-      }, 2000);
-    } catch {
-      /* ignore */
-    }
-  }, []);
-  return { copied, copy };
 }
 
 function extractToolDesc(
@@ -166,6 +152,7 @@ function parseToolProperties(schemaObj: unknown): {
 // ── 工具展示工作区（左右分栏）
 function ToolWorkspace({ tools }: { readonly tools: unknown[] }): React.JSX.Element {
   const { t } = useTranslation();
+  const { resolvedTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIdx, setSelectedIdx] = useState<number>(0);
 
@@ -187,7 +174,6 @@ function ToolWorkspace({ tools }: { readonly tools: unknown[] }): React.JSX.Elem
   }, [toolsInfo, searchQuery]);
 
   const selectedToolInfo = filteredTools[selectedIdx] ?? filteredTools[0];
-  const { copied, copy } = useCopy();
   const [showRaw, setShowRaw] = useState(false);
 
   if (filteredTools.length === 0 && searchQuery !== '') {
@@ -283,9 +269,9 @@ function ToolWorkspace({ tools }: { readonly tools: unknown[] }): React.JSX.Elem
       {selectedToolInfo != null && (
         <div className="flex-1 min-w-0 bg-background overflow-y-auto scrollbar-thin h-full relative">
           <div className="flex flex-col min-h-full">
-            <div className="p-5 border-b bg-muted/5 flex flex-col gap-2 shrink-0">
-              <h2 className="text-lg font-bold font-mono tracking-tight flex items-center gap-2">
-                <Wrench className="h-5 w-5 text-primary shrink-0" />
+            <div className="px-5 border-b bg-background/95 backdrop-blur sticky top-0 z-10 flex items-center shrink-0 h-[61px]">
+              <h2 className="text-[15px] font-bold font-mono tracking-tight flex items-center gap-2 w-full">
+                <Wrench className="h-4 w-4 text-primary shrink-0" />
                 <span className="truncate">{toolName}</span>
               </h2>
             </div>
@@ -311,101 +297,93 @@ function ToolWorkspace({ tools }: { readonly tools: unknown[] }): React.JSX.Elem
             <div className="flex-1 p-5 flex flex-col gap-4 shrink-0">
               <div className="flex items-center justify-between shrink-0 mb-1">
                 <h3 className="text-sm font-semibold">{t('modelsPage.logs.detail.toolParameters', '参数列表')}</h3>
-                <div className="flex items-center bg-muted/40 p-0.5 rounded-md border text-xs font-medium">
-                  <button
-                    type="button"
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-muted-foreground hover:text-foreground shrink-0"
                     onClick={() => {
-                      setShowRaw(false);
+                      setShowRaw(!showRaw);
                     }}
-                    className={cn(
-                      'px-3 py-1.5 rounded-sm transition-colors',
+                    title={
                       showRaw
-                        ? 'text-muted-foreground hover:text-foreground'
-                        : 'bg-background shadow-sm text-foreground',
-                    )}
+                        ? t('modelsPage.logs.detail.structuredTable', '查看结构化表格')
+                        : t('modelsPage.logs.detail.rawJson', '查看原生 JSON Schema')
+                    }
                   >
-                    {t('modelsPage.logs.detail.structuredTable', '结构化表格')}
-                  </button>
-                  <button
-                    type="button"
+                    {showRaw ? <Eye className="h-4 w-4" /> : <Code className="h-4 w-4" />}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-muted-foreground hover:text-foreground shrink-0"
                     onClick={() => {
-                      setShowRaw(true);
+                      const blob = new Blob([schemaText], { type: 'application/json' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `${toolName ?? 'tool'}-schema.json`;
+                      a.click();
+                      URL.revokeObjectURL(url);
                     }}
-                    className={cn(
-                      'px-3 py-1.5 rounded-sm transition-colors',
-                      showRaw
-                        ? 'bg-background shadow-sm text-foreground'
-                        : 'text-muted-foreground hover:text-foreground',
-                    )}
+                    title={t('modelsPage.logs.detail.downloadJson', '下载 JSON Schema')}
                   >
-                    {t('modelsPage.logs.detail.rawJson', '原始 JSON')}
-                  </button>
+                    <Download className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
 
-              {showRaw ? (
-                <div className="border rounded-md bg-muted/10 flex flex-col w-full min-w-0">
-                  <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/20">
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      Schema JSON
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => void copy(schemaText)}
-                      className="flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium bg-background border shadow-sm text-foreground hover:bg-muted transition-colors"
-                    >
-                      {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
-                      {copied ? '已复制' : '复制代码'}
-                    </button>
-                  </div>
-                  <div className="w-full min-w-0 overflow-x-auto bg-card rounded-b-md">
-                    <pre className="p-5 font-mono text-[13px] leading-relaxed text-foreground min-w-max">
-                      {schemaText}
-                    </pre>
-                  </div>
+              {showRaw && (
+                <div className="border border-border/40 rounded-md bg-card w-full min-w-0 p-4 pb-5 overflow-x-auto">
+                  <JsonView
+                    src={schemaObj as object}
+                    collapsed={2}
+                    enableClipboard
+                    displaySize
+                    theme={resolvedTheme === 'dark' ? 'a11y' : 'default'}
+                    style={{
+                      fontSize: '13px',
+                      lineHeight: '1.6',
+                      fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+                    }}
+                  />
                 </div>
-              ) : (
-                <>
-                  {properties.length > 0 ? (
-                    <div className="rounded-md border bg-card flex flex-col overflow-hidden">
-                      <Table className="table-fixed w-full">
-                        <TableHeader className="bg-muted/40">
-                          <TableRow>
-                            <TableHead className="w-[180px]">字段 (Field)</TableHead>
-                            <TableHead className="w-[150px]">类型 (Type)</TableHead>
-                            <TableHead>描述 (Description)</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {properties.map((prop) => (
-                            <TableRow key={prop.field}>
-                              <TableCell className="font-mono text-sm font-medium">
-                                <span className={cn(prop.isRequired ? 'text-primary font-bold' : '')}>
-                                  {prop.field}
-                                </span>
-                                {prop.isRequired && <span className="ml-1 text-primary font-bold">*</span>}
-                              </TableCell>
-                              <TableCell className="font-mono text-xs text-muted-foreground whitespace-normal break-all sm:break-words">
-                                {prop.type}
-                              </TableCell>
-                              <TableCell className="text-sm text-foreground whitespace-normal break-all sm:break-words leading-relaxed">
-                                {prop.description === '' ? (
-                                  <span className="italic opacity-30">-</span>
-                                ) : (
-                                  prop.description
-                                )}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  ) : (
-                    <div className="p-4 border border-dashed rounded-md text-sm text-muted-foreground text-center bg-muted/10">
-                      无参数定义或无法解析为标准属性列表
-                    </div>
-                  )}
-                </>
+              )}
+
+              {!showRaw && properties.length > 0 && (
+                <div className="rounded-md border bg-card flex flex-col overflow-hidden">
+                  <Table className="table-fixed w-full">
+                    <TableHeader className="bg-muted/40">
+                      <TableRow>
+                        <TableHead className="w-[180px]">字段 (Field)</TableHead>
+                        <TableHead className="w-[150px]">类型 (Type)</TableHead>
+                        <TableHead>描述 (Description)</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {properties.map((prop) => (
+                        <TableRow key={prop.field}>
+                          <TableCell className="font-mono text-sm font-medium">
+                            <span className={cn(prop.isRequired ? 'text-primary font-bold' : '')}>{prop.field}</span>
+                            {prop.isRequired && <span className="ml-1 text-primary font-bold">*</span>}
+                          </TableCell>
+                          <TableCell className="font-mono text-xs text-muted-foreground whitespace-normal break-all sm:break-words">
+                            {prop.type}
+                          </TableCell>
+                          <TableCell className="text-sm text-foreground whitespace-normal break-all sm:break-words leading-relaxed">
+                            {prop.description === '' ? <span className="italic opacity-30">-</span> : prop.description}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+
+              {!showRaw && properties.length === 0 && (
+                <div className="p-4 border border-dashed rounded-md text-sm text-muted-foreground text-center bg-muted/10">
+                  无参数定义或无法解析为标准属性列表
+                </div>
               )}
             </div>
           </div>
