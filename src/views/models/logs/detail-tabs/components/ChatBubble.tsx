@@ -172,18 +172,93 @@ function BubbleMeta({ item }: { readonly item: ChatItem }): React.JSX.Element | 
   );
 }
 
+function BubbleContent({
+  item,
+  isPureImage,
+  toolCallMap,
+  toolResponseMap,
+}: {
+  readonly item: ChatItem;
+  readonly isPureImage: boolean;
+  readonly toolCallMap: Map<string, AuditToolCall>;
+  readonly toolResponseMap: Map<string, string>;
+}): React.JSX.Element {
+  const hasExtraContent =
+    (item.content != null && item.content !== '') ||
+    (item.reasoning_content != null && item.reasoning_content !== '');
+
+  return (
+    <>
+      {item.reasoning_content != null && item.reasoning_content !== '' && (
+        <ReasoningBlock content={item.reasoning_content} />
+      )}
+      {item.role === 'tool' && (
+        <Dialog>
+          <DialogTrigger asChild>
+            <ToolInteractionTrigger
+              toolName={item.toolName ?? '工具响应'}
+              callId={item.tool_call_id}
+              defaultTab="response"
+            />
+          </DialogTrigger>
+          <ToolInteractionDialog
+            toolName={item.toolName ?? '工具响应'}
+            toolCall={item.tool_call_id == null ? undefined : toolCallMap.get(item.tool_call_id)}
+            toolResponse={item.content}
+            callId={item.tool_call_id}
+            defaultTab="response"
+          />
+        </Dialog>
+      )}
+      {item.role !== 'tool' && item.content != null && item.content !== '' && (
+        <MarkdownViewer content={item.content} className="text-[13px] leading-relaxed" />
+      )}
+      {item.role === 'user' && item.imageUrl != null && item.imageUrl !== '' && (
+        <img
+          src={item.imageUrl}
+          alt="Message content"
+          className={cn(
+            'max-w-full object-contain',
+            isPureImage
+              ? 'rounded-lg max-h-[500px]'
+              : 'rounded-md border border-border/50 shadow-sm max-h-[400px] my-2 bg-muted/20',
+          )}
+        />
+      )}
+      {item.tool_calls != null && item.tool_calls.length > 0 && (
+        <div className={cn('flex flex-col gap-1', hasExtraContent ? 'mt-1' : 'mt-0')}>
+          {item.tool_calls.map((tc) => (
+            <Dialog key={tc.id}>
+              <DialogTrigger asChild>
+                <ToolInteractionTrigger toolName={tc.function.name} callId={tc.id} defaultTab="request" />
+              </DialogTrigger>
+              <ToolInteractionDialog
+                toolName={tc.function.name}
+                toolCall={tc}
+                toolResponse={toolResponseMap.get(tc.id)}
+                callId={tc.id}
+                defaultTab="request"
+              />
+            </Dialog>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
 function getBubbleType(item: ChatItem): { TypeIcon: React.ElementType; typeLabel: string; typeColor: string } {
   if (item.role === 'tool') {
     return {
       TypeIcon: Wrench,
-      typeLabel: '执行结果',
+      typeLabel: '工具',
       typeColor: 'text-amber-600 dark:text-amber-500 bg-amber-500/10 border-amber-500/20',
     };
   }
   if (item.role === 'assistant' && item.tool_calls && item.tool_calls.length > 0) {
     return {
       TypeIcon: Blocks,
-      typeLabel: '工具调用',
+      typeLabel: '工具',
       typeColor: 'text-purple-600 dark:text-purple-500 bg-purple-500/10 border-purple-500/20',
     };
   }
@@ -228,6 +303,8 @@ export function ChatBubble({
     </div>
   );
 
+  const isToolBubble = typeLabel === '工具';
+
   const isPureImage =
     item.role === 'user' &&
     item.imageUrl != null &&
@@ -263,7 +340,7 @@ export function ChatBubble({
 
       <div
         className={cn('flex flex-col shrink-0 flex-none', isRight ? 'items-end' : 'items-start')}
-        style={{ width: '70%' }}
+        style={{ width: isToolBubble ? '35%' : '70%' }}
       >
         {!isMerged && (
           <div className="mb-1.5 flex items-center">
@@ -273,7 +350,7 @@ export function ChatBubble({
 
         <div className={cn('mb-1.5 flex items-center gap-2', isRight ? 'flex-row-reverse' : 'flex-row')}>
           {TypeBadge}
-          <BubbleMeta item={item} />
+          {!isToolBubble && <BubbleMeta item={item} />}
         </div>
 
         <div
@@ -285,71 +362,12 @@ export function ChatBubble({
             borderRadius,
           )}
         >
-          {item.reasoning_content != null && item.reasoning_content !== '' && (
-            <ReasoningBlock content={item.reasoning_content} />
-          )}
-
-          {item.role === 'tool' && (
-            <Dialog>
-              <DialogTrigger asChild>
-                <ToolInteractionTrigger
-                  toolName={item.toolName ?? '工具响应'}
-                  callId={item.tool_call_id}
-                  defaultTab="response"
-                />
-              </DialogTrigger>
-              <ToolInteractionDialog
-                toolName={item.toolName ?? '工具响应'}
-                toolCall={item.tool_call_id == null ? undefined : toolCallMap.get(item.tool_call_id)}
-                toolResponse={item.content}
-                callId={item.tool_call_id}
-                defaultTab="response"
-              />
-            </Dialog>
-          )}
-          {item.role !== 'tool' && item.content != null && item.content !== '' && (
-            <MarkdownViewer content={item.content} className="text-[13px] leading-relaxed" />
-          )}
-
-          {item.role === 'user' && item.imageUrl != null && item.imageUrl !== '' && (
-            <img
-              src={item.imageUrl}
-              alt="Message content"
-              className={cn(
-                'max-w-full object-contain',
-                isPureImage
-                  ? 'rounded-lg max-h-[500px]'
-                  : 'rounded-md border border-border/50 shadow-sm max-h-[400px] my-2 bg-muted/20',
-              )}
-            />
-          )}
-
-          {item.tool_calls != null && item.tool_calls.length > 0 && (
-            <div
-              className={cn(
-                'flex flex-col gap-1',
-                (item.content != null && item.content !== '') ||
-                  (item.reasoning_content != null && item.reasoning_content !== '')
-                  ? 'mt-1'
-                  : 'mt-0',
-              )}
-            >
-              {item.tool_calls.map((tc) => (
-                <Dialog key={tc.id}>
-                  <DialogTrigger asChild>
-                    <ToolInteractionTrigger toolName={tc.function.name} callId={tc.id} defaultTab="request" />
-                  </DialogTrigger>
-                  <ToolInteractionDialog
-                    toolName={tc.function.name}
-                    toolCall={tc}
-                    toolResponse={toolResponseMap.get(tc.id)}
-                    callId={tc.id}
-                    defaultTab="request"
-                  />
-                </Dialog>
-              ))}
-            </div>
-          )}
+          <BubbleContent
+            item={item}
+            isPureImage={isPureImage}
+            toolCallMap={toolCallMap}
+            toolResponseMap={toolResponseMap}
+          />
         </div>
       </div>
 
