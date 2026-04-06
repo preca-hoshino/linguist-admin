@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/Input';
 import type { Provider } from '@/types';
 import { cn } from '@/utils/utils';
 import { CustomHeadersInput } from './components/CustomHeadersInput';
-import { ProviderKindSelector, type KindOption } from './components/ProviderKindSelector';
+import { type KindOption, ProviderKindSelector } from './components/ProviderKindSelector';
 import { KIND_OPTIONS } from './constants';
 
 interface ProvidersMutateDialogProps {

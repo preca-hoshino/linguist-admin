@@ -34,6 +34,44 @@ interface TagPair {
   endLength: number;
 }
 
+const COMMON_HTML_TAGS = new Set([
+  'a',
+  'b',
+  'blockquote',
+  'br',
+  'code',
+  'del',
+  'div',
+  'em',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'hr',
+  'i',
+  'img',
+  'li',
+  'mark',
+  'ol',
+  'p',
+  'pre',
+  'small',
+  'span',
+  'strong',
+  'sub',
+  'sup',
+  'table',
+  'tbody',
+  'td',
+  'tfoot',
+  'th',
+  'thead',
+  'tr',
+  'ul',
+]);
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function parseSegments(raw: string): Segment[] {
   const segments: Segment[] = [];
@@ -60,6 +98,11 @@ function parseSegments(raw: string): Segment[] {
     const isClosing = tagStr.startsWith('</');
     const isSelfClosing = tagStr.endsWith('/>');
     const tagName = match[3] as string;
+
+    // 忽略标准 HTML 标签，只把未知的自定义标记/大段 XML 提取为折叠块
+    if (COMMON_HTML_TAGS.has(tagName.toLowerCase())) {
+      continue;
+    }
 
     if (isSelfClosing) {
       continue;
@@ -237,25 +280,34 @@ const getMarkdownComponents = (isDark: boolean): React.ComponentProps<typeof Rea
     }
     const codeString = childrenStr.replace(/\n$/, '');
 
-    if (match !== null && match[1] !== undefined) {
-      const lang = match[1];
+    const isBlock = match !== null || codeString.includes('\n');
+    let lang = match?.[1] ?? '';
+
+    if (isBlock && !lang) {
+      lang = 'text';
+    }
+
+    if (lang) {
       const customStyle: CSSProperties = {
         margin: 0,
-        borderTopLeftRadius: 0,
-        borderTopRightRadius: 0,
-        borderBottomLeftRadius: '0.375rem',
-        borderBottomRightRadius: '0.375rem',
-        border: '1px solid hsl(var(--border) / 0.5)',
+        padding: '1rem',
+        background: 'transparent',
+        backgroundColor: 'transparent',
         fontSize: '13px',
         lineHeight: '1.6',
       };
 
       return (
-        <div className="group not-prose relative my-3">
-          <div className="flex items-center justify-between rounded-t-md border border-b-0 border-border/50 bg-muted/60 px-3 py-1.5 text-[11px] font-medium text-muted-foreground">
+        <div
+          className={cn(
+            'group not-prose relative my-3 flex flex-col rounded-md border border-border/50 overflow-hidden',
+            isDark ? 'bg-[#282c34]' : 'bg-muted/30',
+          )}
+        >
+          <div className="flex z-10 items-center justify-between border-b border-border/50 bg-muted/60 px-3 py-1.5 text-[11px] font-medium text-muted-foreground">
             <span>{lang.toUpperCase()}</span>
           </div>
-          <div className="relative">
+          <div className="relative overflow-x-auto">
             <SyntaxHighlighter
               // @ts-expect-error react-syntax-highlighter typings mismatch
               style={isDark ? oneDark : oneLight}
@@ -274,12 +326,49 @@ const getMarkdownComponents = (isDark: boolean): React.ComponentProps<typeof Rea
 
     return (
       <code
-        className="rounded-sm bg-muted/60 px-1.5 py-0.5 font-mono text-[13px] text-foreground ring-1 ring-border/30 ring-inset"
+        className="rounded-sm bg-muted px-1.5 py-0.5 font-mono text-[13px] text-foreground ring-1 ring-border/30 ring-inset"
         {...rest}
       >
         {children}
       </code>
     );
+  },
+
+  pre({ children }): React.JSX.Element {
+    // Simply render children to let our enhanced `code` block completely manage layout and backgrounds, eliminating the nested double background block problem.
+    return <>{children}</>;
+  },
+
+  h1({ children }): React.JSX.Element {
+    return <h1 className="text-xl font-bold text-foreground mt-4 mb-2 first:mt-0">{children}</h1>;
+  },
+  h2({ children }): React.JSX.Element {
+    return <h2 className="text-lg font-semibold text-foreground mt-3.5 mb-1.5 first:mt-0">{children}</h2>;
+  },
+  h3({ children }): React.JSX.Element {
+    return <h3 className="text-base font-semibold text-foreground mt-3 mb-1 first:mt-0">{children}</h3>;
+  },
+
+  hr(): React.JSX.Element {
+    return <hr className="my-4 border-border/50" />;
+  },
+
+  ul({ children }): React.JSX.Element {
+    return <ul className="my-2 list-disc pl-5 text-foreground space-y-1">{children}</ul>;
+  },
+  ol({ children }): React.JSX.Element {
+    return <ol className="my-2 list-decimal pl-5 text-foreground space-y-1">{children}</ol>;
+  },
+  li({ children }): React.JSX.Element {
+    return <li className="text-foreground">{children}</li>;
+  },
+
+  p({ children }): React.JSX.Element {
+    return <p className="my-1.5 text-foreground leading-relaxed first:mt-0 last:mb-0">{children}</p>;
+  },
+
+  strong({ children }): React.JSX.Element {
+    return <strong className="font-semibold text-foreground">{children}</strong>;
   },
 
   table({ children }): React.JSX.Element {
