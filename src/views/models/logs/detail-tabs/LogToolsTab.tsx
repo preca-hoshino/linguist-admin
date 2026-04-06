@@ -219,9 +219,9 @@ function ToolWorkspace({ tools }: { readonly tools: unknown[] }): React.JSX.Elem
   // 保留全量复制与原始模式的展开状态
 
   return (
-    <div className="flex flex-col sm:flex-row h-full max-h-[600px] border rounded-lg bg-card overflow-hidden">
+    <div className="flex flex-col sm:flex-row h-[600px] border rounded-lg bg-card overflow-hidden">
       {/* 左侧列表 */}
-      <div className="w-full sm:w-[280px] shrink-0 border-r flex flex-col bg-muted/10 h-[300px] sm:h-[600px]">
+      <div className="w-full sm:w-[340px] shrink-0 border-r flex flex-col bg-muted/10 h-full overflow-hidden">
         <div className="p-3 border-b bg-background sticky top-0 z-10">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -248,14 +248,26 @@ function ToolWorkspace({ tools }: { readonly tools: unknown[] }): React.JSX.Elem
                   setSelectedIdx(idx);
                 }}
                 className={cn(
-                  'w-full text-left px-3 py-2.5 rounded-md transition-colors text-sm flex items-center gap-2',
+                  'w-full text-left px-3 py-3 rounded-md transition-colors text-sm flex flex-col gap-1',
                   isSelected
-                    ? 'bg-amber-100 text-amber-900 font-semibold dark:bg-amber-500/20 dark:text-amber-100'
-                    : 'text-foreground hover:bg-muted/50',
+                    ? 'bg-accent text-accent-foreground font-semibold shadow-sm border border-border/50'
+                    : 'text-foreground hover:bg-muted/50 border border-transparent',
                 )}
               >
-                <div className="flex-1 min-w-0">
-                  <div className="truncate font-mono">{tInfo.name}</div>
+                <div className="w-full min-w-0">
+                  <div className="truncate font-mono font-medium">{tInfo.name}</div>
+                  <div
+                    className={cn(
+                      'text-xs mt-1 line-clamp-2 font-normal leading-relaxed',
+                      isSelected ? 'text-accent-foreground/80' : 'text-muted-foreground',
+                    )}
+                  >
+                    {tInfo.desc != null && tInfo.desc !== '' ? (
+                      tInfo.desc
+                    ) : (
+                      <span className="italic opacity-50">无描述</span>
+                    )}
+                  </div>
                 </div>
               </button>
             );
@@ -265,10 +277,10 @@ function ToolWorkspace({ tools }: { readonly tools: unknown[] }): React.JSX.Elem
 
       {/* 右侧详情 */}
       {selectedToolInfo != null && (
-        <div className="flex-1 flex flex-col min-w-0 bg-background overflow-hidden h-[400px] sm:h-auto">
+        <div className="flex-1 flex flex-col min-w-0 bg-background overflow-hidden h-full">
           <div className="p-5 border-b bg-muted/5 shrink-0 flex flex-col gap-2">
             <h2 className="text-lg font-bold font-mono tracking-tight flex items-center gap-2">
-              <Wrench className="h-5 w-5 text-amber-500 shrink-0" />
+              <Wrench className="h-5 w-5 text-primary shrink-0" />
               <span className="truncate">{toolName}</span>
             </h2>
             <div className="text-sm text-muted-foreground leading-relaxed">
@@ -276,8 +288,8 @@ function ToolWorkspace({ tools }: { readonly tools: unknown[] }): React.JSX.Elem
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto scrollbar-thin p-5 flex flex-col gap-4">
-            <div className="flex items-center justify-between">
+          <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin p-5 flex flex-col gap-4">
+            <div className="flex items-center justify-between shrink-0">
               <h3 className="text-sm font-semibold">{t('modelsPage.logs.detail.toolParameters', '参数列表')}</h3>
               <button
                 type="button"
@@ -305,10 +317,8 @@ function ToolWorkspace({ tools }: { readonly tools: unknown[] }): React.JSX.Elem
                       {properties.map((prop) => (
                         <TableRow key={prop.field}>
                           <TableCell className="font-mono text-sm font-medium">
-                            <span className={cn(prop.isRequired ? 'text-amber-600 dark:text-amber-400 font-bold' : '')}>
-                              {prop.field}
-                            </span>
-                            {prop.isRequired && <span className="ml-1 text-amber-500 font-bold">*</span>}
+                            <span className={cn(prop.isRequired ? 'text-primary font-bold' : '')}>{prop.field}</span>
+                            {prop.isRequired && <span className="ml-1 text-primary font-bold">*</span>}
                           </TableCell>
                           <TableCell className="font-mono text-xs text-muted-foreground whitespace-nowrap">
                             {prop.type}
@@ -375,7 +385,7 @@ function ToolCallsResult({
   return (
     <div className="flex flex-col gap-3">
       <h3 className="text-sm font-semibold flex items-center gap-2">
-        <Zap className="h-4 w-4 text-amber-500" />
+        <Zap className="h-4 w-4 text-primary" />
         {t('modelsPage.logs.detail.thisCallTools', '模型本次调用的工具')}
       </h3>
       <div className="flex flex-col gap-2">
@@ -405,7 +415,7 @@ function ToolCallsResult({
           return (
             <div key={tcId} className="rounded-lg border bg-card overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-2.5 border-b bg-muted/20">
-                <Wrench className="h-3.5 w-3.5 text-amber-500" />
+                <Wrench className="h-3.5 w-3.5 text-primary" />
                 <span className="font-mono text-sm font-semibold">{callName}</span>
                 <span className="ml-auto font-mono text-[10px] text-muted-foreground truncate max-w-[140px]">
                   {tcId}
@@ -472,7 +482,7 @@ function ToolCallsResult({
                       <DialogHeader className="flex flex-row items-start justify-between shrink-0 border-b px-8 py-5 bg-background">
                         <div className="flex flex-col gap-1.5 text-left">
                           <DialogTitle className="flex items-center gap-2">
-                            <Zap className="h-4 w-4 text-amber-500" />
+                            <Zap className="h-4 w-4 text-primary" />
                             执行结果：{callName}
                           </DialogTitle>
                           <DialogDescription className="font-mono text-[11px]">{tcId}</DialogDescription>
@@ -529,9 +539,7 @@ export function LogToolsTab({ ctx }: LogToolsTabProps): React.JSX.Element {
           variant="outline"
           className={cn(
             'font-medium text-xs gap-1.5',
-            tools.length > 0
-              ? 'border-amber-300 text-amber-700 bg-amber-50/60 dark:bg-amber-500/10 dark:border-amber-500/20 dark:text-amber-400'
-              : 'text-muted-foreground',
+            tools.length > 0 ? 'border-primary/20 text-primary bg-primary/10' : 'text-muted-foreground',
           )}
         >
           <Wrench className="h-3 w-3" />
