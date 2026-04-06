@@ -96,7 +96,7 @@ function getBubbleType(item: ChatItem): { TypeIcon: React.ElementType; typeLabel
       typeColor: 'text-purple-600 dark:text-purple-500 bg-purple-500/10 border-purple-500/20',
     };
   }
-  if (item.role === 'user' && typeof item.content === 'string' && item.content.includes('[image_url]')) {
+  if (item.role === 'user' && item.imageUrl != null && item.imageUrl !== '') {
     return {
       TypeIcon: ImageIcon,
       typeLabel: '图片',
@@ -144,7 +144,9 @@ export function ChatBubble({
     </div>
   );
 
+  const isPureImage = item.role === 'user' && item.imageUrl != null && item.imageUrl !== '' && (item.content == null || item.content === '');
   const bubbleBg = 'bg-card border border-border/60 shadow-sm text-foreground';
+  const paddingClass = isPureImage ? 'p-1.5' : 'px-3 py-2';
   const borderRadius = 'rounded-xl';
 
   let marginTopStr = '40px';
@@ -185,7 +187,9 @@ export function ChatBubble({
 
         <div
           className={cn(
-            'px-3 py-2 text-[13px] text-left leading-relaxed break-words transition-all w-full flex-none',
+            'text-[13px] text-left leading-relaxed break-words transition-all flex-none',
+            isPureImage ? 'w-fit max-w-full' : 'w-full',
+            paddingClass,
             bubbleBg,
             borderRadius,
           )}
@@ -214,6 +218,19 @@ export function ChatBubble({
           )}
           {item.role !== 'tool' && item.content != null && item.content !== '' && (
             <MarkdownViewer content={item.content} className="text-[13px] leading-relaxed" />
+          )}
+
+          {item.role === 'user' && item.imageUrl != null && item.imageUrl !== '' && (
+            <img
+              src={item.imageUrl}
+              alt="Message content"
+              className={cn(
+                'max-w-full object-contain',
+                isPureImage 
+                  ? 'rounded-lg max-h-[500px]' 
+                  : 'rounded-md border border-border/50 shadow-sm max-h-[400px] my-2 bg-muted/20'
+              )}
+            />
           )}
 
           {item.tool_calls != null && item.tool_calls.length > 0 && (

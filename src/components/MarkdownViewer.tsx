@@ -339,6 +339,17 @@ const getMarkdownComponents = (isDark: boolean): React.ComponentProps<typeof Rea
     return <>{children}</>;
   },
 
+  img({ src, alt, ...rest }): React.JSX.Element {
+    return (
+      <img
+        src={src}
+        alt={alt ?? 'Image'}
+        className="max-w-full rounded-md border border-border/50 shadow-sm max-h-[400px] object-contain my-2 bg-muted/20"
+        {...rest}
+      />
+    );
+  },
+
   h1({ children }): React.JSX.Element {
     return <h1 className="text-xl font-bold text-foreground mt-4 mb-2 first:mt-0">{children}</h1>;
   },
