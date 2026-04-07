@@ -356,9 +356,9 @@ function ToolWorkspace({ tools }: { readonly tools: unknown[] }): React.JSX.Elem
                   <Table className="table-fixed w-full">
                     <TableHeader className="bg-muted/40">
                       <TableRow>
-                        <TableHead className="w-[180px]">字段 (Field)</TableHead>
-                        <TableHead className="w-[150px]">类型 (Type)</TableHead>
-                        <TableHead>描述 (Description)</TableHead>
+                        <TableHead className="w-[180px]">{t('modelsPage.logs.detail.field', '字段')}</TableHead>
+                        <TableHead className="w-[150px]">{t('modelsPage.logs.detail.type', '类型')}</TableHead>
+                        <TableHead>{t('modelsPage.logs.detail.description', '描述')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -561,7 +561,7 @@ export function LogToolsTab({ ctx }: LogToolsTabProps): React.JSX.Element {
   const tools: AuditToolDefinition[] = chatReq?.tools ?? [];
 
   return (
-    <div className="flex flex-1 flex-col gap-6 pb-6">
+    <div className="flex flex-1 flex-col gap-6 pb-6 pt-6">
       {tools.length === 0 ? (
         /* 空状态 */
         <div className="flex h-40 flex-col items-center justify-center gap-2 rounded-lg border border-dashed text-sm text-muted-foreground">
