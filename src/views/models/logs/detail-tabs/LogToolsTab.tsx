@@ -1,15 +1,10 @@
-import { Wrench, X, Zap, Search, Eye, Code, Download } from 'lucide-react';
+import { Wrench, Search, Eye, Code, Download } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/Button';
 import {
   Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
@@ -18,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import type { AuditToolDefinition, AuditUserChatRequest, AuditUserChatResponse, GatewayContextSnapshot } from '@/types';
 import { cn } from '@/utils/utils';
 import { SmartContentViewer } from './components/SmartContentViewer';
+import { ToolInteractionButton, ToolInteractionDialog, ToolInteractionTrigger } from './components/ToolInteractionDialog';
 import JsonView from 'react18-json-view';
 import 'react18-json-view/src/style.css';
 import { useTheme } from '@/providers/ThemeProvider';
@@ -418,7 +414,7 @@ function ToolCallsResult({
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h3 className="text-sm font-semibold">{t('modelsPage.logs.detail.thisCallTools', '工具调用')}</h3>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {(toolCalls as unknown[]).map((tcRaw) => {
           const tc = typeof tcRaw === 'object' && tcRaw !== null ? (tcRaw as Record<string, unknown>) : {};
           const tcId = typeof tc.id === 'string' ? tc.id : '';
@@ -428,115 +424,27 @@ function ToolCallsResult({
           const isFunc = tc.type === 'function' && funcObj != null;
           const callName = extractToolName(isFunc, tc, funcObj);
 
-          let parsedArgs: unknown = isFunc ? funcObj.arguments : (tc.input ?? tc.arguments ?? '{}');
-          try {
-            if (isFunc && typeof funcObj.arguments === 'string' && funcObj.arguments !== '') {
-              parsedArgs = JSON.parse(funcObj.arguments);
-            }
-          } catch {
-            /* keep string */
-          }
-          const argsText = typeof parsedArgs === 'string' ? parsedArgs : JSON.stringify(parsedArgs, null, 2);
-          let resultText = '';
+          let resultText: string | undefined;
           if (result != null) {
             resultText = typeof result.content === 'string' ? result.content : JSON.stringify(result.content, null, 2);
           }
 
           return (
-            <div key={tcId} className="rounded-lg border bg-card overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-2.5 border-b bg-muted/20">
-                <Wrench className="h-3.5 w-3.5 text-primary" />
-                <span className="font-mono text-sm font-semibold">{callName}</span>
-                <span className="ml-auto font-mono text-[10px] text-muted-foreground truncate max-w-[140px]">
-                  {tcId}
-                </span>
+            <Dialog key={tcId}>
+              <div className="flex w-full items-center justify-between rounded-xl border border-border/60 bg-card px-3 py-2 shadow-sm text-foreground">
+                <ToolInteractionTrigger toolName={callName} callId={tcId} defaultTab="request" />
+                <DialogTrigger asChild>
+                  <ToolInteractionButton defaultTab="request" className="ml-2 shrink-0" />
+                </DialogTrigger>
               </div>
-              <div className="px-4 py-3 flex items-center gap-2">
-                {/* 查看调用参数弹窗 */}
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <button
-                      type="button"
-                      className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors"
-                    >
-                      <Wrench className="h-3 w-3 text-muted-foreground" />
-                      查看调用参数
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent
-                    showCloseButton={false}
-                    className="flex flex-col h-[85vh] max-h-[850px] min-h-[540px] w-[95vw] sm:max-w-[960px] overflow-hidden p-0 gap-0"
-                  >
-                    <DialogHeader className="flex flex-row items-start justify-between shrink-0 border-b px-8 py-5 bg-background">
-                      <div className="flex flex-col gap-1.5 text-left">
-                        <DialogTitle className="flex items-center gap-2">
-                          <Wrench className="h-4 w-4 text-purple-500" />
-                          工具调用参数：{callName}
-                        </DialogTitle>
-                        <DialogDescription className="font-mono text-[11px]">{tcId}</DialogDescription>
-                      </div>
-                      <DialogClose asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground -mr-2 mt-0.5 border-0"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </DialogClose>
-                    </DialogHeader>
-                    <div className="flex-1 min-h-0 w-full min-w-0 overflow-y-auto px-8 py-6 bg-muted/10">
-                      <pre className="whitespace-pre-wrap break-all font-mono text-[13px] text-foreground leading-relaxed bg-background border border-border/50 rounded-md p-5 min-h-full">
-                        {argsText}
-                      </pre>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-
-                {/* 查看工具返回値弹窗 */}
-                {result != null && (
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <button
-                        type="button"
-                        className="flex items-center gap-1.5 rounded-md border border-emerald-300 dark:border-emerald-700 px-3 py-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors"
-                      >
-                        <Zap className="h-3 w-3" />
-                        查看返回値
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent
-                      showCloseButton={false}
-                      className="flex flex-col h-[85vh] max-h-[850px] min-h-[540px] w-[95vw] sm:max-w-[960px] overflow-hidden p-0 gap-0"
-                    >
-                      <DialogHeader className="flex flex-row items-start justify-between shrink-0 border-b px-8 py-5 bg-background">
-                        <div className="flex flex-col gap-1.5 text-left">
-                          <DialogTitle className="flex items-center gap-2">
-                            <Zap className="h-4 w-4 text-primary" />
-                            执行结果：{callName}
-                          </DialogTitle>
-                          <DialogDescription className="font-mono text-[11px]">{tcId}</DialogDescription>
-                        </div>
-                        <DialogClose asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-muted-foreground -mr-2 mt-0.5 border-0"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </DialogClose>
-                      </DialogHeader>
-                      <div className="flex-1 min-h-0 w-full min-w-0 overflow-y-auto px-8 py-6 bg-emerald-50/30 dark:bg-emerald-950/20">
-                        <pre className="whitespace-pre-wrap break-all font-mono text-[13px] text-foreground leading-relaxed bg-emerald-50/60 border border-emerald-200/60 dark:bg-emerald-500/5 dark:border-emerald-500/20 rounded-md p-5 min-h-full">
-                          {resultText}
-                        </pre>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                )}
-              </div>
-            </div>
+              <ToolInteractionDialog
+                toolName={callName}
+                toolCall={tc as unknown as AuditToolCall}
+                toolResponse={resultText}
+                callId={tcId}
+                defaultTab="request"
+              />
+            </Dialog>
           );
         })}
       </div>
