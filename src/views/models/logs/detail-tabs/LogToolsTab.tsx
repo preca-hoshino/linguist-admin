@@ -267,8 +267,8 @@ function ToolWorkspace({ tools }: { readonly tools: unknown[] }): React.JSX.Elem
         <div className="flex-1 min-w-0 bg-background overflow-y-auto scrollbar-thin h-full relative">
           <div className="flex flex-col min-h-full">
             <div className="px-5 border-b bg-background/95 backdrop-blur sticky top-0 z-10 flex items-center shrink-0 h-[61px]">
-              <h2 className="text-[15px] font-bold font-mono tracking-tight flex items-center gap-2 w-full">
-                <Wrench className="h-4 w-4 text-primary shrink-0" />
+              <h2 className="text-lg font-bold font-mono tracking-tight flex items-center gap-2 w-full">
+                <Wrench className="h-5 w-5 text-primary shrink-0" />
                 <span className="truncate">{toolName}</span>
               </h2>
             </div>
@@ -439,6 +439,7 @@ function ToolCallsResult({
               </div>
               <ToolInteractionDialog
                 toolName={callName}
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 toolCall={tc as unknown as AuditToolCall}
                 toolResponse={resultText}
                 callId={tcId}
@@ -450,6 +451,64 @@ function ToolCallsResult({
       </div>
     </div>
     </>
+  );
+}
+
+// ── 组件：工具用量卡片
+function ToolStatItem({
+  label,
+  value,
+  accent,
+}: {
+  readonly label: string;
+  readonly value: number;
+  readonly accent?: 'emerald' | 'amber' | 'primary' | undefined;
+}): React.JSX.Element {
+  let color = 'text-foreground';
+  switch (accent) {
+  case 'emerald': {
+    color = 'text-emerald-600 dark:text-emerald-400';
+  
+  break;
+  }
+  case 'amber': {
+    color = 'text-amber-600 dark:text-amber-400';
+  
+  break;
+  }
+  case 'primary': {
+    color = 'text-primary';
+  
+  break;
+  }
+  // No default
+  }
+  return (
+    <div className="flex flex-col">
+      <span className="text-[10px] text-muted-foreground">{label}</span>
+      <span className={cn('font-mono text-sm font-semibold', color)}>{value.toLocaleString()}</span>
+    </div>
+  );
+}
+
+function ToolUsageBar({
+  definedCount,
+  invokedCount,
+}: {
+  readonly definedCount: number;
+  readonly invokedCount: number;
+}): React.JSX.Element {
+  const { t } = useTranslation();
+
+  return (
+    <div className="flex flex-wrap gap-4 rounded-xl border bg-card p-4 shadow-sm w-full shrink-0">
+      <ToolStatItem label={t('modelsPage.logs.detail.totalToolsDefined', '总可选工具')} value={definedCount} />
+      <ToolStatItem
+        label={t('modelsPage.logs.detail.toolsInvoked', '本次调用并发')}
+        value={invokedCount}
+        accent={invokedCount > 0 ? 'primary' : undefined}
+      />
+    </div>
   );
 }
 
@@ -467,9 +526,12 @@ export function LogToolsTab({ ctx }: LogToolsTabProps): React.JSX.Element {
   const chatResp = asUserChatResp(ctx.response);
 
   const tools: AuditToolDefinition[] = chatReq?.tools ?? [];
+  const toolCalls = chatResp?.choices?.[0]?.message.tool_calls;
+  const invokedCount = toolCalls == null ? 0 : toolCalls.length;
 
   return (
     <div className="flex flex-1 flex-col gap-6 pb-6 pt-6">
+      <ToolUsageBar definedCount={tools.length} invokedCount={invokedCount} />
       {tools.length === 0 ? (
         /* 空状态 */
         <div className="flex h-40 flex-col items-center justify-center gap-2 rounded-lg border border-dashed text-sm text-muted-foreground">
