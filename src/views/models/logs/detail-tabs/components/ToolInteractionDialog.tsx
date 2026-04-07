@@ -24,7 +24,7 @@ function ToolRequestTab({
   return (
     <TabsContent value="request" className="h-full m-0 flex flex-col min-h-0">
       {toolCall == null ? (
-        <div className="flex h-full items-center justify-center text-sm text-muted-foreground border border-border/50 rounded-md bg-background">
+        <div className="flex h-full items-center justify-center text-sm text-muted-foreground border border-border/50 shadow-sm rounded-lg bg-card">
           {t('modelsPage.logs.detail.noRequestParams', '暂无请求参数')}
         </div>
       ) : (
@@ -32,11 +32,11 @@ function ToolRequestTab({
           {isJsonArgs && parsedArgs != null ? (
             <div className="flex flex-col w-full h-full pb-4">
               {Object.keys(parsedArgs).length > 0 ? (
-                <div className="w-full max-w-full border border-border/40 rounded-md overflow-hidden bg-background">
+                <div className="w-full max-w-full border border-border/50 shadow-sm rounded-lg overflow-hidden bg-card">
                   <div className="overflow-x-auto w-full">
                     <table className="w-full text-left border-collapse min-w-full">
                       <thead>
-                        <tr className="bg-muted/40 dark:bg-muted/20 border-b border-border/40 text-[12px] font-medium text-muted-foreground">
+                        <tr className="bg-muted/50 dark:bg-muted/30 border-b border-border/50 text-[12px] font-medium text-muted-foreground">
                           <th className="px-6 py-4 font-medium whitespace-nowrap w-fit min-w-[160px] sm:min-w-[200px] border-r border-border/40 tracking-wider">
                             {t('modelsPage.logs.detail.field', '字段')}
                           </th>
@@ -90,7 +90,7 @@ function ToolRequestTab({
               )}
             </div>
           ) : (
-            <pre className="whitespace-pre-wrap break-all font-mono text-[13px] text-foreground leading-relaxed bg-background border border-border/50 rounded-md p-5 min-h-full">
+            <pre className="whitespace-pre-wrap break-all font-mono text-[13px] text-foreground leading-relaxed bg-card border border-border/50 shadow-sm rounded-lg p-5 min-h-full">
               {typeof toolCall.function.arguments === 'string'
                 ? toolCall.function.arguments
                 : JSON.stringify(toolCall.function.arguments, null, 2)}
@@ -180,9 +180,9 @@ export function ToolInteractionDialog({
           </div>
         </DialogHeader>
 
-        <div className="flex-1 min-h-0 w-full min-w-0 px-8 py-6 bg-muted/10 overflow-hidden flex flex-col gap-5">
+        <div className="flex-1 min-h-0 w-full min-w-0 px-8 py-6 bg-muted/20 dark:bg-muted/10 overflow-hidden flex flex-col gap-6">
           <div className="flex w-full shrink-0 justify-center">
-            <TabsList className="flex">
+            <TabsList className="flex bg-muted/40 dark:bg-muted/30">
               <TabsTrigger value="request" className="text-[12px] px-4 w-32">
                 {t('modelsPage.logs.detail.toolRequest', '请求参数')}
               </TabsTrigger>
