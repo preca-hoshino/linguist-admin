@@ -1,4 +1,4 @@
-import { Wrench, Search, Eye, Code, Download } from 'lucide-react';
+import { Wrench, Search, Eye, Code, Download, Zap } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -459,34 +459,40 @@ function ToolStatItem({
   label,
   value,
   accent,
+  icon: Icon,
 }: {
   readonly label: string;
   readonly value: number;
   readonly accent?: 'emerald' | 'amber' | 'primary' | undefined;
+  readonly icon?: React.ElementType;
 }): React.JSX.Element {
   let color = 'text-foreground';
+  let iconColor = 'text-muted-foreground';
   switch (accent) {
-  case 'emerald': {
-    color = 'text-emerald-600 dark:text-emerald-400';
-  
-  break;
-  }
-  case 'amber': {
-    color = 'text-amber-600 dark:text-amber-400';
-  
-  break;
-  }
-  case 'primary': {
-    color = 'text-primary';
-  
-  break;
-  }
-  // No default
+    case 'emerald': {
+      color = 'text-emerald-600 dark:text-emerald-400';
+      iconColor = color;
+      break;
+    }
+    case 'amber': {
+      color = 'text-amber-600 dark:text-amber-400';
+      iconColor = color;
+      break;
+    }
+    case 'primary': {
+      color = 'text-primary';
+      iconColor = color;
+      break;
+    }
+    // No default
   }
   return (
-    <div className="flex flex-col">
-      <span className="text-[10px] text-muted-foreground">{label}</span>
-      <span className={cn('font-mono text-sm font-semibold', color)}>{value.toLocaleString()}</span>
+    <div className="flex flex-col items-center justify-center gap-1.5 min-w-[80px]">
+      <div className="flex items-center justify-center gap-1.5">
+        {Icon != null && <Icon className={cn('h-4 w-4', iconColor)} />}
+        <span className={cn('font-mono text-xl font-bold leading-none', color)}>{value.toLocaleString()}</span>
+      </div>
+      <span className="text-[11px] font-medium text-muted-foreground">{label}</span>
     </div>
   );
 }
@@ -501,12 +507,17 @@ function ToolUsageBar({
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-wrap gap-4 rounded-xl border bg-card p-4 shadow-sm w-full shrink-0">
-      <ToolStatItem label={t('modelsPage.logs.detail.totalToolsDefined', '总可选工具')} value={definedCount} />
+    <div className="flex flex-wrap gap-10 rounded-xl border bg-card px-8 py-4 shadow-sm w-fit shrink-0 items-center justify-center">
+      <ToolStatItem 
+        label={t('modelsPage.logs.detail.totalToolsDefined', '总可选工具')} 
+        value={definedCount} 
+        icon={Wrench} 
+      />
       <ToolStatItem
         label={t('modelsPage.logs.detail.toolsInvoked', '本次调用并发')}
         value={invokedCount}
         accent={invokedCount > 0 ? 'primary' : undefined}
+        icon={Zap}
       />
     </div>
   );
@@ -530,8 +541,10 @@ export function LogToolsTab({ ctx }: LogToolsTabProps): React.JSX.Element {
   const invokedCount = toolCalls == null ? 0 : toolCalls.length;
 
   return (
-    <div className="flex flex-1 flex-col gap-6 pb-6 pt-6">
-      <ToolUsageBar definedCount={tools.length} invokedCount={invokedCount} />
+    <div className="flex flex-1 flex-col gap-6 pb-6 pt-4 px-4 overflow-x-hidden">
+      <div className="shrink-0 flex">
+        <ToolUsageBar definedCount={tools.length} invokedCount={invokedCount} />
+      </div>
       {tools.length === 0 ? (
         /* 空状态 */
         <div className="flex h-40 flex-col items-center justify-center gap-2 rounded-lg border border-dashed text-sm text-muted-foreground">
