@@ -107,19 +107,19 @@ export function ProviderModelsMutateDialog({
           id: currentRow.id,
           name: currentRow.name,
           type: (currentRow as { type?: string }).type ?? currentRow.model_type,
-          max_tokens: currentRow.max_tokens,
+          max_tokens: Math.round(currentRow.max_tokens / 1000),
           provider_id: currentRow.provider_id,
           capabilities: currentRow.capabilities,
           pricing_tiers:
             (currentRow.pricing_tiers?.length ?? 0) > 0
               ? (currentRow.pricing_tiers?.map((p) => ({
-                  startTokens: p.startTokens,
-                  maxTokens: p.maxTokens ?? 0,
+                  startTokens: Math.round(p.startTokens / 1000),
+                  maxTokens: Math.round((p.maxTokens ?? currentRow.max_tokens) / 1000),
                   inputPrice: p.inputPrice,
                   outputPrice: p.outputPrice,
                   cachePrice: p.cachePrice,
                 })) ?? [])
-              : [{ startTokens: 0, maxTokens: currentRow.max_tokens, inputPrice: 0, outputPrice: 0, cachePrice: 0 }],
+              : [{ startTokens: 0, maxTokens: Math.round(currentRow.max_tokens / 1000), inputPrice: 0, outputPrice: 0, cachePrice: 0 }],
         });
       } else {
         form.reset({
@@ -149,9 +149,13 @@ export function ProviderModelsMutateDialog({
       const payload = {
         name: values.name,
         model_type: values.type,
-        max_tokens: values.max_tokens,
+        max_tokens: values.max_tokens * 1000,
         capabilities: values.capabilities,
-        pricing_tiers: values.pricing_tiers,
+        pricing_tiers: values.pricing_tiers.map((t, index) => ({
+          ...t,
+          startTokens: t.startTokens * 1000,
+          maxTokens: index === values.pricing_tiers.length - 1 ? null : t.maxTokens * 1000,
+        })),
       };
 
       await (mode === 'edit' && currentRow

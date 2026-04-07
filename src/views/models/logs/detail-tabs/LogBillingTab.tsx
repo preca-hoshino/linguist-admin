@@ -1,71 +1,193 @@
-import { ArrowRight, CheckCircle2, CreditCard, Wallet } from 'lucide-react';
-import type { RequestLog } from '@/types';
+import { ArrowDownToLine, ArrowUpFromLine, ExternalLink, CornerDownRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from '@tanstack/react-router';
+import { listProviderModels } from '@/api/provider-models';
+import { ProviderLogo } from '@/components/ProviderLogo';
+import { Button } from '@/components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import type { GatewayContextSnapshot, PricingTier, RequestLog } from '@/types';
 
-function FinancialCard({
-  title,
-  amount,
+function InvoiceRow({
+  label,
   desc,
+  amount,
   icon: Icon,
-  primary = false,
+  isDiscount = false,
 }: {
-  readonly title: string;
-  readonly amount: number | string | null | undefined;
-  readonly desc?: string;
-  readonly icon?: React.ElementType;
-  readonly primary?: boolean;
-}): React.JSX.Element {
-  const isPrimary = primary;
-  const textColor = isPrimary ? 'text-blue-700 dark:text-blue-300' : 'text-foreground';
-  const bgColor = isPrimary
-    ? 'bg-blue-50/50 border-blue-200 dark:bg-blue-900/10 dark:border-blue-900/30 shadow-md'
-    : 'bg-card border-border shadow-sm';
-
-  let displayAmount: string | null = null;
-  if (amount != null) {
-    displayAmount = typeof amount === 'number' ? amount.toFixed(6) : amount;
+  readonly label: string;
+  readonly desc: string;
+  readonly amount: number | null | undefined;
+  readonly icon: React.ElementType;
+  readonly isDiscount?: boolean;
+}): React.JSX.Element | null {
+  if (amount == null) {
+    return null;
   }
-
+  
   return (
-    <div className={`rounded-xl border p-6 flex flex-col justify-between ${bgColor}`}>
-      <div className="flex items-center justify-between">
-        <h3
-          className={`text-sm font-semibold ${isPrimary ? 'text-blue-800 dark:text-blue-300' : 'text-muted-foreground'}`}
-        >
-          {title}
-        </h3>
-        {Icon != null && <Icon className={`h-5 w-5 ${isPrimary ? 'text-blue-500' : 'text-muted-foreground/30'}`} />}
-      </div>
-
-      <div className="mt-4 flex flex-col">
-        <div className="flex items-end gap-1">
-          <span className="text-sm font-semibold opacity-70 mb-1">¥</span>
-          {displayAmount == null ? (
-            <span className="text-3xl font-bold font-mono text-muted-foreground/30">0.000000</span>
-          ) : (
-            <span className={`text-3xl font-extrabold font-mono tracking-tight ${textColor}`}>{displayAmount}</span>
-          )}
+    <div className="flex items-center justify-between py-4 border-b last:border-0 border-border/40 hover:bg-muted/10 transition-colors px-2 rounded-sm -mx-2">
+      <div className="flex items-start gap-3.5">
+        <div className={`mt-0.5 rounded-lg p-2 ${isDiscount ? 'bg-emerald-500/10 text-emerald-500 dark:text-emerald-400' : 'bg-secondary text-secondary-foreground/70'}`}>
+          <Icon className="h-4 w-4" />
         </div>
-        {desc != null && desc !== '' && <span className="text-[11px] text-muted-foreground mt-1.5">{desc}</span>}
+        <div className="flex flex-col gap-1">
+          <span className="text-sm font-semibold">{label}</span>
+          <span className="text-xs text-muted-foreground max-w-sm leading-relaxed">{desc}</span>
+        </div>
+      </div>
+      <div className={`font-mono text-[15px] font-bold tracking-tight ${isDiscount ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
+        {isDiscount && amount > 0 ? '-' : ''}¥{amount.toFixed(6)}
       </div>
     </div>
   );
 }
 
+function PricingContextCard({
+  ctx,
+  tierStartTokens,
+}: {
+  readonly ctx: GatewayContextSnapshot;
+  readonly tierStartTokens: number;
+}): React.JSX.Element {
+  const { t } = useTranslation();
+  const [tier, setTier] = useState<PricingTier | null>(null);
+  const [providerModelId, setProviderModelId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (ctx.route !== undefined && ctx.route.providerId !== '' && ctx.route.model !== '') {
+      listProviderModels({ provider_id: ctx.route.providerId })
+        .then((res) => {
+          if (res.ok) {
+            const pm = res.data.data.find((m) => m.name === ctx.route?.model);
+            if (pm != null) {
+              setProviderModelId(pm.id);
+              if (pm.pricing_tiers != null) {
+                const matched = pm.pricing_tiers.find((t) => t.startTokens === tierStartTokens);
+                if (matched != null) {
+                  setTier(matched);
+                }
+              }
+            }
+          }
+        })
+        .catch(() => {
+          // ignore
+        });
+    }
+  }, [ctx.route, tierStartTokens]);
+
+  let maxTokensDisplay = '—';
+  let inputCostDisplay = '—';
+  let outputCostDisplay = '—';
+  let cacheCostDisplay = '—';
+
+  if (tier != null) {
+    maxTokensDisplay = tier.maxTokens == null ? 'Infinity (无上限)' : tier.maxTokens.toLocaleString();
+    inputCostDisplay = `¥${tier.inputPrice}`;
+    outputCostDisplay = `¥${tier.outputPrice}`;
+    cacheCostDisplay = `¥${tier.cachePrice}`;
+  }
+
+  return (
+    <Card className="shadow-sm border-border/60">
+      <CardHeader className="pb-3 border-b border-border/40">
+        <CardTitle className="text-sm font-semibold text-foreground/90">
+          {t('modelsPage.logs.detail.billingContext', '计费参数矩阵')}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-5 flex flex-col gap-6">
+        {/* Top Provider Model Rendering */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-background shadow-sm">
+              {(ctx.route?.providerKind != null && ctx.route.providerKind !== '') ||
+              (ctx.route?.providerName != null && ctx.route.providerName !== '') ? (
+                <ProviderLogo
+                  provider={
+                    (ctx.route.providerKind === '' ? ctx.route.providerName : ctx.route.providerKind) as string
+                  }
+                  size={20}
+                  className="opacity-80"
+                />
+              ) : (
+                <div className="h-2 w-2 rounded-full bg-border" />
+              )}
+            </div>
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <span className="truncate text-xs text-muted-foreground/80">
+                {ctx.route?.providerName != null && ctx.route.providerName !== ''
+                  ? ctx.route.providerName
+                  : 'Unknown Provider'}
+              </span>
+              <div className="truncate text-sm font-bold text-foreground/90" title={ctx.route?.model}>
+                {ctx.route?.model != null && ctx.route.model !== '' ? ctx.route.model : '—'}
+              </div>
+            </div>
+          </div>
+
+          {providerModelId != null && (
+            <Button variant="outline" size="sm" className="h-8 text-xs font-semibold" asChild>
+              <Link 
+                to="/models/provider-models/$id" 
+                params={{ id: providerModelId }}
+              >
+                <ExternalLink className="mr-1.5 h-3 w-3" />
+                Detail
+              </Link>
+            </Button>
+          )}
+        </div>
+
+        <div className="flex border-t border-border/40 pt-5 flex-col gap-3">
+          <span className="text-xs font-medium text-muted-foreground">
+            Pricing Tier Metadata
+          </span>
+          <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm">
+            <div className="flex flex-col gap-1">
+              <span className="text-[11px] text-muted-foreground">起始 Token (Start)</span>
+              <span className="font-mono text-xs">{tierStartTokens.toLocaleString()}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-[11px] text-muted-foreground">终止 Token (Max)</span>
+              <span className="font-mono text-xs text-muted-foreground">{maxTokensDisplay}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-[11px] text-muted-foreground">请求单价 / 1M (Prompt)</span>
+              <span className="font-mono text-xs">{inputCostDisplay}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-[11px] text-muted-foreground">响应单价 / 1M (Completion)</span>
+              <span className="font-mono text-xs">{outputCostDisplay}</span>
+            </div>
+            <div className="col-span-2 flex flex-col gap-1">
+              <span className="text-[11px] text-muted-foreground">缓存单价 / 1M (Cache)</span>
+              <span className="font-mono text-xs">{cacheCostDisplay}</span>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.Element {
+  const { t } = useTranslation();
   const ctx = log.gateway_context;
   const breakdown = log.cost_breakdown;
   const isEmbedding = ctx?.route?.modelType === 'embedding';
 
-  // 守卫：没有 cost_breakdown 或 breakdown 是空对象（兼容旧数据）
   const hasBreakdown = breakdown != null && typeof breakdown === 'object' && 'inputCost' in breakdown;
 
   if (!ctx || !hasBreakdown) {
     return (
       <div className="flex h-40 flex-col items-center justify-center gap-2 text-sm text-muted-foreground">
         <Wallet className="h-8 w-8 text-muted-foreground/30 mb-2" />
-        <p>此请求未产生计费记录</p>
+        <p>{t('modelsPage.logs.detail.billingNoRecord', '此请求未产生计费记录')}</p>
         <span className="text-xs opacity-70">
-          {ctx ? '未配置阶梯定价、无有效用量、或请求发生在计费启用之前。' : '缺少网关上下文数据。'}
+          {ctx 
+            ? t('modelsPage.logs.detail.billingNoRecordDesc1', '未配置阶梯定价、无有效用量、或请求发生在计费启用之前。') 
+            : t('modelsPage.logs.detail.billingNoRecordDesc2', '缺少网关上下文数据。')}
         </span>
       </div>
     );
@@ -78,73 +200,71 @@ export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.
   const tierStartTokens = breakdown.tierStartTokens;
 
   return (
-    <div className="flex flex-col gap-6 max-w-5xl mx-auto w-full">
-      {/* 行 1: 总花销 */}
-      <FinancialCard
-        title="本次请求总扣款"
-        amount={calculated_cost}
-        desc={isEmbedding ? '嵌入模型按输入 Token 量结算（无输出费用）' : '结合模型定价与实际使用的最终网关结算快照'}
-        icon={CreditCard}
-        primary
-      />
+    <div className="flex flex-col gap-4 w-full">
 
-      {/* 行 2: 拆分结构 */}
-      <h3 className="text-sm font-semibold text-muted-foreground mt-2 flex items-center gap-2">
-        费用拆分 <ArrowRight className="h-3 w-3" />
-      </h3>
-
-      {isEmbedding ? (
-        /* 嵌入模型：只有输入费用和缓存费用 */
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <FinancialCard title="输入扣费" amount={inputCost} desc="按嵌入输入文本累积的 Token 计算" />
-          <FinancialCard
-            title="Cache 缓存命中"
-            amount={cacheCost}
-            desc="若提供商支持嵌入缓存，此处结算匹配的低价 Token"
-          />
-        </div>
-      ) : (
-        /* Chat 模型：输入 + 输出 + 缓存 三列 */
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <FinancialCard title="Prompt 输入扣费" amount={inputCost} desc="按请求输入文本/视觉内容的 Token 计算" />
-          <FinancialCard title="Completion 输出扣费" amount={outputCost} desc="模型生成内容对应的 Token 开支" />
-          <FinancialCard title="Cache 缓存命中" amount={cacheCost} desc="通过上下文缓存匹配的低价结算费" />
-        </div>
-      )}
-
-      {/* 定价上下文 */}
-      <div className="rounded-lg border bg-muted/20 p-5 mt-4 flex flex-col gap-3 relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-32 h-32 bg-blue-50 dark:bg-blue-900/10 rounded-bl-full -z-10 blur-xl opacity-50" />
-
-        <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">定价依据</h4>
-
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] text-muted-foreground">定价所属模型</span>
-            <span className="font-mono font-medium">
-              {ctx.route?.model != null && ctx.route.model !== '' ? ctx.route.model : '—'}
-            </span>
+      {/* 1. Header (Highlight Cost) */}
+      <Card className="border-border/60 shadow-sm">
+        <CardContent className="pt-6 pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-2 text-foreground/90">
+                <span className="text-sm font-semibold">{t('modelsPage.logs.detail.billingTotal', '请求扣款')}</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {isEmbedding 
+                  ? t('modelsPage.logs.detail.billingTotalDescEmbed', '基于输入 Token 量结算的无感支付快照')
+                  : t('modelsPage.logs.detail.billingTotalDescChat', '最终网关结算快照')
+                }
+              </p>
+            </div>
+            
+            <div className="flex items-baseline gap-1 text-foreground">
+              <span className="text-lg font-semibold opacity-70">¥</span>
+              <span className="text-3xl font-bold font-mono tracking-tighter">
+                {calculated_cost == null ? '0.000000' : Number(calculated_cost).toFixed(6)}
+              </span>
+            </div>
           </div>
+        </CardContent>
+      </Card>
 
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] text-muted-foreground">阶梯阈值 (Tier Start)</span>
-            {((): React.ReactNode => {
-              if (tierStartTokens === 0) {
-                return (
-                  <span className="font-mono font-medium flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
-                    <CheckCircle2 className="h-3 w-3" /> Base Tier
-                  </span>
-                );
-              }
-              return <span className="font-mono font-medium">{tierStartTokens.toLocaleString()} Toks</span>;
-            })()}
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+        {/* 2. Breakdown Table */}
+        <Card className="lg:col-span-2 shadow-sm border-border/60">
+          <CardHeader className="pb-3 border-b border-border/40">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground/90">
+              {t('modelsPage.logs.detail.billingBreakdown', '费用明细')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-2 px-6 pb-4">
+            <InvoiceRow 
+              label={t('modelsPage.logs.detail.billInput', 'Prompt 输入')}
+              desc={isEmbedding ? t('modelsPage.logs.detail.billInputDescEmbed', '按嵌入输入文本累积的 Token 计算') : t('modelsPage.logs.detail.billInputDescChat', '按请求输入文本/视觉内容的 Token 计算')}
+              amount={inputCost}
+              icon={ArrowDownToLine}
+            />
+            
+            {!isEmbedding && (
+              <InvoiceRow 
+                label={t('modelsPage.logs.detail.billOutput', 'Completion 输出')}
+                desc={t('modelsPage.logs.detail.billOutputDescChat', '模型生成内容对应的 Token 开支')}
+                amount={outputCost}
+                icon={ArrowUpFromLine}
+              />
+            )}
 
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] text-muted-foreground">模型类型</span>
-            <span className="text-xs font-medium uppercase">{isEmbedding ? 'Embedding' : 'Chat'}</span>
-          </div>
-        </div>
+            <InvoiceRow 
+              label={t('modelsPage.logs.detail.billCache', 'Cache 缓存节省')}
+              desc={isEmbedding ? t('modelsPage.logs.detail.billCacheDescEmbed', '若提供商支持且启用嵌入缓存时的低价结算') : t('modelsPage.logs.detail.billCacheDescChat', '通过上下文缓存匹配的特殊结算费')}
+              amount={cacheCost}
+              icon={CornerDownRight}
+              isDiscount
+            />
+          </CardContent>
+        </Card>
+
+        {/* 3. Pricing Context Meta */}
+        <PricingContextCard ctx={ctx} tierStartTokens={tierStartTokens} />
       </div>
     </div>
   );
