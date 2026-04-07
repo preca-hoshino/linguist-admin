@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/utils/utils';
+import { BarChart2 } from 'lucide-react';
 
 // ── 组件：Token 用量卡片
 interface TokenUsage {
@@ -13,25 +14,21 @@ interface TokenUsage {
 function StatItem({
   label,
   value,
-  accent,
+  isTotal,
 }: {
   readonly label: string;
   readonly value?: number | undefined;
-  readonly accent?: 'emerald' | 'amber' | undefined;
+  readonly isTotal?: boolean;
 }): React.JSX.Element | null {
   if (value == null) {
     return null;
   }
-  let color = 'text-foreground';
-  if (accent === 'emerald') {
-    color = 'text-emerald-600 dark:text-emerald-400';
-  } else if (accent === 'amber') {
-    color = 'text-amber-600 dark:text-amber-400';
-  }
   return (
     <div className="flex flex-col">
-      <span className="text-[10px] text-muted-foreground">{label}</span>
-      <span className={cn('font-mono text-sm font-semibold', color)}>{value.toLocaleString()}</span>
+      <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">{label}</span>
+      <span className={cn('text-sm font-bold mt-0.5', isTotal ? 'text-primary text-[15px]' : 'text-foreground')}>
+        {value.toLocaleString()}
+      </span>
     </div>
   );
 }
@@ -49,29 +46,44 @@ export function TokenUsageBar({
   }
 
   return (
-    <div className="flex flex-wrap gap-4 rounded-xl border bg-card p-4 shadow-sm w-full shrink-0">
-      <StatItem label={t('modelsPage.logs.detail.totalTokens', '总 Token')} value={usage.total_tokens} />
-      <StatItem label={t('modelsPage.logs.detail.promptTokens', '输入')} value={usage.prompt_tokens} />
+    <div className="flex w-full items-center rounded-xl border bg-card/60 backdrop-blur px-4 py-2.5 shadow-sm overflow-x-auto scrollbar-hide">
+      {/* 左侧：标题 */}
+      <div className="flex shrink-0 items-center justify-center gap-2 pr-4 text-primary/80">
+        <BarChart2 className="h-4 w-4" />
+        <span className="text-[13px] font-bold text-foreground/80">{t('modelsPage.logs.detail.tokenUsageTitle', 'Token 用量')}</span>
+      </div>
 
-      {mode === 'chat' && (
-        <StatItem label={t('modelsPage.logs.detail.completionTokens', '输出')} value={usage.completion_tokens} />
-      )}
+      <div className="h-5 w-[1px] shrink-0 bg-border/80" />
 
-      {mode === 'chat' && usage.cached_tokens != null && usage.cached_tokens > 0 && (
-        <StatItem
-          label={t('modelsPage.logs.detail.cachedTokens', '缓存')}
-          value={usage.cached_tokens}
-          accent="emerald"
-        />
-      )}
+      {/* 中间：各项明细 */}
+      <div className="flex items-center gap-6 md:gap-8 px-5 flex-1 min-w-0">
+        <StatItem label={t('modelsPage.logs.detail.promptTokens', 'PROMPT')} value={usage.prompt_tokens} />
+        
+        {mode === 'chat' && (
+          <StatItem label={t('modelsPage.logs.detail.completionTokens', 'COMPLETION')} value={usage.completion_tokens} />
+        )}
+        
+        {mode === 'chat' && usage.cached_tokens != null && (
+          <StatItem
+            label={t('modelsPage.logs.detail.cachedTokens', 'CACHED')}
+            value={usage.cached_tokens}
+          />
+        )}
+        
+        {mode === 'chat' && usage.reasoning_tokens != null && usage.reasoning_tokens > 0 && (
+          <StatItem
+            label={t('modelsPage.logs.detail.reasoningTokens', 'REASONING')}
+            value={usage.reasoning_tokens}
+          />
+        )}
+      </div>
 
-      {mode === 'chat' && usage.reasoning_tokens != null && usage.reasoning_tokens > 0 && (
-        <StatItem
-          label={t('modelsPage.logs.detail.reasoningTokens', '思考')}
-          value={usage.reasoning_tokens}
-          accent="amber"
-        />
-      )}
+      <div className="h-5 w-[1px] shrink-0 bg-border/80" />
+
+      {/* 右侧：总计 */}
+      <div className="flex shrink-0 items-center pl-5">
+        <StatItem label={t('modelsPage.logs.detail.totalTokens', 'TOTAL')} value={usage.total_tokens} isTotal />
+      </div>
     </div>
   );
 }
