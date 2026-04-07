@@ -158,7 +158,7 @@ export function ToolInteractionDialog({
           <div className="flex items-center gap-3 z-10 w-full min-w-0 pr-8">
             <Wrench className="h-5 w-5 text-foreground shrink-0 mt-0.5" />
             <div className="flex flex-col gap-1.5 text-left justify-center min-w-0 flex-1">
-              <DialogTitle className="leading-tight flex items-center break-all sm:break-normal truncate sm:whitespace-normal sm:line-clamp-2 text-[15px]">
+              <DialogTitle className="leading-tight flex items-center break-all sm:break-normal truncate sm:whitespace-normal sm:line-clamp-2 text-lg font-semibold font-mono tracking-tight">
                 {toolCall != null && toolCall.function.name !== '' ? toolCall.function.name : toolName}
               </DialogTitle>
               {displayId === 'Unknown ID' ? (
@@ -251,8 +251,8 @@ export const ToolInteractionTrigger = forwardRef<
       <div className="flex items-center gap-2 w-full min-w-0 overflow-hidden pl-1 my-0.5">
         <Wrench className="h-4 w-4 shrink-0 text-muted-foreground" />
         <div className="flex flex-col text-left justify-center min-w-0 flex-1 gap-1.5 overflow-hidden">
-          <span className="font-mono text-[14px] font-bold leading-none truncate pt-0.5">{toolName}</span>
-          {displayId !== 'Unknown ID' && <CopyableId id={displayId} prefix="" className="text-[10px] self-start" />}
+          <span className="font-mono text-[15px] font-bold leading-none truncate pt-0.5 tracking-tight">{toolName}</span>
+          {displayId !== 'Unknown ID' && <CopyableId id={displayId} prefix="" className="text-[9px] self-start opacity-80" />}
         </div>
       </div>
     </div>
