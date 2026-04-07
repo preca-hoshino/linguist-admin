@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
+import { Separator } from '@/components/ui/Separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import type { AuditToolDefinition, AuditUserChatRequest, AuditUserChatResponse, GatewayContextSnapshot } from '@/types';
 import { cn } from '@/utils/utils';
@@ -411,12 +412,13 @@ function ToolCallsResult({
   const toolResults = reqBody?.messages?.filter((m) => m.role === 'tool') ?? [];
 
   return (
-    <div className="flex flex-col gap-3">
-      <h3 className="text-sm font-semibold flex items-center gap-2">
-        <Zap className="h-4 w-4 text-primary" />
-        {t('modelsPage.logs.detail.thisCallTools', '模型本次调用的工具')}
-      </h3>
+    <>
+      <Separator />
       <div className="flex flex-col gap-2">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-sm font-semibold">{t('modelsPage.logs.detail.thisCallTools', '工具调用')}</h3>
+        </div>
+        <div className="flex flex-col gap-2">
         {(toolCalls as unknown[]).map((tcRaw) => {
           const tc = typeof tcRaw === 'object' && tcRaw !== null ? (tcRaw as Record<string, unknown>) : {};
           const tcId = typeof tc.id === 'string' ? tc.id : '';
@@ -539,6 +541,7 @@ function ToolCallsResult({
         })}
       </div>
     </div>
+    </>
   );
 }
 
@@ -558,7 +561,7 @@ export function LogToolsTab({ ctx }: LogToolsTabProps): React.JSX.Element {
   const tools: AuditToolDefinition[] = chatReq?.tools ?? [];
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-1 flex-col gap-6 pb-6">
       {tools.length === 0 ? (
         /* 空状态 */
         <div className="flex h-40 flex-col items-center justify-center gap-2 rounded-lg border border-dashed text-sm text-muted-foreground">
@@ -567,16 +570,15 @@ export function LogToolsTab({ ctx }: LogToolsTabProps): React.JSX.Element {
         </div>
       ) : (
         /* 工具列表工作区 */
-        <div className="flex flex-col gap-3">
-          <h3 className="text-sm font-semibold flex items-center gap-2">
-            <Wrench className="h-4 w-4 text-primary" />
-            {t('modelsPage.logs.detail.availableTools', '请求中包含的候选工具')}
-          </h3>
+        <div className="flex flex-col gap-2">
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+            <h3 className="text-sm font-semibold">{t('modelsPage.logs.detail.availableTools', '工具定义')}</h3>
+          </div>
           <ToolWorkspace tools={tools} />
         </div>
       )}
 
-      {/* 本次调用结果区 */}
+      {/* 本次调用结果区 (内部自带 Separator 且为空时自动不渲染) */}
       <ToolCallsResult resp={chatResp} reqBody={chatReq} />
     </div>
   );
