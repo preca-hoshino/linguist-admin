@@ -1,7 +1,7 @@
 import { Wrench, X, Zap, Search, Eye, Code, Download } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Badge } from '@/components/ui/Badge';
+
 import { Button } from '@/components/ui/Button';
 import {
   Dialog,
@@ -556,35 +556,9 @@ export function LogToolsTab({ ctx }: LogToolsTabProps): React.JSX.Element {
   const chatResp = asUserChatResp(ctx.response);
 
   const tools: AuditToolDefinition[] = chatReq?.tools ?? [];
-  const toolChoice = chatReq?.tool_choice;
-  const choiceLabel = formatToolChoice(toolChoice);
 
   return (
     <div className="flex flex-col gap-5">
-      {/* 顶部状态栏 */}
-      <div className="flex flex-wrap items-center gap-2">
-        <Badge
-          variant="outline"
-          className={cn(
-            'font-medium text-xs gap-1.5',
-            tools.length > 0 ? 'border-primary/20 text-primary bg-primary/10' : 'text-muted-foreground',
-          )}
-        >
-          <Wrench className="h-3 w-3" />
-          {tools.length > 0
-            ? t('modelsPage.logs.detail.toolCount', '{{count}} 个工具', {
-                count: tools.length,
-                defaultValue: `${tools.length} 个工具`,
-              })
-            : t('modelsPage.logs.detail.noTools', '无工具')}
-        </Badge>
-        {choiceLabel != null && choiceLabel !== '' && (
-          <Badge variant="outline" className="text-xs text-muted-foreground">
-            tool_choice: <span className="ml-1 font-mono font-medium text-foreground">{choiceLabel}</span>
-          </Badge>
-        )}
-      </div>
-
       {tools.length === 0 ? (
         /* 空状态 */
         <div className="flex h-40 flex-col items-center justify-center gap-2 rounded-lg border border-dashed text-sm text-muted-foreground">
@@ -593,7 +567,13 @@ export function LogToolsTab({ ctx }: LogToolsTabProps): React.JSX.Element {
         </div>
       ) : (
         /* 工具列表工作区 */
-        <ToolWorkspace tools={tools} />
+        <div className="flex flex-col gap-3">
+          <h3 className="text-sm font-semibold flex items-center gap-2">
+            <Wrench className="h-4 w-4 text-primary" />
+            {t('modelsPage.logs.detail.availableTools', '请求中包含的候选工具')}
+          </h3>
+          <ToolWorkspace tools={tools} />
+        </div>
       )}
 
       {/* 本次调用结果区 */}
