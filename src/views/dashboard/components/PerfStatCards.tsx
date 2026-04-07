@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { type ChartPoint, type TimeRange, useUsageChart } from '@/composables/use-usage-chart';
 import type { GlobalTimeRange, StatsFilterOptions } from '@/types/dashboard';
+import { formatDuration, formatDurationUnit } from '@/utils/utils';
 
 interface StatDef {
   labelKey: string;
@@ -16,17 +17,6 @@ interface StatDef {
   unitFn: (v: number) => string;
 }
 
-function formatMs(v: number): string {
-  if (v >= 1000) {
-    return (v / 1000).toFixed(2);
-  }
-  return Math.round(v).toString();
-}
-
-function msUnit(v: number): string {
-  return v >= 1000 ? 's' : 'ms';
-}
-
 const STATS: StatDef[] = [
   {
     labelKey: 'dashboard.perf.stat_e2e',
@@ -35,8 +25,8 @@ const STATS: StatDef[] = [
     descFallback: 'Average round-trip latency',
     dataKey: 'avg_latency_ms',
     icon: Clock,
-    format: formatMs,
-    unitFn: msUnit,
+    format: formatDuration,
+    unitFn: formatDurationUnit,
   },
   {
     labelKey: 'dashboard.perf.stat_ttft',
@@ -45,8 +35,8 @@ const STATS: StatDef[] = [
     descFallback: 'Average time to first token',
     dataKey: 'ttft_avg_ms',
     icon: Timer,
-    format: formatMs,
-    unitFn: msUnit,
+    format: formatDuration,
+    unitFn: formatDurationUnit,
   },
   {
     labelKey: 'dashboard.perf.stat_itl',
@@ -55,8 +45,8 @@ const STATS: StatDef[] = [
     descFallback: 'Average inter-token latency',
     dataKey: 'itl_avg_ms',
     icon: Gauge,
-    format: formatMs,
-    unitFn: msUnit,
+    format: formatDuration,
+    unitFn: formatDurationUnit,
   },
   {
     labelKey: 'dashboard.perf.stat_tok_s',

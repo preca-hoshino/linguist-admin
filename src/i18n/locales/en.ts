@@ -535,6 +535,44 @@ export default {
         completionTokens: 'Output',
         cachedTokens: 'Cached',
         reasoningTokens: 'Reasoning',
+
+        // TokenUsageBar
+        tokenUsageTitle: 'Token Usage',
+
+        // Performance - MetricCards
+        perfE2ELatency: 'E2E',
+        perfE2EDesc: 'Full end-to-end round-trip latency across the gateway and model',
+        perfTTFT: 'TTFT',
+        perfTTFTDesc: 'Time from receiving the request to the first valid token from the model',
+        perfGatewayOverhead: 'Gateway Overhead',
+        perfGatewayOverheadDesc: 'Additional time spent on auth, context orchestration, and parameter mapping',
+        perfGenRate: 'Generation Rate',
+        perfGenRateDesc: 'Tokens generated per second during streaming output',
+        perfProviderTime: 'Provider Time',
+        perfProviderTimeDesc: 'Total time spent by the model provider processing the request',
+        perfITLDesc: 'Typing smoothness (ITL): {{ms}}ms/token',
+        perfITLDescSingle: 'Average time between generated tokens during stream response',
+        perfGenRateDescSingle: 'Number of tokens generated per second during the streaming phase',
+
+        // Performance - Waterfall
+        waterfallTitle: 'Latency Breakdown',
+        phaseGatewayIn: 'Gateway Receive & Adapt',
+        phaseProviderTtft: 'Model Inference (TTFT)',
+        phaseProviderFull: 'Model Inference & Generation',
+        phaseGeneration: 'Streaming Output',
+        phaseGatewayOut: 'Gateway Post-processing',
+
+        // Tools
+        totalToolsDefined: 'Tools Defined',
+        toolsInvoked: 'Tools Invoked',
+        availableTools: 'Tool Definitions',
+        thisCallTools: 'Tool Calls',
+        toolDescription: 'Description',
+        toolParameters: 'Parameters',
+        paramName: 'Name',
+        paramType: 'Type',
+        paramRequired: 'Required',
+        paramDescription: 'Description',
       },
     },
   },

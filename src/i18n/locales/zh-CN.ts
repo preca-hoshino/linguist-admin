@@ -530,6 +530,44 @@ export default {
         completionTokens: '输出',
         cachedTokens: '缓存',
         reasoningTokens: '思考',
+
+        // TokenUsageBar
+        tokenUsageTitle: 'Token 用量',
+
+        // Performance - MetricCards
+        perfE2ELatency: 'E2E',
+        perfE2EDesc: '网关及大模型全局端到端响应耗时',
+        perfTTFT: 'TTFT',
+        perfTTFTDesc: '从网关接收请求至大模型响应首个有效 Token',
+        perfGatewayOverhead: '网关损耗',
+        perfGatewayOverheadDesc: '网关执行鉴权、上下文编排及出入参映射产生的额外耗时',
+        perfGenRate: '生成速率',
+        perfGenRateDesc: '单位时间流式生成的 Token 数',
+        perfProviderTime: '提供商耗时',
+        perfProviderTimeDesc: '大模型处理请求的完整耗时（包含推理与生成）',
+        perfITLDesc: '打字平顺度 (ITL): {{ms}}ms/字',
+        perfITLDescSingle: '流式响应中每次字间生成的平均耗时',
+        perfGenRateDescSingle: '流式持续阶段单位时间内生成的 Token 数量',
+
+        // Performance - Waterfall
+        waterfallTitle: '耗时分析',
+        phaseGatewayIn: '网关接收与适配',
+        phaseProviderTtft: '大模型推理 (TTFT)',
+        phaseProviderFull: '大模型推理与生成',
+        phaseGeneration: '流式持续输出',
+        phaseGatewayOut: '网关后处理与下发',
+
+        // Tools
+        totalToolsDefined: '总可选工具',
+        toolsInvoked: '本次调用并发',
+        availableTools: '工具定义',
+        thisCallTools: '工具调用',
+        toolDescription: '工具描述',
+        toolParameters: '参数列表',
+        paramName: '参数名',
+        paramType: '类型',
+        paramRequired: '必填',
+        paramDescription: '描述',
       },
     },
   },

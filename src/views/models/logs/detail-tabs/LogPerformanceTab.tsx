@@ -1,7 +1,8 @@
-import { Activity, BarChart, Server, Timer, Zap } from 'lucide-react';
+import { Clock, Gauge, Server, Timer, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import type { GatewayContextSnapshot, RequestLog } from '@/types';
-import { cn } from '@/utils/utils';
+import { cn, formatDuration, formatDurationUnit } from '@/utils/utils';
 
 function MetricCard({
   title,
@@ -9,127 +10,260 @@ function MetricCard({
   unit,
   desc,
   icon: Icon,
-  accent = 'blue',
 }: {
   readonly title: string;
   readonly value: string | number | null;
   readonly unit?: string;
   readonly desc?: string;
   readonly icon?: React.ElementType;
-  readonly accent?: 'blue' | 'emerald' | 'amber' | 'violet';
 }): React.JSX.Element {
-  const TEXT_COLORS = {
-    emerald: 'text-emerald-600 dark:text-emerald-400',
-    amber: 'text-amber-600 dark:text-amber-400',
-    violet: 'text-violet-600 dark:text-violet-400',
-    blue: 'text-blue-600 dark:text-blue-400',
-  } as const;
-
-  const BG_COLORS = {
-    emerald: 'bg-emerald-50 dark:bg-emerald-500/10',
-    amber: 'bg-amber-50 dark:bg-amber-500/10',
-    violet: 'bg-violet-50 dark:bg-violet-500/10',
-    blue: 'bg-blue-50 dark:bg-blue-500/10',
-  } as const;
-
-  const colorText = TEXT_COLORS[accent];
-  const colorBg = BG_COLORS[accent];
-
   return (
-    <div className="rounded-lg border bg-card p-5 shadow-sm">
-      <div className="flex items-center gap-2 mb-3">
-        {Icon != null && (
-          <div className={cn('p-1.5 rounded-md', colorBg)}>
-            <Icon className={cn('h-4 w-4', colorText)} />
-          </div>
-        )}
-        <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
-      </div>
-      <div className="flex items-baseline gap-1.5">
-        {value == null ? (
-          <span className="text-xl font-medium text-muted-foreground/50">—</span>
-        ) : (
-          <>
-            <span className={cn('text-2xl font-bold font-mono tracking-tight', colorText)}>{value}</span>
-            {unit != null && unit !== '' && <span className="text-xs font-semibold text-muted-foreground">{unit}</span>}
-          </>
-        )}
-      </div>
-      {desc != null && desc !== '' && <p className="mt-2 text-[11px] text-muted-foreground">{desc}</p>}
-    </div>
+    <Card className="gap-4 py-5">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        {Icon != null && <Icon className="h-4 w-4 text-muted-foreground" />}
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="text-3xl font-bold tracking-normal">
+          {value == null ? (
+            <span className="text-muted-foreground">—</span>
+          ) : (
+            <>
+              {value}
+              {unit != null && unit !== '' && <span className="ml-1 text-lg font-medium text-muted-foreground">{unit}</span>}
+            </>
+          )}
+        </div>
+        {desc != null && desc !== '' && <p className="mt-4 text-xs text-muted-foreground">{desc}</p>}
+      </CardContent>
+    </Card>
   );
 }
 
-// ── 时间线组件 ──
-function TimingTimeline({ ctx }: { readonly ctx: GatewayContextSnapshot }): React.JSX.Element {
-  const { t } = useTranslation();
-  const { start, requestAdapted, routed, providerStart, ttft, providerEnd, end } = ctx.timing;
+// ── 时序组件：垂直瀑布流 ──
+function getWaterfallBlocks(
+  ctx: GatewayContextSnapshot,
+  startMs: number,
+  endMs: number,
+  t: (key: string, fallback: string) => string
+): { label: string; start: number; end: number; colorBg: string; colorText: string }[] {
+  const { providerStart, ttft, providerEnd } = ctx.timing;
   const isStream = ctx.stream;
+  const blocks = [];
+
+  // 1. 网关接收与适配
+  if (providerStart != null && providerStart >= startMs) {
+    blocks.push({
+      label: t('modelsPage.logs.detail.phaseGatewayIn', '网关接收与适配'),
+      start: startMs,
+      end: providerStart,
+      colorBg: 'bg-violet-500/80 dark:bg-violet-500/60',
+      colorText: 'text-violet-600 dark:text-violet-400',
+    });
+  }
+
+  // 2. 提供商等待 / 推理 (TTFT 或 完整响应)
+  if (providerStart != null) {
+    const waitEnd = isStream && ttft != null ? ttft : (providerEnd ?? endMs);
+    if (waitEnd >= providerStart) {
+      blocks.push({
+        label: isStream
+          ? t('modelsPage.logs.detail.phaseProviderTtft', '大模型推理 (TTFT)')
+          : t('modelsPage.logs.detail.phaseProviderFull', '大模型推理与生成'),
+        start: providerStart,
+        end: waitEnd,
+        colorBg: 'bg-amber-500/80 dark:bg-amber-500/60',
+        colorText: 'text-amber-600 dark:text-amber-400',
+      });
+    }
+  }
+
+  // 3. 流式持续生成 (若有)
+  if (isStream && ttft != null && providerEnd != null && providerEnd >= ttft) {
+    blocks.push({
+      label: t('modelsPage.logs.detail.phaseGeneration', '流式持续输出'),
+      start: ttft,
+      end: providerEnd,
+      colorBg: 'bg-emerald-500/80 dark:bg-emerald-500/60',
+      colorText: 'text-emerald-600 dark:text-emerald-400',
+    });
+  }
+
+  // 4. 网关后处理与下发响应
+  if (providerEnd != null && endMs >= providerEnd) {
+    blocks.push({
+      label: t('modelsPage.logs.detail.phaseGatewayOut', '网关后处理与下发'),
+      start: providerEnd,
+      end: endMs,
+      colorBg: 'bg-blue-500/80 dark:bg-blue-500/60',
+      colorText: 'text-blue-600 dark:text-blue-400',
+    });
+  }
+
+  return blocks;
+}
+
+function WaterfallChart({ ctx }: { readonly ctx: GatewayContextSnapshot }): React.JSX.Element {
+  const { t } = useTranslation();
+  const { start, end } = ctx.timing;
 
   const startMs = start;
+  const endMs = end ?? startMs; // 兜底防止意外空值
+  const e2eTotalMs = Math.max(1, endMs - startMs);
 
-  // 关键节点
-  const phases: { label: string; ts?: number; key: string }[] = [
-    { label: t('modelsPage.logs.detail.timingStart', '请求到达'), ts: startMs, key: 'start' },
-    ...(requestAdapted == null
-      ? []
-      : [{ label: t('modelsPage.logs.detail.timingAdapted', '请求适配'), ts: requestAdapted, key: 'adapted' }]),
-    ...(routed == null
-      ? []
-      : [{ label: t('modelsPage.logs.detail.timingRouted', '路由完成'), ts: routed, key: 'routed' }]),
-    ...(providerStart == null
-      ? []
-      : [
-          {
-            label: t('modelsPage.logs.detail.timingProviderStart', '发给提供商'),
-            ts: providerStart,
-            key: 'providerStart',
-          },
-        ]),
-    ...(isStream && ttft != null
-      ? [{ label: t('modelsPage.logs.detail.timingTtft', 'TTFT'), ts: ttft, key: 'ttft' }]
-      : []),
-    ...(providerEnd == null
-      ? []
-      : [{ label: t('modelsPage.logs.detail.timingProviderEnd', '提供商响应'), ts: providerEnd, key: 'providerEnd' }]),
-    ...(end == null ? [] : [{ label: t('modelsPage.logs.detail.timingEnd', '请求完成'), ts: end, key: 'end' }]),
-  ];
+  const blocks = getWaterfallBlocks(ctx, startMs, endMs, t);
 
   return (
-    <div className="rounded-lg border bg-card p-6 shadow-sm overflow-x-auto">
-      <h3 className="mb-6 flex items-center gap-2 text-sm font-semibold">
-        <BarChart className="h-4 w-4 text-muted-foreground" />
-        瀑布流时序分析
-      </h3>
-      <div className="flex justify-center min-w-max my-8">
-        {phases.map((p, i) => {
-          const delta = i === 0 ? 0 : (p.ts ?? 0) - startMs;
+    <div>
+      <h3 className="text-sm font-semibold mb-4">{t('modelsPage.logs.detail.waterfallTitle', '耗时分析')}</h3>
+
+      <div className="flex flex-col gap-3">
+        {blocks.map((b) => {
+          const offsetPct = Math.max(0, ((b.start - startMs) / e2eTotalMs) * 100);
+          let widthPct = Math.max(0, ((b.end - b.start) / e2eTotalMs) * 100);
+          if (offsetPct + widthPct > 100) {
+            widthPct = 100 - offsetPct;
+          }
+          const duration = Math.round(b.end - b.start);
+
           return (
-            <div key={p.key} className="flex items-center">
-              <div className="flex flex-col items-center relative">
-                {/* 节点点缀 */}
-                <div className="h-3 w-3 rounded-full bg-primary ring-4 ring-primary/20 z-10" />
-                <div className="absolute top-6 flex flex-col items-center min-w-24">
-                  <span className="text-xs font-medium text-foreground whitespace-nowrap">{p.label}</span>
-                  {i > 0 && (
-                    <span className="text-[10px] font-mono font-medium text-muted-foreground mt-0.5">+{delta}ms</span>
-                  )}
-                  {i === 0 && (
-                    <span className="text-[10px] font-mono text-muted-foreground mt-0.5">
-                      {new Date(startMs).toLocaleTimeString()}
-                    </span>
-                  )}
-                </div>
+            <div key={b.label} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+              <div className="w-32 shrink-0 sm:text-right">
+                <div className="text-[11px] font-semibold text-foreground/70 tracking-wide">{b.label}</div>
               </div>
-              {i < phases.length - 1 && (
-                <div className="h-[2px] w-16 md:w-32 bg-border relative">
-                  {/* 分段耗时? 暂不显示以免过密，通过上面的 +delta 已经清晰 */}
-                </div>
-              )}
+
+              {/* 进度条槽 */}
+              <div className="flex-1 relative h-[22px] rounded-md bg-muted/30 overflow-hidden flex items-center">
+                <div
+                  className={cn('absolute h-full transition-all min-w-[2px] rounded-sm', b.colorBg)}
+                  style={{ left: `${offsetPct}%`, width: `${Math.max(widthPct, 0.5)}%` }}
+                />
+              </div>
+
+              {/* 时长说明 */}
+              <div className="w-16 shrink-0 text-right">
+                <span className={cn('text-sm font-bold', b.colorText)}>{duration}ms</span>
+              </div>
             </div>
           );
         })}
       </div>
+
+      {/* X 轴刻度指示 */}
+      <div className="flex justify-between items-center mt-4 pt-3 border-t text-[10px] text-muted-foreground/60 font-medium" style={{ paddingLeft: '140px' }}>
+        <span>0ms</span>
+        <span>{Math.round(e2eTotalMs / 2)}ms</span>
+        <span>{e2eTotalMs}ms</span>
+      </div>
+    </div>
+  );
+}
+
+interface PerfMetrics {
+  totalMs: number | null;
+  ttftMs: number | null;
+  providerTimeMs: number | null;
+  gatewayOverheadMs: number | null;
+  itlMs: number | null;
+  genRate: number | null;
+}
+
+function computeMetrics(ctx: GatewayContextSnapshot): PerfMetrics {
+  const { start, providerStart, providerEnd, ttft, end } = ctx.timing;
+  const isStream = ctx.stream;
+  const usage = ctx.response?.usage;
+
+  const startMs = start;
+  const endMs = end ?? null;
+  const totalMs = endMs == null ? null : endMs - startMs;
+  const ttftMs = isStream && ttft != null && providerStart != null ? Math.round(ttft - startMs) : null;
+  const providerTimeMs = providerStart != null && providerEnd != null ? Math.round(providerEnd - providerStart) : null;
+  const gatewayOverheadMs = totalMs != null && providerTimeMs != null ? totalMs - providerTimeMs : null;
+
+  let itlMs: number | null = null;
+  let genRate: number | null = null;
+
+  if (isStream && ttft != null && providerEnd != null && usage?.completion_tokens != null && usage.completion_tokens > 1) {
+    const genTime = providerEnd - ttft;
+    if (genTime > 0) {
+      itlMs = Math.round(genTime / (usage.completion_tokens - 1));
+      genRate = Math.round((usage.completion_tokens / genTime) * 1000);
+    }
+  }
+
+  return { totalMs, ttftMs, providerTimeMs, gatewayOverheadMs, itlMs, genRate };
+}
+
+function getDurationProps(ms: number | null): { value: string | null; unit: string } {
+  return {
+    value: ms == null ? null : formatDuration(ms),
+    unit: ms == null ? 'ms' : formatDurationUnit(ms),
+  };
+}
+
+function PerformanceCardsList({
+  isStream,
+  metrics,
+  t,
+}: {
+  readonly isStream: boolean;
+  readonly metrics: PerfMetrics;
+  readonly t: (key: string, Default: string, opts?: Record<string, unknown>) => string;
+}): React.JSX.Element {
+  const { totalMs, ttftMs, providerTimeMs, gatewayOverheadMs, itlMs, genRate } = metrics;
+
+  return (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {/* 1. E2E 卡片 */}
+      <MetricCard
+        title={t('dashboard.perf.stat_e2e', 'E2E')}
+        {...getDurationProps(totalMs)}
+        desc={t('modelsPage.logs.detail.perfE2EDesc', '网关及大模型全局端到端响应耗时')}
+        icon={Clock}
+      />
+      
+      {/* 2. TTFT 或 Provider Time 卡片 */}
+      {isStream ? (
+        <MetricCard
+          title={t('dashboard.perf.stat_ttft', 'TTFT')}
+          {...getDurationProps(ttftMs)}
+          desc={t('modelsPage.logs.detail.perfTTFTDesc', '从网关接收请求至大模型响应首个有效 Token')}
+          icon={Timer}
+        />
+      ) : (
+        <MetricCard
+          title={t('modelsPage.logs.detail.perfProviderTime', 'Provider Time')}
+          {...getDurationProps(providerTimeMs)}
+          desc={t('modelsPage.logs.detail.perfProviderTimeDesc', '大模型处理请求的完整耗时（包含推理与生成）')}
+          icon={Timer}
+        />
+      )}
+      
+      {/* 3. ITL 或 网关损耗 卡片 */}
+      {isStream ? (
+        <MetricCard
+          title={t('dashboard.perf.stat_itl', 'ITL')}
+          {...getDurationProps(itlMs)}
+          desc={t('modelsPage.logs.detail.perfITLDescSingle', '流式响应中每次字间生成的平均耗时')}
+          icon={Gauge}
+        />
+      ) : (
+        <MetricCard
+          title={t('modelsPage.logs.detail.perfGatewayOverhead', 'Gateway Overhead')}
+          {...getDurationProps(gatewayOverheadMs)}
+          desc={t('modelsPage.logs.detail.perfGatewayOverheadDesc', '网关执行鉴权、上下文编排及出入参映射产生的额外耗时')}
+          icon={Server}
+        />
+      )}
+      
+      {/* 4. Token 生成速率 卡片 */}
+      <MetricCard
+        title={t('dashboard.perf.stat_tok_s', 'Generation Rate')}
+        value={isStream && genRate != null ? genRate.toLocaleString() : null}
+        unit={isStream && genRate != null ? 'Tok/s' : ''}
+        desc={t('modelsPage.logs.detail.perfGenRateDescSingle', '流式持续阶段单位时间内生成的 Token 数量')}
+        icon={Zap}
+      />
     </div>
   );
 }
@@ -146,80 +280,13 @@ export function LogPerformanceTab({ log }: { readonly log: RequestLog }): React.
     );
   }
 
-  const { start, providerStart, providerEnd, ttft, end } = ctx.timing;
   const isStream = ctx.stream;
-  const usage = ctx.response?.usage;
-
-  // 1. E2E Latency
-  const startMs = start;
-  const endMs = end ?? null;
-  const totalMs = endMs == null ? null : endMs - startMs;
-
-  // 2. TTFT (Time To First Token)
-  const ttftMs = isStream && ttft != null && providerStart != null ? Math.round(ttft - startMs) : null;
-
-  // 3. Provider Processing Time
-  const providerTimeMs = providerStart != null && providerEnd != null ? Math.round(providerEnd - providerStart) : null;
-
-  // 4. Gateway Overhead
-  const gatewayOverheadMs = totalMs != null && providerTimeMs != null ? totalMs - providerTimeMs : null;
-
-  // 5. ITL (Inter-Token Latency) & Generation Rate
-  let itlMs: number | null = null;
-  let genRate: number | null = null;
-
-  if (
-    isStream &&
-    ttft != null &&
-    providerEnd != null &&
-    usage?.completion_tokens != null &&
-    usage.completion_tokens > 0
-  ) {
-    const genTime = providerEnd - ttft;
-    if (genTime > 0 && usage.completion_tokens > 1) {
-      itlMs = Math.round(genTime / (usage.completion_tokens - 1));
-      genRate = Math.round((usage.completion_tokens / genTime) * 1000);
-    }
-  }
+  const metrics = computeMetrics(ctx);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard
-          title="E2E 延时"
-          value={totalMs}
-          unit="ms"
-          desc="系统完整处理耗时 (Client 感知)"
-          icon={Timer}
-          accent="blue"
-        />
-        <MetricCard
-          title="TTFT 首字延时"
-          value={ttftMs}
-          unit="ms"
-          desc="从请求到达网关至产生第一个输出 Token"
-          icon={Zap}
-          accent="amber"
-        />
-        <MetricCard
-          title="网关处理损耗"
-          value={gatewayOverheadMs}
-          unit="ms"
-          desc="鉴权、路由适配及网络转发带来的额外耗时"
-          icon={Server}
-          accent="violet"
-        />
-        <MetricCard
-          title="生成极速 (Tok/s)"
-          value={genRate}
-          unit="Tok/s"
-          desc={itlMs == null ? '流式输出每秒生成速度' : `打字平顺度 (ITL): ${itlMs}ms/字`}
-          icon={Activity}
-          accent="emerald"
-        />
-      </div>
-
-      <TimingTimeline ctx={ctx} />
+    <div className="flex flex-col gap-6 pt-2 pb-6">
+      <PerformanceCardsList isStream={isStream} metrics={metrics} t={t} />
+      <WaterfallChart ctx={ctx} />
     </div>
   );
 }

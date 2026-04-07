@@ -41,3 +41,35 @@ export function getPageNumbers(currentPage: number, totalPages: number): (number
 
   return pages;
 }
+
+/**
+ * 智能格式化毫秒为最合适的时间显示数值 (结合 formatDurationUnit 一起使用)
+ */
+export function formatDuration(ms: number): string {
+  if (ms >= 1000 * 60 * 60) {
+    return (ms / (1000 * 60 * 60)).toFixed(2);
+  }
+  if (ms >= 1000 * 60) {
+    return (ms / (1000 * 60)).toFixed(2);
+  }
+  if (ms >= 1000) {
+    return (ms / 1000).toFixed(2);
+  }
+  return Math.round(ms).toString();
+}
+
+/**
+ * 取回上述 formatDuration 格式化后的单位后缀
+ */
+export function formatDurationUnit(ms: number): string {
+  if (ms >= 1000 * 60 * 60) {
+    return 'h';
+  }
+  if (ms >= 1000 * 60) {
+    return 'min';
+  }
+  if (ms >= 1000) {
+    return 's';
+  }
+  return 'ms';
+}
