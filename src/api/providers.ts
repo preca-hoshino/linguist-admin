@@ -30,7 +30,7 @@ export interface CreateProviderPayload {
   name: string;
   kind: string;
   base_url: string;
-  credential_type?: 'api_key' | 'oauth2' | 'none';
+  credential_type?: 'api_key' | 'oauth2' | 'copilot' | 'none';
   credential?: Record<string, unknown>;
   config?: Partial<Provider['config']>;
 }
@@ -49,3 +49,52 @@ export const updateProvider = async (id: string, data: UpdateProviderPayload): P
 export const deleteProvider = async (id: string): Promise<ApiResult<DeletedResponse>> => {
   return await request<DeletedResponse>('DELETE', `/providers/${id}`);
 };
+
+// ===== Copilot OAuth Device Flow API =====
+
+/** Device Code 响应 */
+export interface CopilotDeviceCodeResponse {
+  object: 'device_code';
+  device_code: string;
+  user_code: string;
+  verification_uri: string;
+  expires_in: number;
+  interval: number;
+}
+
+/** Poll Token 响应 */
+export interface CopilotPollTokenResponse {
+  object: 'oauth_token';
+  status: 'pending' | 'complete' | 'expired';
+  provider_id?: string | null;
+  token_prefix?: string;
+  access_token?: string;
+}
+
+/** 验证响应 */
+export interface CopilotVerifyResponse {
+  object: 'oauth_verification';
+  valid: boolean;
+  github_login?: string;
+}
+
+/** 发起 Copilot OAuth Device Flow */
+export const copilotCreateDeviceCode = async (): Promise<ApiResult<CopilotDeviceCodeResponse>> =>
+  await request<CopilotDeviceCodeResponse>('POST', '/oauth/copilot/device-codes');
+
+/**
+ * 轮询 OAuth 授权状态，尝试换取 access_token
+ * @param deviceCode - 第一步返回的 device_code
+ * @param providerId - 可选。有则写入 DB；无则返回完整 token（创建模式用）
+ */
+export const copilotPollToken = async (
+  deviceCode: string,
+  providerId?: string,
+): Promise<ApiResult<CopilotPollTokenResponse>> =>
+  await request<CopilotPollTokenResponse>('POST', `/oauth/copilot/device-codes/${deviceCode}/poll`, {
+    ...(providerId !== undefined && providerId !== '' ? { provider_id: providerId } : {}),
+  });
+
+/** 验证 provider 凭证是否仍然有效 */
+export const copilotVerifyToken = async (providerId: string): Promise<ApiResult<CopilotVerifyResponse>> =>
+  await request<CopilotVerifyResponse>('POST', '/oauth/copilot/verify', { provider_id: providerId });
