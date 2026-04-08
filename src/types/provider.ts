@@ -5,7 +5,7 @@ export interface Provider {
   kind: string;
   base_url: string;
   /** 凭证类型 */
-  credential_type: 'api_key' | 'oauth2' | 'none';
+  credential_type: 'api_key' | 'oauth2' | 'copilot' | 'none';
   /** 凭证数据 */
   credential: Record<string, unknown>;
   /** 高级配置 */
