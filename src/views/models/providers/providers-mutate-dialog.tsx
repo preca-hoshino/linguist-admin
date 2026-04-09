@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-deprecated, sonarjs/deprecation, sonarjs/cognitive-complexity */
+/* eslint-disable sonarjs/cognitive-complexity */
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DeepSeek, Gemini, ProviderIcon, Volcengine } from '@lobehub/icons';
-import { Eye, EyeOff, Github, Globe, Key, Network, Type, X } from 'lucide-react';
+import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine } from '@lobehub/icons';
+import { Eye, EyeOff, Globe, Key, Network, Type, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -72,8 +72,11 @@ export function ProvidersMutateDialog({
     (currentRow?.config.http_proxy ?? '') === '' ? 'off' : 'custom',
   );
   const [showApiKey, setShowApiKey] = useState(false);
-  // Copilot OAuth 凭证暂存（null = 保留现有，对象 = 新凭证）
-  const [copilotCredential, setCopilotCredential] = useState<{ accessToken: string } | null>(null);
+  // Copilot OAuth 凭证与附加信息暂存
+  const [copilotAuthData, setCopilotAuthData] = useState<{
+    accessToken: string;
+    user?: { login: string; avatarUrl: string; htmlUrl: string };
+  } | null>(null);
 
   const form = useForm<ProviderForm>({
     resolver: zodResolver(formSchema),
@@ -123,7 +126,7 @@ export function ProvidersMutateDialog({
       setTimeout(() => {
         setShowApiKey(false);
         setSearchQuery('');
-        setCopilotCredential(null);
+        setCopilotAuthData(null);
       }, 0);
     }
   }, [open, currentRow, form]);
@@ -135,13 +138,18 @@ export function ProvidersMutateDialog({
         (data.custom_headers ?? []).filter((h) => h.key.trim() !== '').map((h) => [h.key.trim(), h.value]),
       );
 
-      const config = {
+      const config: Record<string, unknown> = {
+        ...currentRow?.config,
         http_proxy: proxyMode === 'custom' ? (data.http_proxy ?? '') : '',
         custom_headers: customHeaders,
       };
 
       // 判断当前 kind 是否为 copilot
       const isCopilotKind = KIND_OPTIONS.find((o) => o.value === data.kind)?.credentialType === 'copilot';
+
+      if (isCopilotKind && copilotAuthData?.user) {
+        config.github_info = copilotAuthData.user;
+      }
 
       if (currentRow) {
         const payload: Record<string, unknown> = {
@@ -152,9 +160,9 @@ export function ProvidersMutateDialog({
 
         if (isCopilotKind) {
           // Copilot 类型：不提交 base_url，仅当有新凭证时才提交 credential
-          if (copilotCredential !== null) {
+          if (copilotAuthData !== null) {
             payload.credential_type = 'copilot';
-            payload.credential = copilotCredential;
+            payload.credential = { accessToken: copilotAuthData.accessToken };
           }
         } else {
           // API Key 类型：提交 base_url，仅在有新 key 时才更新凭证
@@ -169,7 +177,7 @@ export function ProvidersMutateDialog({
       } else {
         if (isCopilotKind) {
           // Copilot 创建：必须先完成赋权
-          if (copilotCredential === null) {
+          if (copilotAuthData === null) {
             form.setError('root', {
               message: t('modelsPage.copilot.authRequired', 'Please complete GitHub authorization first'),
             });
@@ -180,7 +188,7 @@ export function ProvidersMutateDialog({
             kind: data.kind,
             base_url: '',
             credential_type: 'copilot',
-            credential: copilotCredential,
+            credential: { accessToken: copilotAuthData.accessToken },
             config,
           });
         } else {
@@ -202,7 +210,7 @@ export function ProvidersMutateDialog({
 
       onOpenChange(false);
       form.reset();
-      setCopilotCredential(null);
+      setCopilotAuthData(null);
       if (onSuccess) {
         void onSuccess();
       }
@@ -395,8 +403,13 @@ export function ProvidersMutateDialog({
                     <CopilotOAuthPanel
                       providerId={currentRow?.id}
                       currentCredential={currentRow?.credential}
+                      githubInfo={
+                        currentRow?.config.github_info as
+                          | undefined
+                          | { login: string; avatarUrl: string; htmlUrl: string }
+                      }
                       isUpdate={isUpdate}
-                      onCredentialChange={setCopilotCredential}
+                      onCredentialChange={setCopilotAuthData}
                     />
                   </div>
                 ) : (
