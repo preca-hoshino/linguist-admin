@@ -15,7 +15,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { DeepSeek, Gemini, ProviderIcon, Volcengine } from '@lobehub/icons';
+import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine } from '@lobehub/icons';
 import type { TFunction } from 'i18next';
 import { GripVertical, Plus, Trash2 } from 'lucide-react';
 import { useMemo } from 'react';
@@ -115,6 +115,9 @@ function renderProviderLogo(kind?: string): React.ReactNode {
   }
   if (kind === 'volcengine') {
     return <Volcengine size={14} className="fill-current" />;
+  }
+  if (kind === 'copilot') {
+    return <Github size={14} className="fill-current" />;
   }
   return <ProviderIcon provider={kind as 'openai'} size={14} type="mono" className="fill-current" />;
 }

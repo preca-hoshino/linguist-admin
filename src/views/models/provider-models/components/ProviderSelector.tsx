@@ -1,4 +1,4 @@
-import { DeepSeek, Gemini, ProviderIcon, Volcengine } from '@lobehub/icons';
+import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine } from '@lobehub/icons';
 import { Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Input } from '@/components/ui/Input';
@@ -68,6 +68,10 @@ export function ProviderSelector({
               }
               case 'volcengine': {
                 iconNode = <Volcengine size={24} className="fill-current" />;
+                break;
+              }
+              case 'copilot': {
+                iconNode = <Github size={24} className="fill-current" />;
                 break;
               }
               default: {

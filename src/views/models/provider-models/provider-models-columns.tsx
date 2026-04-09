@@ -1,4 +1,4 @@
-import { DeepSeek, Gemini, ProviderIcon, Volcengine } from '@lobehub/icons';
+import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine } from '@lobehub/icons';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
   Box,
@@ -105,6 +105,10 @@ export function useProviderModelsColumns(): ColumnDef<ProviderModel>[] {
           }
           case 'volcengine': {
             iconNode = <Volcengine size={14} className="fill-current" />;
+            break;
+          }
+          case 'copilot': {
+            iconNode = <Github size={14} className="fill-current" />;
             break;
           }
           default: {
