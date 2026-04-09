@@ -319,6 +319,18 @@ export default {
       httpProxy: 'HTTP Proxy',
       customHeaders: 'Custom Headers',
     },
+    copilot: {
+      authorized: 'Authorized via GitHub Copilot',
+      reauthorize: 'Re-authorize',
+      reauthorizeWarning: 'Note: Re-authorizing will invalidate the previous credentials.',
+      polling: 'Waiting for authorization...',
+      userCode: 'Please paste the code below into GitHub to authorize Linguist:',
+      authorize: 'Authorize GitHub Copilot',
+      expired: 'Authorization expired, please try again.',
+      authRequired: 'Please complete GitHub authorization first.',
+      autoDetected: 'Auto-detected',
+      authorization: 'Authorization',
+    },
 
     modelType: {
       chat: 'Chat',

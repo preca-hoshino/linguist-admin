@@ -316,6 +316,18 @@ export default {
       httpProxy: 'HTTP 代理',
       customHeaders: '自定义请求头',
     },
+    copilot: {
+      authorized: '已通过 GitHub 授权',
+      reauthorize: '重新授权',
+      reauthorizeWarning: '提示：重新授权将使原凭证失效。',
+      polling: '等待授权...',
+      userCode: '请将下方代码粘贴到 GitHub 以授权 Linguist：',
+      authorize: '授权 GitHub Copilot',
+      expired: '授权已过期，请重试。',
+      authRequired: '请先完成 GitHub 授权。',
+      autoDetected: '自动检测',
+      authorization: '身份授权',
+    },
     modelType: {
       chat: '对话',
       embedding: '嵌入',
