@@ -50,7 +50,9 @@ export function TokenUsageBar({
       {/* 左侧：标题 */}
       <div className="flex shrink-0 items-center justify-center gap-2 pr-4 text-primary/80">
         <BarChart2 className="h-4 w-4" />
-        <span className="text-[13px] font-bold text-foreground/80">{t('modelsPage.logs.detail.tokenUsageTitle', 'Token 用量')}</span>
+        <span className="text-[13px] font-bold text-foreground/80">
+          {t('modelsPage.logs.detail.tokenUsageTitle', 'Token 用量')}
+        </span>
       </div>
 
       <div className="h-5 w-[1px] shrink-0 bg-border/80" />
@@ -58,23 +60,20 @@ export function TokenUsageBar({
       {/* 中间：各项明细 */}
       <div className="flex items-center gap-6 md:gap-8 px-5 flex-1 min-w-0">
         <StatItem label={t('modelsPage.logs.detail.promptTokens', 'PROMPT')} value={usage.prompt_tokens} />
-        
+
         {mode === 'chat' && (
-          <StatItem label={t('modelsPage.logs.detail.completionTokens', 'COMPLETION')} value={usage.completion_tokens} />
+          <StatItem
+            label={t('modelsPage.logs.detail.completionTokens', 'COMPLETION')}
+            value={usage.completion_tokens}
+          />
         )}
-        
+
         {mode === 'chat' && usage.cached_tokens != null && (
-          <StatItem
-            label={t('modelsPage.logs.detail.cachedTokens', 'CACHED')}
-            value={usage.cached_tokens}
-          />
+          <StatItem label={t('modelsPage.logs.detail.cachedTokens', 'CACHED')} value={usage.cached_tokens} />
         )}
-        
+
         {mode === 'chat' && usage.reasoning_tokens != null && usage.reasoning_tokens > 0 && (
-          <StatItem
-            label={t('modelsPage.logs.detail.reasoningTokens', 'REASONING')}
-            value={usage.reasoning_tokens}
-          />
+          <StatItem label={t('modelsPage.logs.detail.reasoningTokens', 'REASONING')} value={usage.reasoning_tokens} />
         )}
       </div>
 

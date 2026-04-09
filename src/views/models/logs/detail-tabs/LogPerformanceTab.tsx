@@ -30,7 +30,9 @@ function MetricCard({
           ) : (
             <>
               {value}
-              {unit != null && unit !== '' && <span className="ml-1 text-lg font-medium text-muted-foreground">{unit}</span>}
+              {unit != null && unit !== '' && (
+                <span className="ml-1 text-lg font-medium text-muted-foreground">{unit}</span>
+              )}
             </>
           )}
         </div>
@@ -45,7 +47,7 @@ function getWaterfallBlocks(
   ctx: GatewayContextSnapshot,
   startMs: number,
   endMs: number,
-  t: (key: string, fallback: string) => string
+  t: (key: string, fallback: string) => string,
 ): { label: string; start: number; end: number; colorBg: string; colorText: string }[] {
   const { providerStart, ttft, providerEnd } = ctx.timing;
   const isStream = ctx.stream;
@@ -150,7 +152,10 @@ function WaterfallChart({ ctx }: { readonly ctx: GatewayContextSnapshot }): Reac
       </div>
 
       {/* X 轴刻度指示 */}
-      <div className="flex justify-between items-center mt-4 pt-3 border-t text-[10px] text-muted-foreground/60 font-medium" style={{ paddingLeft: '140px' }}>
+      <div
+        className="flex justify-between items-center mt-4 pt-3 border-t text-[10px] text-muted-foreground/60 font-medium"
+        style={{ paddingLeft: '140px' }}
+      >
         <span>0ms</span>
         <span>{Math.round(e2eTotalMs / 2)}ms</span>
         <span>{e2eTotalMs}ms</span>
@@ -183,7 +188,13 @@ function computeMetrics(ctx: GatewayContextSnapshot): PerfMetrics {
   let itlMs: number | null = null;
   let genRate: number | null = null;
 
-  if (isStream && ttft != null && providerEnd != null && usage?.completion_tokens != null && usage.completion_tokens > 1) {
+  if (
+    isStream &&
+    ttft != null &&
+    providerEnd != null &&
+    usage?.completion_tokens != null &&
+    usage.completion_tokens > 1
+  ) {
     const genTime = providerEnd - ttft;
     if (genTime > 0) {
       itlMs = Math.round(genTime / (usage.completion_tokens - 1));
@@ -208,7 +219,7 @@ function PerformanceCardsList({
 }: {
   readonly isStream: boolean;
   readonly metrics: PerfMetrics;
-  readonly t: (key: string, Default: string, opts?: Record<string, unknown>) => string;
+  readonly t: (key: string, defaultValue: string) => string;
 }): React.JSX.Element {
   const { totalMs, ttftMs, providerTimeMs, gatewayOverheadMs, itlMs, genRate } = metrics;
 
@@ -221,7 +232,7 @@ function PerformanceCardsList({
         desc={t('modelsPage.logs.detail.perfE2EDesc', '网关及大模型全局端到端响应耗时')}
         icon={Clock}
       />
-      
+
       {/* 2. TTFT 或 Provider Time 卡片 */}
       {isStream ? (
         <MetricCard
@@ -238,7 +249,7 @@ function PerformanceCardsList({
           icon={Timer}
         />
       )}
-      
+
       {/* 3. ITL 或 网关损耗 卡片 */}
       {isStream ? (
         <MetricCard
@@ -251,11 +262,14 @@ function PerformanceCardsList({
         <MetricCard
           title={t('modelsPage.logs.detail.perfGatewayOverhead', 'Gateway Overhead')}
           {...getDurationProps(gatewayOverheadMs)}
-          desc={t('modelsPage.logs.detail.perfGatewayOverheadDesc', '网关执行鉴权、上下文编排及出入参映射产生的额外耗时')}
+          desc={t(
+            'modelsPage.logs.detail.perfGatewayOverheadDesc',
+            '网关执行鉴权、上下文编排及出入参映射产生的额外耗时',
+          )}
           icon={Server}
         />
       )}
-      
+
       {/* 4. Token 生成速率 卡片 */}
       <MetricCard
         title={t('dashboard.perf.stat_tok_s', 'Generation Rate')}
@@ -285,7 +299,7 @@ export function LogPerformanceTab({ log }: { readonly log: RequestLog }): React.
 
   return (
     <div className="flex flex-col gap-6 pt-2 pb-6">
-      <PerformanceCardsList isStream={isStream} metrics={metrics} t={t} />
+      <PerformanceCardsList isStream={isStream ?? false} metrics={metrics} t={t} />
       <WaterfallChart ctx={ctx} />
     </div>
   );

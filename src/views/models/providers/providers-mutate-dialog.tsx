@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-deprecated, sonarjs/deprecation, sonarjs/cognitive-complexity */
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DeepSeek, Gemini, ProviderIcon, Volcengine } from '@lobehub/icons';
-import { Eye, EyeOff, Globe, Key, Network, Type, X } from 'lucide-react';
+import { Eye, EyeOff, Github, Globe, Key, Network, Type, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +20,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/Input';
 import type { Provider } from '@/types';
 import { cn } from '@/utils/utils';
+import { CopilotOAuthPanel } from './components/CopilotOAuthPanel';
 import { CustomHeadersInput } from './components/CustomHeadersInput';
 import { type KindOption, ProviderKindSelector } from './components/ProviderKindSelector';
 import { KIND_OPTIONS } from './constants';
@@ -33,7 +35,8 @@ interface ProvidersMutateDialogProps {
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   kind: z.string().min(1, 'Kind is required'),
-  base_url: z.string().min(1, 'Base URL is required'),
+  // base_url 对 copilot 可为空
+  base_url: z.string().optional(),
   api_key: z.string().optional(),
   // 高级配置
   http_proxy: z.string().optional(),
@@ -69,6 +72,8 @@ export function ProvidersMutateDialog({
     (currentRow?.config.http_proxy ?? '') === '' ? 'off' : 'custom',
   );
   const [showApiKey, setShowApiKey] = useState(false);
+  // Copilot OAuth 凭证暂存（null = 保留现有，对象 = 新凭证）
+  const [copilotCredential, setCopilotCredential] = useState<{ accessToken: string } | null>(null);
 
   const form = useForm<ProviderForm>({
     resolver: zodResolver(formSchema),
@@ -118,6 +123,7 @@ export function ProvidersMutateDialog({
       setTimeout(() => {
         setShowApiKey(false);
         setSearchQuery('');
+        setCopilotCredential(null);
       }, 0);
     }
   }, [open, currentRow, form]);
@@ -134,31 +140,69 @@ export function ProvidersMutateDialog({
         custom_headers: customHeaders,
       };
 
+      // 判断当前 kind 是否为 copilot
+      const isCopilotKind = KIND_OPTIONS.find((o) => o.value === data.kind)?.credentialType === 'copilot';
+
       if (currentRow) {
         const payload: Record<string, unknown> = {
           name: data.name,
           kind: data.kind,
-          base_url: data.base_url,
           config,
         };
-        // 仅在有新 key 时才更新凭证
-        if ((data.api_key ?? '') !== '') {
-          payload.credential_type = 'api_key';
-          payload.credential = { key: data.api_key };
+
+        if (isCopilotKind) {
+          // Copilot 类型：不提交 base_url，仅当有新凭证时才提交 credential
+          if (copilotCredential !== null) {
+            payload.credential_type = 'copilot';
+            payload.credential = copilotCredential;
+          }
+        } else {
+          // API Key 类型：提交 base_url，仅在有新 key 时才更新凭证
+          payload.base_url = data.base_url ?? '';
+          if ((data.api_key ?? '') !== '') {
+            payload.credential_type = 'api_key';
+            payload.credential = { key: data.api_key };
+          }
         }
+
         await updateProvider(currentRow.id, payload as Parameters<typeof updateProvider>[1]);
       } else {
-        await createProvider({
-          name: data.name,
-          kind: data.kind,
-          base_url: data.base_url,
-          credential_type: 'api_key',
-          credential: { key: data.api_key ?? '' },
-          config,
-        });
+        if (isCopilotKind) {
+          // Copilot 创建：必须先完成赋权
+          if (copilotCredential === null) {
+            form.setError('root', {
+              message: t('modelsPage.copilot.authRequired', 'Please complete GitHub authorization first'),
+            });
+            return;
+          }
+          await createProvider({
+            name: data.name,
+            kind: data.kind,
+            base_url: '',
+            credential_type: 'copilot',
+            credential: copilotCredential,
+            config,
+          });
+        } else {
+          // API Key 创建模式：必须有 base_url
+          if ((data.base_url ?? '') === '') {
+            form.setError('base_url', { message: 'Base URL is required' });
+            return;
+          }
+          await createProvider({
+            name: data.name,
+            kind: data.kind,
+            base_url: data.base_url ?? '',
+            credential_type: 'api_key',
+            credential: { key: data.api_key ?? '' },
+            config,
+          });
+        }
       }
+
       onOpenChange(false);
       form.reset();
+      setCopilotCredential(null);
       if (onSuccess) {
         void onSuccess();
       }
@@ -263,14 +307,18 @@ export function ProvidersMutateDialog({
                                     {val === 'gemini' && <Gemini size={16} className="fill-current" />}
                                     {val === 'deepseek' && <DeepSeek size={16} className="fill-current" />}
                                     {val === 'volcengine' && <Volcengine size={16} className="fill-current" />}
-                                    {val !== 'gemini' && val !== 'deepseek' && val !== 'volcengine' && (
-                                      <ProviderIcon
-                                        provider={val as 'openai'}
-                                        size={16}
-                                        type="mono"
-                                        className="fill-current"
-                                      />
-                                    )}
+                                    {val === 'copilot' && <Github className="h-4 w-4" />}
+                                    {val !== 'gemini' &&
+                                      val !== 'deepseek' &&
+                                      val !== 'volcengine' &&
+                                      val !== 'copilot' && (
+                                        <ProviderIcon
+                                          provider={val as 'openai'}
+                                          size={16}
+                                          type="mono"
+                                          className="fill-current"
+                                        />
+                                      )}
                                     <span className="font-medium text-foreground">{selectedOption.label}</span>
                                   </>
                                 );
@@ -299,11 +347,11 @@ export function ProvidersMutateDialog({
                     const displayUrl = field.value === '' ? fallbackUrl : field.value;
                     const endpoint =
                       KIND_OPTIONS.find((opt) => opt.value === selectedKind)?.exampleEndpoint ?? '/chat/completions';
-                    let u = displayUrl;
+                    let u = displayUrl ?? '';
                     while (u.endsWith('/')) {
                       u = u.slice(0, -1);
                     }
-                    const curlUrl = u + endpoint;
+                    const curlUrl = `${u}${endpoint}`;
 
                     return (
                       <FormItem className="grid grid-cols-[140px_1fr] items-start gap-5 space-y-0">
@@ -315,9 +363,20 @@ export function ProvidersMutateDialog({
                         </FormLabel>
                         <div className="min-w-0 space-y-2">
                           <FormControl>
-                            <Input {...field} placeholder={fallbackUrl} className="h-9 w-full" />
+                            <Input
+                              {...field}
+                              placeholder={
+                                selectedKind === 'copilot'
+                                  ? t('modelsPage.copilot.autoDetected', 'Auto-detected')
+                                  : fallbackUrl
+                              }
+                              className="h-9 w-full"
+                              disabled={selectedKind === 'copilot'}
+                            />
                           </FormControl>
-                          <p className="truncate px-1 text-xs text-muted-foreground">{curlUrl}</p>
+                          {selectedKind !== 'copilot' && (
+                            <p className="truncate px-1 text-xs text-muted-foreground">{curlUrl}</p>
+                          )}
                           <FormMessage />
                         </div>
                       </FormItem>
@@ -325,42 +384,59 @@ export function ProvidersMutateDialog({
                   }}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="api_key"
-                  render={({ field }) => (
-                    <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                      <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                        <Key className="h-3.5 w-3.5" />
-                        <span className="font-medium text-foreground">
-                          {t('modelsPage.providers.apiKey', 'API Key')}
-                        </span>
-                      </FormLabel>
-                      <div className="space-y-1.5">
-                        <FormControl>
-                          <div className="relative">
-                            <Input
-                              {...field}
-                              type={showApiKey ? 'text' : 'password'}
-                              placeholder={isUpdate ? '••••••••  (leave blank to keep current)' : 'sk-...'}
-                              className="pr-10 font-mono"
-                            />
-                            <button
-                              type="button"
-                              className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                              onClick={() => {
-                                setShowApiKey(!showApiKey);
-                              }}
-                            >
-                              {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </button>
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </div>
-                    </FormItem>
-                  )}
-                />
+                {selectedKind === 'copilot' ? (
+                  <div className="grid grid-cols-[140px_1fr] items-center gap-5">
+                    <div className="flex items-center justify-start gap-2 text-sm text-muted-foreground">
+                      <Github className="h-3.5 w-3.5" />
+                      <span className="font-medium text-foreground">
+                        {t('modelsPage.copilot.authorization', 'Authorization')}
+                      </span>
+                    </div>
+                    <CopilotOAuthPanel
+                      providerId={currentRow?.id}
+                      currentCredential={currentRow?.credential}
+                      isUpdate={isUpdate}
+                      onCredentialChange={setCopilotCredential}
+                    />
+                  </div>
+                ) : (
+                  <FormField
+                    control={form.control}
+                    name="api_key"
+                    render={({ field }) => (
+                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                          <Key className="h-3.5 w-3.5" />
+                          <span className="font-medium text-foreground">
+                            {t('modelsPage.providers.apiKey', 'API Key')}
+                          </span>
+                        </FormLabel>
+                        <div className="space-y-1.5">
+                          <FormControl>
+                            <div className="relative">
+                              <Input
+                                {...field}
+                                type={showApiKey ? 'text' : 'password'}
+                                placeholder={isUpdate ? '••••••••  (leave blank to keep current)' : 'sk-...'}
+                                className="pr-10 font-mono"
+                              />
+                              <button
+                                type="button"
+                                className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                onClick={() => {
+                                  setShowApiKey(!showApiKey);
+                                }}
+                              >
+                                {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                              </button>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                )}
 
                 {/* Proxy */}
                 <div className="grid grid-cols-[140px_1fr] items-start gap-5">

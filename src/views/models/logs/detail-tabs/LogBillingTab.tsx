@@ -1,4 +1,4 @@
-import { ArrowDownToLine, ArrowUpFromLine, ExternalLink, CornerDownRight } from 'lucide-react';
+import { ArrowDownToLine, ArrowUpFromLine, ExternalLink, CornerDownRight, Wallet } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from '@tanstack/react-router';
@@ -24,11 +24,13 @@ function InvoiceRow({
   if (amount == null) {
     return null;
   }
-  
+
   return (
     <div className="flex items-center justify-between py-4 border-b last:border-0 border-border/40 hover:bg-muted/10 transition-colors px-2 rounded-sm -mx-2">
       <div className="flex items-start gap-3.5">
-        <div className={`mt-0.5 rounded-lg p-2 ${isDiscount ? 'bg-emerald-500/10 text-emerald-500 dark:text-emerald-400' : 'bg-secondary text-secondary-foreground/70'}`}>
+        <div
+          className={`mt-0.5 rounded-lg p-2 ${isDiscount ? 'bg-emerald-500/10 text-emerald-500 dark:text-emerald-400' : 'bg-secondary text-secondary-foreground/70'}`}
+        >
           <Icon className="h-4 w-4" />
         </div>
         <div className="flex flex-col gap-1">
@@ -36,7 +38,9 @@ function InvoiceRow({
           <span className="text-xs text-muted-foreground max-w-sm leading-relaxed">{desc}</span>
         </div>
       </div>
-      <div className={`font-mono text-[15px] font-bold tracking-tight ${isDiscount ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
+      <div
+        className={`font-mono text-[15px] font-bold tracking-tight ${isDiscount ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}
+      >
         {isDiscount && amount > 0 ? '-' : ''}¥{amount.toFixed(6)}
       </div>
     </div>
@@ -104,9 +108,7 @@ function PricingContextCard({
               {(ctx.route?.providerKind != null && ctx.route.providerKind !== '') ||
               (ctx.route?.providerName != null && ctx.route.providerName !== '') ? (
                 <ProviderLogo
-                  provider={
-                    (ctx.route.providerKind === '' ? ctx.route.providerName : ctx.route.providerKind) as string
-                  }
+                  provider={(ctx.route.providerKind === '' ? ctx.route.providerName : ctx.route.providerKind) as string}
                   size={20}
                   className="opacity-80"
                 />
@@ -128,10 +130,7 @@ function PricingContextCard({
 
           {providerModelId != null && (
             <Button variant="outline" size="sm" className="h-8 text-xs font-semibold" asChild>
-              <Link 
-                to="/models/provider-models/$id" 
-                params={{ id: providerModelId }}
-              >
+              <Link to="/models/provider-models/$id" params={{ id: providerModelId }}>
                 <ExternalLink className="mr-1.5 h-3 w-3" />
                 Detail
               </Link>
@@ -140,9 +139,7 @@ function PricingContextCard({
         </div>
 
         <div className="flex border-t border-border/40 pt-5 flex-col gap-3">
-          <span className="text-xs font-medium text-muted-foreground">
-            Pricing Tier Metadata
-          </span>
+          <span className="text-xs font-medium text-muted-foreground">Pricing Tier Metadata</span>
           <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm">
             <div className="flex flex-col gap-1">
               <span className="text-[11px] text-muted-foreground">起始 Token (Start)</span>
@@ -185,8 +182,8 @@ export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.
         <Wallet className="h-8 w-8 text-muted-foreground/30 mb-2" />
         <p>{t('modelsPage.logs.detail.billingNoRecord', '此请求未产生计费记录')}</p>
         <span className="text-xs opacity-70">
-          {ctx 
-            ? t('modelsPage.logs.detail.billingNoRecordDesc1', '未配置阶梯定价、无有效用量、或请求发生在计费启用之前。') 
+          {ctx
+            ? t('modelsPage.logs.detail.billingNoRecordDesc1', '未配置阶梯定价、无有效用量、或请求发生在计费启用之前。')
             : t('modelsPage.logs.detail.billingNoRecordDesc2', '缺少网关上下文数据。')}
         </span>
       </div>
@@ -201,7 +198,6 @@ export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.
 
   return (
     <div className="flex flex-col gap-4 w-full">
-
       {/* 1. Header (Highlight Cost) */}
       <Card className="border-border/60 shadow-sm">
         <CardContent className="pt-6 pb-6">
@@ -211,13 +207,12 @@ export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.
                 <span className="text-sm font-semibold">{t('modelsPage.logs.detail.billingTotal', '请求扣款')}</span>
               </div>
               <p className="text-xs text-muted-foreground">
-                {isEmbedding 
+                {isEmbedding
                   ? t('modelsPage.logs.detail.billingTotalDescEmbed', '基于输入 Token 量结算的无感支付快照')
-                  : t('modelsPage.logs.detail.billingTotalDescChat', '最终网关结算快照')
-                }
+                  : t('modelsPage.logs.detail.billingTotalDescChat', '最终网关结算快照')}
               </p>
             </div>
-            
+
             <div className="flex items-baseline gap-1 text-foreground">
               <span className="text-lg font-semibold opacity-70">¥</span>
               <span className="text-3xl font-bold font-mono tracking-tighter">
@@ -237,15 +232,19 @@ export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-2 px-6 pb-4">
-            <InvoiceRow 
+            <InvoiceRow
               label={t('modelsPage.logs.detail.billInput', 'Prompt 输入')}
-              desc={isEmbedding ? t('modelsPage.logs.detail.billInputDescEmbed', '按嵌入输入文本累积的 Token 计算') : t('modelsPage.logs.detail.billInputDescChat', '按请求输入文本/视觉内容的 Token 计算')}
+              desc={
+                isEmbedding
+                  ? t('modelsPage.logs.detail.billInputDescEmbed', '按嵌入输入文本累积的 Token 计算')
+                  : t('modelsPage.logs.detail.billInputDescChat', '按请求输入文本/视觉内容的 Token 计算')
+              }
               amount={inputCost}
               icon={ArrowDownToLine}
             />
-            
+
             {!isEmbedding && (
-              <InvoiceRow 
+              <InvoiceRow
                 label={t('modelsPage.logs.detail.billOutput', 'Completion 输出')}
                 desc={t('modelsPage.logs.detail.billOutputDescChat', '模型生成内容对应的 Token 开支')}
                 amount={outputCost}
@@ -253,9 +252,13 @@ export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.
               />
             )}
 
-            <InvoiceRow 
+            <InvoiceRow
               label={t('modelsPage.logs.detail.billCache', 'Cache 缓存节省')}
-              desc={isEmbedding ? t('modelsPage.logs.detail.billCacheDescEmbed', '若提供商支持且启用嵌入缓存时的低价结算') : t('modelsPage.logs.detail.billCacheDescChat', '通过上下文缓存匹配的特殊结算费')}
+              desc={
+                isEmbedding
+                  ? t('modelsPage.logs.detail.billCacheDescEmbed', '若提供商支持且启用嵌入缓存时的低价结算')
+                  : t('modelsPage.logs.detail.billCacheDescChat', '通过上下文缓存匹配的特殊结算费')
+              }
               amount={cacheCost}
               icon={CornerDownRight}
               isDiscount
