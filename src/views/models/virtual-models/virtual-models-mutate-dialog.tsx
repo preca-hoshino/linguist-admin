@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
-import { Fingerprint, GitMerge, Type, X } from 'lucide-react';
+import { Activity, Fingerprint, GitMerge, Type, X } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -40,6 +40,8 @@ const formSchema = z.object({
       }),
     )
     .min(1),
+  rpm_limit: z.number().nullable().optional(),
+  tpm_limit: z.number().nullable().optional(),
 });
 
 export type VirtualModelForm = z.infer<typeof formSchema>;
@@ -91,6 +93,8 @@ export function VirtualModelsMutateDialog({
       model_type: 'chat',
       routing_strategy: 'load_balance',
       backends: [],
+      rpm_limit: null,
+      tpm_limit: null,
     },
   });
 
@@ -109,6 +113,8 @@ export function VirtualModelsMutateDialog({
             provider_model_id: b.provider_model_id,
             weight: b.weight,
           })),
+          rpm_limit: currentRow.rpm_limit,
+          tpm_limit: currentRow.tpm_limit,
         });
       } else {
         form.reset({
@@ -117,6 +123,8 @@ export function VirtualModelsMutateDialog({
           model_type: 'chat',
           routing_strategy: 'load_balance',
           backends: [{ provider_id: '', provider_model_id: '', weight: 1 }],
+          rpm_limit: null,
+          tpm_limit: null,
         });
       }
     }
@@ -134,6 +142,8 @@ export function VirtualModelsMutateDialog({
             priority: index,
           })),
           ...(values.description === undefined ? {} : { description: values.description }),
+          rpm_limit: values.rpm_limit,
+          tpm_limit: values.tpm_limit,
         };
         const res = await updateVirtualModel(currentRow.id, payload);
         if (!res.ok) {
@@ -150,6 +160,8 @@ export function VirtualModelsMutateDialog({
             priority: index,
           })),
           ...(values.description === undefined ? {} : { description: values.description }),
+          rpm_limit: values.rpm_limit,
+          tpm_limit: values.tpm_limit,
         };
         const res = await createVirtualModel(payload);
         if (!res.ok) {
@@ -330,6 +342,68 @@ export function VirtualModelsMutateDialog({
                               </SelectItem>
                             </SelectContent>
                           </Select>
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="rpm_limit"
+                    render={({ field }) => (
+                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                          <Activity className="h-3.5 w-3.5" />
+                          <span className="font-medium text-foreground">
+                            {t('modelsPage.providerModels.rpmLimit', 'RPM 限制')}
+                          </span>
+                        </FormLabel>
+                        <div className="space-y-1.5">
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min={0}
+                              placeholder={t('modelsPage.providerModels.unlimited', '留空或 0 代表无限制')}
+                              value={field.value === null ? '' : field.value}
+                              onChange={(e) => {
+                                const val = e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
+                                field.onChange(val);
+                              }}
+                              className="bg-muted/10 font-mono"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="tpm_limit"
+                    render={({ field }) => (
+                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                          <Activity className="h-3.5 w-3.5" />
+                          <span className="font-medium text-foreground">
+                            {t('modelsPage.providerModels.tpmLimit', 'TPM 限制')}
+                          </span>
+                        </FormLabel>
+                        <div className="space-y-1.5">
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min={0}
+                              placeholder={t('modelsPage.providerModels.unlimited', '留空或 0 代表无限制')}
+                              value={field.value === null ? '' : field.value}
+                              onChange={(e) => {
+                                const val = e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
+                                field.onChange(val);
+                              }}
+                              className="bg-muted/10 font-mono"
+                            />
+                          </FormControl>
                           <FormMessage />
                         </div>
                       </FormItem>

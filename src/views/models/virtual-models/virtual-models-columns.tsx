@@ -3,12 +3,41 @@ import { Box, Braces, GitMerge, MessageSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { DataTableColumnHeader } from '@/components/data-table';
 import { Badge } from '@/components/ui/Badge';
+import { Progress } from '@/components/ui/Progress';
 import type { VirtualModel } from '@/types';
 import { cn } from '@/utils/utils';
 import { VirtualModelsRowActions } from './virtual-models-row-actions';
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleString();
+}
+
+function renderThroughput(
+  usage: number | undefined,
+  limit: number | null | undefined,
+  label: string,
+): React.JSX.Element {
+  if (limit == null || limit === 0) {
+    return (
+      <div className="flex w-full items-center justify-between text-[11px] text-muted-foreground">
+        <span>{label}</span>
+        <span>{usage ?? 0} / ∞</span>
+      </div>
+    );
+  }
+  const pct = Math.min(((usage ?? 0) / limit) * 100, 100);
+  const isHigh = pct >= 90;
+  return (
+    <div className="flex w-full flex-col gap-1">
+      <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+        <span>{label}</span>
+        <span className={isHigh ? 'font-medium text-destructive' : ''}>
+          {usage ?? 0} / {limit}
+        </span>
+      </div>
+      <Progress value={pct} className={cn('h-1', isHigh && '[&>div]:bg-destructive')} />
+    </div>
+  );
 }
 
 const MODEL_TYPE_ICON: Record<string, React.ElementType> = {
@@ -121,16 +150,19 @@ export function useVirtualModelsColumns(): ColumnDef<VirtualModel>[] {
       enableHiding: true,
     },
     {
-      id: 'rpm',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="RPM" />,
-      cell: () => null,
-      enableSorting: false,
-      enableHiding: true,
-    },
-    {
-      id: 'tpm',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="TPM" />,
-      cell: () => null,
+      id: 'throughput',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('modelsPage.virtualModels.throughput', 'Throughput')} />
+      ),
+      cell: ({ row }): React.JSX.Element => {
+        const model = row.original;
+        return (
+          <div className="flex w-36 flex-col gap-2">
+            {renderThroughput(model.throughput?.rpm, model.rpm_limit, 'RPM')}
+            {renderThroughput(model.throughput?.tpm, model.tpm_limit, 'TPM')}
+          </div>
+        );
+      },
       enableSorting: false,
       enableHiding: true,
     },

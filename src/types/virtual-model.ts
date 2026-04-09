@@ -20,4 +20,8 @@ export interface VirtualModel {
   backends: VirtualModelBackend[];
   rpm_limit?: number | null;
   tpm_limit?: number | null;
+  throughput?: {
+    rpm: number;
+    tpm: number;
+  };
 }
