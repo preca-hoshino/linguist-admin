@@ -36,6 +36,8 @@ export const createProviderModel = async (data: {
   model_type: string;
   capabilities?: string[];
   parameters?: Record<string, unknown>;
+  /** 提供商模型级专属配置（如 Copilot 端点覆盖、特殊 Header 等） */
+  model_config?: Record<string, unknown>;
   rpm_limit?: number | null | undefined;
   tpm_limit?: number | null | undefined;
   max_tokens?: number;
@@ -51,6 +53,8 @@ export const updateProviderModel = async (
     model_type: string;
     capabilities: string[];
     parameters: Record<string, unknown>;
+    /** 提供商模型级专属配置（如 Copilot 端点覆盖、特殊 Header 等） */
+    model_config: Record<string, unknown>;
     is_active: boolean;
     rpm_limit?: number | null | undefined;
     tpm_limit?: number | null | undefined;

@@ -6,6 +6,8 @@ export interface ProviderModel {
   model_type: 'chat' | 'embedding';
   capabilities: string[];
   parameters: Record<string, unknown>;
+  /** 提供商模型级专属配置（如 Copilot 端点覆盖、特殊 Header 等） */
+  model_config?: Record<string, unknown>;
   is_active: boolean;
   created_at: string;
   updated_at: string;
