@@ -1,4 +1,4 @@
-import { DeepSeek, Gemini, ProviderIcon, Volcengine } from '@lobehub/icons';
+import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine } from '@lobehub/icons';
 import { forwardRef } from 'react';
 
 export interface ProviderLogoProps {
@@ -28,6 +28,9 @@ export const ProviderLogo = forwardRef<SVGSVGElement, ProviderLogoProps>(
     }
     if (kindValue === 'volcengine') {
       return <Volcengine ref={ref as never} size={size} className={className} />;
+    }
+    if (kindValue === 'copilot') {
+      return <Github ref={ref as never} size={size} className={className} />;
     }
 
     // Fallback to the generic ProviderIcon which handles mainstream ones like openai, anthropic, azure, etc.
