@@ -5,7 +5,7 @@ import { AlertCircle, CheckCircle, ExternalLink, Github, Loader2, RefreshCw } fr
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CopilotDeviceCodeResponse } from '@/api/providers';
-import { copilotCreateDeviceCode, copilotPollToken } from '@/api/providers';
+import { copilotCreateDeviceCode, copilotPollToken, copilotVerifyToken } from '@/api/providers';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 
@@ -32,12 +32,72 @@ export interface CopilotOAuthPanelProps {
   readonly currentCredential?: Record<string, unknown> | undefined;
   /** 是否为编辑模式 */
   readonly isUpdate: boolean;
+  /** GitHub 用户信息（从已有的配置加载） */
+  readonly githubInfo?: { login: string; avatarUrl: string; htmlUrl: string } | undefined;
   /**
    * 凭证变化回调
    * - null：保留现有凭证（编辑模式下未重新授权）
-   * - 对象：新凭证数据（包含 accessToken）
+   * - 对象：新凭证数据（包含 accessToken，以及可选的 user 附加信息）
    */
-  readonly onCredentialChange: (data: { accessToken: string } | null) => void;
+  readonly onCredentialChange: (
+    data: {
+      accessToken: string;
+      user?: { login: string; avatarUrl: string; htmlUrl: string };
+    } | null,
+  ) => void;
+}
+
+// ==================== 辅助函数 ====================
+
+async function fetchUserFromGithub(
+  accessToken: string,
+): Promise<{ login: string; avatarUrl: string; htmlUrl: string } | undefined> {
+  try {
+    const res = await fetch('https://api.github.com/user', {
+      headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/vnd.github.v3+json' },
+    });
+    if (!res.ok) {
+      return undefined;
+    }
+    const json = (await res.json()) as { login?: string; avatar_url?: string; html_url?: string };
+    if (typeof json.login === 'string' && typeof json.avatar_url === 'string' && typeof json.html_url === 'string') {
+      return { login: json.login, avatarUrl: json.avatar_url, htmlUrl: json.html_url };
+    }
+  } catch {
+    // Ignore
+  }
+  return undefined;
+}
+
+async function fetchUserFromVerify(
+  pid: string,
+): Promise<{ login: string; avatarUrl: string; htmlUrl: string } | undefined> {
+  try {
+    const res = await copilotVerifyToken(pid);
+    if (res.ok && typeof res.data.github_login === 'string' && res.data.github_login !== '') {
+      return {
+        login: res.data.github_login,
+        avatarUrl: `https://github.com/${res.data.github_login}.png`,
+        htmlUrl: `https://github.com/${res.data.github_login}`,
+      };
+    }
+  } catch {
+    // Ignore
+  }
+  return undefined;
+}
+
+async function fetchGithubUser(
+  accessToken: string | undefined,
+  pid: string | undefined,
+): Promise<{ login: string; avatarUrl: string; htmlUrl: string } | undefined> {
+  if (typeof accessToken === 'string' && accessToken !== '') {
+    return await fetchUserFromGithub(accessToken);
+  }
+  if (typeof pid === 'string' && pid !== '') {
+    return await fetchUserFromVerify(pid);
+  }
+  return undefined;
 }
 
 // ==================== 组件实现 ====================
@@ -54,6 +114,7 @@ export function CopilotOAuthPanel({
   providerId,
   currentCredential,
   isUpdate,
+  githubInfo,
   onCredentialChange,
 }: CopilotOAuthPanelProps): import('react').JSX.Element {
   const { t } = useTranslation();
@@ -61,6 +122,10 @@ export function CopilotOAuthPanel({
   // 判断是否已有授权
   const hasExistingAuth =
     isUpdate && typeof currentCredential?.accessToken === 'string' && currentCredential.accessToken !== '';
+
+  const [githubUser, setGithubUser] = useState<{ login: string; avatarUrl: string; htmlUrl: string } | null>(
+    githubInfo ? { login: githubInfo.login, avatarUrl: githubInfo.avatarUrl, htmlUrl: githubInfo.htmlUrl } : null,
+  );
 
   // OAuth 状态机
   const [phase, setPhase] = useState<OAuthPhase>({ type: 'idle' });
@@ -96,6 +161,12 @@ export function CopilotOAuthPanel({
         const data = result.data;
 
         if (data.status === 'complete') {
+          const user = await fetchGithubUser(data.access_token, providerId);
+
+          if (user !== undefined) {
+            setGithubUser(user);
+          }
+
           if (providerId === undefined) {
             // 创建模式：前端暂存完整 token
             const accessToken = data.access_token;
@@ -103,11 +174,11 @@ export function CopilotOAuthPanel({
               setPhase({ type: 'error', message: t('modelsPage.copilot.expired') });
               return;
             }
-            onCredentialChange({ accessToken });
+            onCredentialChange({ accessToken, ...(user ? { user } : {}) });
             setPhase({ type: 'authorized', tokenPrefix: accessToken.slice(0, 12) });
           } else {
             // 编辑模式：token 已写入 DB，标记为有新凭证（防止提交时清空）
-            onCredentialChange({ accessToken: '(saved)' });
+            onCredentialChange({ accessToken: '(saved)', ...(user ? { user } : {}) });
             setPhase({ type: 'authorized', tokenPrefix: data.token_prefix ?? '' });
           }
           setIsExistingAuth(true);
@@ -170,6 +241,7 @@ export function CopilotOAuthPanel({
     }
     setPhase({ type: 'idle' });
     setIsExistingAuth(false);
+    setGithubUser(null);
     onCredentialChange(null);
     await handleAuthorize();
   }, [handleAuthorize, onCredentialChange]);
@@ -183,6 +255,17 @@ export function CopilotOAuthPanel({
         <div className="flex items-center gap-2">
           <CheckCircle className="h-4 w-4 text-green-500" />
           <span className="text-sm text-muted-foreground">{t('modelsPage.copilot.authorized')}</span>
+          {githubUser !== null && (
+            <a
+              href={githubUser.htmlUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="ml-auto inline-flex items-center gap-1.5 rounded-full border bg-background px-2 py-0.5 text-xs transition-colors hover:bg-muted"
+            >
+              <img src={githubUser.avatarUrl} alt={githubUser.login} className="h-4 w-4 rounded-full" />
+              <span className="font-medium text-foreground">{githubUser.login}</span>
+            </a>
+          )}
         </div>
         <Button
           type="button"
@@ -210,6 +293,17 @@ export function CopilotOAuthPanel({
           <Badge variant="secondary" className="font-mono text-xs">
             {phase.tokenPrefix}...
           </Badge>
+        )}
+        {githubUser !== null && (
+          <a
+            href={githubUser.htmlUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="ml-auto inline-flex items-center gap-1.5 rounded-full border bg-background px-2 py-0.5 text-xs transition-colors hover:bg-muted"
+          >
+            <img src={githubUser.avatarUrl} alt={githubUser.login} className="h-4 w-4 rounded-full" />
+            <span className="font-medium text-foreground">{githubUser.login}</span>
+          </a>
         )}
       </div>
     );
