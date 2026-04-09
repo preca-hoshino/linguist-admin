@@ -167,20 +167,28 @@ export function CopilotOAuthPanel({
             setGithubUser(user);
           }
 
+          let tokenToUse: string;
+          let prefixToUse: string;
+
           if (providerId === undefined) {
-            // 创建模式：前端暂存完整 token
-            const accessToken = data.access_token;
-            if (typeof accessToken !== 'string' || accessToken === '') {
+            tokenToUse = data.access_token ?? '';
+            if (tokenToUse === '') {
               setPhase({ type: 'error', message: t('modelsPage.copilot.expired') });
               return;
             }
-            onCredentialChange({ accessToken, ...(user ? { user } : {}) });
-            setPhase({ type: 'authorized', tokenPrefix: accessToken.slice(0, 12) });
+            prefixToUse = tokenToUse.slice(0, 12);
           } else {
-            // 编辑模式：token 已写入 DB，标记为有新凭证（防止提交时清空）
-            onCredentialChange({ accessToken: '(saved)', ...(user ? { user } : {}) });
-            setPhase({ type: 'authorized', tokenPrefix: data.token_prefix ?? '' });
+            tokenToUse = '(saved)';
+            prefixToUse = data.token_prefix ?? '';
           }
+
+          if (user === undefined) {
+            onCredentialChange({ accessToken: tokenToUse });
+          } else {
+            onCredentialChange({ accessToken: tokenToUse, user });
+          }
+
+          setPhase({ type: 'authorized', tokenPrefix: prefixToUse });
           setIsExistingAuth(true);
           return;
         }
