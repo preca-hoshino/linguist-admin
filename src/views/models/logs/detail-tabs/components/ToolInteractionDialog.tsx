@@ -251,8 +251,12 @@ export const ToolInteractionTrigger = forwardRef<
       <div className="flex items-center gap-2 w-full min-w-0 overflow-hidden pl-1 my-0.5">
         <Wrench className="h-4 w-4 shrink-0 text-muted-foreground" />
         <div className="flex flex-col text-left justify-center min-w-0 flex-1 gap-1.5 overflow-hidden">
-          <span className="font-mono text-[15px] font-bold leading-none truncate pt-0.5 tracking-tight">{toolName}</span>
-          {displayId !== 'Unknown ID' && <CopyableId id={displayId} prefix="" className="text-[9px] self-start opacity-80" />}
+          <span className="font-mono text-[15px] font-bold leading-none truncate pt-0.5 tracking-tight">
+            {toolName}
+          </span>
+          {displayId !== 'Unknown ID' && (
+            <CopyableId id={displayId} prefix="" className="text-[9px] self-start opacity-80" />
+          )}
         </div>
       </div>
     </div>

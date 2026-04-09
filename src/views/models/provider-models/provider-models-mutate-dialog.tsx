@@ -119,7 +119,15 @@ export function ProviderModelsMutateDialog({
                   outputPrice: p.outputPrice,
                   cachePrice: p.cachePrice,
                 })) ?? [])
-              : [{ startTokens: 0, maxTokens: Math.round(currentRow.max_tokens / 1000), inputPrice: 0, outputPrice: 0, cachePrice: 0 }],
+              : [
+                  {
+                    startTokens: 0,
+                    maxTokens: Math.round(currentRow.max_tokens / 1000),
+                    inputPrice: 0,
+                    outputPrice: 0,
+                    cachePrice: 0,
+                  },
+                ],
         });
       } else {
         form.reset({
