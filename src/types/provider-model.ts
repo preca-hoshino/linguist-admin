@@ -17,6 +17,10 @@ export interface ProviderModel {
   pricing_tiers?: PricingTier[];
   rpm_limit?: number | null;
   tpm_limit?: number | null;
+  throughput?: {
+    rpm: number;
+    tpm: number;
+  };
 }
 
 export interface PricingTier {
