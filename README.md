@@ -6,15 +6,14 @@ Modern administration dashboard for the Linguist ecosystem. Built with React 19,
 
 ## 🚀 Features
 
-- **Dashboard**: Real-time overview of system status and usage.
-- **API Keys**: Secure management of your translation and model API keys.
-- **Models**: Comprehensive tools to manage and configure translation models.
-- **MCPs**: Support for Model Context Protocol (MCP) integrations.
-- **Users**: System-wide user and administrator management.
-- **Settings**: Flexible account and preference settings.
-- **I18n & RTL**: Seamless internationalization with full Right-to-Left (RTL) support.
-- **Themes**: Modern aesthetics with built-in Light and Dark modes.
-- **Responsive**: Fully optimized for mobile, tablet, and desktop.
+- **Dashboard**: Real-time overview of system status, request volume, token cost calculation, and granular billing insights.
+- **Providers & Models**: Comprehensive tools to add AI providers (including GitHub Copilot, OpenAI, DeepSeek, etc.) and seamlessly control dynamic model mappings and configurations.
+- **API Keys**: Secure management of your application tokens and LLM API keys.
+- **Users**: System-wide user and administrator management, with authentication mapping.
+- **Settings**: Flexible global configurations including default system prompts and error behaviors.
+- **MCPs**: Support for Model Context Protocol (MCP) tool integrations, bridging capabilities to supported models like Anthropic and Copilot.
+- **Themes & I18n**: Modern aesthetics with Light/Dark modes, seamless internationalization, and complete Right-to-Left (RTL) layout support.
+- **Responsive**: Fully optimized for mobile, tablet, and desktop viewing.
 
 ## 🛠️ Tech Stack
 
