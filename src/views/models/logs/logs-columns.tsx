@@ -1,4 +1,4 @@
-import { Anthropic, DeepSeek, Gemini, OpenAI, ProviderIcon, Volcengine } from '@lobehub/icons';
+import { Anthropic, DeepSeek, Gemini, Github, OpenAI, ProviderIcon, Volcengine } from '@lobehub/icons';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { DataTableColumnHeader } from '@/components/data-table';
@@ -209,6 +209,10 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
           }
           case 'volcengine': {
             iconNode = <Volcengine size={12} className="fill-current" />;
+            break;
+          }
+          case 'copilot': {
+            iconNode = <Github size={12} className="fill-current" />;
             break;
           }
           default: {

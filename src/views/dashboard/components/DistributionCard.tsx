@@ -1,4 +1,4 @@
-import { Anthropic, Gemini, OpenAI, ProviderIcon } from '@lobehub/icons';
+import { Anthropic, Gemini, Github, OpenAI, ProviderIcon, Volcengine } from '@lobehub/icons';
 import { Box, Braces, Loader2, MessageSquare } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -106,6 +106,12 @@ export function DistributionCard({
         }
         if (fmt === 'gemini') {
           return <Gemini size={14} className="fill-current" />;
+        }
+        if (fmt === 'volcengine') {
+          return <Volcengine size={14} className="fill-current" />;
+        }
+        if (fmt === 'copilot') {
+          return <Github size={14} className="fill-current" />;
         }
         return <ProviderIcon provider={fmt} size={14} type="mono" className="fill-current" />;
       };

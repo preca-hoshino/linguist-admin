@@ -1,4 +1,4 @@
-import { DeepSeek, Gemini, ProviderIcon, Volcengine } from '@lobehub/icons';
+import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine } from '@lobehub/icons';
 import { Link, useRouter } from '@tanstack/react-router';
 import {
   Box,
@@ -37,6 +37,9 @@ function SettingsProviderIcon({ kind }: { readonly kind: string }): React.JSX.El
     }
     case 'volcengine': {
       return <Volcengine {...props} />;
+    }
+    case 'copilot': {
+      return <Github {...props} />;
     }
 
     default: {
