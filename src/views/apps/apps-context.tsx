@@ -13,7 +13,6 @@ interface AppsContextType {
   currentRow: App | null;
   setCurrentRow: React.Dispatch<React.SetStateAction<App | null>>;
   apps: App[];
-  total: number;
   pagination: PaginationState;
   setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
   search: string;
@@ -33,7 +32,6 @@ export function AppsProvider({ children }: { readonly children: React.ReactNode 
   const [open, setOpen] = useDialogState<AppsDialogType>(null);
   const [currentRow, setCurrentRow] = useState<App | null>(null);
   const [apps, setApps] = useState<App[]>([]);
-  const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(false);
 
   // For cursor-based pagination with pageIndex map
@@ -71,7 +69,6 @@ export function AppsProvider({ children }: { readonly children: React.ReactNode 
       }
 
       setApps(res.data.data);
-      setTotal(res.data.total);
       setHasMore(res.data.has_more);
 
       // Record next cursor if available
@@ -108,7 +105,6 @@ export function AppsProvider({ children }: { readonly children: React.ReactNode 
         currentRow,
         setCurrentRow,
         apps,
-        total,
         pagination,
         setPagination,
         search,

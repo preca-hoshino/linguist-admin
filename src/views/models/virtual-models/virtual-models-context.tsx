@@ -13,13 +13,13 @@ interface VirtualModelsContextType {
   currentRow: VirtualModel | null;
   setCurrentRow: React.Dispatch<React.SetStateAction<VirtualModel | null>>;
   virtualModels: VirtualModel[];
-  total: number;
   pagination: PaginationState;
   setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   loading: boolean;
   error: string;
+  hasMore: boolean;
   loadVirtualModels: () => Promise<void>;
 }
 
@@ -30,7 +30,8 @@ export function VirtualModelsProvider({ children }: { readonly children: React.R
   const [open, setOpen] = useDialogState<VirtualModelsDialogType>(null);
   const [currentRow, setCurrentRow] = useState<VirtualModel | null>(null);
   const [virtualModels, setVirtualModels] = useState<VirtualModel[]>([]);
-  const [total, setTotal] = useState(0);
+  const cursorsRef = React.useRef<(string | undefined)[]>([undefined]);
+  const [hasMore, setHasMore] = useState(false);
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -45,14 +46,29 @@ export function VirtualModelsProvider({ children }: { readonly children: React.R
     try {
       setLoading(true);
       setError('');
-      const limit = pagination.pageSize;
-      const offset = pagination.pageIndex * pagination.pageSize;
-      const res = await listVirtualModels({ limit, offset, search });
+
+      const startingAfter = cursorsRef.current[pagination.pageIndex];
+      const payload: Parameters<typeof listVirtualModels>[0] = { limit: pagination.pageSize };
+      if (startingAfter !== undefined) {
+        payload.starting_after = startingAfter;
+      }
+      if (search) {
+        payload.search = search;
+      }
+
+      const res = await listVirtualModels(payload);
       if (!res.ok) {
         throw new Error(res.error.message || t('common.loadFailed', 'Failed to load data'));
       }
       setVirtualModels(res.data.data);
-      setTotal(res.data.total);
+      setHasMore(res.data.has_more);
+
+      if (res.data.has_more && res.data.data.length > 0) {
+        const lastItem = res.data.data.at(-1);
+        if (lastItem) {
+          cursorsRef.current[pagination.pageIndex + 1] = lastItem.id;
+        }
+      }
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : t('common.loadFailed', 'Failed to load data'));
     } finally {
@@ -62,8 +78,9 @@ export function VirtualModelsProvider({ children }: { readonly children: React.R
 
   // Reset to first page on search change
   useEffect(() => {
+    cursorsRef.current = [undefined];
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, []);
+  }, [search]);
 
   useEffect(() => {
     void load();
@@ -77,13 +94,13 @@ export function VirtualModelsProvider({ children }: { readonly children: React.R
         currentRow,
         setCurrentRow,
         virtualModels,
-        total,
         pagination,
         setPagination,
         search,
         setSearch,
         loading,
         error,
+        hasMore,
         loadVirtualModels: load,
       }}
     >

@@ -18,7 +18,7 @@ import { useProviders } from './providers-context';
 
 export function ProvidersTable(): React.JSX.Element {
   const { t } = useTranslation();
-  const { providers, total, loading, pagination, setPagination, search, setSearch } = useProviders();
+  const { providers, loading, pagination, setPagination, search, setSearch, hasMore } = useProviders();
   const columns = useProvidersColumns();
 
   const [rowSelection, setRowSelection] = useState({});
@@ -31,7 +31,7 @@ export function ProvidersTable(): React.JSX.Element {
   const table = useReactTable({
     data: filteredData,
     columns,
-    rowCount: total,
+    pageCount: hasMore ? -1 : pagination.pageIndex + 1,
     state: {
       sorting,
       columnVisibility,

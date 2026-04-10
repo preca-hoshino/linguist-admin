@@ -18,7 +18,7 @@ import { useApiKeys } from './api-keys-context';
 
 export function ApiKeysTable(): React.JSX.Element {
   const { t } = useTranslation();
-  const { apiKeys, total, loading, pagination, setPagination, search, setSearch } = useApiKeys();
+  const { apiKeys, loading, pagination, setPagination, search, setSearch, hasMore } = useApiKeys();
   const columns = useApiKeysColumns();
 
   const [rowSelection, setRowSelection] = useState({});
@@ -31,7 +31,7 @@ export function ApiKeysTable(): React.JSX.Element {
   const table = useReactTable({
     data: filteredData,
     columns,
-    rowCount: total,
+    pageCount: hasMore ? -1 : pagination.pageIndex + 1,
     state: {
       sorting,
       columnVisibility,

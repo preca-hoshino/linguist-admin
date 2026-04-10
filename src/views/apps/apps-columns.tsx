@@ -39,13 +39,13 @@ export function useAppsColumns(): ColumnDef<App>[] {
         <DataTableColumnHeader column={column} title={t('apps.virtualModels', 'Virtual Models')} />
       ),
       cell: ({ row }): React.JSX.Element => {
-        const models = row.getValue<string[] | null>('allowed_model_ids');
-        return <span className="font-medium text-muted-foreground">{models?.length || 0}</span>;
+        const models = row.getValue<unknown[] | null>('allowed_model_ids');
+        return <span className="font-medium text-muted-foreground">{models?.length ?? 0}</span>;
       },
       enableSorting: true,
-      sortingFn: (rowA, rowB, columnId) => {
-        const a = (rowA.getValue(columnId))?.length || 0;
-        const b = (rowB.getValue(columnId))?.length || 0;
+      sortingFn: (rowA, rowB, columnId): number => {
+        const a = rowA.getValue<unknown[] | null>(columnId)?.length ?? 0;
+        const b = rowB.getValue<unknown[] | null>(columnId)?.length ?? 0;
         return a - b;
       },
       enableHiding: true,
@@ -54,13 +54,13 @@ export function useAppsColumns(): ColumnDef<App>[] {
       accessorKey: 'allowed_mcp_ids',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('apps.virtualMcps', 'Virtual MCPs')} />,
       cell: ({ row }): React.JSX.Element => {
-        const mcps = row.getValue<string[] | null>('allowed_mcp_ids');
-        return <span className="font-medium text-muted-foreground">{mcps?.length || 0}</span>;
+        const mcps = row.getValue<unknown[] | null>('allowed_mcp_ids');
+        return <span className="font-medium text-muted-foreground">{mcps?.length ?? 0}</span>;
       },
       enableSorting: true,
-      sortingFn: (rowA, rowB, columnId) => {
-        const a = (rowA.getValue(columnId))?.length || 0;
-        const b = (rowB.getValue(columnId))?.length || 0;
+      sortingFn: (rowA, rowB, columnId): number => {
+        const a = rowA.getValue<unknown[] | null>(columnId)?.length ?? 0;
+        const b = rowB.getValue<unknown[] | null>(columnId)?.length ?? 0;
         return a - b;
       },
       enableHiding: true,

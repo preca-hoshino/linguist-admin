@@ -13,13 +13,13 @@ interface ProviderModelsContextType {
   currentRow: ProviderModel | null;
   setCurrentRow: React.Dispatch<React.SetStateAction<ProviderModel | null>>;
   providerModels: ProviderModel[];
-  total: number;
   pagination: PaginationState;
   setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   loading: boolean;
   error: string;
+  hasMore: boolean;
   loadProviderModels: () => Promise<void>;
 }
 
@@ -30,7 +30,8 @@ export function ProviderModelsProvider({ children }: { readonly children: React.
   const [open, setOpen] = useDialogState<ProviderModelsDialogType>(null);
   const [currentRow, setCurrentRow] = useState<ProviderModel | null>(null);
   const [providerModels, setProviderModels] = useState<ProviderModel[]>([]);
-  const [total, setTotal] = useState(0);
+  const cursorsRef = React.useRef<(string | undefined)[]>([undefined]);
+  const [hasMore, setHasMore] = useState(false);
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -45,14 +46,30 @@ export function ProviderModelsProvider({ children }: { readonly children: React.
     try {
       setLoading(true);
       setError('');
-      const limit = pagination.pageSize;
-      const offset = pagination.pageIndex * pagination.pageSize;
-      const res = await listProviderModels({ limit, offset, search });
+
+      const startingAfter = cursorsRef.current[pagination.pageIndex];
+      const payload: Parameters<typeof listProviderModels>[0] = { limit: pagination.pageSize };
+      if (startingAfter !== undefined) {
+        payload.starting_after = startingAfter;
+      }
+      if (search) {
+        payload.search = search;
+      }
+
+      const res = await listProviderModels(payload);
       if (!res.ok) {
-        throw new Error(res.error.message);
+        throw new Error(res.error.message || t('common.loadFailed', 'Failed to load data'));
       }
       setProviderModels(res.data.data);
-      setTotal(res.data.total);
+      setHasMore(res.data.has_more);
+
+      // Record next cursor
+      if (res.data.has_more && res.data.data.length > 0) {
+        const lastItem = res.data.data.at(-1);
+        if (lastItem) {
+          cursorsRef.current[pagination.pageIndex + 1] = lastItem.id;
+        }
+      }
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : t('common.loadFailed', 'Failed to load data'));
     } finally {
@@ -62,33 +79,34 @@ export function ProviderModelsProvider({ children }: { readonly children: React.
 
   // Reset to first page on search change
   useEffect(() => {
+    cursorsRef.current = [undefined];
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, []);
+  }, [search]);
 
   useEffect(() => {
     void load();
   }, [load]);
 
   return (
-    <ProviderModelsContext
+    <ProviderModelsContext.Provider
       value={{
         open,
         setOpen,
         currentRow,
         setCurrentRow,
         providerModels,
-        total,
         pagination,
         setPagination,
         search,
         setSearch,
         loading,
         error,
+        hasMore,
         loadProviderModels: load,
       }}
     >
       {children}
-    </ProviderModelsContext>
+    </ProviderModelsContext.Provider>
   );
 }
 

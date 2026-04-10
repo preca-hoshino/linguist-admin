@@ -12,13 +12,13 @@ interface ProvidersContextType {
   currentRow: Provider | null;
   setCurrentRow: React.Dispatch<React.SetStateAction<Provider | null>>;
   providers: Provider[];
-  total: number;
   pagination: PaginationState;
   setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   loading: boolean;
   error: string;
+  hasMore: boolean;
   loadProviders: () => Promise<void>;
 }
 
@@ -28,7 +28,8 @@ export function ProvidersProvider({ children }: { readonly children: React.React
   const [open, setOpen] = useDialogState<ProvidersDialogType>(null);
   const [currentRow, setCurrentRow] = useState<Provider | null>(null);
   const [providers, setProviders] = useState<Provider[]>([]);
-  const [total, setTotal] = useState(0);
+  const cursorsRef = React.useRef<(string | undefined)[]>([undefined]);
+  const [hasMore, setHasMore] = useState(false);
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -43,14 +44,30 @@ export function ProvidersProvider({ children }: { readonly children: React.React
     try {
       setLoading(true);
       setError('');
-      const limit = pagination.pageSize;
-      const offset = pagination.pageIndex * pagination.pageSize;
-      const res = await listProviders({ limit, offset, search });
+
+      const startingAfter = cursorsRef.current[pagination.pageIndex];
+      const payload: Parameters<typeof listProviders>[0] = { limit: pagination.pageSize };
+      if (startingAfter !== undefined) {
+        payload.starting_after = startingAfter;
+      }
+      if (search) {
+        payload.search = search;
+      }
+
+      const res = await listProviders(payload);
       if (!res.ok) {
-        throw new Error(res.error.message);
+        throw new Error(res.error.message || 'Failed to load data');
       }
       setProviders(res.data.data);
-      setTotal(res.data.total);
+      setHasMore(res.data.has_more);
+
+      // Record next cursor
+      if (res.data.has_more && res.data.data.length > 0) {
+        const lastItem = res.data.data.at(-1);
+        if (lastItem) {
+          cursorsRef.current[pagination.pageIndex + 1] = lastItem.id;
+        }
+      }
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : 'Failed to load providers');
     } finally {
@@ -60,33 +77,34 @@ export function ProvidersProvider({ children }: { readonly children: React.React
 
   // Reset to first page on search change
   useEffect(() => {
+    cursorsRef.current = [undefined];
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, []);
+  }, [search]);
 
   useEffect(() => {
     void load();
   }, [load]);
 
   return (
-    <ProvidersContext
+    <ProvidersContext.Provider
       value={{
         open,
         setOpen,
         currentRow,
         setCurrentRow,
         providers,
-        total,
         pagination,
         setPagination,
         search,
         setSearch,
         loading,
         error,
+        hasMore,
         loadProviders: load,
       }}
     >
       {children}
-    </ProvidersContext>
+    </ProvidersContext.Provider>
   );
 }
 

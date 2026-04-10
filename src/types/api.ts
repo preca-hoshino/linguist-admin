@@ -5,7 +5,6 @@ import type { ResourceObjectType } from './resource-types';
 export interface ListResponse<T> {
   readonly object: 'list';
   readonly data: T[];
-  readonly total: number;
   readonly has_more: boolean;
 }
 

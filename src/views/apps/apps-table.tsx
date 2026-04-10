@@ -17,7 +17,7 @@ import { useApps } from './apps-context';
 export function AppsTable(): React.JSX.Element {
   const { t } = useTranslation();
   const columns = useAppsColumns();
-  const { apps, total, pagination, setPagination, search, setSearch, statusFilter, setStatusFilter, loading } =
+  const { apps, pagination, setPagination, search, setSearch, statusFilter, setStatusFilter, loading, hasMore } =
     useApps();
 
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -30,8 +30,8 @@ export function AppsTable(): React.JSX.Element {
         setStatusFilter('all');
       }
     } else {
-      const val = activeF.value[0];
-      if (statusFilter !== val) {
+      const val = (activeF.value as unknown[])[0];
+      if (typeof val === 'string' && statusFilter !== val) {
         setStatusFilter(val);
       }
     }
@@ -41,7 +41,7 @@ export function AppsTable(): React.JSX.Element {
   const table = useReactTable({
     data: apps,
     columns,
-    rowCount: total, // we might not know total for cursor pagination, but we provide it
+    pageCount: hasMore ? -1 : pagination.pageIndex + 1,
     state: {
       sorting,
       columnFilters,

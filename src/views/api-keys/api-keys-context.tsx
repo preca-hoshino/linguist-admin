@@ -16,13 +16,13 @@ interface ApiKeysContextType {
   newKeyText: string | null;
   setNewKeyText: React.Dispatch<React.SetStateAction<string | null>>;
   apiKeys: ApiKey[];
-  total: number;
   pagination: PaginationState;
   setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   loading: boolean;
   error: string;
+  hasMore: boolean;
   loadApiKeys: () => Promise<void>;
 }
 
@@ -40,7 +40,7 @@ export function ApiKeysProvider({
   const [currentRow, setCurrentRow] = useState<ApiKey | null>(null);
   const [newKeyText, setNewKeyText] = useState<string | null>(null);
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
-  const [total, setTotal] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -62,7 +62,7 @@ export function ApiKeysProvider({
         throw new Error(res.error.message || t('common.loadFailed', 'Failed to load data'));
       }
       setApiKeys(res.data.data);
-      setTotal(res.data.total);
+      setHasMore(res.data.has_more);
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : t('common.loadFailed', 'Failed to load data'));
     } finally {
@@ -90,13 +90,13 @@ export function ApiKeysProvider({
         newKeyText,
         setNewKeyText,
         apiKeys,
-        total,
         pagination,
         setPagination,
         search,
         setSearch,
         loading,
         error,
+        hasMore,
         loadApiKeys: load,
       }}
     >

@@ -3,15 +3,15 @@ import { request } from './client';
 
 export const listVirtualModels = async (params?: {
   limit?: number;
-  offset?: number;
+  starting_after?: string;
   search?: string;
 }): Promise<ApiResult<ListResponse<VirtualModel>>> => {
   const qs = new URLSearchParams();
   if (params?.limit !== undefined) {
     qs.set('limit', String(params.limit));
   }
-  if (params?.offset !== undefined) {
-    qs.set('offset', String(params.offset));
+  if (params?.starting_after !== undefined) {
+    qs.set('starting_after', String(params.starting_after));
   }
   if (params?.search != null && params.search !== '') {
     qs.set('search', params.search);

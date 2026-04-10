@@ -1,5 +1,5 @@
 import { Plus } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { deleteUserApi, fetchUsers, type User } from '@/api/users';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
@@ -17,8 +17,9 @@ export function UsersPage(): React.JSX.Element {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const [offset, setOffset] = useState(0);
-  const [total, setTotal] = useState(0);
+  const cursorsRef = useRef<(string | undefined)[]>([undefined]);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
   const limit = 10;
 
   // Mutate Dialog state
@@ -33,18 +34,33 @@ export function UsersPage(): React.JSX.Element {
     try {
       setLoading(true);
       setError('');
-      const res = await fetchUsers({ limit, offset });
+
+      const startingAfter = cursorsRef.current[pageIndex];
+      const payload: Parameters<typeof fetchUsers>[0] = { limit };
+      if (startingAfter !== undefined) {
+        payload.starting_after = startingAfter;
+      }
+
+      const res = await fetchUsers(payload);
+
       if (!res.ok) {
         throw new Error(res.error.message);
       }
       setUsers(res.data.data);
-      setTotal(res.data.total);
+      setHasMore(res.data.has_more);
+
+      if (res.data.has_more && res.data.data.length > 0) {
+        const lastItem = res.data.data.at(-1);
+        if (lastItem) {
+          cursorsRef.current[pageIndex + 1] = lastItem.id;
+        }
+      }
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : 'Failed to load users');
     } finally {
       setLoading(false);
     }
-  }, [offset]);
+  }, [pageIndex]);
 
   useEffect(() => {
     void loadUsers();
@@ -100,16 +116,16 @@ export function UsersPage(): React.JSX.Element {
 
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {t('common.total', 'Total: {{count}}', { count: total })}
+          {t('common.cursorPage', 'Current Page: {{page}}', { page: pageIndex + 1 })}
         </div>
         <div className="space-x-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => {
-              setOffset((old) => Math.max(old - limit, 0));
+              setPageIndex((old) => Math.max(old - 1, 0));
             }}
-            disabled={offset === 0}
+            disabled={pageIndex === 0}
           >
             {t('common.previous', 'Previous')}
           </Button>
@@ -117,9 +133,9 @@ export function UsersPage(): React.JSX.Element {
             variant="outline"
             size="sm"
             onClick={() => {
-              setOffset((old) => old + limit);
+              setPageIndex((old) => old + 1);
             }}
-            disabled={offset + users.length >= total}
+            disabled={!hasMore}
           >
             {t('common.next', 'Next')}
           </Button>

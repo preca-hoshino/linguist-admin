@@ -23,15 +23,15 @@ export interface UserUpdatePayload {
 
 export async function fetchUsers(params?: {
   limit?: number;
-  offset?: number;
+  starting_after?: string;
   search?: string;
 }): Promise<ApiResult<ListResponse<User>>> {
   const qs = new URLSearchParams();
   if (params?.limit !== undefined) {
     qs.set('limit', String(params.limit));
   }
-  if (params?.offset !== undefined) {
-    qs.set('offset', String(params.offset));
+  if (params?.starting_after !== undefined) {
+    qs.set('starting_after', params.starting_after);
   }
   if (params?.search != null && params.search !== '') {
     qs.set('search', params.search);
@@ -51,7 +51,7 @@ export async function createUserApi(data: {
 }
 
 export async function updateUserApi(id: string, data: UserUpdatePayload): Promise<ApiResult<User>> {
-  return await request<User>('PATCH', `/users/${id}`, data);
+  return await request<User>('POST', `/users/${id}`, data);
 }
 
 export async function deleteUserApi(id: string): Promise<ApiResult<{ deleted: true; id: string; object: 'user' }>> {

@@ -8,7 +8,7 @@ export const getProviderModel = async (id: string): Promise<ApiResult<ProviderMo
 export const listProviderModels = async (params?: {
   provider_id?: string;
   limit?: number;
-  offset?: number;
+  starting_after?: string;
   search?: string;
 }): Promise<ApiResult<ListResponse<ProviderModel>>> => {
   const qs = new URLSearchParams();
@@ -18,8 +18,8 @@ export const listProviderModels = async (params?: {
   if (params?.limit !== undefined) {
     qs.set('limit', String(params.limit));
   }
-  if (params?.offset !== undefined) {
-    qs.set('offset', String(params.offset));
+  if (params?.starting_after !== undefined) {
+    qs.set('starting_after', String(params.starting_after));
   }
   if (params?.search != null && params.search !== '') {
     qs.set('search', params.search);

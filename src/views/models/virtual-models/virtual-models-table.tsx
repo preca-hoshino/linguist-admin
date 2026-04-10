@@ -18,7 +18,7 @@ import { useVirtualModels } from './virtual-models-context';
 
 export function VirtualModelsTable(): React.JSX.Element {
   const { t } = useTranslation();
-  const { virtualModels, total, loading, pagination, setPagination, search, setSearch } = useVirtualModels();
+  const { virtualModels, loading, pagination, setPagination, search, setSearch, hasMore } = useVirtualModels();
   const columns = useVirtualModelsColumns();
 
   const [rowSelection, setRowSelection] = useState({});
@@ -37,7 +37,7 @@ export function VirtualModelsTable(): React.JSX.Element {
   const table = useReactTable({
     data: filteredData,
     columns,
-    rowCount: total,
+    pageCount: hasMore ? -1 : pagination.pageIndex + 1,
     state: {
       sorting,
       columnVisibility,
