@@ -1,5 +1,5 @@
 import { Link, useLoaderData, useRouter } from '@tanstack/react-router';
-import { ChevronLeft, Settings } from 'lucide-react';
+import { AppWindow, ChevronLeft, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CopyableId } from '@/components/CopyableId';
@@ -18,7 +18,7 @@ type AppTab = (typeof APP_TABS)[number];
 export function AppDetailPage(): React.JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
-  // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+
   const { app }: { app: import('@/types/app').App } = useLoaderData({
     from: '/_authenticated/apps/$id',
   }) as unknown as { app: import('@/types/app').App };
@@ -44,7 +44,7 @@ export function AppDetailPage(): React.JSX.Element {
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted/50 text-foreground text-2xl">
-            {app.icon !== null && app.icon !== '' ? app.icon : '📦'}
+            <AppWindow className="h-6 w-6 text-muted-foreground" />
           </div>
           <div>
             <div className="flex items-center gap-3">
@@ -118,6 +118,42 @@ export function AppDetailPage(): React.JSX.Element {
               </p>
             </div>
             <div className="p-6">
+              <dl className="mb-8 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-muted-foreground">
+                    {t('apps.allowedModels', 'Allowed Models')}
+                  </dt>
+                  <dd className="mt-1 text-sm text-foreground">
+                    {app.allowed_model_ids.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {app.allowed_model_ids.map((id) => (
+                          <Badge key={id} variant="secondary" className="font-mono text-xs font-normal">
+                            {id}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground">{t('apps.noneAllowed', 'None Allowed')}</span>
+                    )}
+                  </dd>
+                </div>
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-muted-foreground">{t('apps.virtualMcps', 'Virtual MCPs')}</dt>
+                  <dd className="mt-1 text-sm text-foreground">
+                    {app.allowed_mcp_ids && app.allowed_mcp_ids.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {app.allowed_mcp_ids.map((id) => (
+                          <Badge key={id} variant="secondary" className="font-mono text-xs font-normal">
+                            {id}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground">{t('apps.noneAllowed', 'None Allowed')}</span>
+                    )}
+                  </dd>
+                </div>
+              </dl>
               <Button
                 variant="default"
                 onClick={() => {

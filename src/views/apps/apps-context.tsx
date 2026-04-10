@@ -18,6 +18,8 @@ interface AppsContextType {
   setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
+  statusFilter: string;
+  setStatusFilter: React.Dispatch<React.SetStateAction<string>>;
   loading: boolean;
   error: string;
   loadApps: () => Promise<void>;
@@ -42,6 +44,7 @@ export function AppsProvider({ children }: { readonly children: React.ReactNode 
     pageSize: 10,
   });
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -56,6 +59,9 @@ export function AppsProvider({ children }: { readonly children: React.ReactNode 
       const payload: Parameters<typeof listApps>[0] = { limit: pagination.pageSize, search };
       if (startingAfter !== undefined) {
         payload.starting_after = startingAfter;
+      }
+      if (statusFilter !== 'all') {
+        payload.is_active = statusFilter === 'true';
       }
 
       const res = await listApps(payload);
@@ -80,7 +86,7 @@ export function AppsProvider({ children }: { readonly children: React.ReactNode 
     } finally {
       setLoading(false);
     }
-  }, [t, pagination.pageSize, pagination.pageIndex, search]);
+  }, [t, pagination.pageSize, pagination.pageIndex, search, statusFilter]);
 
   // Handle data load when pagination changes
   useEffect(() => {
@@ -92,7 +98,7 @@ export function AppsProvider({ children }: { readonly children: React.ReactNode 
   useEffect(() => {
     cursorsRef.current = [undefined];
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, [search]);
+  }, [search, statusFilter]);
 
   return (
     <AppsContext.Provider
@@ -107,6 +113,8 @@ export function AppsProvider({ children }: { readonly children: React.ReactNode 
         setPagination,
         search,
         setSearch,
+        statusFilter,
+        setStatusFilter,
         loading,
         error,
         loadApps: load,

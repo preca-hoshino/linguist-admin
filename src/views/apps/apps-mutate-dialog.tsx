@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
-import { Fingerprint, ImageIcon, ListFilter, Plus, Trash2, X } from 'lucide-react';
+import { Box, Braces, Fingerprint, ListFilter, MessageSquare, Plus, Trash2, X } from 'lucide-react';
 import { useEffect } from 'react';
 import { useFieldArray, useForm, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +25,6 @@ interface AppsMutateDialogProps {
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  icon: z.string().optional(),
   allowed_model_ids: z.array(z.object({ id: z.string().min(1, 'ID is required') })),
   allowed_mcp_ids: z.array(z.object({ id: z.string().min(1, 'ID is required') })),
 });
@@ -35,11 +34,16 @@ type AppForm = z.infer<typeof formSchema>;
 interface AppAllowedListProps {
   readonly form: UseFormReturn<AppForm>;
   readonly name: 'allowed_model_ids' | 'allowed_mcp_ids';
-  readonly options?: { id: string; name: string }[];
+  readonly options?: { id: string; name: string; type?: string }[];
   readonly isSelect?: boolean;
   readonly t: TFunction<'translation', undefined>;
   readonly itemName: string;
 }
+
+const MODEL_TYPE_ICON: Record<string, React.ElementType> = {
+  chat: MessageSquare,
+  embedding: Braces,
+};
 
 function AppAllowedList({ form, name, options, isSelect, t, itemName }: AppAllowedListProps): React.JSX.Element {
   const { fields, append, remove } = useFieldArray({
@@ -52,8 +56,8 @@ function AppAllowedList({ form, name, options, isSelect, t, itemName }: AppAllow
       {fields.length === 0 && (
         <div className="rounded-md border border-dashed py-6 text-center text-sm text-muted-foreground">
           {name === 'allowed_model_ids'
-            ? t('apps.noAllowedModels', 'No specific models configured. All models are allowed by default.')
-            : t('apps.noAllowedMcps', 'No specific MCPs configured. All MCPs are allowed by default.')}
+            ? t('apps.noAllowedModels', 'No specific models configured. API keys will have no access to models.')
+            : t('apps.noAllowedMcps', 'No specific MCPs configured. API keys will have no access to MCPs.')}
         </div>
       )}
 
@@ -73,11 +77,17 @@ function AppAllowedList({ form, name, options, isSelect, t, itemName }: AppAllow
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {options.map((opt) => (
-                          <SelectItem key={opt.id} value={opt.id}>
-                            <span className="block w-full truncate">{opt.name}</span>
-                          </SelectItem>
-                        ))}
+                        {options.map((opt) => {
+                          const Icon = opt.type && MODEL_TYPE_ICON[opt.type] ? MODEL_TYPE_ICON[opt.type] : Box;
+                          return (
+                            <SelectItem key={opt.id} value={opt.id}>
+                              <div className="flex items-center gap-2">
+                                <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
+                                <span className="block w-full truncate">{opt.name}</span>
+                              </div>
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                   ) : (
@@ -147,7 +157,6 @@ export function AppsMutateDialog({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      icon: '',
       allowed_model_ids: [],
       allowed_mcp_ids: [],
     },
@@ -158,14 +167,12 @@ export function AppsMutateDialog({
       if (currentRow) {
         form.reset({
           name: currentRow.name,
-          icon: currentRow.icon ?? '',
           allowed_model_ids: currentRow.allowed_model_ids.map((id) => ({ id })),
           allowed_mcp_ids: [],
         });
       } else {
         form.reset({
           name: '',
-          icon: '',
           allowed_model_ids: [],
           allowed_mcp_ids: [],
         });
@@ -180,7 +187,6 @@ export function AppsMutateDialog({
       if (currentRow) {
         const res = await updateApp(currentRow.id, {
           name: values.name,
-          icon: values.icon ?? null,
           allowed_model_ids: allowedModelsArray,
         });
         if (!res.ok) {
@@ -189,7 +195,6 @@ export function AppsMutateDialog({
       } else {
         const res = await createApp({
           name: values.name,
-          icon: values.icon ?? null,
           allowed_model_ids: allowedModelsArray,
         });
         if (!res.ok) {
@@ -278,25 +283,6 @@ export function AppsMutateDialog({
                       </FormItem>
                     )}
                   />
-
-                  <FormField
-                    control={form.control}
-                    name="icon"
-                    render={({ field }) => (
-                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                          <ImageIcon className="h-3.5 w-3.5" />
-                          <span className="font-medium text-foreground">{t('apps.icon', 'Icon (Emoji/URL)')}</span>
-                        </FormLabel>
-                        <div className="space-y-1.5">
-                          <FormControl>
-                            <Input {...field} placeholder={t('apps.iconPlaceholder', '📱')} />
-                          </FormControl>
-                          <FormMessage />
-                        </div>
-                      </FormItem>
-                    )}
-                  />
                 </div>
 
                 {/* 右侧手风琴区: 准入列表 */}
@@ -314,7 +300,7 @@ export function AppsMutateDialog({
                           form={form}
                           name="allowed_model_ids"
                           isSelect={true}
-                          options={virtualModels.map((vm) => ({ id: vm.id, name: vm.name }))}
+                          options={virtualModels.map((vm) => ({ id: vm.id, name: vm.name, type: vm.model_type }))}
                           t={t}
                           itemName="Model"
                         />

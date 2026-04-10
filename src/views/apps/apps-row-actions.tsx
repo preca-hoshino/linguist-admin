@@ -1,6 +1,6 @@
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import type { Row } from '@tanstack/react-table';
-import { Pencil, Power, PowerOff, Trash2, Key } from 'lucide-react';
+import { Pencil, Power, PowerOff, Trash2, FileText } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from '@tanstack/react-router';
@@ -56,8 +56,8 @@ export function AppsRowActions({ row }: AppsRowActionsProps): React.JSX.Element 
             void navigate({ to: `/apps/${model.id}` });
           }}
         >
-          <Key className="mr-2 h-4 w-4" />
-          {t('apps.manageKeys', 'Manage Keys')}
+          <FileText className="mr-2 h-4 w-4" />
+          {t('apps.viewDetails', 'View Details')}
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />

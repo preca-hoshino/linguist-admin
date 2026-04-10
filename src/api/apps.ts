@@ -13,6 +13,7 @@ export const listApps = async (params?: {
   limit?: number;
   starting_after?: string;
   search?: string;
+  is_active?: boolean;
 }): Promise<ApiResult<ListResponse<App>>> => {
   const qs = new URLSearchParams();
   if (params?.limit !== undefined) {
@@ -23,6 +24,9 @@ export const listApps = async (params?: {
   }
   if (params?.search != null && params.search !== '') {
     qs.set('search', params.search);
+  }
+  if (params?.is_active !== undefined) {
+    qs.set('is_active', String(params.is_active));
   }
   const queryStr = qs.toString() === '' ? '' : `?${qs.toString()}`;
 

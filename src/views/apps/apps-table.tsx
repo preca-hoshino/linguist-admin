@@ -1,8 +1,14 @@
-import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { Search } from 'lucide-react';
+import {
+  type ColumnFiltersState,
+  type SortingState,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DataTablePagination } from '@/components/data-table';
-import { Input } from '@/components/ui/Input';
+import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { cn } from '@/utils/utils';
 import { useAppsColumns } from './apps-columns';
@@ -11,7 +17,25 @@ import { useApps } from './apps-context';
 export function AppsTable(): React.JSX.Element {
   const { t } = useTranslation();
   const columns = useAppsColumns();
-  const { apps, total, pagination, setPagination, search, setSearch, loading } = useApps();
+  const { apps, total, pagination, setPagination, search, setSearch, statusFilter, setStatusFilter, loading } =
+    useApps();
+
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  useEffect(() => {
+    const activeF = columnFilters.find((f) => f.id === 'is_active');
+    if (!activeF || !Array.isArray(activeF.value) || activeF.value.length === 0 || activeF.value.length > 1) {
+      if (statusFilter !== 'all') {
+        setStatusFilter('all');
+      }
+    } else {
+      const val = activeF.value[0];
+      if (statusFilter !== val) {
+        setStatusFilter(val);
+      }
+    }
+  }, [columnFilters, statusFilter, setStatusFilter]);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
@@ -19,14 +43,19 @@ export function AppsTable(): React.JSX.Element {
     columns,
     rowCount: total, // we might not know total for cursor pagination, but we provide it
     state: {
+      sorting,
+      columnFilters,
       globalFilter: search,
       pagination,
     },
     manualPagination: true,
     manualFiltering: true,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setSearch,
     onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
 
   const renderTableBody = (): React.JSX.Element => {
@@ -73,19 +102,20 @@ export function AppsTable(): React.JSX.Element {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="relative w-full sm:w-72">
-          <Search className="absolute top-2.5 left-2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={t('apps.searchPlaceholder', 'Search apps by name...')}
-            className="pl-8"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-            }}
-          />
-        </div>
-      </div>
+      <DataTableToolbar
+        table={table}
+        searchPlaceholder={t('apps.searchPlaceholder', 'Search apps by name...')}
+        filters={[
+          {
+            columnId: 'is_active',
+            title: t('common.status', 'Status'),
+            options: [
+              { label: t('apps.active', 'Active'), value: 'true' },
+              { label: t('apps.inactive', 'Inactive'), value: 'false' },
+            ],
+          },
+        ]}
+      />
 
       <div className="overflow-hidden rounded-md border">
         <Table className="min-w-xl">

@@ -32,9 +32,7 @@ function KeyValueCell({ row }: { readonly row: import('@tanstack/react-table').R
   return (
     <div className="flex items-center gap-2">
       <Key className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-      <span className="font-mono text-sm tracking-tight">
-        {show ? keyValue : '•'.repeat(Math.min(24, keyValue.length))}
-      </span>
+      <span className="font-mono text-sm tracking-tight w-[300px] truncate">{show ? keyValue : '•'.repeat(24)}</span>
       <button
         type="button"
         title="Toggle visibility"

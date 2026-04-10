@@ -4,6 +4,7 @@ import { DataTableColumnHeader } from '@/components/data-table';
 import { Badge } from '@/components/ui/Badge';
 import type { App } from '@/types/app';
 import { cn } from '@/utils/utils';
+import { AppWindow } from 'lucide-react';
 import { AppsRowActions } from './apps-row-actions';
 
 export function useAppsColumns(): ColumnDef<App>[] {
@@ -24,14 +25,44 @@ export function useAppsColumns(): ColumnDef<App>[] {
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('apps.name', 'Name')} />,
       cell: ({ row }): React.JSX.Element => (
         <div className="flex items-center gap-2">
-          {/* 这里可以放一个 icon 的渲染，比如 <span>{row.original.icon}</span>，假设目前 icon 保存了 emoji 或者 img src */}
-          {row.original.icon !== null && row.original.icon !== '' && (
-            <span className="text-lg">{row.original.icon}</span>
-          )}
+          {/* 使用统计占位图标 */}
+          <AppWindow className="h-5 w-5 text-muted-foreground mr-1" />
           <span className="font-medium">{row.getValue<string>('name')}</span>
         </div>
       ),
       enableSorting: true,
+      enableHiding: true,
+    },
+    {
+      accessorKey: 'allowed_model_ids',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('apps.virtualModels', 'Virtual Models')} />
+      ),
+      cell: ({ row }): React.JSX.Element => {
+        const models = row.getValue<string[] | null>('allowed_model_ids');
+        return <span className="font-medium text-muted-foreground">{models?.length || 0}</span>;
+      },
+      enableSorting: true,
+      sortingFn: (rowA, rowB, columnId) => {
+        const a = (rowA.getValue(columnId))?.length || 0;
+        const b = (rowB.getValue(columnId))?.length || 0;
+        return a - b;
+      },
+      enableHiding: true,
+    },
+    {
+      accessorKey: 'allowed_mcp_ids',
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('apps.virtualMcps', 'Virtual MCPs')} />,
+      cell: ({ row }): React.JSX.Element => {
+        const mcps = row.getValue<string[] | null>('allowed_mcp_ids');
+        return <span className="font-medium text-muted-foreground">{mcps?.length || 0}</span>;
+      },
+      enableSorting: true,
+      sortingFn: (rowA, rowB, columnId) => {
+        const a = (rowA.getValue(columnId))?.length || 0;
+        const b = (rowB.getValue(columnId))?.length || 0;
+        return a - b;
+      },
       enableHiding: true,
     },
     {
@@ -41,25 +72,6 @@ export function useAppsColumns(): ColumnDef<App>[] {
         <span className="text-muted-foreground">{row.getValue<number>('key_count')}</span>
       ),
       enableSorting: true,
-      enableHiding: true,
-    },
-    {
-      accessorKey: 'allowed_model_ids',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('apps.allowedModels', 'Allowed Models')} />
-      ),
-      cell: ({ row }): React.JSX.Element => {
-        const models = row.original.allowed_model_ids;
-        if (models.length === 0) {
-          return <span className="text-sm text-muted-foreground">{t('apps.allModels', 'All Models')}</span>;
-        }
-        return (
-          <div className="flex items-center gap-1 flex-wrap">
-            {models.length} {t('apps.modelsCount', 'Models')}
-          </div>
-        );
-      },
-      enableSorting: false,
       enableHiding: true,
     },
     {
