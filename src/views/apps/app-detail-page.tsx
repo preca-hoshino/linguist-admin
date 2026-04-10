@@ -18,8 +18,8 @@ type AppTab = (typeof APP_TABS)[number];
 export function AppDetailPage(): React.JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
+  // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
   const { app }: { app: import('@/types/app').App } = useLoaderData({
-    // @ts-expect-error Route not generated yet
     from: '/_authenticated/apps/$id',
   }) as unknown as { app: import('@/types/app').App };
 
@@ -33,7 +33,6 @@ export function AppDetailPage(): React.JSX.Element {
       {/* 返回按钮 */}
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="sm" className="-ml-3 text-muted-foreground" asChild>
-          {/* @ts-expect-error Route not generated yet */}
           <Link to="/apps">
             <ChevronLeft className="mr-1 h-4 w-4" />
             {t('apps.backToList', 'Back to List')}
