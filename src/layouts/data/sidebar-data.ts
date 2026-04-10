@@ -3,12 +3,12 @@ import {
   Box,
   Command,
   Database,
-  Key,
   LayoutDashboard,
   ScrollText,
   Settings as SettingsIcon,
   Users,
   Wrench,
+  AppWindow,
 } from 'lucide-react';
 import i18n from '@/i18n';
 import type { SidebarData } from '../types';
@@ -108,9 +108,9 @@ export function getSidebarData(_language?: string): SidebarData {
         title: i18n.t('nav.management'),
         items: [
           {
-            title: i18n.t('nav.apiKeys'),
-            url: '/api-keys',
-            icon: Key,
+            title: i18n.t('nav.apps'),
+            url: '/apps',
+            icon: AppWindow,
           },
           {
             title: i18n.t('nav.users'),
