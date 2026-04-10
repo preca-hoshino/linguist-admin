@@ -1,14 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Fingerprint, ImageIcon, ListFilter, X } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import type { TFunction } from 'i18next';
+import { Fingerprint, ImageIcon, ListFilter, Plus, Trash2, X } from 'lucide-react';
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useFieldArray, useForm, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { createApp, updateApp } from '@/api/apps';
+import { listVirtualModels } from '@/api/virtual-models';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import type { App } from '@/types/app';
 
 interface AppsMutateDialogProps {
@@ -21,10 +26,100 @@ interface AppsMutateDialogProps {
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   icon: z.string().optional(),
-  allowed_models_raw: z.string().optional(),
+  allowed_model_ids: z.array(z.object({ id: z.string().min(1, 'ID is required') })),
+  allowed_mcp_ids: z.array(z.object({ id: z.string().min(1, 'ID is required') })),
 });
 
 type AppForm = z.infer<typeof formSchema>;
+
+interface AppAllowedListProps {
+  readonly form: UseFormReturn<AppForm>;
+  readonly name: 'allowed_model_ids' | 'allowed_mcp_ids';
+  readonly options?: { id: string; name: string }[];
+  readonly isSelect?: boolean;
+  readonly t: TFunction<'translation', undefined>;
+  readonly itemName: string;
+}
+
+function AppAllowedList({ form, name, options, isSelect, t, itemName }: AppAllowedListProps): React.JSX.Element {
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name,
+  });
+
+  return (
+    <div className="flex flex-col gap-3 py-2">
+      {fields.length === 0 && (
+        <div className="rounded-md border border-dashed py-6 text-center text-sm text-muted-foreground">
+          {name === 'allowed_model_ids'
+            ? t('apps.noAllowedModels', 'No specific models configured. All models are allowed by default.')
+            : t('apps.noAllowedMcps', 'No specific MCPs configured. All MCPs are allowed by default.')}
+        </div>
+      )}
+
+      {fields.map((field, index) => (
+        <div key={field.id} className="flex items-center gap-3 rounded-md border bg-background p-2.5 shadow-sm">
+          <div className="min-w-0 flex-1">
+            <FormField
+              control={form.control}
+              name={`${name}.${index}.id`}
+              render={({ field }) => (
+                <FormItem className="space-y-0">
+                  {isSelect && options ? (
+                    <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder={`Select ${itemName}`} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {options.map((opt) => (
+                          <SelectItem key={opt.id} value={opt.id}>
+                            <span className="block w-full truncate">{opt.name}</span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <FormControl>
+                      <Input {...field} placeholder={`Enter ${itemName} ID`} />
+                    </FormControl>
+                  )}
+                  <FormMessage className="mt-1 text-xs" />
+                </FormItem>
+              )}
+            />
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 shrink-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive/90"
+            onClick={() => {
+              remove(index);
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      ))}
+
+      <Button
+        type="button"
+        variant="outline"
+        className="mt-1 h-9 w-full border-dashed text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+        onClick={() => {
+          append({ id: '' });
+        }}
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        {name === 'allowed_model_ids'
+          ? t('apps.addAllowedModel', 'Add Allowed Model')
+          : t('apps.addAllowedMcp', 'Add Allowed MCP')}
+      </Button>
+    </div>
+  );
+}
 
 export function AppsMutateDialog({
   open,
@@ -35,12 +130,26 @@ export function AppsMutateDialog({
   const { t } = useTranslation();
   const isUpdate = !!currentRow;
 
+  const { data: virtualModels = [] } = useQuery({
+    queryKey: ['virtual-models-list'],
+    queryFn: async () => {
+      const res = await listVirtualModels();
+      if (!res.ok) {
+        throw new Error('Failed to load virtual models');
+      }
+      return res.data.data;
+    },
+    enabled: open,
+    staleTime: 60_000,
+  });
+
   const form = useForm<AppForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
       icon: '',
-      allowed_models_raw: '',
+      allowed_model_ids: [],
+      allowed_mcp_ids: [],
     },
   });
 
@@ -50,13 +159,15 @@ export function AppsMutateDialog({
         form.reset({
           name: currentRow.name,
           icon: currentRow.icon ?? '',
-          allowed_models_raw: currentRow.allowed_model_ids.join(', '),
+          allowed_model_ids: currentRow.allowed_model_ids.map((id) => ({ id })),
+          allowed_mcp_ids: [],
         });
       } else {
         form.reset({
           name: '',
           icon: '',
-          allowed_models_raw: '',
+          allowed_model_ids: [],
+          allowed_mcp_ids: [],
         });
       }
     }
@@ -64,16 +175,9 @@ export function AppsMutateDialog({
 
   const onSubmit = async (values: AppForm): Promise<void> => {
     try {
-      // Parse allowed models
-      const allowedModelsArray =
-        values.allowed_models_raw !== undefined && values.allowed_models_raw !== ''
-          ? values.allowed_models_raw
-              .split(',')
-              .map((s) => s.trim())
-              .filter((s) => s !== '')
-          : [];
+      const allowedModelsArray = values.allowed_model_ids.map((m) => m.id.trim()).filter((id) => id !== '');
 
-      if (currentRow !== null && currentRow !== undefined) {
+      if (currentRow) {
         const res = await updateApp(currentRow.id, {
           name: values.name,
           icon: values.icon ?? null,
@@ -112,8 +216,11 @@ export function AppsMutateDialog({
         }
       }}
     >
-      <DialogContent showCloseButton={false} className="flex flex-col overflow-hidden p-0 sm:max-w-[500px]">
-        <DialogHeader className="flex shrink-0 flex-row items-start justify-between border-b bg-background px-6 py-5">
+      <DialogContent
+        showCloseButton={false}
+        className="flex h-[85vh] max-h-[850px] flex-col overflow-hidden p-0 sm:max-w-[700px] lg:h-[700px] lg:max-w-[1000px] xl:max-w-[1200px]"
+      >
+        <DialogHeader className="flex shrink-0 flex-row items-start justify-between border-b bg-background px-8 py-5">
           <div className="flex flex-col gap-1.5 text-left">
             <DialogTitle>{isUpdate ? t('apps.edit', 'Edit App') : t('apps.create', 'New App')}</DialogTitle>
             <DialogDescription>
@@ -141,7 +248,7 @@ export function AppsMutateDialog({
             onSubmit={(e) => {
               void form.handleSubmit(onSubmit)(e);
             }}
-            className="flex min-h-0 flex-1 flex-col overflow-hidden px-6 py-6"
+            className="flex min-h-0 flex-1 flex-col overflow-hidden px-8 py-6"
           >
             <div className="flex h-full min-h-0 w-full flex-col gap-6">
               {form.formState.errors.root && (
@@ -150,65 +257,89 @@ export function AppsMutateDialog({
                 </div>
               )}
 
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col gap-1.5 space-y-0">
-                    <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                      <Fingerprint className="h-3.5 w-3.5" />
-                      <span className="font-medium text-foreground">{t('apps.name', 'Name')}</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={t('apps.namePlaceholder', 'e.g. Production App')} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid min-h-0 flex-1 grid-cols-1 gap-10 lg:grid-cols-[360px_1fr]">
+                {/* 基础配置区 */}
+                <div className="-mr-4 flex flex-col gap-6 overflow-y-auto pt-1 pr-4 pb-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                          <Fingerprint className="h-3.5 w-3.5" />
+                          <span className="font-medium text-foreground">{t('apps.name', 'Name')}</span>
+                        </FormLabel>
+                        <div className="space-y-1.5">
+                          <FormControl>
+                            <Input {...field} placeholder={t('apps.namePlaceholder', 'e.g. Production App')} />
+                          </FormControl>
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
 
-              <FormField
-                control={form.control}
-                name="icon"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col gap-1.5 space-y-0">
-                    <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                      <ImageIcon className="h-3.5 w-3.5" />
-                      <span className="font-medium text-foreground">{t('apps.icon', 'Icon (Emoji/URL)')}</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={t('apps.iconPlaceholder', '📱')} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  <FormField
+                    control={form.control}
+                    name="icon"
+                    render={({ field }) => (
+                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                          <ImageIcon className="h-3.5 w-3.5" />
+                          <span className="font-medium text-foreground">{t('apps.icon', 'Icon (Emoji/URL)')}</span>
+                        </FormLabel>
+                        <div className="space-y-1.5">
+                          <FormControl>
+                            <Input {...field} placeholder={t('apps.iconPlaceholder', '📱')} />
+                          </FormControl>
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-              <FormField
-                control={form.control}
-                name="allowed_models_raw"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col gap-1.5 space-y-0">
-                    <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                      <ListFilter className="h-3.5 w-3.5" />
-                      <span className="font-medium text-foreground">{t('apps.allowedModels', 'Allowed Models')}</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={t('apps.allowedModelsPlaceholder', 'gpt-4, claude-3-opus')} />
-                    </FormControl>
-                    <p className="text-[13px] text-muted-foreground">
-                      {t('apps.allowedModelsHelp', 'Comma separated list of model IDs. Leave blank for all.')}
-                    </p>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                {/* 右侧手风琴区: 准入列表 */}
+                <div className="mt-1 -mr-4 flex flex-col gap-3 overflow-y-auto pt-1 pr-4 pb-4">
+                  <Accordion type="multiple" defaultValue={['models', 'mcps']} className="w-full">
+                    <AccordionItem value="models" className="border-none">
+                      <AccordionTrigger className="rounded-md bg-muted/40 px-4 py-3 text-sm font-medium hover:no-underline">
+                        <div className="flex items-center gap-2">
+                          <ListFilter className="h-4 w-4" />
+                          {t('apps.allowedModels', 'Allowed Models')}
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="px-1 pt-4 pb-2">
+                        <AppAllowedList
+                          form={form}
+                          name="allowed_model_ids"
+                          isSelect={true}
+                          options={virtualModels.map((vm) => ({ id: vm.id, name: vm.name }))}
+                          t={t}
+                          itemName="Model"
+                        />
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="mcps" className="mt-4 border-none">
+                      <AccordionTrigger className="rounded-md bg-muted/40 px-4 py-3 text-sm font-medium hover:no-underline">
+                        <div className="flex items-center gap-2">
+                          <ListFilter className="h-4 w-4" />
+                          {t('apps.allowedMcps', 'Allowed MCPs')}
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="px-1 pt-4 pb-2">
+                        <AppAllowedList form={form} name="allowed_mcp_ids" isSelect={false} t={t} itemName="MCP" />
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+              </div>
             </div>
           </form>
         </Form>
 
-        {/* 底部按钮栏 */}
-        <div className="flex shrink-0 items-center justify-end gap-3 border-t bg-muted/30 px-6 py-4">
+        {/* 底部按钮 */}
+        <div className="flex shrink-0 items-center justify-end gap-3 border-t bg-muted/30 px-8 py-4">
           <Button
             type="button"
             variant="outline"
