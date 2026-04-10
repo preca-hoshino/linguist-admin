@@ -159,6 +159,7 @@ function LogPageHeader({ log }: { readonly log: RequestLog }): React.JSX.Element
 
   const isCompleted = log.status === 'completed';
   const isError = log.status === 'error';
+  const appNameFromCtx = ctx ? (ctx as unknown as { appName?: string }).appName : undefined;
 
   return (
     <div className="flex flex-col gap-6 mb-2">
@@ -238,7 +239,7 @@ function LogPageHeader({ log }: { readonly log: RequestLog }): React.JSX.Element
         {/* Client */}
         {renderNode(
           <User className="h-5 w-5" />,
-          ctx?.apiKeyName ?? ctx?.apiKeyPrefix ?? 'Unknown Client',
+          appNameFromCtx ?? ctx?.apiKeyName ?? ctx?.apiKeyPrefix ?? 'Unknown Client',
           null,
           ctx?.requestModel,
         )}

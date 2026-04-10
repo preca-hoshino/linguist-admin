@@ -10,7 +10,7 @@ import {
 import { Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { listApiKeys } from '@/api/api-keys';
+import { listApps } from '@/api/apps';
 import { listProviders } from '@/api/providers';
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
 import { DataTableBulkActions } from '@/components/data-table/BulkActions';
@@ -49,7 +49,7 @@ export function LogsTable(): React.JSX.Element {
   const columns = useLogsColumns();
 
   const [providerOptions, setProviderOptions] = useState<{ label: string; value: string }[]>([]);
-  const [apiKeyOptions, setApiKeyOptions] = useState<{ label: string; value: string }[]>([]);
+  const [appOptions, setAppOptions] = useState<{ label: string; value: string }[]>([]);
 
   useEffect(() => {
     // 异步拉取全部已有 providers 以作为过滤选项（直接以具体实例的 id 作为筛选值）
@@ -67,15 +67,15 @@ export function LogsTable(): React.JSX.Element {
         // block catch
       });
 
-    // 异步拉取全部 API Key，以生成选项
-    listApiKeys({ limit: 100 })
+    // 异步拉取全部 App，以生成选项
+    listApps({ limit: 100 })
       .then((res) => {
         if (res.ok) {
-          const options = res.data.data.map((k) => ({
-            label: k.name || k.key_prefix,
-            value: k.key_prefix,
+          const options = res.data.data.map((a) => ({
+            label: a.name,
+            value: a.id, // now request logs store app_id soon, currently filtering might use key or id, but backend supports it
           }));
-          setApiKeyOptions(options);
+          setAppOptions(options);
         }
       })
       .catch(() => {
@@ -157,9 +157,9 @@ export function LogsTable(): React.JSX.Element {
             ],
           },
           {
-            columnId: 'api_key',
-            title: t('modelsPage.logs.apiKey', 'API Key'),
-            options: apiKeyOptions,
+            columnId: 'app_id', // Note: backend filter needs to match this or we change it if needed
+            title: t('modelsPage.logs.app', 'App'),
+            options: appOptions,
           },
         ]}
       />

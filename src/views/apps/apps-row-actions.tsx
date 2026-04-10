@@ -1,9 +1,10 @@
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import type { Row } from '@tanstack/react-table';
-import { Pencil, Power, PowerOff, RefreshCw, Trash2 } from 'lucide-react';
+import { Pencil, Power, PowerOff, Trash2, FileText } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { updateAppKey } from '@/api/apps';
+import { useNavigate } from '@tanstack/react-router';
+import { updateApp } from '@/api/apps';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
@@ -12,25 +13,26 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
-import type { ApiKey } from '@/types';
-import { useApiKeys } from './api-keys-context';
+import type { App } from '@/types/app';
+import { useApps } from './apps-context';
 
-interface ApiKeysRowActionsProps {
-  readonly row: Row<ApiKey>;
+interface AppsRowActionsProps {
+  readonly row: Row<App>;
 }
 
-export function ApiKeysRowActions({ row }: ApiKeysRowActionsProps): React.JSX.Element {
+export function AppsRowActions({ row }: AppsRowActionsProps): React.JSX.Element {
   const model = row.original;
   const { t } = useTranslation();
-  const { appId, setOpen, setCurrentRow, loadApiKeys } = useApiKeys();
+  const navigate = useNavigate();
+  const { setOpen, setCurrentRow, loadApps } = useApps();
   const [isToggling, setIsToggling] = useState(false);
 
   const handleToggle = (): void => {
     void (async (): Promise<void> => {
       try {
         setIsToggling(true);
-        await updateAppKey(appId, model.id, { is_active: !model.is_active });
-        await loadApiKeys();
+        await updateApp(model.id, { is_active: !model.is_active });
+        await loadApps();
       } finally {
         setIsToggling(false);
       }
@@ -40,12 +42,26 @@ export function ApiKeysRowActions({ row }: ApiKeysRowActionsProps): React.JSX.El
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="flex h-8 w-8 p-0 data-[state=open]:bg-muted">
+        <Button
+          variant="ghost"
+          className="flex h-8 w-8 p-0 border-0 shadow-none hover:bg-muted data-[state=open]:bg-muted"
+        >
           <DotsHorizontalIcon className="h-4 w-4" />
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
+        <DropdownMenuItem
+          onClick={() => {
+            void navigate({ to: `/apps/${model.id}` });
+          }}
+        >
+          <FileText className="mr-2 h-4 w-4" />
+          {t('apps.viewDetails', 'View Details')}
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
         <DropdownMenuItem
           onClick={() => {
             setCurrentRow(model);
@@ -56,28 +72,18 @@ export function ApiKeysRowActions({ row }: ApiKeysRowActionsProps): React.JSX.El
           {t('common.edit', 'Edit')}
         </DropdownMenuItem>
 
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(model);
-            setOpen('rotate');
-          }}
-        >
-          <RefreshCw className="mr-2 h-4 w-4 text-orange-500" />
-          {t('common.rotate', 'Rotate')}
-        </DropdownMenuItem>
-
         <DropdownMenuSeparator />
 
         <DropdownMenuItem onClick={handleToggle} disabled={isToggling}>
           {model.is_active ? (
             <>
               <PowerOff className="mr-2 h-4 w-4 text-orange-500" />
-              {t('apiKeys.toggleDisable', 'Disable')}
+              {t('apps.toggleDisable', 'Disable')}
             </>
           ) : (
             <>
               <Power className="mr-2 h-4 w-4 text-green-500" />
-              {t('apiKeys.toggleEnable', 'Enable')}
+              {t('apps.toggleEnable', 'Enable')}
             </>
           )}
         </DropdownMenuItem>

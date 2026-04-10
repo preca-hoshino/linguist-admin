@@ -235,22 +235,25 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       enableSorting: true,
     },
     {
-      id: 'api_key',
+      id: 'app_id',
       accessorFn: (row): string => {
-        const ctx = row.gateway_context;
-        if (ctx?.apiKeyName != null && ctx.apiKeyName !== '') {
+        const ctx = row.gateway_context as NonNullable<RequestLog['gateway_context']> & { appName?: string };
+        if (ctx.appName != null && ctx.appName !== '') {
+          return ctx.appName;
+        }
+        if (ctx.apiKeyName != null && ctx.apiKeyName !== '') {
           return ctx.apiKeyName;
         }
-        if (ctx?.apiKeyPrefix != null && ctx.apiKeyPrefix !== '') {
+        if (ctx.apiKeyPrefix != null && ctx.apiKeyPrefix !== '') {
           return ctx.apiKeyPrefix;
         }
         return '-';
       },
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.apiKey', 'API Key')} />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.app', 'App')} />,
       meta: { className: 'ps-1', tdClassName: 'ps-4' },
       cell: ({ row }): React.JSX.Element => {
-        const ctx = row.original.gateway_context;
-        const name = ctx?.apiKeyName;
+        const ctx = row.original.gateway_context as NonNullable<RequestLog['gateway_context']> & { appName?: string };
+        const name = ctx.appName ?? ctx.apiKeyName;
         return <span className="text-[11px] font-medium">{name != null && name !== '' ? name : '-'}</span>;
       },
       enableSorting: false,

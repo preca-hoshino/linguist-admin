@@ -32,9 +32,9 @@ function ApiKeysContent(): React.JSX.Element {
   );
 }
 
-export function ApiKeysPage(): React.JSX.Element {
+export function ApiKeysPage({ appId }: { readonly appId?: string }): React.JSX.Element {
   return (
-    <ApiKeysProvider>
+    <ApiKeysProvider appId={appId ?? ''}>
       <ApiKeysContent />
       <ApiKeysDialogs />
     </ApiKeysProvider>
