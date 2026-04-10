@@ -3,7 +3,7 @@ import type { Row } from '@tanstack/react-table';
 import { Pencil, Power, PowerOff, RefreshCw, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { updateApiKey } from '@/api/api-keys';
+import { updateAppKey } from '@/api/apps';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
@@ -22,14 +22,14 @@ interface ApiKeysRowActionsProps {
 export function ApiKeysRowActions({ row }: ApiKeysRowActionsProps): React.JSX.Element {
   const model = row.original;
   const { t } = useTranslation();
-  const { setOpen, setCurrentRow, loadApiKeys } = useApiKeys();
+  const { appId, setOpen, setCurrentRow, loadApiKeys } = useApiKeys();
   const [isToggling, setIsToggling] = useState(false);
 
   const handleToggle = (): void => {
     void (async (): Promise<void> => {
       try {
         setIsToggling(true);
-        await updateApiKey(model.id, { is_active: !model.is_active });
+        await updateAppKey(appId, model.id, { is_active: !model.is_active });
         await loadApiKeys();
       } finally {
         setIsToggling(false);

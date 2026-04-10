@@ -1,13 +1,14 @@
 import type { PaginationState } from '@tanstack/react-table';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { listApiKeys } from '@/api/api-keys';
+import { listAppKeys } from '@/api/apps';
 import { useDialogState } from '@/composables/use-dialog-state';
 import type { ApiKey } from '@/types';
 
 export type ApiKeysDialogType = 'create' | 'update' | 'delete' | 'rotate' | 'copy';
 
 interface ApiKeysContextType {
+  appId: string;
   open: ApiKeysDialogType | null;
   setOpen: (str: ApiKeysDialogType | null) => void;
   currentRow: ApiKey | null;
@@ -27,7 +28,13 @@ interface ApiKeysContextType {
 
 const ApiKeysContext = React.createContext<ApiKeysContextType | null>(null);
 
-export function ApiKeysProvider({ children }: { readonly children: React.ReactNode }): React.JSX.Element {
+export function ApiKeysProvider({
+  appId,
+  children,
+}: {
+  readonly appId: string;
+  readonly children: React.ReactNode;
+}): React.JSX.Element {
   const { t } = useTranslation();
   const [open, setOpen] = useDialogState<ApiKeysDialogType>(null);
   const [currentRow, setCurrentRow] = useState<ApiKey | null>(null);
@@ -50,7 +57,7 @@ export function ApiKeysProvider({ children }: { readonly children: React.ReactNo
       setError('');
       const limit = pagination.pageSize;
       const offset = pagination.pageIndex * pagination.pageSize;
-      const res = await listApiKeys({ limit, offset, search });
+      const res = await listAppKeys(appId, { limit, offset, search });
       if (!res.ok) {
         throw new Error(res.error.message || t('common.loadFailed', 'Failed to load data'));
       }
@@ -61,7 +68,7 @@ export function ApiKeysProvider({ children }: { readonly children: React.ReactNo
     } finally {
       setLoading(false);
     }
-  }, [t, pagination.pageSize, pagination.pageIndex, search]);
+  }, [t, appId, pagination.pageSize, pagination.pageIndex, search]);
 
   // Reset to first page on search change
   useEffect(() => {
@@ -75,6 +82,7 @@ export function ApiKeysProvider({ children }: { readonly children: React.ReactNo
   return (
     <ApiKeysContext.Provider
       value={{
+        appId,
         open,
         setOpen,
         currentRow,

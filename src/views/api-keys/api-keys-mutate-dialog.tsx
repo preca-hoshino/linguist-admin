@@ -4,7 +4,8 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { createApiKey, updateApiKey } from '@/api/api-keys';
+import { createAppKey, updateAppKey } from '@/api/apps';
+import { useApiKeys } from './api-keys-context';
 import { Button } from '@/components/ui/Button';
 import {
   Dialog,
@@ -23,7 +24,6 @@ interface ApiKeysMutateDialogProps {
   readonly onOpenChange: (open: boolean) => void;
   readonly currentRow?: ApiKey | null;
   readonly onSuccess?: () => void | Promise<void>;
-  readonly onKeyGenerated?: (key: string) => void;
 }
 
 const formSchema = z.object({
@@ -60,9 +60,9 @@ export function ApiKeysMutateDialog({
   onOpenChange,
   currentRow,
   onSuccess,
-  onKeyGenerated,
 }: ApiKeysMutateDialogProps): React.JSX.Element {
   const { t } = useTranslation();
+  const { appId } = useApiKeys();
   const isUpdate = !!currentRow;
 
   const form = useForm<ApiKeyForm>({
@@ -94,7 +94,7 @@ export function ApiKeysMutateDialog({
     if (!currentRow?.id) {
       return;
     }
-    const res = await updateApiKey(currentRow.id, {
+    const res = await updateAppKey(appId, currentRow.id, {
       name: values.name,
       expires_at: expiresAtIso,
     });
@@ -105,21 +105,19 @@ export function ApiKeysMutateDialog({
   };
 
   const handleCreate = async (values: ApiKeyForm, expiresAtIso: string | null): Promise<void> => {
-    const payload: Parameters<typeof createApiKey>[0] = {
+    const payload: Parameters<typeof createAppKey>[1] = {
       name: values.name,
     };
     if (expiresAtIso !== null && expiresAtIso !== '') {
       payload.expires_at = expiresAtIso;
     }
-    const res = await createApiKey(payload);
+    const res = await createAppKey(appId, payload);
 
     if (!res.ok) {
       throw new Error(res.error.message || 'Creation failed');
     }
 
-    if (res.data.key !== undefined && res.data.key !== '' && onKeyGenerated !== undefined) {
-      onKeyGenerated(res.data.key);
-    }
+    // no longer need onKeyGenerated since keys are visible anytime
   };
 
   const onSubmit = async (values: ApiKeyForm): Promise<void> => {
