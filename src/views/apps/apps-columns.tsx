@@ -44,8 +44,8 @@ export function useAppsColumns(): ColumnDef<App>[] {
       },
       enableSorting: true,
       sortingFn: (rowA, rowB, columnId) => {
-        const a = (rowA.getValue(columnId))?.length || 0;
-        const b = (rowB.getValue(columnId))?.length || 0;
+        const a = rowA.getValue(columnId)?.length || 0;
+        const b = rowB.getValue(columnId)?.length || 0;
         return a - b;
       },
       enableHiding: true,
@@ -59,8 +59,8 @@ export function useAppsColumns(): ColumnDef<App>[] {
       },
       enableSorting: true,
       sortingFn: (rowA, rowB, columnId) => {
-        const a = (rowA.getValue(columnId))?.length || 0;
-        const b = (rowB.getValue(columnId))?.length || 0;
+        const a = rowA.getValue(columnId)?.length || 0;
+        const b = rowB.getValue(columnId)?.length || 0;
         return a - b;
       },
       enableHiding: true,
