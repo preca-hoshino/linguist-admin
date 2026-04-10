@@ -1,4 +1,4 @@
-import type { PaginationState } from '@tanstack/react-table';
+import type { ColumnFiltersState, PaginationState } from '@tanstack/react-table';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { listVirtualModels } from '@/api/virtual-models';
@@ -13,57 +13,105 @@ interface VirtualModelsContextType {
   currentRow: VirtualModel | null;
   setCurrentRow: React.Dispatch<React.SetStateAction<VirtualModel | null>>;
   virtualModels: VirtualModel[];
-  total: number;
   pagination: PaginationState;
   setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
+  columnFilters: ColumnFiltersState;
+  setColumnFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>;
   loading: boolean;
   error: string;
+  hasMore: boolean;
   loadVirtualModels: () => Promise<void>;
 }
 
 const VirtualModelsContext = React.createContext<VirtualModelsContextType | null>(null);
+
+/** 从 TanStack columnFilters 状态中提取出第一个选中值 */
+function extractFilterValue(filters: ColumnFiltersState, id: string): string | undefined {
+  const f = filters.find((item) => item.id === id);
+  if (!f) {
+    return undefined;
+  }
+  const val = f.value;
+  if (Array.isArray(val) && val.length === 1 && typeof val[0] === 'string') {
+    return val[0];
+  }
+  return undefined;
+}
 
 export function VirtualModelsProvider({ children }: { readonly children: React.ReactNode }): React.JSX.Element {
   const { t } = useTranslation();
   const [open, setOpen] = useDialogState<VirtualModelsDialogType>(null);
   const [currentRow, setCurrentRow] = useState<VirtualModel | null>(null);
   const [virtualModels, setVirtualModels] = useState<VirtualModel[]>([]);
-  const [total, setTotal] = useState(0);
+  const cursorsRef = React.useRef<(string | undefined)[]>([undefined]);
+  const [hasMore, setHasMore] = useState(false);
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
   const [search, setSearch] = useState('');
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // 从 columnFilters 提取 API 参数
+  const modelTypeFilter = extractFilterValue(columnFilters, 'model_type');
+  const routingStrategyFilter = extractFilterValue(columnFilters, 'routing_strategy');
+  const isActiveFilter = extractFilterValue(columnFilters, 'is_active');
 
   const load = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
-      const limit = pagination.pageSize;
-      const offset = pagination.pageIndex * pagination.pageSize;
-      const res = await listVirtualModels({ limit, offset, search });
+
+      const startingAfter = cursorsRef.current[pagination.pageIndex];
+      const payload: Parameters<typeof listVirtualModels>[0] = { limit: pagination.pageSize };
+      if (startingAfter !== undefined) {
+        payload.starting_after = startingAfter;
+      }
+      if (search) {
+        payload.search = search;
+      }
+      if (modelTypeFilter !== undefined) {
+        payload.model_type = modelTypeFilter;
+      }
+      if (routingStrategyFilter !== undefined) {
+        payload.routing_strategy = routingStrategyFilter;
+      }
+      if (isActiveFilter !== undefined) {
+        payload.is_active = isActiveFilter === 'true';
+      }
+
+      const res = await listVirtualModels(payload);
       if (!res.ok) {
         throw new Error(res.error.message || t('common.loadFailed', 'Failed to load data'));
       }
       setVirtualModels(res.data.data);
-      setTotal(res.data.total);
+      setHasMore(res.data.has_more);
+
+      if (res.data.has_more && res.data.data.length > 0) {
+        const lastItem = res.data.data.at(-1);
+        if (lastItem) {
+          cursorsRef.current[pagination.pageIndex + 1] = lastItem.id;
+        }
+      }
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : t('common.loadFailed', 'Failed to load data'));
     } finally {
       setLoading(false);
     }
-  }, [t, pagination.pageSize, pagination.pageIndex, search]);
+  }, [t, pagination.pageSize, pagination.pageIndex, search, modelTypeFilter, routingStrategyFilter, isActiveFilter]);
 
-  // Reset to first page on search change
+  // Reset to first page on search/filter change
+  // biome-ignore lint/correctness/useExhaustiveDependencies: react to search/filter change
   useEffect(() => {
+    cursorsRef.current = [undefined];
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, []);
+  }, [search, modelTypeFilter, routingStrategyFilter, isActiveFilter]);
 
   useEffect(() => {
     void load();
@@ -77,13 +125,15 @@ export function VirtualModelsProvider({ children }: { readonly children: React.R
         currentRow,
         setCurrentRow,
         virtualModels,
-        total,
         pagination,
         setPagination,
         search,
         setSearch,
+        columnFilters,
+        setColumnFilters,
         loading,
         error,
+        hasMore,
         loadVirtualModels: load,
       }}
     >

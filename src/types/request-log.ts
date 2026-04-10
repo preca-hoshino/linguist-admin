@@ -193,6 +193,6 @@ export interface CostBreakdown {
 }
 
 export interface RequestLogList {
-  total: number;
+  has_more: boolean;
   data: RequestLog[];
 }

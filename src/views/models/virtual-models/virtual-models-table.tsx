@@ -8,8 +8,9 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { listVirtualModels } from '@/api/virtual-models';
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { cn } from '@/utils/utils';
@@ -18,7 +19,17 @@ import { useVirtualModels } from './virtual-models-context';
 
 export function VirtualModelsTable(): React.JSX.Element {
   const { t } = useTranslation();
-  const { virtualModels, total, loading, pagination, setPagination, search, setSearch } = useVirtualModels();
+  const {
+    virtualModels,
+    loading,
+    pagination,
+    setPagination,
+    search,
+    setSearch,
+    columnFilters,
+    setColumnFilters,
+    hasMore,
+  } = useVirtualModels();
   const columns = useVirtualModelsColumns();
 
   const [rowSelection, setRowSelection] = useState({});
@@ -31,18 +42,35 @@ export function VirtualModelsTable(): React.JSX.Element {
     created_at: false,
   });
 
-  const filteredData = useMemo(() => virtualModels, [virtualModels]);
+  // 动态生成筛选选项（通过独立请求获取全量列表以免被 pagination 限制）
+  const [modelTypeOptions, setModelTypeOptions] = useState<{ label: string; value: string }[]>([]);
+  const [strategyOptions, setStrategyOptions] = useState<{ label: string; value: string }[]>([]);
+  useEffect(() => {
+    listVirtualModels({ limit: 100 })
+      .then((res) => {
+        if (res.ok) {
+          const types = [...new Set(res.data.data.map((vm) => vm.model_type))];
+          setModelTypeOptions(types.map((k) => ({ label: k, value: k })));
+          const strategies = [...new Set(res.data.data.map((vm) => vm.routing_strategy))];
+          setStrategyOptions(strategies.map((k) => ({ label: k, value: k })));
+        }
+      })
+      .catch(() => {
+        // ignore
+      });
+  }, []);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
-    data: filteredData,
+    data: virtualModels,
     columns,
-    rowCount: total,
+    pageCount: hasMore ? -1 : pagination.pageIndex + 1,
     state: {
       sorting,
       columnVisibility,
       rowSelection,
       globalFilter: search,
+      columnFilters,
       pagination,
     },
     manualPagination: true,
@@ -51,6 +79,7 @@ export function VirtualModelsTable(): React.JSX.Element {
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
     onGlobalFilterChange: setSearch,
+    onColumnFiltersChange: setColumnFilters,
     onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -118,18 +147,12 @@ export function VirtualModelsTable(): React.JSX.Element {
           {
             columnId: 'model_type',
             title: t('modelsPage.virtualModels.type', 'Type'),
-            options: [...new Set(virtualModels.map((p) => p.model_type))].map((type) => ({
-              label: type,
-              value: type,
-            })),
+            options: modelTypeOptions,
           },
           {
             columnId: 'routing_strategy',
             title: t('modelsPage.virtualModels.routingStrategy', 'Routing Strategy'),
-            options: [...new Set(virtualModels.map((p) => p.routing_strategy))].map((strategy) => ({
-              label: strategy,
-              value: strategy,
-            })),
+            options: strategyOptions,
           },
         ]}
       />

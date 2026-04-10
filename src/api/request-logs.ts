@@ -10,8 +10,9 @@ export const listRequestLogs = async (params?: {
   api_key_prefix?: string;
   user_format?: string;
   is_stream?: string;
+  app_id?: string;
   limit?: number;
-  offset?: number;
+  starting_after?: string;
 }): Promise<ApiResult<RequestLogList>> => {
   const qs = new URLSearchParams();
   if (params) {
@@ -22,8 +23,6 @@ export const listRequestLogs = async (params?: {
     }
   }
   const query = qs.toString();
-  // list 路由返回了 object: 'list', data, total，恰好符合 RequestLogList
-  // RequestLogList 类型在 types 中包含了 total 和 data
   const queryStr = query ? `?${query}` : '';
   return await request<RequestLogList>('GET', `/request-logs${queryStr}`);
 };
