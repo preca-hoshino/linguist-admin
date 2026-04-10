@@ -148,7 +148,7 @@ export type StatsBreakdownGroupBy =
   | 'provider'
   | 'provider_model'
   | 'virtual_model'
-  | 'api_key'
+  | 'app'
   | 'error_type'
   | 'user_format';
 

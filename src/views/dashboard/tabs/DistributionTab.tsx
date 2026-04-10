@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import type { TimeRange } from '@/composables/use-breakdown-stats';
 import { type GlobalTimeRange, mapGlobalRangeToApi } from '@/types/dashboard';
-import { ApiKeyBarChart } from '../components/ApiKeyBarChart';
+import { AppBarChart } from '../components/AppBarChart';
 import { DistributionCard } from '../components/DistributionCard';
 import { DistributionKpiCards } from '../components/DistributionKpiCards';
 
@@ -21,7 +21,7 @@ export function DistributionTab({ timeRange, refreshKey }: DistributionTabProps)
 
       {/* 第 2 层: API Key 请求分布柱状图 — 全宽视觉焦点 */}
       <div className="h-[380px]">
-        <ApiKeyBarChart timeRange={timeRange} refreshKey={refreshKey} />
+        <AppBarChart timeRange={timeRange} refreshKey={refreshKey} />
       </div>
 
       {/* 第 3 层: 三列对称分布明细 — API 格式 / 虚拟模型 / 提供商模型 */}

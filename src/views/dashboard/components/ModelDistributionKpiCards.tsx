@@ -18,27 +18,27 @@ export function ModelDistributionKpiCards({
   const { t } = useTranslation();
   const apiRange = mapGlobalRangeToApi(timeRange) as TimeRange;
 
-  const { data: keyData, loading: keyLoading } = useBreakdownStats('api_key', apiRange, 100, filterOptions);
+  const { data: appData, loading: appLoading } = useBreakdownStats('app', apiRange, 1, filterOptions);
 
-  const activeKeys = keyData.filter((k) => k.request_count > 0).length;
-  const totalRequests = keyData.reduce((sum, k) => sum + k.request_count, 0);
+  const activeApps = appData.filter((k) => k.request_count > 0).length;
+  const totalRequests = appData.reduce((sum, k) => sum + k.request_count, 0);
 
   return (
     <div className="flex flex-col gap-4">
-      {/* 活跃 API Key 数量 */}
+      {/* 活跃 App 数量 */}
       <Card className="gap-4 py-5">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
-          <CardTitle className="text-sm font-medium">{t('dashboard.dist.active_keys', 'Active API Keys')}</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('dashboard.dist.active_apps', 'Active Apps')}</CardTitle>
           <Key className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent className="pt-0">
-          {keyLoading && keyData.length === 0 ? (
+          {appLoading && appData.length === 0 ? (
             <Skeleton className="h-10 w-20" />
           ) : (
             <>
-              <div className="text-3xl font-bold tracking-normal">{activeKeys}</div>
+              <div className="text-3xl font-bold tracking-normal">{activeApps}</div>
               <p className="mt-4 text-xs text-muted-foreground">
-                {t('dashboard.dist.active_keys_desc', 'Keys with requests in period')}
+                {t('dashboard.dist.active_apps_desc', 'Apps with requests in period')}
               </p>
             </>
           )}
@@ -52,7 +52,7 @@ export function ModelDistributionKpiCards({
           <Activity className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent className="pt-0">
-          {keyLoading && keyData.length === 0 ? (
+          {appLoading && appData.length === 0 ? (
             <Skeleton className="h-10 w-20" />
           ) : (
             <>

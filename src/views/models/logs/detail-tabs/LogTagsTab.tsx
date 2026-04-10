@@ -126,6 +126,8 @@ export function LogTagsTab({ log }: LogTagsTabProps): React.JSX.Element {
     StatusIcon = XCircle;
   }
 
+  const ctxExtended = ctx as typeof ctx & { appName?: string };
+
   return (
     <div className="flex flex-col gap-6">
       {/* 错误信息（置顶） */}
@@ -241,15 +243,23 @@ export function LogTagsTab({ log }: LogTagsTabProps): React.JSX.Element {
           下发来源追踪追踪
         </h3>
         <div>
-          <InfoRow label={t('modelsPage.logs.detail.apiKey', '认证令牌 (API Key)')} icon={Key}>
+          <InfoRow label={t('modelsPage.logs.detail.app', '归属应用 (App)')} icon={Key}>
             <span className="text-sm">
-              {ctx.apiKeyName != null && ctx.apiKeyName !== '' && <span className="font-medium">{ctx.apiKeyName}</span>}
+              {ctxExtended.appName != null && ctxExtended.appName !== '' && (
+                <span className="font-medium">{ctxExtended.appName}</span>
+              )}
+              {ctx.apiKeyName != null &&
+                ctx.apiKeyName !== '' &&
+                (ctxExtended.appName == null || ctxExtended.appName === '') && (
+                  <span className="font-medium">{ctx.apiKeyName}</span>
+                )}
               {ctx.apiKeyPrefix != null && ctx.apiKeyPrefix !== '' && (
                 <span className="ml-2 font-mono text-xs text-muted-foreground">{ctx.apiKeyPrefix}…</span>
               )}
-              {(ctx.apiKeyName == null || ctx.apiKeyName === '') &&
+              {(ctxExtended.appName == null || ctxExtended.appName === '') &&
+                (ctx.apiKeyName == null || ctx.apiKeyName === '') &&
                 (ctx.apiKeyPrefix == null || ctx.apiKeyPrefix === '') && (
-                  <span className="text-muted-foreground opacity-50">未追踪到明确的 API Key / 或者匿名请求</span>
+                  <span className="text-muted-foreground opacity-50">未追踪到明确的 App / 或匿名请求</span>
                 )}
             </span>
           </InfoRow>

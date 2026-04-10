@@ -9,7 +9,7 @@ import { type TimeRange, useBreakdownStats } from '@/composables/use-breakdown-s
 import { type GlobalTimeRange, mapGlobalRangeToApi, type StatsFilterOptions } from '@/types/dashboard';
 import { formatCompact } from '@/utils/format-number';
 
-interface ApiKeyBarChartProps {
+interface AppBarChartProps {
   readonly timeRange: GlobalTimeRange;
   readonly providerId?: string;
   readonly filterOptions?: StatsFilterOptions;
@@ -75,19 +75,14 @@ function CustomTooltip({ active, payload, metric }: CustomTooltipProps): ReactEl
   );
 }
 
-export function ApiKeyBarChart({
-  timeRange,
-  providerId,
-  filterOptions,
-  refreshKey,
-}: ApiKeyBarChartProps): ReactElement {
+export function AppBarChart({ timeRange, providerId, filterOptions, refreshKey }: AppBarChartProps): ReactElement {
   const { t } = useTranslation();
   const [metric, setMetric] = useState<'requests' | 'tokens'>('requests');
   const apiRange = mapGlobalRangeToApi(timeRange) as TimeRange;
   const opts =
     filterOptions ??
     (providerId !== undefined && providerId !== '' ? { dimension: 'provider' as const, id: providerId } : undefined);
-  const { data, loading, error } = useBreakdownStats('api_key', apiRange, 10, opts, refreshKey);
+  const { data, loading, error } = useBreakdownStats('app', apiRange, 10, opts, refreshKey);
 
   const chartData: ChartItem[] = data.map((item) => ({
     name: item.name,
@@ -101,11 +96,11 @@ export function ApiKeyBarChart({
     <Card className="flex h-full flex-col">
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
         <div>
-          <CardTitle className="font-semibold">{t('dashboard.dist.api_key_chart', 'API Key Distribution')}</CardTitle>
+          <CardTitle className="font-semibold">{t('dashboard.dist.app_chart', 'App Distribution')}</CardTitle>
           <p className="mt-1 text-sm text-muted-foreground">
             {metric === 'requests'
-              ? t('dashboard.dist.api_key_chart_req_desc', 'API Key usage ranked by total requests')
-              : t('dashboard.dist.api_key_chart_tok_desc', 'API Key usage ranked by total tokens consumed')}
+              ? t('dashboard.dist.app_chart_req_desc', 'App usage ranked by total requests')
+              : t('dashboard.dist.app_chart_tok_desc', 'App usage ranked by total tokens consumed')}
           </p>
         </div>
         <Tabs

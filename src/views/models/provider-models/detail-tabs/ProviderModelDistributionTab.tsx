@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import type { TimeRange } from '@/composables/use-breakdown-stats';
 import type { ProviderModel } from '@/types';
 import { type GlobalTimeRange, mapGlobalRangeToApi, type StatsFilterOptions } from '@/types/dashboard';
-import { ApiKeyBarChart } from '@/views/dashboard/components/ApiKeyBarChart';
+import { AppBarChart } from '@/views/dashboard/components/AppBarChart';
 import { DistributionCard } from '@/views/dashboard/components/DistributionCard';
 import { ModelDistributionKpiCards } from '@/views/dashboard/components/ModelDistributionKpiCards';
 
@@ -25,7 +25,7 @@ export function ProviderModelDistributionTab({
       {/* 行 1: Bento 不对称网格 — 柱状图(2/3) + KPI 卡(1/3) */}
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="min-h-[380px] lg:col-span-2">
-          <ApiKeyBarChart timeRange={timeRange} filterOptions={filterOptions} />
+          <AppBarChart timeRange={timeRange} filterOptions={filterOptions} />
         </div>
         <div className="lg:col-span-1">
           <ModelDistributionKpiCards timeRange={timeRange} filterOptions={filterOptions} />

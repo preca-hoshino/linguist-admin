@@ -20,8 +20,8 @@ export function DistributionKpiCards({
     providerId !== undefined && providerId !== '' ? { dimension: 'provider' as const, id: providerId } : undefined;
 
   // 用不限制 limit 的方式获取全部数据来计算活跃数量
-  const { data: keyData, loading: keyLoading } = useBreakdownStats('api_key', apiRange, 100, filterParam, refreshKey);
-  const activeKeys = keyData.filter((k) => k.request_count > 0).length;
+  const { data: appData, loading: appLoading } = useBreakdownStats('app', apiRange, 1000, filterParam, refreshKey);
+  const activeApps = appData.filter((k) => k.request_count > 0).length;
   const { data: virtualData, loading: virtualLoading } = useBreakdownStats(
     'virtual_model',
     apiRange,
@@ -51,20 +51,20 @@ export function DistributionKpiCards({
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {/* 活跃 API Key 数量 */}
+      {/* 活跃 App 数量 */}
       <Card className="gap-2 py-4">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
-          <CardTitle className="text-sm font-medium">{t('dashboard.dist.active_keys', 'Active API Keys')}</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('dashboard.dist.active_apps', 'Active Apps')}</CardTitle>
           <Key className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent className="pt-0">
-          {keyLoading && keyData.length === 0 ? (
+          {appLoading && appData.length === 0 ? (
             <Skeleton className="h-8 w-16" />
           ) : (
             <>
-              <div className="text-2xl font-bold tracking-tight">{activeKeys}</div>
+              <div className="text-2xl font-bold tracking-tight">{activeApps}</div>
               <p className="mt-1 text-xs text-muted-foreground">
-                {t('dashboard.dist.active_keys_desc', 'Keys with requests in period')}
+                {t('dashboard.dist.active_apps_desc', 'Apps with requests in period')}
               </p>
             </>
           )}
