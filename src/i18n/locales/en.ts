@@ -27,6 +27,7 @@ export default {
     virtualMcps: 'Virtual MCPs',
     logs: 'Logs',
     management: 'Management',
+    apps: 'Applications',
     apiKeys: 'API Keys',
     users: 'Users',
     preferences: 'Preferences',
@@ -270,7 +271,7 @@ export default {
     providers: {
       title: 'Models — Providers',
       desc: 'Configure and manage LLM model providers.',
-      id: 'Provider ID',
+      id: 'ID',
       name: 'Name',
       nameRequired: 'Name is required',
       kind: 'Kind',

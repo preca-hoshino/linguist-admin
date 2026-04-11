@@ -3,18 +3,30 @@ import { request } from './client';
 
 export const listVirtualModels = async (params?: {
   limit?: number;
-  offset?: number;
+  starting_after?: string;
   search?: string;
+  model_type?: string;
+  routing_strategy?: string;
+  is_active?: boolean;
 }): Promise<ApiResult<ListResponse<VirtualModel>>> => {
   const qs = new URLSearchParams();
   if (params?.limit !== undefined) {
     qs.set('limit', String(params.limit));
   }
-  if (params?.offset !== undefined) {
-    qs.set('offset', String(params.offset));
+  if (params?.starting_after != null && params.starting_after !== '') {
+    qs.set('starting_after', params.starting_after);
   }
   if (params?.search != null && params.search !== '') {
     qs.set('search', params.search);
+  }
+  if (params?.model_type != null && params.model_type !== '') {
+    qs.set('model_type', params.model_type);
+  }
+  if (params?.routing_strategy != null && params.routing_strategy !== '') {
+    qs.set('routing_strategy', params.routing_strategy);
+  }
+  if (params?.is_active !== undefined) {
+    qs.set('is_active', String(params.is_active));
   }
   const query = qs.toString();
   const queryStr = query ? `?${query}` : '';

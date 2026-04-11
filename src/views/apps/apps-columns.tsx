@@ -1,4 +1,4 @@
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, Row } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { DataTableColumnHeader } from '@/components/data-table';
 import { Badge } from '@/components/ui/Badge';
@@ -40,12 +40,12 @@ export function useAppsColumns(): ColumnDef<App>[] {
       ),
       cell: ({ row }): React.JSX.Element => {
         const models = row.getValue<string[] | null>('allowed_model_ids');
-        return <span className="font-medium text-muted-foreground">{models?.length || 0}</span>;
+        return <span className="font-medium text-muted-foreground">{models?.length ?? 0}</span>;
       },
       enableSorting: true,
-      sortingFn: (rowA, rowB, columnId) => {
-        const a = (rowA.getValue(columnId))?.length || 0;
-        const b = (rowB.getValue(columnId))?.length || 0;
+      sortingFn: (rowA: Row<App>, rowB: Row<App>, columnId: string): number => {
+        const a = rowA.getValue<string[] | null>(columnId)?.length ?? 0;
+        const b = rowB.getValue<string[] | null>(columnId)?.length ?? 0;
         return a - b;
       },
       enableHiding: true,
@@ -55,12 +55,12 @@ export function useAppsColumns(): ColumnDef<App>[] {
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('apps.virtualMcps', 'Virtual MCPs')} />,
       cell: ({ row }): React.JSX.Element => {
         const mcps = row.getValue<string[] | null>('allowed_mcp_ids');
-        return <span className="font-medium text-muted-foreground">{mcps?.length || 0}</span>;
+        return <span className="font-medium text-muted-foreground">{mcps?.length ?? 0}</span>;
       },
       enableSorting: true,
-      sortingFn: (rowA, rowB, columnId) => {
-        const a = (rowA.getValue(columnId))?.length || 0;
-        const b = (rowB.getValue(columnId))?.length || 0;
+      sortingFn: (rowA: Row<App>, rowB: Row<App>, columnId: string): number => {
+        const a = rowA.getValue<string[] | null>(columnId)?.length ?? 0;
+        const b = rowB.getValue<string[] | null>(columnId)?.length ?? 0;
         return a - b;
       },
       enableHiding: true,

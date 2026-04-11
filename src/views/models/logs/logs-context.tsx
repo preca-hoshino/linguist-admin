@@ -7,16 +7,6 @@ import type { RequestLog } from '@/types';
 
 export type LogsDialogType = 'delete' | 'batch-delete';
 
-export interface LogsFiltersType {
-  status?: string;
-  request_model?: string;
-  provider_kind?: string;
-  provider_id?: string;
-  api_key_prefix?: string;
-  user_format?: string;
-  is_stream?: string;
-}
-
 interface LogsContextType {
   open: LogsDialogType | null;
   setOpen: (str: LogsDialogType | null) => void;
@@ -25,13 +15,11 @@ interface LogsContextType {
   selectedIds: string[];
   setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>;
   logs: RequestLog[];
-  total: number;
   loading: boolean;
   error: string;
+  hasMore: boolean;
   pagination: PaginationState;
   setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
-  filters: LogsFiltersType;
-  setFilters: React.Dispatch<React.SetStateAction<LogsFiltersType>>;
   columnFilters: ColumnFiltersState;
   setColumnFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>;
   globalFilter: string;
@@ -41,48 +29,17 @@ interface LogsContextType {
 
 const LogsContext = React.createContext<LogsContextType | null>(null);
 
-function buildFiltersFromTableState(globalValue: string, colValues: ColumnFiltersState): LogsFiltersType {
-  const newFilters: LogsFiltersType = {};
+import { extractFilterValue } from '@/utils/table';
 
-  // search input maps to request_model
-  if (globalValue !== '') {
-    newFilters.request_model = globalValue;
+function getIsStreamApiValue(val?: string): string | undefined {
+  const mode = val;
+  if (mode === 'stream') {
+    return 'true';
   }
-
-  // facet filters
-  for (const filter of colValues) {
-    if (filter.id === 'api_key' && typeof filter.value === 'string' && filter.value !== '') {
-      newFilters.api_key_prefix = filter.value;
-      continue;
-    }
-
-    const value = filter.value as string[] | undefined | null;
-    const v0 = value?.[0];
-    if (v0 == null || v0 === '') {
-      continue;
-    }
-
-    const mapping: Record<string, () => void> = {
-      status: () => {
-        newFilters.status = v0;
-      },
-      provider_kind: () => {
-        newFilters.provider_kind = v0;
-      },
-      provider_id: () => {
-        newFilters.provider_id = v0;
-      },
-      mode: () => {
-        newFilters.is_stream = v0 === 'stream' ? 'true' : 'false';
-      },
-      source: () => {
-        newFilters.user_format = v0;
-      },
-    };
-    mapping[filter.id]?.();
+  if (mode === 'unary' || mode === 'non-stream') {
+    return 'false';
   }
-
-  return newFilters;
+  return undefined;
 }
 
 export function LogsProvider({ children }: { readonly children: React.ReactNode }): React.JSX.Element {
@@ -91,7 +48,8 @@ export function LogsProvider({ children }: { readonly children: React.ReactNode 
   const [currentRow, setCurrentRow] = useState<RequestLog | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [logs, setLogs] = useState<RequestLog[]>([]);
-  const [total, setTotal] = useState(0);
+  const cursorsRef = React.useRef<(string | undefined)[]>([undefined]);
+  const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -103,39 +61,90 @@ export function LogsProvider({ children }: { readonly children: React.ReactNode 
 
   // Table filters state mapped to API
   const [globalFilter, setGlobalFilter] = useState(''); // mapped to request_model
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]); // mapped to status / provider_kind
-  const [filters, setFilters] = useState<LogsFiltersType>({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-  // Update API filters when table state changes
-  useEffect((): void => {
-    setFilters(buildFiltersFromTableState(globalFilter, columnFilters));
-    // When filters change, reset pagination to page 0
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, [globalFilter, columnFilters]);
+  // 提取 API 参数
+  const statusFilter = extractFilterValue(columnFilters, 'status');
+  const providerKindFilter = extractFilterValue(columnFilters, 'provider_kind');
+  const providerIdFilter = extractFilterValue(columnFilters, 'provider_id');
+  const keyPrefixFilter = extractFilterValue(columnFilters, 'api_key');
+  const sourceFilter = extractFilterValue(columnFilters, 'source');
+  const isStreamFilter = extractFilterValue(columnFilters, 'mode');
+  const appIdFilter = extractFilterValue(columnFilters, 'app_id');
 
   const load = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
-      const params = {
+
+      const rawPayload = {
         limit: pagination.pageSize,
-        offset: pagination.pageIndex * pagination.pageSize,
-        ...filters,
+        starting_after: cursorsRef.current[pagination.pageIndex],
+        request_model: globalFilter === '' ? undefined : globalFilter,
+        status: statusFilter,
+        provider_kind: providerKindFilter,
+        provider_id: providerIdFilter,
+        api_key_prefix: keyPrefixFilter?.trim(),
+        user_format: sourceFilter,
+        is_stream: isStreamFilter === undefined ? undefined : getIsStreamApiValue(isStreamFilter),
+        app_id: appIdFilter,
       };
-      const res = await listRequestLogs(params);
+
+      // 移除未定义的值
+      const payload = Object.fromEntries(
+        Object.entries(rawPayload).filter(([_, v]) => v !== undefined && v !== ''),
+      ) as Parameters<typeof listRequestLogs>[0];
+
+      const res = await listRequestLogs(payload);
       if (!res.ok) {
         throw new Error(res.error.message);
       }
       setLogs(res.data.data);
-      setTotal(res.data.total);
+      setHasMore(res.data.has_more);
+
+      if (res.data.has_more && res.data.data.length > 0) {
+        const lastItem = res.data.data.at(-1);
+        if (lastItem) {
+          cursorsRef.current[pagination.pageIndex + 1] = lastItem.id;
+        }
+      }
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : t('common.loadFailed', 'Failed to load logs'));
     } finally {
       setLoading(false);
     }
-  }, [pagination.pageIndex, pagination.pageSize, filters, t]);
+  }, [
+    pagination.pageIndex,
+    pagination.pageSize,
+    globalFilter,
+    statusFilter,
+    providerKindFilter,
+    providerIdFilter,
+    keyPrefixFilter,
+    sourceFilter,
+    isStreamFilter,
+    appIdFilter,
+    t,
+  ]);
 
-  // Reload when params change
+  // Reset to first page on search/filter change
+  // biome-ignore lint/correctness/useExhaustiveDependencies: react to search/filter change
+  useEffect(() => {
+    cursorsRef.current = [undefined];
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  }, [
+    globalFilter,
+    statusFilter,
+    providerKindFilter,
+    providerIdFilter,
+    keyPrefixFilter,
+    sourceFilter,
+    isStreamFilter,
+    appIdFilter,
+    pagination.pageSize,
+  ]);
+
+  // Reload when triggered
   useEffect((): (() => void) => {
     const timeout = setTimeout((): void => {
       void load();
@@ -146,7 +155,7 @@ export function LogsProvider({ children }: { readonly children: React.ReactNode 
   }, [load]);
 
   return (
-    <LogsContext
+    <LogsContext.Provider
       value={{
         open,
         setOpen,
@@ -155,13 +164,11 @@ export function LogsProvider({ children }: { readonly children: React.ReactNode 
         selectedIds,
         setSelectedIds,
         logs,
-        total,
         loading,
         error,
         pagination,
+        hasMore,
         setPagination,
-        filters,
-        setFilters,
         columnFilters,
         setColumnFilters,
         globalFilter,
@@ -170,7 +177,7 @@ export function LogsProvider({ children }: { readonly children: React.ReactNode 
       }}
     >
       {children}
-    </LogsContext>
+    </LogsContext.Provider>
   );
 }
 

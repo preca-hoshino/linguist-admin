@@ -1,3 +1,5 @@
+import type { ListResponse } from './api';
+
 // ==================== Audit 精确类型 ====================
 
 /** 内容块 - 文本 */
@@ -192,7 +194,4 @@ export interface CostBreakdown {
   outputCost: number;
 }
 
-export interface RequestLogList {
-  total: number;
-  data: RequestLog[];
-}
+export type RequestLogList = Omit<ListResponse<RequestLog>, 'total'> & { total?: number };

@@ -36,7 +36,7 @@ export function LogsTable(): React.JSX.Element {
   const {
     logs,
     loading,
-    total,
+    hasMore,
     pagination,
     setPagination,
     columnFilters,
@@ -97,7 +97,7 @@ export function LogsTable(): React.JSX.Element {
   const table = useReactTable({
     data: logs,
     columns,
-    pageCount: Math.ceil(total / pagination.pageSize),
+    pageCount: hasMore ? pagination.pageIndex + 2 : pagination.pageIndex + 1,
     state: {
       pagination,
       columnVisibility,
@@ -118,6 +118,15 @@ export function LogsTable(): React.JSX.Element {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
+
+  // 保证页码不越界
+  const pageCount = table.getPageCount();
+  useEffect(() => {
+    const currentPage = table.getState().pagination.pageIndex;
+    if (pageCount > 0 && currentPage >= pageCount) {
+      table.setPageIndex(pageCount - 1);
+    }
+  }, [pageCount, table]);
 
   return (
     <div className={cn('flex flex-1 flex-col gap-4')}>

@@ -76,7 +76,6 @@ export function ProviderModelsMutateDialog({
     queryKey: ['admin_providers_all'],
     queryFn: async () =>
       await listProviders({
-        offset: 0,
         limit: 500, // fetch all for selection
       }),
     enabled: open,
