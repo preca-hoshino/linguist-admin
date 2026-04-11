@@ -211,35 +211,35 @@ const AuthenticatedModelsLogsIdRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof AuthenticatedIndexRoute
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/login': typeof authLoginRoute
   '/mcps': typeof AuthenticatedMcpsRouteWithChildren
   '/models': typeof AuthenticatedModelsRouteWithChildren
-  '/': typeof AuthenticatedIndexRoute
   '/apps/$id': typeof AuthenticatedAppsIdRoute
   '/settings/about': typeof AuthenticatedSettingsAboutRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
-  '/apps': typeof AuthenticatedAppsIndexRoute
-  '/data': typeof AuthenticatedDataIndexRoute
+  '/apps/': typeof AuthenticatedAppsIndexRoute
+  '/data/': typeof AuthenticatedDataIndexRoute
   '/mcps/': typeof AuthenticatedMcpsIndexRoute
   '/models/': typeof AuthenticatedModelsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
-  '/users': typeof AuthenticatedUsersIndexRoute
+  '/users/': typeof AuthenticatedUsersIndexRoute
   '/models/logs/$id': typeof AuthenticatedModelsLogsIdRoute
   '/models/provider-models/$id': typeof AuthenticatedModelsProviderModelsIdRoute
   '/models/providers/$id': typeof AuthenticatedModelsProvidersIdRoute
   '/models/virtual-models/$id': typeof AuthenticatedModelsVirtualModelsIdRoute
-  '/mcps/logs': typeof AuthenticatedMcpsLogsIndexRoute
-  '/mcps/provider-mcps': typeof AuthenticatedMcpsProviderMcpsIndexRoute
-  '/mcps/providers': typeof AuthenticatedMcpsProvidersIndexRoute
-  '/mcps/virtual-mcps': typeof AuthenticatedMcpsVirtualMcpsIndexRoute
-  '/models/logs': typeof AuthenticatedModelsLogsIndexRoute
-  '/models/provider-models': typeof AuthenticatedModelsProviderModelsIndexRoute
-  '/models/providers': typeof AuthenticatedModelsProvidersIndexRoute
-  '/models/virtual-models': typeof AuthenticatedModelsVirtualModelsIndexRoute
+  '/mcps/logs/': typeof AuthenticatedMcpsLogsIndexRoute
+  '/mcps/provider-mcps/': typeof AuthenticatedMcpsProviderMcpsIndexRoute
+  '/mcps/providers/': typeof AuthenticatedMcpsProvidersIndexRoute
+  '/mcps/virtual-mcps/': typeof AuthenticatedMcpsVirtualMcpsIndexRoute
+  '/models/logs/': typeof AuthenticatedModelsLogsIndexRoute
+  '/models/provider-models/': typeof AuthenticatedModelsProviderModelsIndexRoute
+  '/models/providers/': typeof AuthenticatedModelsProvidersIndexRoute
+  '/models/virtual-models/': typeof AuthenticatedModelsVirtualModelsIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof authLoginRoute
@@ -305,35 +305,35 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/settings'
     | '/login'
     | '/mcps'
     | '/models'
-    | '/'
     | '/apps/$id'
     | '/settings/about'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
-    | '/apps'
-    | '/data'
+    | '/apps/'
+    | '/data/'
     | '/mcps/'
     | '/models/'
     | '/settings/'
-    | '/users'
+    | '/users/'
     | '/models/logs/$id'
     | '/models/provider-models/$id'
     | '/models/providers/$id'
     | '/models/virtual-models/$id'
-    | '/mcps/logs'
-    | '/mcps/provider-mcps'
-    | '/mcps/providers'
-    | '/mcps/virtual-mcps'
-    | '/models/logs'
-    | '/models/provider-models'
-    | '/models/providers'
-    | '/models/virtual-models'
+    | '/mcps/logs/'
+    | '/mcps/provider-mcps/'
+    | '/mcps/providers/'
+    | '/mcps/virtual-mcps/'
+    | '/models/logs/'
+    | '/models/provider-models/'
+    | '/models/providers/'
+    | '/models/virtual-models/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -406,7 +406,7 @@ declare module '@tanstack/react-router' {
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -448,7 +448,7 @@ declare module '@tanstack/react-router' {
     '/_authenticated/users/': {
       id: '/_authenticated/users/'
       path: '/users'
-      fullPath: '/users'
+      fullPath: '/users/'
       preLoaderRoute: typeof AuthenticatedUsersIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
@@ -476,14 +476,14 @@ declare module '@tanstack/react-router' {
     '/_authenticated/data/': {
       id: '/_authenticated/data/'
       path: '/data'
-      fullPath: '/data'
+      fullPath: '/data/'
       preLoaderRoute: typeof AuthenticatedDataIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/apps/': {
       id: '/_authenticated/apps/'
       path: '/apps'
-      fullPath: '/apps'
+      fullPath: '/apps/'
       preLoaderRoute: typeof AuthenticatedAppsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
@@ -532,56 +532,56 @@ declare module '@tanstack/react-router' {
     '/_authenticated/models/virtual-models/': {
       id: '/_authenticated/models/virtual-models/'
       path: '/virtual-models'
-      fullPath: '/models/virtual-models'
+      fullPath: '/models/virtual-models/'
       preLoaderRoute: typeof AuthenticatedModelsVirtualModelsIndexRouteImport
       parentRoute: typeof AuthenticatedModelsRoute
     }
     '/_authenticated/models/providers/': {
       id: '/_authenticated/models/providers/'
       path: '/providers'
-      fullPath: '/models/providers'
+      fullPath: '/models/providers/'
       preLoaderRoute: typeof AuthenticatedModelsProvidersIndexRouteImport
       parentRoute: typeof AuthenticatedModelsRoute
     }
     '/_authenticated/models/provider-models/': {
       id: '/_authenticated/models/provider-models/'
       path: '/provider-models'
-      fullPath: '/models/provider-models'
+      fullPath: '/models/provider-models/'
       preLoaderRoute: typeof AuthenticatedModelsProviderModelsIndexRouteImport
       parentRoute: typeof AuthenticatedModelsRoute
     }
     '/_authenticated/models/logs/': {
       id: '/_authenticated/models/logs/'
       path: '/logs'
-      fullPath: '/models/logs'
+      fullPath: '/models/logs/'
       preLoaderRoute: typeof AuthenticatedModelsLogsIndexRouteImport
       parentRoute: typeof AuthenticatedModelsRoute
     }
     '/_authenticated/mcps/virtual-mcps/': {
       id: '/_authenticated/mcps/virtual-mcps/'
       path: '/virtual-mcps'
-      fullPath: '/mcps/virtual-mcps'
+      fullPath: '/mcps/virtual-mcps/'
       preLoaderRoute: typeof AuthenticatedMcpsVirtualMcpsIndexRouteImport
       parentRoute: typeof AuthenticatedMcpsRoute
     }
     '/_authenticated/mcps/providers/': {
       id: '/_authenticated/mcps/providers/'
       path: '/providers'
-      fullPath: '/mcps/providers'
+      fullPath: '/mcps/providers/'
       preLoaderRoute: typeof AuthenticatedMcpsProvidersIndexRouteImport
       parentRoute: typeof AuthenticatedMcpsRoute
     }
     '/_authenticated/mcps/provider-mcps/': {
       id: '/_authenticated/mcps/provider-mcps/'
       path: '/provider-mcps'
-      fullPath: '/mcps/provider-mcps'
+      fullPath: '/mcps/provider-mcps/'
       preLoaderRoute: typeof AuthenticatedMcpsProviderMcpsIndexRouteImport
       parentRoute: typeof AuthenticatedMcpsRoute
     }
     '/_authenticated/mcps/logs/': {
       id: '/_authenticated/mcps/logs/'
       path: '/logs'
-      fullPath: '/mcps/logs'
+      fullPath: '/mcps/logs/'
       preLoaderRoute: typeof AuthenticatedMcpsLogsIndexRouteImport
       parentRoute: typeof AuthenticatedMcpsRoute
     }
