@@ -23,15 +23,15 @@ export interface UserUpdatePayload {
 
 export async function fetchUsers(params?: {
   limit?: number;
-  offset?: number;
+  starting_after?: string;
   search?: string;
 }): Promise<ApiResult<ListResponse<User>>> {
   const qs = new URLSearchParams();
   if (params?.limit !== undefined) {
     qs.set('limit', String(params.limit));
   }
-  if (params?.offset !== undefined) {
-    qs.set('offset', String(params.offset));
+  if (params?.starting_after != null && params.starting_after !== '') {
+    qs.set('starting_after', params.starting_after);
   }
   if (params?.search != null && params.search !== '') {
     qs.set('search', params.search);
