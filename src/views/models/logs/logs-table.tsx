@@ -97,7 +97,7 @@ export function LogsTable(): React.JSX.Element {
   const table = useReactTable({
     data: logs,
     columns,
-    pageCount: hasMore ? -1 : pagination.pageIndex + 1,
+    pageCount: hasMore ? pagination.pageIndex + 2 : pagination.pageIndex + 1,
     state: {
       pagination,
       columnVisibility,

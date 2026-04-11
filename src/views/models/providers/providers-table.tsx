@@ -30,7 +30,7 @@ export function ProvidersTable(): React.JSX.Element {
   // 动态生成 kind 筛选选项（通过独立请求获取全量 kind 列表）
   const [kindOptions, setKindOptions] = useState<{ label: string; value: string }[]>([]);
   useEffect(() => {
-    listProviders({ limit: 100 })
+    listProviders({ limit: 500 })
       .then((res) => {
         if (res.ok) {
           const kinds = [...new Set(res.data.data.map((p) => p.kind))];
@@ -46,7 +46,7 @@ export function ProvidersTable(): React.JSX.Element {
   const table = useReactTable({
     data: providers,
     columns,
-    pageCount: hasMore ? -1 : pagination.pageIndex + 1,
+    pageCount: hasMore ? pagination.pageIndex + 2 : pagination.pageIndex + 1,
     state: {
       sorting,
       columnVisibility,

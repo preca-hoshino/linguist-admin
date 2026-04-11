@@ -49,7 +49,7 @@ export function ProviderModelsTable(): React.JSX.Element {
 
   useEffect(() => {
     // 拉取所有 provider 供过滤使用
-    listProviders({ limit: 100 })
+    listProviders({ limit: 500 })
       .then((res) => {
         if (res.ok) {
           setProviderOptions(res.data.data.map((p) => ({ label: p.name, value: p.id })));
@@ -60,7 +60,7 @@ export function ProviderModelsTable(): React.JSX.Element {
       });
 
     // 拉取一些模型以推断 model_type，或者可以硬编码。这里按现有数据推断
-    listProviderModels({ limit: 100 })
+    listProviderModels({ limit: 500 })
       .then((res) => {
         if (res.ok) {
           const types = [...new Set(res.data.data.map((m) => m.model_type))];
@@ -76,7 +76,7 @@ export function ProviderModelsTable(): React.JSX.Element {
   const table = useReactTable({
     data: providerModels,
     columns,
-    pageCount: hasMore ? -1 : pagination.pageIndex + 1,
+    pageCount: hasMore ? pagination.pageIndex + 2 : pagination.pageIndex + 1,
     state: {
       sorting,
       columnVisibility,

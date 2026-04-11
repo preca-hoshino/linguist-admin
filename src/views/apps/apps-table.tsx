@@ -30,9 +30,9 @@ export function AppsTable(): React.JSX.Element {
         setStatusFilter('all');
       }
     } else {
-      const val = activeF.value[0];
+      const val = (activeF.value as string[])[0];
       if (statusFilter !== val) {
-        setStatusFilter(val);
+        setStatusFilter(val as 'all' | 'true' | 'false');
       }
     }
   }, [columnFilters, statusFilter, setStatusFilter]);

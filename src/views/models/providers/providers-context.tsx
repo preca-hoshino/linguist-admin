@@ -1,5 +1,6 @@
 import type { ColumnFiltersState, PaginationState } from '@tanstack/react-table';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { listProviders } from '@/api/providers';
 import { useDialogState } from '@/composables/use-dialog-state';
 import type { Provider } from '@/types';
@@ -33,13 +34,14 @@ function extractFilterValue(filters: ColumnFiltersState, id: string): string | u
     return undefined;
   }
   const val = f.value;
-  if (Array.isArray(val) && val.length === 1 && typeof val[0] === 'string') {
+  if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'string') {
     return val[0];
   }
   return undefined;
 }
 
 export function ProvidersProvider({ children }: { readonly children: React.ReactNode }): React.JSX.Element {
+  const { t } = useTranslation();
   const [open, setOpen] = useDialogState<ProvidersDialogType>(null);
   const [currentRow, setCurrentRow] = useState<Provider | null>(null);
   const [providers, setProviders] = useState<Provider[]>([]);
@@ -78,7 +80,7 @@ export function ProvidersProvider({ children }: { readonly children: React.React
 
       const res = await listProviders(payload);
       if (!res.ok) {
-        throw new Error(res.error.message || 'Failed to load data');
+        throw new Error(res.error.message || t('common.loadFailed'));
       }
       setProviders(res.data.data);
       setHasMore(res.data.has_more);
@@ -94,7 +96,7 @@ export function ProvidersProvider({ children }: { readonly children: React.React
     } finally {
       setLoading(false);
     }
-  }, [pagination.pageSize, pagination.pageIndex, search, kindFilter]);
+  }, [pagination.pageSize, pagination.pageIndex, search, kindFilter, t]);
 
   // Reset to first page on search/filter change
   // biome-ignore lint/correctness/useExhaustiveDependencies: react to search/filter change

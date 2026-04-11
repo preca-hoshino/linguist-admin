@@ -36,21 +36,22 @@ function extractFilterValue(filters: ColumnFiltersState, id: string): string | u
     return undefined;
   }
   const val = f.value;
-  if (Array.isArray(val) && val.length === 1 && typeof val[0] === 'string') {
+  if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'string') {
     return val[0];
   }
   return undefined;
 }
 
-const getIsStreamApiValue = (val?: string): string | undefined => {
-  if (val === 'stream') {
+function getIsStreamApiValue(val?: string): string | undefined {
+  const mode = val;
+  if (mode === 'stream') {
     return 'true';
   }
-  if (val === 'unary') {
+  if (mode === 'unary' || mode === 'non-stream') {
     return 'false';
   }
   return undefined;
-};
+}
 
 export function LogsProvider({ children }: { readonly children: React.ReactNode }): React.JSX.Element {
   const { t } = useTranslation();

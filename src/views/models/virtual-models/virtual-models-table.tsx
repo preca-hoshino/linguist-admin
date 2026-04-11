@@ -46,7 +46,7 @@ export function VirtualModelsTable(): React.JSX.Element {
   const [modelTypeOptions, setModelTypeOptions] = useState<{ label: string; value: string }[]>([]);
   const [strategyOptions, setStrategyOptions] = useState<{ label: string; value: string }[]>([]);
   useEffect(() => {
-    listVirtualModels({ limit: 100 })
+    listVirtualModels({ limit: 500 })
       .then((res) => {
         if (res.ok) {
           const types = [...new Set(res.data.data.map((vm) => vm.model_type))];
@@ -64,7 +64,7 @@ export function VirtualModelsTable(): React.JSX.Element {
   const table = useReactTable({
     data: virtualModels,
     columns,
-    pageCount: hasMore ? -1 : pagination.pageIndex + 1,
+    pageCount: hasMore ? pagination.pageIndex + 2 : pagination.pageIndex + 1,
     state: {
       sorting,
       columnVisibility,

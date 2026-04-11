@@ -34,7 +34,7 @@ function extractFilterValue(filters: ColumnFiltersState, id: string): string | u
     return undefined;
   }
   const val = f.value;
-  if (Array.isArray(val) && val.length === 1 && typeof val[0] === 'string') {
+  if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'string') {
     return val[0];
   }
   return undefined;
