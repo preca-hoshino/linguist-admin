@@ -17,7 +17,8 @@ export function UsersPage(): React.JSX.Element {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const [offset, setOffset] = useState(0);
+  const [cursorMap, setCursorMap] = useState<Record<number, string | undefined>>({ 0: undefined });
+  const [pageIndex, setPageIndex] = useState(0);
   const [total, setTotal] = useState(0);
   const limit = 10;
 
@@ -33,18 +34,26 @@ export function UsersPage(): React.JSX.Element {
     try {
       setLoading(true);
       setError('');
-      const res = await fetchUsers({ limit, offset });
+      const startingAfter = cursorMap[pageIndex];
+      const res = await fetchUsers({ limit, ...(startingAfter == null ? {} : { starting_after: startingAfter }) });
       if (!res.ok) {
         throw new Error(res.error.message);
       }
       setUsers(res.data.data);
       setTotal(res.data.total);
+
+      if (res.data.data.length > 0) {
+        setCursorMap((prev) => ({
+          ...prev,
+          [pageIndex + 1]: res.data.data.at(-1)?.id,
+        }));
+      }
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : 'Failed to load users');
     } finally {
       setLoading(false);
     }
-  }, [offset]);
+  }, [pageIndex, cursorMap]);
 
   useEffect(() => {
     void loadUsers();
@@ -107,9 +116,9 @@ export function UsersPage(): React.JSX.Element {
             variant="outline"
             size="sm"
             onClick={() => {
-              setOffset((old) => Math.max(old - limit, 0));
+              setPageIndex((old) => Math.max(old - 1, 0));
             }}
-            disabled={offset === 0}
+            disabled={pageIndex === 0}
           >
             {t('common.previous', 'Previous')}
           </Button>
@@ -117,9 +126,9 @@ export function UsersPage(): React.JSX.Element {
             variant="outline"
             size="sm"
             onClick={() => {
-              setOffset((old) => old + limit);
+              setPageIndex((old) => old + 1);
             }}
-            disabled={offset + users.length >= total}
+            disabled={pageIndex * limit + users.length >= total}
           >
             {t('common.next', 'Next')}
           </Button>
