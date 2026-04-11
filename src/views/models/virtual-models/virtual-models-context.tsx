@@ -27,18 +27,7 @@ interface VirtualModelsContextType {
 
 const VirtualModelsContext = React.createContext<VirtualModelsContextType | null>(null);
 
-/** 从 TanStack columnFilters 状态中提取出第一个选中值 */
-function extractFilterValue(filters: ColumnFiltersState, id: string): string | undefined {
-  const f = filters.find((item) => item.id === id);
-  if (!f) {
-    return undefined;
-  }
-  const val = f.value;
-  if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'string') {
-    return val[0];
-  }
-  return undefined;
-}
+import { extractFilterValue } from '@/utils/table';
 
 export function VirtualModelsProvider({ children }: { readonly children: React.ReactNode }): React.JSX.Element {
   const { t } = useTranslation();
@@ -111,7 +100,7 @@ export function VirtualModelsProvider({ children }: { readonly children: React.R
   useEffect(() => {
     cursorsRef.current = [undefined];
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, [search, modelTypeFilter, routingStrategyFilter, isActiveFilter]);
+  }, [search, modelTypeFilter, routingStrategyFilter, isActiveFilter, pagination.pageSize]);
 
   useEffect(() => {
     void load();

@@ -29,18 +29,7 @@ interface LogsContextType {
 
 const LogsContext = React.createContext<LogsContextType | null>(null);
 
-/** 从 TanStack columnFilters 状态中提取出第一个选中值 */
-function extractFilterValue(filters: ColumnFiltersState, id: string): string | undefined {
-  const f = filters.find((item) => item.id === id);
-  if (!f) {
-    return undefined;
-  }
-  const val = f.value;
-  if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'string') {
-    return val[0];
-  }
-  return undefined;
-}
+import { extractFilterValue } from '@/utils/table';
 
 function getIsStreamApiValue(val?: string): string | undefined {
   const mode = val;
@@ -152,6 +141,7 @@ export function LogsProvider({ children }: { readonly children: React.ReactNode 
     sourceFilter,
     isStreamFilter,
     appIdFilter,
+    pagination.pageSize,
   ]);
 
   // Reload when triggered

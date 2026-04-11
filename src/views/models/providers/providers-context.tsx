@@ -27,18 +27,7 @@ interface ProvidersContextType {
 
 const ProvidersContext = React.createContext<ProvidersContextType | null>(null);
 
-/** 从 TanStack columnFilters 状态中提取出第一个选中值 */
-function extractFilterValue(filters: ColumnFiltersState, id: string): string | undefined {
-  const f = filters.find((item) => item.id === id);
-  if (!f) {
-    return undefined;
-  }
-  const val = f.value;
-  if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'string') {
-    return val[0];
-  }
-  return undefined;
-}
+import { extractFilterValue } from '@/utils/table';
 
 export function ProvidersProvider({ children }: { readonly children: React.ReactNode }): React.JSX.Element {
   const { t } = useTranslation();
@@ -80,7 +69,7 @@ export function ProvidersProvider({ children }: { readonly children: React.React
 
       const res = await listProviders(payload);
       if (!res.ok) {
-        throw new Error(res.error.message || t('common.loadFailed'));
+        throw new Error(res.error.message || t('common.loadFailed', 'Failed to load data'));
       }
       setProviders(res.data.data);
       setHasMore(res.data.has_more);
@@ -92,7 +81,7 @@ export function ProvidersProvider({ children }: { readonly children: React.React
         }
       }
     } catch (error_) {
-      setError(error_ instanceof Error ? error_.message : 'Failed to load providers');
+      setError(error_ instanceof Error ? error_.message : t('common.loadFailed', 'Failed to load data'));
     } finally {
       setLoading(false);
     }
@@ -103,7 +92,7 @@ export function ProvidersProvider({ children }: { readonly children: React.React
   useEffect(() => {
     cursorsRef.current = [undefined];
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, [search, kindFilter]);
+  }, [search, kindFilter, pagination.pageSize]);
 
   useEffect(() => {
     void load();
