@@ -24,12 +24,12 @@ export interface ProviderModel {
 }
 
 export interface PricingTier {
-  startTokens: number;
-  maxTokens: number | null;
+  start_tokens: number;
+  max_tokens: number | null;
   /** 每百万 Token 输入价格（CNY） */
-  inputPrice: number;
+  input_price: number;
   /** 每百万 Token 输出价格（CNY） */
-  outputPrice: number;
+  output_price: number;
   /** 每百万 Token 缓存命中价格（CNY） */
-  cachePrice: number;
+  cache_price: number;
 }
