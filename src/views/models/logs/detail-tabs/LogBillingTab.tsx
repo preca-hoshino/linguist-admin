@@ -67,7 +67,7 @@ function PricingContextCard({
             if (pm != null) {
               setProviderModelId(pm.id);
               if (pm.pricing_tiers != null) {
-                const matched = pm.pricing_tiers.find((t) => t.startTokens === tierStartTokens);
+                const matched = pm.pricing_tiers.find((t) => t.start_tokens === tierStartTokens);
                 if (matched != null) {
                   setTier(matched);
                 }
@@ -87,10 +87,10 @@ function PricingContextCard({
   let cacheCostDisplay = '—';
 
   if (tier != null) {
-    maxTokensDisplay = tier.maxTokens == null ? 'Infinity (无上限)' : tier.maxTokens.toLocaleString();
-    inputCostDisplay = `¥${tier.inputPrice}`;
-    outputCostDisplay = `¥${tier.outputPrice}`;
-    cacheCostDisplay = `¥${tier.cachePrice}`;
+    maxTokensDisplay = tier.max_tokens == null ? 'Infinity (无上限)' : tier.max_tokens.toLocaleString();
+    inputCostDisplay = `¥${tier.input_price}`;
+    outputCostDisplay = `¥${tier.output_price}`;
+    cacheCostDisplay = `¥${tier.cache_price}`;
   }
 
   return (
