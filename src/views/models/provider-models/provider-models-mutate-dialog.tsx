@@ -27,11 +27,11 @@ import { MODEL_TYPE_OPTIONS } from './constants';
 
 // --- Definitions & Schemas ---
 const PricingTierSchema = z.object({
-  startTokens: z.number().min(0),
-  maxTokens: z.number().min(0),
-  inputPrice: z.number().min(0),
-  outputPrice: z.number().min(0),
-  cachePrice: z.number().min(0),
+  start_tokens: z.number().min(0),
+  max_tokens: z.number().min(0),
+  input_price: z.number().min(0),
+  output_price: z.number().min(0),
+  cache_price: z.number().min(0),
 });
 
 const formSchema = z.object({
@@ -90,7 +90,7 @@ export function ProviderModelsMutateDialog({
       max_tokens: 128,
       provider_id: fixedProviderId ?? '',
       capabilities: [],
-      pricing_tiers: [{ startTokens: 0, maxTokens: 128, inputPrice: 0, outputPrice: 0, cachePrice: 0 }],
+      pricing_tiers: [{ start_tokens: 0, max_tokens: 128, input_price: 0, output_price: 0, cache_price: 0 }],
       rpm_limit: null,
       tpm_limit: null,
     },
@@ -116,19 +116,19 @@ export function ProviderModelsMutateDialog({
           pricing_tiers:
             (currentRow.pricing_tiers?.length ?? 0) > 0
               ? (currentRow.pricing_tiers?.map((p) => ({
-                  startTokens: Math.round(p.startTokens / 1000),
-                  maxTokens: Math.round((p.maxTokens ?? currentRow.max_tokens) / 1000),
-                  inputPrice: p.inputPrice,
-                  outputPrice: p.outputPrice,
-                  cachePrice: p.cachePrice,
+                  start_tokens: Math.round(p.start_tokens / 1000),
+                  max_tokens: Math.round((p.max_tokens ?? currentRow.max_tokens) / 1000),
+                  input_price: p.input_price,
+                  output_price: p.output_price,
+                  cache_price: p.cache_price,
                 })) ?? [])
               : [
                   {
-                    startTokens: 0,
-                    maxTokens: Math.round(currentRow.max_tokens / 1000),
-                    inputPrice: 0,
-                    outputPrice: 0,
-                    cachePrice: 0,
+                    start_tokens: 0,
+                    max_tokens: Math.round(currentRow.max_tokens / 1000),
+                    input_price: 0,
+                    output_price: 0,
+                    cache_price: 0,
                   },
                 ],
           rpm_limit: currentRow.rpm_limit,
@@ -142,7 +142,7 @@ export function ProviderModelsMutateDialog({
           max_tokens: 128,
           provider_id: fixedProviderId ?? '',
           capabilities: [],
-          pricing_tiers: [{ startTokens: 0, maxTokens: 128, inputPrice: 0, outputPrice: 0, cachePrice: 0 }],
+          pricing_tiers: [{ start_tokens: 0, max_tokens: 128, input_price: 0, output_price: 0, cache_price: 0 }],
           rpm_limit: null,
           tpm_limit: null,
         });
@@ -168,8 +168,8 @@ export function ProviderModelsMutateDialog({
         capabilities: values.capabilities,
         pricing_tiers: values.pricing_tiers.map((t, index) => ({
           ...t,
-          startTokens: t.startTokens * 1000,
-          maxTokens: index === values.pricing_tiers.length - 1 ? null : t.maxTokens * 1000,
+          start_tokens: t.start_tokens * 1000,
+          max_tokens: index === values.pricing_tiers.length - 1 ? null : t.max_tokens * 1000,
         })),
         rpm_limit: values.rpm_limit,
         tpm_limit: values.tpm_limit,
