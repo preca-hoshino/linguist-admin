@@ -46,6 +46,7 @@ export function ApiKeysProvider({
     pageIndex: 0,
     pageSize: 10,
   });
+  const [cursorMap, setCursorMap] = useState<Record<number, string | undefined>>({ 0: undefined });
   const [search, setSearch] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -56,24 +57,38 @@ export function ApiKeysProvider({
       setLoading(true);
       setError('');
       const limit = pagination.pageSize;
-      const offset = pagination.pageIndex * pagination.pageSize;
-      const res = await listAppKeys(appId, { limit, offset, search });
+      const startingAfter = cursorMap[pagination.pageIndex];
+      const res = await listAppKeys(appId, {
+        limit,
+        ...(startingAfter == null ? {} : { starting_after: startingAfter }),
+        search,
+      });
       if (!res.ok) {
         throw new Error(res.error.message || t('common.loadFailed', 'Failed to load data'));
       }
       setApiKeys(res.data.data);
       setTotal(res.data.total);
+
+      // Update cursor map for next page
+      if (res.data.data.length > 0) {
+        setCursorMap((prev) => ({
+          ...prev,
+          [pagination.pageIndex + 1]: res.data.data.at(-1)?.id,
+        }));
+      }
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : t('common.loadFailed', 'Failed to load data'));
     } finally {
       setLoading(false);
     }
-  }, [t, appId, pagination.pageSize, pagination.pageIndex, search]);
+  }, [t, appId, pagination.pageSize, pagination.pageIndex, search, cursorMap]);
 
   // Reset to first page on search change
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run when search string changes
   useEffect(() => {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, []);
+    setCursorMap({ 0: undefined });
+  }, [search]);
 
   useEffect(() => {
     void load();
