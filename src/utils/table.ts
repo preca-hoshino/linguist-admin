@@ -14,8 +14,8 @@ export function extractFilterValue(filters: ColumnFiltersState, id: string): str
     return undefined;
   }
   const val = f.value;
-  if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'string') {
-    return val[0];
+  if (Array.isArray(val) && val.length > 0) {
+    return val.join(',');
   }
   return undefined;
 }
