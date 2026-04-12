@@ -1,80 +1,139 @@
+import type { ColumnFiltersState, PaginationState } from '@tanstack/react-table';
 import type React from 'react';
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { McpLog } from '@/types/mcp';
 import { listMcpLogs } from '@/api/mcp-logs';
+import { extractFilterValue } from '@/utils/table';
+import { useTranslation } from 'react-i18next';
+import { useDialogState } from '@/composables/use-dialog-state';
+
+export type McpLogsDialogType = 'batch-delete' | 'detail';
 
 interface McpLogsContextType {
+  open: McpLogsDialogType | null;
+  setOpen: (str: McpLogsDialogType | null) => void;
+  currentRow: McpLog | null;
+  setCurrentRow: React.Dispatch<React.SetStateAction<McpLog | null>>;
+  selectedIds: string[];
+  setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>;
   logs: McpLog[];
-  isLoading: boolean;
-  error: string | null;
-  total: number;
+  loading: boolean;
+  error: string;
   hasMore: boolean;
-  fetchLogs: (params?: {
-    search?: string;
-    offset?: number;
-    limit?: number;
-    direction?: 'inbound' | 'outbound';
-    method?: string;
-  }) => Promise<void>;
-  dialogState: {
-    detailOpen: boolean;
-    selectedLog: McpLog | null;
-  };
-  setDialogState: React.Dispatch<React.SetStateAction<McpLogsContextType['dialogState']>>;
+  pagination: PaginationState;
+  setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
+  columnFilters: ColumnFiltersState;
+  setColumnFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>;
+  globalFilter: string;
+  setGlobalFilter: React.Dispatch<React.SetStateAction<string>>;
+  loadLogs: () => Promise<void>;
 }
 
 const McpLogsContext = createContext<McpLogsContextType | undefined>(undefined);
 
 export function McpLogsProvider({ children }: { readonly children: React.ReactNode }): React.JSX.Element {
+  const { t } = useTranslation();
+  const [open, setOpen] = useDialogState<McpLogsDialogType>(null);
+  const [currentRow, setCurrentRow] = useState<McpLog | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [logs, setLogs] = useState<McpLog[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(false);
-  const [dialogState, setDialogState] = useState<McpLogsContextType['dialogState']>({
-    detailOpen: false,
-    selectedLog: null,
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // Table Server-side State
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 20,
   });
 
-  const fetchLogs = useCallback(
-    async (params?: {
-      search?: string;
-      offset?: number;
-      limit?: number;
-      direction?: 'inbound' | 'outbound';
-      method?: string;
-    }) => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const res = await listMcpLogs({ ...params });
-        if (res.ok) {
-          setLogs(res.data.data);
-          setTotal(res.data.total);
-          setHasMore(res.data.has_more);
-        } else {
-          setError(res.error.message);
-        }
-      } catch (error_) {
-        setError(String(error_));
-      } finally {
-        setIsLoading(false);
+  // Table filters state mapped to API
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  // 提取 API 参数
+  const methodFilter = extractFilterValue(columnFilters, 'method');
+  const directionFilter = extractFilterValue(columnFilters, 'direction');
+  const providerIdFilter = extractFilterValue(columnFilters, 'provider_mcp_id');
+  const virtualIdFilter = extractFilterValue(columnFilters, 'virtual_mcp_id');
+
+  const load = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError('');
+
+      const rawPayload = {
+        limit: pagination.pageSize,
+        offset: pagination.pageIndex * pagination.pageSize,
+        search: globalFilter === '' ? undefined : globalFilter,
+        method: methodFilter,
+        direction: directionFilter === undefined ? undefined : (directionFilter as 'inbound' | 'outbound'),
+        provider_mcp_id: providerIdFilter,
+        virtual_mcp_id: virtualIdFilter,
+      };
+
+      const payload = Object.fromEntries(
+        Object.entries(rawPayload).filter(([_, v]) => v !== undefined && v !== ''),
+      ) as Parameters<typeof listMcpLogs>[0];
+
+      const res = await listMcpLogs(payload);
+      if (!res.ok) {
+        throw new Error(res.error.message);
       }
-    },
-    [],
-  );
+      setLogs(res.data.data);
+      setHasMore(res.data.has_more);
+    } catch (error_) {
+      setError(error_ instanceof Error ? error_.message : t('common.loadFailed', 'Failed to load logs'));
+    } finally {
+      setLoading(false);
+    }
+  }, [
+    pagination.pageIndex,
+    pagination.pageSize,
+    globalFilter,
+    methodFilter,
+    directionFilter,
+    providerIdFilter,
+    virtualIdFilter,
+    t,
+  ]);
+
+  // Reset to first page on search/filter change
+  // biome-ignore lint/correctness/useExhaustiveDependencies: react to search/filter change
+  useEffect(() => {
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  }, [globalFilter, methodFilter, directionFilter, providerIdFilter, virtualIdFilter, pagination.pageSize]);
+
+  // Reload when triggered
+  useEffect((): (() => void) => {
+    const timeout = setTimeout((): void => {
+      void load();
+    }, 300); // debounce API calls
+    return (): void => {
+      clearTimeout(timeout);
+    };
+  }, [load]);
 
   return (
     <McpLogsContext.Provider
       value={{
+        open,
+        setOpen,
+        currentRow,
+        setCurrentRow,
+        selectedIds,
+        setSelectedIds,
         logs,
-        isLoading,
+        loading,
         error,
-        total,
+        pagination,
         hasMore,
-        fetchLogs,
-        dialogState,
-        setDialogState,
+        setPagination,
+        columnFilters,
+        setColumnFilters,
+        globalFilter,
+        setGlobalFilter,
+        loadLogs: load,
       }}
     >
       {children}
@@ -86,7 +145,7 @@ export function McpLogsProvider({ children }: { readonly children: React.ReactNo
 export function useMcpLogs(): McpLogsContextType {
   const context = useContext(McpLogsContext);
   if (context === undefined) {
-    throw new Error('useMcpLogs must be used within a McpLogsProvider');
+    throw new Error('useMcpLogs must be used within an McpLogsProvider');
   }
   return context;
 }
