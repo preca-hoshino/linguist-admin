@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Trash, Plus, X, Key, Terminal, Network, Fingerprint, Info, Globe } from 'lucide-react';
+import { Trash, Plus, X, Key, Terminal, Network, Fingerprint, Info, Globe, Settings2 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -15,37 +15,22 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { Textarea } from '@/components/ui/Textarea';
 import { useTranslation } from 'react-i18next';
 
-import { Badge } from '@/components/ui/Badge';
 import { cn } from '@/utils/utils';
 import { useProviders } from './providers-context';
 import type { McpProvider, McpProviderCreateInput, McpProviderUpdateInput } from '@/types/mcp';
 
+// -------------------------
+// Zod Schema
+// -------------------------
 const providerSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   transport_type: z.enum(['stdio', 'streamable_http', 'sse'] as const),
   endpoint_url: z.string().optional(),
-  headers: z
-    .string()
-    .optional()
-    .refine(
-      (val) => {
-        if (val === undefined || val === '') {
-          return true;
-        }
-        try {
-          JSON.parse(val);
-          return true;
-        } catch {
-          return false;
-        }
-      },
-      { message: 'Invalid JSON format' },
-    ),
+  headers: z.array(z.object({ key: z.string(), value: z.string() })).optional(),
   stdio_command: z.string().optional(),
-  stdio_args: z.string().optional(),
+  stdio_args: z.array(z.object({ value: z.string() })).optional(),
   api_keys: z.array(z.object({ value: z.string() })).optional(),
 });
 
@@ -70,7 +55,7 @@ function ApikeyHint(): React.JSX.Element {
         <p className="text-xs text-amber-600/80 dark:text-amber-400/70">
           {t(
             'mcpsPage.providers.apiKeyHintDesc',
-            '在 URL / 命令 / 参数中写入此标记，网关会在每次连接时自动从下方凭证池中轮换注入实际 API Key。',
+            '在 URL / 命令 / 参数等任意字段中写入此标记，网关会在每次连接时自动从右侧凭证池中轮换注入实际 API Key。',
             { interpolation: { escapeValue: false } },
           )}
         </p>
@@ -79,6 +64,9 @@ function ApikeyHint(): React.JSX.Element {
   );
 }
 
+// -------------------------
+// Main Entry
+// -------------------------
 export function ProvidersDialogs(): React.JSX.Element {
   const { dialogState, setDialogState, createProvider, updateProvider, deleteProvider } = useProviders();
   const { t } = useTranslation();
@@ -174,6 +162,9 @@ export function ProvidersDialogs(): React.JSX.Element {
   );
 }
 
+// -------------------------
+// Form Dialog
+// -------------------------
 function MutateProviderDialog({
   open,
   onOpenChange,
@@ -196,16 +187,38 @@ function MutateProviderDialog({
       name: '',
       transport_type: 'stdio',
       endpoint_url: '',
-      headers: '{}',
+      headers: [],
       stdio_command: '',
-      stdio_args: '',
+      stdio_args: [],
       api_keys: [],
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const {
+    fields: apiKeys,
+    append: appendApiKey,
+    remove: removeApiKey,
+  } = useFieldArray({
     control: form.control,
     name: 'api_keys',
+  });
+
+  const {
+    fields: stdioArgs,
+    append: appendStdioArg,
+    remove: removeStdioArg,
+  } = useFieldArray({
+    control: form.control,
+    name: 'stdio_args',
+  });
+
+  const {
+    fields: headerFields,
+    append: appendHeader,
+    remove: removeHeader,
+  } = useFieldArray({
+    control: form.control,
+    name: 'headers',
   });
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -217,10 +230,10 @@ function MutateProviderDialog({
         form.reset({
           name: initialData.name,
           transport_type: initialData.transport_type,
-          endpoint_url: initialData.endpoint_url,
-          headers: JSON.stringify(initialData.headers, null, 2),
-          stdio_command: initialData.stdio_command,
-          stdio_args: initialData.stdio_args.join(' '),
+          endpoint_url: initialData.endpoint_url || '',
+          headers: Object.entries(initialData.headers).map(([k, v]) => ({ key: k, value: v })),
+          stdio_command: initialData.stdio_command || '',
+          stdio_args: initialData.stdio_args.map((v: string) => ({ value: v })),
           api_keys: initialData.api_keys.map((k: string) => ({ value: k })),
         });
       } else {
@@ -228,9 +241,9 @@ function MutateProviderDialog({
           name: '',
           transport_type: 'stdio',
           endpoint_url: '',
-          headers: '{}',
+          headers: [],
           stdio_command: '',
-          stdio_args: '',
+          stdio_args: [],
           api_keys: [],
         });
       }
@@ -238,35 +251,29 @@ function MutateProviderDialog({
   }, [open, isEdit, initialData, form]);
 
   const handleSubmit = form.handleSubmit(async (values) => {
-    let parsedHeaders: Record<string, string> | undefined;
-    if (values.headers !== undefined && values.headers !== '') {
-      try {
-        parsedHeaders = JSON.parse(values.headers) as Record<string, string>;
-      } catch {
-        // refined by zod
+    const isStdio = values.transport_type === 'stdio';
+    const parsedArgs = (values.stdio_args ?? []).map((a) => a.value).filter((v) => v !== '');
+    
+    const parsedHeaders: Record<string, string> = {};
+    for (const h of values.headers ?? []) {
+      if (h.key !== '' && h.value !== '') {
+        parsedHeaders[h.key] = h.value;
       }
     }
 
-    const apiKeysRaw = values.api_keys ?? [];
-    const rawPayload = {
+    const payload: Partial<McpProviderCreateInput> = {
       name: values.name,
       transport_type: values.transport_type,
-      api_keys: apiKeysRaw.map((k) => k.value).filter((v) => v !== ''),
-      ...(values.transport_type === 'stdio'
-        ? {
-            stdio_command: values.stdio_command === '' ? undefined : values.stdio_command,
-            stdio_args:
-              values.stdio_args !== '' && values.stdio_args !== undefined ? values.stdio_args.split(' ') : undefined,
-          }
-        : {
-            endpoint_url: values.endpoint_url === '' ? undefined : values.endpoint_url,
-            headers: parsedHeaders,
-          }),
+      api_keys: (values.api_keys ?? []).map((k) => k.value).filter((v) => v !== ''),
     };
 
-    const payload = Object.fromEntries(
-      Object.entries(rawPayload).filter(([_, v]) => v !== undefined),
-    ) as Partial<McpProviderCreateInput>;
+    if (isStdio) {
+      payload.stdio_command = (values.stdio_command ?? '') === '' ? undefined : values.stdio_command;
+      payload.stdio_args = parsedArgs.length > 0 ? parsedArgs : undefined;
+    } else {
+      payload.endpoint_url = (values.endpoint_url ?? '') === '' ? undefined : values.endpoint_url;
+      payload.headers = Object.keys(parsedHeaders).length > 0 ? parsedHeaders : undefined;
+    }
 
     await onSubmit(payload as McpProviderCreateInput | McpProviderUpdateInput);
   });
@@ -325,10 +332,11 @@ function MutateProviderDialog({
           >
             <div className="flex min-h-0 flex-1 flex-col lg:flex-row overflow-hidden">
               {/* 左栏：基础配置 */}
-              <div className="flex w-full lg:w-[60%] flex-col gap-6 overflow-y-auto border-b lg:border-r lg:border-b-0 px-8 py-6">
-                <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                  <Terminal className="h-4 w-4" />
-                  {t('mcpsPage.providers.connectionConfig', 'Connection Config')}
+              <div className="flex w-full lg:w-1/2 flex-col gap-6 overflow-y-auto border-b lg:border-r lg:border-b-0 px-8 py-6">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-foreground">
+                    {t('mcpsPage.providers.basicConfig', '基础配置')}
+                  </h3>
                 </div>
 
                 {form.formState.errors.root != null && (
@@ -400,9 +408,6 @@ function MutateProviderDialog({
                     )}
                   />
 
-                  {/* API Hint */}
-                  <ApikeyHint />
-
                   {/* 动态字段：stdio */}
                   {transportType === 'stdio' ? (
                     <>
@@ -433,39 +438,59 @@ function MutateProviderDialog({
                           </FormItem>
                         )}
                       />
-                      <FormField
-                        control={form.control}
-                        name="stdio_args"
-                        render={({ field }) => (
-                          <FormItem className="grid grid-cols-[140px_1fr] items-start gap-5 space-y-0">
-                            <FormLabel className="flex mt-2 items-center justify-start gap-2 text-left text-muted-foreground">
-                              <Terminal className="h-3.5 w-3.5" />
-                              <span className="font-medium text-foreground">
-                                {t('mcpsPage.providers.arguments', 'Arguments')}
-                              </span>
-                            </FormLabel>
-                            <div className="space-y-1.5">
-                              <FormControl>
-                                <Input
-                                  placeholder={t(
-                                    'mcpsPage.providers.argsPlaceholder',
-                                    '-y @org/server --key {{APIKEY}}',
-                                  )}
-                                  className="font-mono text-sm"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <p className="text-xs text-muted-foreground">
-                                {t('mcpsPage.providers.argsHelp', 'Space-separated. Use {{APIKEY}} for key injection.')}
-                              </p>
-                              <FormMessage />
+
+                      <div className="grid grid-cols-[140px_1fr] items-start gap-5">
+                        <div className="flex items-center gap-2 pt-2 text-muted-foreground">
+                          <Settings2 className="h-3.5 w-3.5" />
+                          <span className="text-sm font-medium text-foreground">
+                            {t('mcpsPage.providers.arguments', 'Arguments')}
+                          </span>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          {stdioArgs.map((field, index) => (
+                            <div key={field.id} className="flex items-center gap-2">
+                              <FormField
+                                control={form.control}
+                                name={`stdio_args.${index}.value`}
+                                render={({ field: subField }) => (
+                                  <FormItem className="flex-1 space-y-0">
+                                    <FormControl>
+                                      <Input
+                                        placeholder={index === 0 ? '-y' : `@org/server`}
+                                        className="font-mono text-xs shadow-none"
+                                        {...subField}
+                                      />
+                                    </FormControl>
+                                  </FormItem>
+                                )}
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
+                                onClick={() => { removeStdioArg(index); }}
+                              >
+                                <Trash className="h-3.5 w-3.5" />
+                              </Button>
                             </div>
-                          </FormItem>
-                        )}
-                      />
+                          ))}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="w-full border-dashed bg-transparent mt-1"
+                            onClick={() => { appendStdioArg({ value: '' }); }}
+                          >
+                            <Plus className="mr-2 h-4 w-4" />
+                            {t('mcpsPage.providers.addArgument', 'Add Argument')}
+                          </Button>
+                        </div>
+                      </div>
                     </>
                   ) : (
                     <>
+                      {/* HTTP Endpoint */}
                       <FormField
                         control={form.control}
                         name="endpoint_url"
@@ -488,73 +513,93 @@ function MutateProviderDialog({
                                   {...field}
                                 />
                               </FormControl>
-                              <p className="text-xs text-muted-foreground">
-                                {t(
-                                  'mcpsPage.providers.endpointHelp',
-                                  'Append {{APIKEY}} as a query parameter or in auth headers.',
+                              <FormMessage />
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* HTTP Headers */}
+                      <div className="grid grid-cols-[140px_1fr] items-start gap-5">
+                        <div className="flex items-center gap-2 pt-2 text-muted-foreground">
+                          <Settings2 className="h-3.5 w-3.5" />
+                          <span className="text-sm font-medium text-foreground">
+                            {t('mcpsPage.providers.headersRow', 'Headers')}
+                          </span>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          {headerFields.map((field, index) => (
+                            <div key={field.id} className="flex items-center gap-2">
+                              <FormField
+                                control={form.control}
+                                name={`headers.${index}.key`}
+                                render={({ field: subField }) => (
+                                  <FormItem className="flex-[0.4] space-y-0">
+                                    <FormControl>
+                                      <Input
+                                        placeholder="Key"
+                                        className="font-mono text-xs shadow-none"
+                                        {...subField}
+                                      />
+                                    </FormControl>
+                                  </FormItem>
                                 )}
-                              </p>
-                              <FormMessage />
+                              />
+                              <FormField
+                                control={form.control}
+                                name={`headers.${index}.value`}
+                                render={({ field: subField }) => (
+                                  <FormItem className="flex-[0.6] space-y-0">
+                                    <FormControl>
+                                      <Input
+                                        placeholder="Value"
+                                        className="font-mono text-xs shadow-none"
+                                        {...subField}
+                                      />
+                                    </FormControl>
+                                  </FormItem>
+                                )}
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
+                                onClick={() => { removeHeader(index); }}
+                              >
+                                <Trash className="h-3.5 w-3.5" />
+                              </Button>
                             </div>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="headers"
-                        render={({ field }) => (
-                          <FormItem className="grid grid-cols-[140px_1fr] items-start gap-5 space-y-0">
-                            <FormLabel className="flex mt-2 items-center justify-start gap-2 text-left text-muted-foreground">
-                              <Key className="h-3.5 w-3.5" />
-                              <span className="font-medium text-foreground">
-                                {t('mcpsPage.providers.headers', 'Headers (JSON)')}
-                              </span>
-                            </FormLabel>
-                            <div className="space-y-1.5">
-                              <FormControl>
-                                <Textarea
-                                  className="font-mono text-sm min-h-[80px]"
-                                  placeholder={'{\n  "Authorization": "Bearer {{APIKEY}}"\n}'}
-                                  {...field}
-                                />
-                              </FormControl>
-                              <p className="text-xs text-muted-foreground">
-                                {t('mcpsPage.providers.headersHelp', 'JSON format. Use {{APIKEY}} for key injection.')}
-                              </p>
-                              <FormMessage />
-                            </div>
-                          </FormItem>
-                        )}
-                      />
+                          ))}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="w-full border-dashed bg-transparent mt-1"
+                            onClick={() => { appendHeader({ key: '', value: '' }); }}
+                          >
+                            <Plus className="mr-2 h-4 w-4" />
+                            {t('mcpsPage.providers.addHeader', 'Add Header')}
+                          </Button>
+                        </div>
+                      </div>
                     </>
                   )}
                 </div>
               </div>
 
               {/* 右栏：凭证池 */}
-              <div className="flex w-full lg:w-[40%] flex-col gap-5 overflow-y-auto bg-muted/10 px-8 py-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                    <Key className="h-4 w-4" />
-                    {t('mcpsPage.providers.credentialsPool', 'Credentials Pool')}
-                  </div>
-                  {fields.length > 0 && (
-                    <Badge variant="secondary" className="text-xs">
-                      {fields.length} {t('mcpsPage.providers.keysCount', 'keys')}
-                    </Badge>
-                  )}
+              <div className="flex w-full lg:w-1/2 flex-col gap-6 overflow-y-auto px-8 py-6">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-foreground">
+                    {t('mcpsPage.providers.apiKeyManagement', 'API KEY 管理')}
+                  </h3>
                 </div>
 
-                <p className="text-xs text-muted-foreground">
-                  {t(
-                    'mcpsPage.providers.credentialsHelp',
-                    'Add one or more API keys. The gateway rotates through them automatically on each connection, replacing {{APIKEY}} in any field above.',
-                    { interpolation: { escapeValue: false } },
-                  )}
-                </p>
+                <ApikeyHint />
 
-                <div className="flex flex-col gap-3">
-                  {fields.map((field, index) => (
+                <div className="flex flex-col gap-3 mt-2">
+                  {apiKeys.map((field, index) => (
                     <div key={field.id} className="flex items-center gap-2">
                       <FormField
                         control={form.control}
@@ -576,9 +621,7 @@ function MutateProviderDialog({
                         variant="ghost"
                         size="icon"
                         className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
-                        onClick={() => {
-                          remove(index);
-                        }}
+                        onClick={() => { removeApiKey(index); }}
                       >
                         <Trash className="h-3.5 w-3.5" />
                       </Button>
@@ -589,17 +632,17 @@ function MutateProviderDialog({
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full border-dashed bg-transparent"
+                  className="w-full border-dashed bg-transparent mt-1"
                   onClick={() => {
-                    append({ value: '' });
+                    appendApiKey({ value: '' });
                   }}
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   {t('mcpsPage.providers.addKey', 'Add API Key')}
                 </Button>
 
-                {fields.length === 0 && (
-                  <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border/50 bg-background/50 py-8 text-center text-sm text-muted-foreground">
+                {apiKeys.length === 0 && (
+                  <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border/50 bg-muted/10 py-8 text-center text-sm text-muted-foreground">
                     <Key className="mb-2 h-8 w-8 opacity-20" />
                     <p className="font-medium">{t('mcpsPage.providers.noCredentials', 'No credentials yet')}</p>
                     <p className="text-xs opacity-70">

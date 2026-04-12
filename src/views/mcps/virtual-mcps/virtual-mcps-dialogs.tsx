@@ -430,7 +430,9 @@ function MutateVirtualMcpDialog({
                   className="h-8 pl-8 text-xs bg-muted/30"
                   placeholder={t('common.search', 'Search...')}
                   value={searchQuery}
-                  onChange={(e) => { setSearchQuery(e.target.value); }}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                  }}
                   disabled={providerId === '' || tools.length === 0}
                 />
               </div>
