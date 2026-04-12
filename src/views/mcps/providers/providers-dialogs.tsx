@@ -253,7 +253,7 @@ function MutateProviderDialog({
   const handleSubmit = form.handleSubmit(async (values) => {
     const isStdio = values.transport_type === 'stdio';
     const parsedArgs = (values.stdio_args ?? []).map((a) => a.value).filter((v) => v !== '');
-    
+
     const parsedHeaders: Record<string, string> = {};
     for (const h of values.headers ?? []) {
       if (h.key !== '' && h.value !== '') {
@@ -333,10 +333,8 @@ function MutateProviderDialog({
             <div className="flex min-h-0 flex-1 flex-col lg:flex-row overflow-hidden">
               {/* 左栏：基础配置 */}
               <div className="flex w-full lg:w-1/2 flex-col gap-6 overflow-y-auto border-b lg:border-r lg:border-b-0 px-8 py-6">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-bold text-foreground">
-                    {t('mcpsPage.providers.basicConfig', '基础配置')}
-                  </h3>
+                <div className="text-sm font-semibold text-foreground">
+                  {t('mcpsPage.providers.basicConfig', '基础配置')}
                 </div>
 
                 {form.formState.errors.root != null && (
@@ -469,7 +467,9 @@ function MutateProviderDialog({
                                 variant="ghost"
                                 size="icon"
                                 className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
-                                onClick={() => { removeStdioArg(index); }}
+                                onClick={() => {
+                                  removeStdioArg(index);
+                                }}
                               >
                                 <Trash className="h-3.5 w-3.5" />
                               </Button>
@@ -480,7 +480,9 @@ function MutateProviderDialog({
                             variant="outline"
                             size="sm"
                             className="w-full border-dashed bg-transparent mt-1"
-                            onClick={() => { appendStdioArg({ value: '' }); }}
+                            onClick={() => {
+                              appendStdioArg({ value: '' });
+                            }}
                           >
                             <Plus className="mr-2 h-4 w-4" />
                             {t('mcpsPage.providers.addArgument', 'Add Argument')}
@@ -565,7 +567,9 @@ function MutateProviderDialog({
                                 variant="ghost"
                                 size="icon"
                                 className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
-                                onClick={() => { removeHeader(index); }}
+                                onClick={() => {
+                                  removeHeader(index);
+                                }}
                               >
                                 <Trash className="h-3.5 w-3.5" />
                               </Button>
@@ -576,7 +580,9 @@ function MutateProviderDialog({
                             variant="outline"
                             size="sm"
                             className="w-full border-dashed bg-transparent mt-1"
-                            onClick={() => { appendHeader({ key: '', value: '' }); }}
+                            onClick={() => {
+                              appendHeader({ key: '', value: '' });
+                            }}
                           >
                             <Plus className="mr-2 h-4 w-4" />
                             {t('mcpsPage.providers.addHeader', 'Add Header')}
@@ -590,10 +596,8 @@ function MutateProviderDialog({
 
               {/* 右栏：凭证池 */}
               <div className="flex w-full lg:w-1/2 flex-col gap-6 overflow-y-auto px-8 py-6">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-bold text-foreground">
-                    {t('mcpsPage.providers.apiKeyManagement', 'API KEY 管理')}
-                  </h3>
+                <div className="text-sm font-semibold text-foreground">
+                  {t('mcpsPage.providers.apiKeyManagement', 'API KEY 管理')}
                 </div>
 
                 <ApikeyHint />
@@ -621,7 +625,9 @@ function MutateProviderDialog({
                         variant="ghost"
                         size="icon"
                         className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
-                        onClick={() => { removeApiKey(index); }}
+                        onClick={() => {
+                          removeApiKey(index);
+                        }}
                       >
                         <Trash className="h-3.5 w-3.5" />
                       </Button>

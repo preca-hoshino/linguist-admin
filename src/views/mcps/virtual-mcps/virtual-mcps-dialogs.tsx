@@ -286,9 +286,12 @@ function MutateVirtualMcpDialog({
         </DialogHeader>
 
         {/* 可滚动内容区双列 */}
-        <div className="flex min-h-0 flex-1 overflow-hidden lg:grid lg:grid-cols-[360px_1fr]">
+        <div className="flex min-h-0 flex-1 flex-col lg:flex-row overflow-hidden">
           {/* 左栏：基础配置 */}
-          <div className="flex flex-col gap-6 overflow-y-auto border-r px-8 py-6">
+          <div className="flex w-full lg:w-1/2 flex-col gap-6 overflow-y-auto border-b lg:border-r lg:border-b-0 px-8 py-6 pt-5">
+            <div className="text-sm font-semibold text-foreground pb-2">
+              {t('mcpsPage.providers.basicConfig', '基础配置')}
+            </div>
             <Form {...form}>
               <form id="virtual-mcp-form" onSubmit={(e) => void handleSubmit(e)} className="flex flex-col gap-6">
                 <FormField
@@ -418,10 +421,9 @@ function MutateVirtualMcpDialog({
           </div>
 
           {/* 右栏：Tools Selection List */}
-          <div className="flex flex-col overflow-hidden bg-muted/10 h-full">
-            <div className="flex items-center justify-between border-b px-6 py-4 bg-background sticky top-0 z-10 shrink-0">
-              <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground w-1/2">
-                <Wrench className="h-4 w-4" />
+          <div className="flex w-full lg:w-1/2 flex-col overflow-hidden h-full">
+            <div className="flex items-center justify-between border-b px-8 py-[22px] bg-background sticky top-0 z-10 shrink-0">
+              <div className="text-sm font-semibold text-foreground w-1/2">
                 {t('mcpsPage.virtualMcps.availableTools', 'Tool Configuration')}
               </div>
               <div className="relative w-1/2">
