@@ -1,5 +1,6 @@
+import type { ColumnFiltersState, PaginationState } from '@tanstack/react-table';
 import type React from 'react';
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { McpVirtualServer, McpVirtualServerCreateInput, McpVirtualServerUpdateInput } from '@/types/mcp';
 import {
   listMcpVirtualServers,
@@ -14,7 +15,15 @@ interface VirtualMcpsContextType {
   error: string | null;
   total: number;
   hasMore: boolean;
-  fetchServers: (params?: { search?: string; offset?: number; limit?: number }) => Promise<void>;
+
+  pagination: PaginationState;
+  setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
+  columnFilters: ColumnFiltersState;
+  setColumnFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>;
+  globalFilter: string;
+  setGlobalFilter: React.Dispatch<React.SetStateAction<string>>;
+
+  fetchServers: () => Promise<void>;
   createServer: (data: McpVirtualServerCreateInput) => Promise<boolean>;
   updateServer: (id: string, data: McpVirtualServerUpdateInput) => Promise<boolean>;
   deleteServer: (id: string) => Promise<boolean>;
@@ -42,11 +51,28 @@ export function VirtualMcpsProvider({ children }: { readonly children: React.Rea
     selectedServer: null,
   });
 
-  const fetchServers = useCallback(async (params?: { search?: string; offset?: number; limit?: number }) => {
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  const fetchServers = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await listMcpVirtualServers({ ...params });
+      const rawPayload = {
+        limit: pagination.pageSize,
+        offset: pagination.pageIndex * pagination.pageSize,
+        search: globalFilter || undefined,
+      };
+
+      const payload = Object.fromEntries(
+        Object.entries(rawPayload).filter(([_, v]) => v !== undefined && v !== ''),
+      ) as Parameters<typeof listMcpVirtualServers>[0];
+
+      const res = await listMcpVirtualServers(payload);
       if (res.ok) {
         setServers(res.data.data);
         setTotal(res.data.total);
@@ -59,7 +85,21 @@ export function VirtualMcpsProvider({ children }: { readonly children: React.Rea
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [pagination.pageIndex, pagination.pageSize, globalFilter]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset pagination when globalFilter changes
+  useEffect(() => {
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  }, [globalFilter, pagination.pageSize]);
+
+  useEffect((): (() => void) => {
+    const timeout = setTimeout((): void => {
+      void fetchServers();
+    }, 300);
+    return (): void => {
+      clearTimeout(timeout);
+    };
+  }, [fetchServers]);
 
   const createServer = useCallback(
     async (data: McpVirtualServerCreateInput) => {
@@ -123,6 +163,12 @@ export function VirtualMcpsProvider({ children }: { readonly children: React.Rea
         error,
         total,
         hasMore,
+        pagination,
+        setPagination,
+        columnFilters,
+        setColumnFilters,
+        globalFilter,
+        setGlobalFilter,
         fetchServers,
         createServer,
         updateServer,
