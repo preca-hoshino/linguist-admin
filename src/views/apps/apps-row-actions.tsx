@@ -1,9 +1,9 @@
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
+import { useNavigate } from '@tanstack/react-router';
 import type { Row } from '@tanstack/react-table';
-import { Pencil, Power, PowerOff, Trash2, FileText } from 'lucide-react';
+import { FileText, Pencil, Power, PowerOff, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from '@tanstack/react-router';
 import { updateApp } from '@/api/apps';
 import { Button } from '@/components/ui/Button';
 import {

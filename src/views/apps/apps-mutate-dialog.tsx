@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { Box, Braces, Fingerprint, ListFilter, MessageSquare, Plus, Trash2, X } from 'lucide-react';
 import { useEffect } from 'react';
-import { useFieldArray, useForm, type UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn, useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { createApp, updateApp } from '@/api/apps';

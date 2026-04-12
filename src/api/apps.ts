@@ -43,9 +43,9 @@ export const createApp = async (data: AppCreateInput): Promise<ApiResult<App>> =
   return await request<App>('POST', '/apps', data);
 };
 
-/** 更新应用（Stripe: POST） */
+/** 更新应用（Stripe: PATCH 局部更新） */
 export const updateApp = async (id: string, data: AppUpdateInput): Promise<ApiResult<App>> => {
-  return await request<App>('POST', `/apps/${id}`, data);
+  return await request<App>('PATCH', `/apps/${id}`, data);
 };
 
 /** 删除应用 */
@@ -58,21 +58,22 @@ export const deleteApp = async (id: string): Promise<ApiResult<{ id: string; obj
 /** 列出应用下的 Keys */
 export const listAppKeys = async (
   appId: string,
-  params?: { limit?: number; offset?: number; search?: string },
+  params?: { limit?: number; starting_after?: string; search?: string },
 ): Promise<ApiResult<ListResponse<ApiKey>>> => {
   const qs = new URLSearchParams();
   if (params?.limit !== undefined) {
     qs.set('limit', String(params.limit));
   }
-  if (params?.offset !== undefined) {
-    qs.set('offset', String(params.offset));
+  if (params?.starting_after != null && params.starting_after !== '') {
+    qs.set('starting_after', params.starting_after);
   }
   if (params?.search != null && params.search !== '') {
     qs.set('search', params.search);
   }
   const queryStr = qs.toString() === '' ? '' : `?${qs.toString()}`;
+  const url = appId ? `/apps/${appId}/keys${queryStr}` : `/apps/keys${queryStr}`;
 
-  return await request<ListResponse<ApiKey>>('GET', `/apps/${appId}/keys${queryStr}`);
+  return await request<ListResponse<ApiKey>>('GET', url);
 };
 
 /** 获取指定 Key 详情 */
@@ -88,13 +89,13 @@ export const createAppKey = async (
   return await request<ApiKey>('POST', `/apps/${appId}/keys`, data);
 };
 
-/** 更新 Key（Stripe: POST） */
+/** 更新 Key（Stripe: PATCH 局部更新） */
 export const updateAppKey = async (
   appId: string,
   keyId: string,
   data: { name?: string; is_active?: boolean; expires_at?: string | null },
 ): Promise<ApiResult<ApiKey>> => {
-  return await request<ApiKey>('POST', `/apps/${appId}/keys/${keyId}`, data);
+  return await request<ApiKey>('PATCH', `/apps/${appId}/keys/${keyId}`, data);
 };
 
 /** 删除 Key */

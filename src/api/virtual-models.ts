@@ -28,6 +28,8 @@ export const listVirtualModels = async (params?: {
   if (params?.is_active !== undefined) {
     qs.set('is_active', String(params.is_active));
   }
+  qs.append('expand', 'backends');
+
   const query = qs.toString();
   const queryStr = query ? `?${query}` : '';
   return await request<ListResponse<VirtualModel>>('GET', `/virtual-models${queryStr}`);

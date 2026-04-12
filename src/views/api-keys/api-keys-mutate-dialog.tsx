@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { createAppKey, updateAppKey } from '@/api/apps';
-import { useApiKeys } from './api-keys-context';
 import { Button } from '@/components/ui/Button';
 import {
   Dialog,
@@ -18,6 +17,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
 import type { ApiKey } from '@/types';
+import { useApiKeys } from './api-keys-context';
 
 interface ApiKeysMutateDialogProps {
   readonly open: boolean;

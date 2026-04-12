@@ -1,9 +1,9 @@
 import {
   type ColumnFiltersState,
-  type SortingState,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
+  type SortingState,
   useReactTable,
 } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';

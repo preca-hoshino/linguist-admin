@@ -1,18 +1,18 @@
-import { Wrench, Search, Eye, Code, Download, Zap } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { Code, Download, Eye, Search, Wrench, Zap } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
+import JsonView from 'react18-json-view';
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogTrigger } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { Separator } from '@/components/ui/Separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import type {
+  AuditToolCall,
   AuditToolDefinition,
   AuditUserChatRequest,
   AuditUserChatResponse,
   GatewayContextSnapshot,
-  AuditToolCall,
 } from '@/types';
 import { cn } from '@/utils/utils';
 import { SmartContentViewer } from './components/SmartContentViewer';
@@ -21,7 +21,6 @@ import {
   ToolInteractionDialog,
   ToolInteractionTrigger,
 } from './components/ToolInteractionDialog';
-import JsonView from 'react18-json-view';
 import 'react18-json-view/src/style.css';
 import { useTheme } from '@/providers/ThemeProvider';
 
