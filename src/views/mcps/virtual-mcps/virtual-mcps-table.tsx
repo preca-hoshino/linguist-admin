@@ -4,26 +4,43 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { getVirtualMcpsColumns } from './virtual-mcps-columns';
 import { useVirtualMcps } from './virtual-mcps-context';
 import { toast } from 'sonner';
+import { listMcpProviders } from '@/api/mcp-providers';
+import { useTranslation } from 'react-i18next';
 
 export function VirtualMcpsTable(): React.JSX.Element {
   const { servers, isLoading, fetchServers, updateServer } = useVirtualMcps();
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const [providerMap, setProviderMap] = useState<Record<string, string>>({});
+  const { t } = useTranslation();
 
   useEffect(() => {
     void fetchServers();
+    void listMcpProviders({ limit: 100 }).then((res) => {
+      if (res.ok) {
+        const map: Record<string, string> = {};
+        for (const p of res.data.data) {
+          map[p.id] = p.name;
+        }
+        setProviderMap(map);
+      }
+    });
   }, [fetchServers]);
 
   const onToggleActive = async (id: string, current: boolean): Promise<void> => {
     const success = await updateServer(id, { is_active: !current });
     if (success) {
-      toast.success(current ? 'Virtual MCP disabled' : 'Virtual MCP enabled');
+      toast.success(
+        current
+          ? t('mcpsPage.virtualMcps.disabledSuccess', 'Virtual MCP disabled')
+          : t('mcpsPage.virtualMcps.enabledSuccess', 'Virtual MCP enabled'),
+      );
     }
   };
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: servers,
-    columns: getVirtualMcpsColumns(onToggleActive),
+    columns: getVirtualMcpsColumns(t, onToggleActive, providerMap),
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
@@ -33,7 +50,7 @@ export function VirtualMcpsTable(): React.JSX.Element {
   });
 
   if (isLoading && servers.length === 0) {
-    return <div className="text-sm text-muted-foreground">Loading...</div>;
+    return <div className="text-sm text-muted-foreground">{t('common.loading', 'Loading...')}</div>;
   }
 
   return (
@@ -64,7 +81,7 @@ export function VirtualMcpsTable(): React.JSX.Element {
           ) : (
             <TableRow>
               <TableCell colSpan={7} className="h-24 text-center">
-                No virtual MCP servers found.
+                {t('mcpsPage.virtualMcps.noData', 'No virtual MCP servers found.')}
               </TableCell>
             </TableRow>
           )}

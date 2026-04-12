@@ -268,11 +268,19 @@ function MutateProviderDialog({
     };
 
     if (isStdio) {
-      payload.stdio_command = (values.stdio_command ?? '') === '' ? undefined : values.stdio_command;
-      payload.stdio_args = parsedArgs.length > 0 ? parsedArgs : undefined;
+      if ((values.stdio_command ?? '') !== '') {
+        payload.stdio_command = values.stdio_command as string;
+      }
+      if (parsedArgs.length > 0) {
+        payload.stdio_args = parsedArgs;
+      }
     } else {
-      payload.endpoint_url = (values.endpoint_url ?? '') === '' ? undefined : values.endpoint_url;
-      payload.headers = Object.keys(parsedHeaders).length > 0 ? parsedHeaders : undefined;
+      if ((values.endpoint_url ?? '') !== '') {
+        payload.endpoint_url = values.endpoint_url as string;
+      }
+      if (Object.keys(parsedHeaders).length > 0) {
+        payload.headers = parsedHeaders;
+      }
     }
 
     await onSubmit(payload as McpProviderCreateInput | McpProviderUpdateInput);

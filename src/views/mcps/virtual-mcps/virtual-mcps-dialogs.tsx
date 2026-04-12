@@ -491,7 +491,7 @@ function MutateVirtualMcpDialog({
                           )}
                         >
                           <div className="shrink-0 mt-0.5">
-                            <Checkbox checked={isSelected} onCheckedChange={undefined} />
+                            <Checkbox checked={isSelected} />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="truncate font-mono text-[15px] font-bold tracking-tight">{tInfo.name}</div>

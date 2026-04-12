@@ -1,19 +1,26 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/Badge';
-import { Switch } from '@/components/ui/Switch';
 import type { McpProvider } from '@/types/mcp';
 import { ProvidersRowActions } from './providers-row-actions';
+import type { TFunction } from 'i18next';
 
-export function getProvidersColumns(onToggleActive: (id: string, current: boolean) => void): ColumnDef<McpProvider>[] {
+export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
   return [
     {
+      accessorKey: 'id',
+      header: t('common.id', 'ID'),
+      cell: ({ row }): React.JSX.Element => (
+        <code className="text-xs bg-muted px-1.5 py-0.5 rounded text-muted-foreground">{row.getValue('id')}</code>
+      ),
+    },
+    {
       accessorKey: 'name',
-      header: 'Name',
+      header: t('mcpsPage.providers.name', 'Name'),
       cell: ({ row }): React.JSX.Element => <div className="font-medium">{row.getValue('name')}</div>,
     },
     {
       accessorKey: 'transport_type',
-      header: 'Transport',
+      header: t('mcpsPage.providers.transportType', 'Transport'),
       cell: ({ row }): React.JSX.Element => {
         const type = row.getValue('transport_type');
         return (
@@ -25,7 +32,7 @@ export function getProvidersColumns(onToggleActive: (id: string, current: boolea
     },
     {
       id: 'endpoint_or_command',
-      header: 'Endpoint / Command',
+      header: t('mcpsPage.providers.endpointOrCommand', 'Endpoint / Command'),
       cell: ({ row }): React.JSX.Element => {
         const provider = row.original;
         if (provider.transport_type === 'stdio') {
@@ -44,7 +51,7 @@ export function getProvidersColumns(onToggleActive: (id: string, current: boolea
     },
     {
       id: 'api_keys',
-      header: 'API Keys',
+      header: t('mcpsPage.providers.apiKeys', 'API Keys'),
       cell: ({ row }): React.JSX.Element => {
         const keys = row.original.api_keys;
         if (keys.length === 0) {
@@ -54,23 +61,8 @@ export function getProvidersColumns(onToggleActive: (id: string, current: boolea
       },
     },
     {
-      accessorKey: 'is_active',
-      header: 'Status',
-      cell: ({ row }): React.JSX.Element => {
-        const isActive = row.original.is_active;
-        const id = row.original.id;
-        return (
-          <Switch
-            checked={isActive}
-            onCheckedChange={() => {
-              onToggleActive(id, isActive);
-            }}
-          />
-        );
-      },
-    },
-    {
       id: 'actions',
+      header: t('common.actions', 'Actions'),
       cell: ({ row }): React.JSX.Element => <ProvidersRowActions provider={row.original} />,
     },
   ];

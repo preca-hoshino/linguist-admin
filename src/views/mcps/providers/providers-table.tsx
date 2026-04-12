@@ -3,27 +3,21 @@ import { useEffect, useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { getProvidersColumns } from './providers-columns';
 import { useProviders } from './providers-context';
-import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 export function ProvidersTable(): React.JSX.Element {
-  const { providers, isLoading, fetchProviders, updateProvider } = useProviders();
+  const { providers, isLoading, fetchProviders } = useProviders();
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const { t } = useTranslation();
 
   useEffect(() => {
     void fetchProviders();
   }, [fetchProviders]);
 
-  const onToggleActive = async (id: string, current: boolean): Promise<void> => {
-    const success = await updateProvider(id, { is_active: !current });
-    if (success) {
-      toast.success(current ? 'Provider disabled' : 'Provider enabled');
-    }
-  };
-
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: providers,
-    columns: getProvidersColumns(onToggleActive),
+    columns: getProvidersColumns(t),
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
@@ -33,7 +27,7 @@ export function ProvidersTable(): React.JSX.Element {
   });
 
   if (isLoading && providers.length === 0) {
-    return <div className="text-sm text-muted-foreground">Loading...</div>;
+    return <div className="text-sm text-muted-foreground">{t('common.loading', 'Loading...')}</div>;
   }
 
   return (
@@ -64,7 +58,7 @@ export function ProvidersTable(): React.JSX.Element {
           ) : (
             <TableRow>
               <TableCell colSpan={6} className="h-24 text-center">
-                No MCP providers found.
+                {t('mcpsPage.providers.noData', 'No MCP providers found.')}
               </TableCell>
             </TableRow>
           )}

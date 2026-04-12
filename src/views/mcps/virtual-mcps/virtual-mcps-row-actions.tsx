@@ -1,4 +1,4 @@
-import { Edit, MoreHorizontal, Trash } from 'lucide-react';
+import { Edit, MoreHorizontal, Trash, Power, PowerOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
@@ -9,9 +9,17 @@ import {
 } from '@/components/ui/DropdownMenu';
 import type { McpVirtualServer } from '@/types/mcp';
 import { useVirtualMcps } from './virtual-mcps-context';
+import { useTranslation } from 'react-i18next';
 
-export function VirtualMcpsRowActions({ server }: { readonly server: McpVirtualServer }): React.JSX.Element {
+export function VirtualMcpsRowActions({
+  server,
+  onToggleActive,
+}: {
+  readonly server: McpVirtualServer;
+  readonly onToggleActive: (id: string, current: boolean) => void;
+}): React.JSX.Element {
   const { setDialogState } = useVirtualMcps();
+  const { t } = useTranslation();
 
   return (
     <DropdownMenu>
@@ -24,11 +32,20 @@ export function VirtualMcpsRowActions({ server }: { readonly server: McpVirtualS
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem
           onClick={() => {
+            onToggleActive(server.id, server.is_active);
+          }}
+        >
+          {server.is_active ? <PowerOff className="mr-2 h-4 w-4" /> : <Power className="mr-2 h-4 w-4" />}
+          {server.is_active ? t('common.disable', 'Disable') : t('common.enable', 'Enable')}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => {
             setDialogState((prev) => ({ ...prev, editOpen: true, selectedServer: server }));
           }}
         >
           <Edit className="mr-2 h-4 w-4" />
-          Edit
+          {t('common.edit', 'Edit')}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
@@ -38,7 +55,7 @@ export function VirtualMcpsRowActions({ server }: { readonly server: McpVirtualS
           }}
         >
           <Trash className="mr-2 h-4 w-4" />
-          Delete
+          {t('common.delete', 'Delete')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
