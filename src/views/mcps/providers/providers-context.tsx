@@ -1,4 +1,5 @@
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import type React from 'react';
+import { createContext, useCallback, useContext, useState } from 'react';
 import type { McpProvider, McpProviderCreateInput, McpProviderUpdateInput } from '@/types/mcp';
 import { listMcpProviders, createMcpProvider, updateMcpProvider, deleteMcpProvider } from '@/api/mcp-providers';
 

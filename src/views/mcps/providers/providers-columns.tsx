@@ -1,4 +1,4 @@
-import { type ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/Badge';
 import { Switch } from '@/components/ui/Switch';
 import type { McpProvider } from '@/types/mcp';
