@@ -1,5 +1,6 @@
+import type { ColumnFiltersState, PaginationState } from '@tanstack/react-table';
 import type React from 'react';
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { McpProvider, McpProviderCreateInput, McpProviderUpdateInput } from '@/types/mcp';
 import { listMcpProviders, createMcpProvider, updateMcpProvider, deleteMcpProvider } from '@/api/mcp-providers';
 
@@ -9,7 +10,15 @@ interface ProvidersContextType {
   error: string | null;
   total: number;
   hasMore: boolean;
-  fetchProviders: (params?: { search?: string; offset?: number; limit?: number }) => Promise<void>;
+
+  pagination: PaginationState;
+  setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
+  columnFilters: ColumnFiltersState;
+  setColumnFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>;
+  globalFilter: string;
+  setGlobalFilter: React.Dispatch<React.SetStateAction<string>>;
+
+  fetchProviders: () => Promise<void>;
   createProvider: (data: McpProviderCreateInput) => Promise<boolean>;
   updateProvider: (id: string, data: McpProviderUpdateInput) => Promise<boolean>;
   deleteProvider: (id: string) => Promise<boolean>;
@@ -37,11 +46,27 @@ export function ProvidersProvider({ children }: { readonly children: React.React
     selectedProvider: null,
   });
 
-  const fetchProviders = useCallback(async (params?: { search?: string; offset?: number; limit?: number }) => {
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  const fetchProviders = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await listMcpProviders({ ...params });
+      const rawPayload = {
+        limit: pagination.pageSize,
+        offset: pagination.pageIndex * pagination.pageSize,
+        search: globalFilter || undefined,
+      };
+      const payload = Object.fromEntries(
+        Object.entries(rawPayload).filter(([_, v]) => v !== undefined && v !== ''),
+      ) as Parameters<typeof listMcpProviders>[0];
+
+      const res = await listMcpProviders(payload);
       if (res.ok) {
         setProviders(res.data.data);
         setTotal(res.data.total);
@@ -54,7 +79,22 @@ export function ProvidersProvider({ children }: { readonly children: React.React
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [pagination.pageIndex, pagination.pageSize, globalFilter]);
+
+  // Reset to first page on search
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset pagination when globalFilter changes
+  useEffect(() => {
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  }, [globalFilter, pagination.pageSize]);
+
+  useEffect((): (() => void) => {
+    const timeout = setTimeout((): void => {
+      void fetchProviders();
+    }, 300);
+    return (): void => {
+      clearTimeout(timeout);
+    };
+  }, [fetchProviders]);
 
   const createProvider = useCallback(
     async (data: McpProviderCreateInput) => {
@@ -118,6 +158,12 @@ export function ProvidersProvider({ children }: { readonly children: React.React
         error,
         total,
         hasMore,
+        pagination,
+        setPagination,
+        columnFilters,
+        setColumnFilters,
+        globalFilter,
+        setGlobalFilter,
         fetchProviders,
         createProvider,
         updateProvider,
