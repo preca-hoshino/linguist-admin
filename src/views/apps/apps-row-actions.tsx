@@ -1,7 +1,7 @@
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { useNavigate } from '@tanstack/react-router';
 import type { Row } from '@tanstack/react-table';
-import { FileText, Pencil, Power, PowerOff, Trash2 } from 'lucide-react';
+import { FileText, Pencil, Power, PowerOff, Trash2, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { updateApp } from '@/api/apps';
@@ -89,6 +89,17 @@ export function AppsRowActions({ row }: AppsRowActionsProps): React.JSX.Element 
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          onClick={() => {
+            setCurrentRow(model);
+            setOpen('rotate');
+          }}
+          className="text-destructive focus:text-destructive"
+        >
+          <RefreshCw className="mr-2 h-4 w-4" />
+          {t('apps.rotateKey', 'Rotate Key')}
+        </DropdownMenuItem>
 
         <DropdownMenuItem
           onClick={() => {

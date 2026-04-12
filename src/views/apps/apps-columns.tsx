@@ -1,5 +1,4 @@
 import type { ColumnDef, Row } from '@tanstack/react-table';
-import { AppWindow } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { DataTableColumnHeader } from '@/components/data-table';
 import { CopyableId } from '@/components/CopyableId';
@@ -24,13 +23,7 @@ export function useAppsColumns(): ColumnDef<App>[] {
     {
       accessorKey: 'name',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('apps.name', 'Name')} />,
-      cell: ({ row }): React.JSX.Element => (
-        <div className="flex items-center gap-2">
-          {/* 使用统计占位图标 */}
-          <AppWindow className="h-5 w-5 text-muted-foreground mr-1" />
-          <span className="font-medium">{row.getValue<string>('name')}</span>
-        </div>
-      ),
+      cell: ({ row }): React.JSX.Element => <span className="font-medium">{row.getValue<string>('name')}</span>,
       enableSorting: true,
       enableHiding: true,
     },
