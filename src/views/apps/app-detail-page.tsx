@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { CopyableId } from '@/components/CopyableId';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { usePageTitle } from '@/composables/use-page-title';
 import { Main } from '@/layouts/Main';
 import { cn } from '@/utils/utils';
@@ -98,128 +99,141 @@ export function AppDetailPage(): React.JSX.Element {
         </div>
       </div>
 
-      <div className="space-y-6">
-        {/* API Key 卡片 */}
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-          <div className="flex flex-col space-y-1.5 p-6 border-b">
-            <h3 className="font-semibold leading-none tracking-tight flex items-center gap-2">
-              <KeyRound className="h-4 w-4 text-muted-foreground" />
-              {t('apps.apiKey', 'API Key')}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {t(
-                'apps.apiKeyDesc',
-                'The single API key used for authentication. If compromised, rotate it immediately.',
-              )}
-            </p>
-          </div>
-          <div className="p-6 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="font-mono bg-muted px-2 py-1 rounded text-sm select-all">{app.api_key}</span>
-              <CopyableId id={app.api_key} />
-            </div>
+      <Tabs defaultValue="settings" className="space-y-6">
+        <div className="scrollbar-hide -mb-1 flex items-center justify-between overflow-x-auto pb-1">
+          <TabsList className="h-9 w-auto justify-start rounded-none border-b bg-transparent p-0">
+            <TabsTrigger
+              value="settings"
+              className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pt-2 pb-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+            >
+              {t('common.settings', 'Settings')}
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-            <Dialog open={rotateOpen} onOpenChange={setRotateOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
-                >
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  {t('apps.rotateKey', 'Rotate Key')}
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2 text-destructive">
-                    <AlertTriangle className="h-5 w-5" />
-                    {t('apps.rotateConfirmTitle', 'Rotate API Key?')}
-                  </DialogTitle>
-                  <DialogDescription>
-                    {t(
-                      'apps.rotateConfirmDesc',
-                      'Rotating the API key will immediately invalidate the current key. All existing integrations using the old key will stop working until they are updated with the new key. This action cannot be undone.',
-                    )}
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter className="mt-4">
+        <TabsContent value="settings" className="space-y-6 outline-none">
+          {/* API Key 卡片 */}
+          <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+            <div className="flex flex-col space-y-1.5 p-6 border-b">
+              <h3 className="font-semibold leading-none tracking-tight flex items-center gap-2">
+                <KeyRound className="h-4 w-4 text-muted-foreground" />
+                {t('apps.apiKey', 'API Key')}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t(
+                  'apps.apiKeyDesc',
+                  'The single API key used for authentication. If compromised, rotate it immediately.',
+                )}
+              </p>
+            </div>
+            <div className="p-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="font-mono bg-muted px-2 py-1 rounded text-sm select-all">{app.api_key}</span>
+                <CopyableId id={app.api_key} />
+              </div>
+
+              <Dialog open={rotateOpen} onOpenChange={setRotateOpen}>
+                <DialogTrigger asChild>
                   <Button
                     variant="outline"
-                    onClick={() => {
-                      setRotateOpen(false);
-                    }}
-                    disabled={isRotating}
+                    className="text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
                   >
-                    {t('common.cancel', 'Cancel')}
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    {t('apps.rotateKey', 'Rotate Key')}
                   </Button>
-                  <Button variant="destructive" onClick={handleRotate} disabled={isRotating}>
-                    {isRotating && <RefreshCw className="mr-2 h-4 w-4 animate-spin" />}
-                    {t('apps.rotateConfirmBtn', 'Yes, Rotate Key')}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2 text-destructive">
+                      <AlertTriangle className="h-5 w-5" />
+                      {t('apps.rotateConfirmTitle', 'Rotate API Key?')}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {t(
+                        'apps.rotateConfirmDesc',
+                        'Rotating the API key will immediately invalidate the current key. All existing integrations using the old key will stop working until they are updated with the new key. This action cannot be undone.',
+                      )}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter className="mt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setRotateOpen(false);
+                      }}
+                      disabled={isRotating}
+                    >
+                      {t('common.cancel', 'Cancel')}
+                    </Button>
+                    <Button variant="destructive" onClick={handleRotate} disabled={isRotating}>
+                      {isRotating && <RefreshCw className="mr-2 h-4 w-4 animate-spin" />}
+                      {t('apps.rotateConfirmBtn', 'Yes, Rotate Key')}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
-        </div>
 
-        {/* 设置卡片 */}
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-          <div className="flex flex-col space-y-1.5 p-6 border-b">
-            <h3 className="font-semibold leading-none tracking-tight">
-              {t('apps.allowlist', 'App Security & Settings')}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {t('apps.settingsDesc', 'Configure models available and fundamental properties for this application.')}
-            </p>
+          {/* 设置卡片 */}
+          <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+            <div className="flex flex-col space-y-1.5 p-6 border-b">
+              <h3 className="font-semibold leading-none tracking-tight">
+                {t('apps.allowlist', 'App Security & Settings')}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t('apps.settingsDesc', 'Configure models available and fundamental properties for this application.')}
+              </p>
+            </div>
+            <div className="p-6">
+              <dl className="mb-8 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-muted-foreground">
+                    {t('apps.allowedModels', 'Allowed Models')}
+                  </dt>
+                  <dd className="mt-1 text-sm text-foreground">
+                    {app.allowed_model_ids.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {app.allowed_model_ids.map((id) => (
+                          <Badge key={id} variant="secondary" className="font-mono text-xs font-normal">
+                            {id}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground">{t('apps.noneAllowed', 'None Allowed')}</span>
+                    )}
+                  </dd>
+                </div>
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-muted-foreground">{t('apps.virtualMcps', 'Virtual MCPs')}</dt>
+                  <dd className="mt-1 text-sm text-foreground">
+                    {app.allowed_mcp_ids && app.allowed_mcp_ids.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {app.allowed_mcp_ids.map((id) => (
+                          <Badge key={id} variant="secondary" className="font-mono text-xs font-normal">
+                            {id}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground">{t('apps.noneAllowed', 'None Allowed')}</span>
+                    )}
+                  </dd>
+                </div>
+              </dl>
+              <Button
+                variant="default"
+                onClick={() => {
+                  setEditOpen(true);
+                }}
+              >
+                {t('common.edit', 'Edit Settings')}
+              </Button>
+            </div>
           </div>
-          <div className="p-6">
-            <dl className="mb-8 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-muted-foreground">
-                  {t('apps.allowedModels', 'Allowed Models')}
-                </dt>
-                <dd className="mt-1 text-sm text-foreground">
-                  {app.allowed_model_ids.length > 0 ? (
-                    <div className="flex flex-wrap gap-1">
-                      {app.allowed_model_ids.map((id) => (
-                        <Badge key={id} variant="secondary" className="font-mono text-xs font-normal">
-                          {id}
-                        </Badge>
-                      ))}
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground">{t('apps.noneAllowed', 'None Allowed')}</span>
-                  )}
-                </dd>
-              </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-muted-foreground">{t('apps.virtualMcps', 'Virtual MCPs')}</dt>
-                <dd className="mt-1 text-sm text-foreground">
-                  {app.allowed_mcp_ids && app.allowed_mcp_ids.length > 0 ? (
-                    <div className="flex flex-wrap gap-1">
-                      {app.allowed_mcp_ids.map((id) => (
-                        <Badge key={id} variant="secondary" className="font-mono text-xs font-normal">
-                          {id}
-                        </Badge>
-                      ))}
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground">{t('apps.noneAllowed', 'None Allowed')}</span>
-                  )}
-                </dd>
-              </div>
-            </dl>
-            <Button
-              variant="default"
-              onClick={() => {
-                setEditOpen(true);
-              }}
-            >
-              {t('common.edit', 'Edit Settings')}
-            </Button>
-          </div>
-        </div>
-      </div>
+        </TabsContent>
+      </Tabs>
 
       <AppsMutateDialog
         open={editOpen}
