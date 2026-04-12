@@ -188,7 +188,7 @@ export interface RequestLog {
 }
 
 export interface CostBreakdown {
-  tierStartTokens: number;
+  tierStartTokens?: number;
   inputCost: number;
   cacheCost: number;
   outputCost: number;

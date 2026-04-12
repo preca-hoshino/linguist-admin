@@ -267,7 +267,7 @@ export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.
         </Card>
 
         {/* 3. Pricing Context Meta */}
-        <PricingContextCard ctx={ctx} tierStartTokens={tierStartTokens} />
+        <PricingContextCard ctx={ctx} tierStartTokens={tierStartTokens ?? 0} />
       </div>
     </div>
   );
