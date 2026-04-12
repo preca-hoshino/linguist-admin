@@ -33,7 +33,6 @@ import { Route as AuthenticatedModelsProviderModelsIndexRouteImport } from './ro
 import { Route as AuthenticatedModelsLogsIndexRouteImport } from './router/_authenticated/models/logs/index'
 import { Route as AuthenticatedMcpsVirtualMcpsIndexRouteImport } from './router/_authenticated/mcps/virtual-mcps/index'
 import { Route as AuthenticatedMcpsProvidersIndexRouteImport } from './router/_authenticated/mcps/providers/index'
-import { Route as AuthenticatedMcpsProviderMcpsIndexRouteImport } from './router/_authenticated/mcps/provider-mcps/index'
 import { Route as AuthenticatedMcpsLogsIndexRouteImport } from './router/_authenticated/mcps/logs/index'
 import { Route as AuthenticatedModelsVirtualModelsIdRouteImport } from './router/_authenticated/models/virtual-models/$id'
 import { Route as AuthenticatedModelsProvidersIdRouteImport } from './router/_authenticated/models/providers/$id'
@@ -173,12 +172,6 @@ const AuthenticatedMcpsProvidersIndexRoute =
     path: '/providers/',
     getParentRoute: () => AuthenticatedMcpsRoute,
   } as any)
-const AuthenticatedMcpsProviderMcpsIndexRoute =
-  AuthenticatedMcpsProviderMcpsIndexRouteImport.update({
-    id: '/provider-mcps/',
-    path: '/provider-mcps/',
-    getParentRoute: () => AuthenticatedMcpsRoute,
-  } as any)
 const AuthenticatedMcpsLogsIndexRoute =
   AuthenticatedMcpsLogsIndexRouteImport.update({
     id: '/logs/',
@@ -233,7 +226,6 @@ export interface FileRoutesByFullPath {
   '/models/providers/$id': typeof AuthenticatedModelsProvidersIdRoute
   '/models/virtual-models/$id': typeof AuthenticatedModelsVirtualModelsIdRoute
   '/mcps/logs/': typeof AuthenticatedMcpsLogsIndexRoute
-  '/mcps/provider-mcps/': typeof AuthenticatedMcpsProviderMcpsIndexRoute
   '/mcps/providers/': typeof AuthenticatedMcpsProvidersIndexRoute
   '/mcps/virtual-mcps/': typeof AuthenticatedMcpsVirtualMcpsIndexRoute
   '/models/logs/': typeof AuthenticatedModelsLogsIndexRoute
@@ -261,7 +253,6 @@ export interface FileRoutesByTo {
   '/models/providers/$id': typeof AuthenticatedModelsProvidersIdRoute
   '/models/virtual-models/$id': typeof AuthenticatedModelsVirtualModelsIdRoute
   '/mcps/logs': typeof AuthenticatedMcpsLogsIndexRoute
-  '/mcps/provider-mcps': typeof AuthenticatedMcpsProviderMcpsIndexRoute
   '/mcps/providers': typeof AuthenticatedMcpsProvidersIndexRoute
   '/mcps/virtual-mcps': typeof AuthenticatedMcpsVirtualMcpsIndexRoute
   '/models/logs': typeof AuthenticatedModelsLogsIndexRoute
@@ -294,7 +285,6 @@ export interface FileRoutesById {
   '/_authenticated/models/providers/$id': typeof AuthenticatedModelsProvidersIdRoute
   '/_authenticated/models/virtual-models/$id': typeof AuthenticatedModelsVirtualModelsIdRoute
   '/_authenticated/mcps/logs/': typeof AuthenticatedMcpsLogsIndexRoute
-  '/_authenticated/mcps/provider-mcps/': typeof AuthenticatedMcpsProviderMcpsIndexRoute
   '/_authenticated/mcps/providers/': typeof AuthenticatedMcpsProvidersIndexRoute
   '/_authenticated/mcps/virtual-mcps/': typeof AuthenticatedMcpsVirtualMcpsIndexRoute
   '/_authenticated/models/logs/': typeof AuthenticatedModelsLogsIndexRoute
@@ -327,7 +317,6 @@ export interface FileRouteTypes {
     | '/models/providers/$id'
     | '/models/virtual-models/$id'
     | '/mcps/logs/'
-    | '/mcps/provider-mcps/'
     | '/mcps/providers/'
     | '/mcps/virtual-mcps/'
     | '/models/logs/'
@@ -355,7 +344,6 @@ export interface FileRouteTypes {
     | '/models/providers/$id'
     | '/models/virtual-models/$id'
     | '/mcps/logs'
-    | '/mcps/provider-mcps'
     | '/mcps/providers'
     | '/mcps/virtual-mcps'
     | '/models/logs'
@@ -387,7 +375,6 @@ export interface FileRouteTypes {
     | '/_authenticated/models/providers/$id'
     | '/_authenticated/models/virtual-models/$id'
     | '/_authenticated/mcps/logs/'
-    | '/_authenticated/mcps/provider-mcps/'
     | '/_authenticated/mcps/providers/'
     | '/_authenticated/mcps/virtual-mcps/'
     | '/_authenticated/models/logs/'
@@ -571,13 +558,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMcpsProvidersIndexRouteImport
       parentRoute: typeof AuthenticatedMcpsRoute
     }
-    '/_authenticated/mcps/provider-mcps/': {
-      id: '/_authenticated/mcps/provider-mcps/'
-      path: '/provider-mcps'
-      fullPath: '/mcps/provider-mcps/'
-      preLoaderRoute: typeof AuthenticatedMcpsProviderMcpsIndexRouteImport
-      parentRoute: typeof AuthenticatedMcpsRoute
-    }
     '/_authenticated/mcps/logs/': {
       id: '/_authenticated/mcps/logs/'
       path: '/logs'
@@ -644,7 +624,6 @@ const AuthenticatedSettingsRouteRouteWithChildren =
 interface AuthenticatedMcpsRouteChildren {
   AuthenticatedMcpsIndexRoute: typeof AuthenticatedMcpsIndexRoute
   AuthenticatedMcpsLogsIndexRoute: typeof AuthenticatedMcpsLogsIndexRoute
-  AuthenticatedMcpsProviderMcpsIndexRoute: typeof AuthenticatedMcpsProviderMcpsIndexRoute
   AuthenticatedMcpsProvidersIndexRoute: typeof AuthenticatedMcpsProvidersIndexRoute
   AuthenticatedMcpsVirtualMcpsIndexRoute: typeof AuthenticatedMcpsVirtualMcpsIndexRoute
 }
@@ -652,8 +631,6 @@ interface AuthenticatedMcpsRouteChildren {
 const AuthenticatedMcpsRouteChildren: AuthenticatedMcpsRouteChildren = {
   AuthenticatedMcpsIndexRoute: AuthenticatedMcpsIndexRoute,
   AuthenticatedMcpsLogsIndexRoute: AuthenticatedMcpsLogsIndexRoute,
-  AuthenticatedMcpsProviderMcpsIndexRoute:
-    AuthenticatedMcpsProviderMcpsIndexRoute,
   AuthenticatedMcpsProvidersIndexRoute: AuthenticatedMcpsProvidersIndexRoute,
   AuthenticatedMcpsVirtualMcpsIndexRoute:
     AuthenticatedMcpsVirtualMcpsIndexRoute,
