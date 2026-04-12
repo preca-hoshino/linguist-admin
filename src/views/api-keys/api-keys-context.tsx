@@ -73,7 +73,9 @@ export function ApiKeysProvider({
       if (res.data.data.length > 0) {
         const nextCursor = res.data.data.at(-1)?.id;
         setCursorMap((prev) => {
-          if (prev[pagination.pageIndex + 1] === nextCursor) return prev;
+          if (prev[pagination.pageIndex + 1] === nextCursor) {
+            return prev;
+          }
           return {
             ...prev,
             [pagination.pageIndex + 1]: nextCursor,

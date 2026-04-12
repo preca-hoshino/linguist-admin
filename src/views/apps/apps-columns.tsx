@@ -1,10 +1,10 @@
 import type { ColumnDef, Row } from '@tanstack/react-table';
+import { AppWindow } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { DataTableColumnHeader } from '@/components/data-table';
 import { Badge } from '@/components/ui/Badge';
 import type { App } from '@/types/app';
 import { cn } from '@/utils/utils';
-import { AppWindow } from 'lucide-react';
 import { AppsRowActions } from './apps-row-actions';
 
 export function useAppsColumns(): ColumnDef<App>[] {

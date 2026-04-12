@@ -71,8 +71,9 @@ export const listAppKeys = async (
     qs.set('search', params.search);
   }
   const queryStr = qs.toString() === '' ? '' : `?${qs.toString()}`;
+  const url = appId ? `/apps/${appId}/keys${queryStr}` : `/apps/keys${queryStr}`;
 
-  return await request<ListResponse<ApiKey>>('GET', `/apps/${appId}/keys${queryStr}`);
+  return await request<ListResponse<ApiKey>>('GET', url);
 };
 
 /** 获取指定 Key 详情 */

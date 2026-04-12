@@ -1,4 +1,5 @@
 import {
+  AppWindow,
   BarChart,
   Box,
   Command,
@@ -8,7 +9,6 @@ import {
   Settings as SettingsIcon,
   Users,
   Wrench,
-  AppWindow,
 } from 'lucide-react';
 import i18n from '@/i18n';
 import type { SidebarData } from '../types';

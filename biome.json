@@ -47,14 +47,7 @@
         "recommended": true
       }
     },
-    "includes": [
-      "**",
-      "!dist/",
-      "!node_modules/",
-      "!coverage/",
-      "!src/components/ui/**",
-      "!src/routeTree.gen.ts"
-    ]
+    "includes": ["**", "!dist/", "!node_modules/", "!coverage/", "!src/components/ui/**", "!src/routeTree.gen.ts"]
   },
   "javascript": {
     "formatter": {

@@ -1,7 +1,7 @@
-import { ArrowDownToLine, ArrowUpFromLine, ExternalLink, CornerDownRight, Wallet } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
+import { ArrowDownToLine, ArrowUpFromLine, CornerDownRight, ExternalLink, Wallet } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from '@tanstack/react-router';
 import { listProviderModels } from '@/api/provider-models';
 import { ProviderLogo } from '@/components/ProviderLogo';
 import { Button } from '@/components/ui/Button';

@@ -3,7 +3,14 @@ import type { KnipConfig } from 'knip';
 const config: KnipConfig = {
   project: ['src/**/*.{ts,tsx}'],
   ignore: ['src/components/ui/**'],
-  ignoreDependencies: ["tailwindcss", "tw-animate-css", "@radix-ui/react-switch", "input-otp", "react-day-picker", "@tailwindcss/typography"],
+  ignoreDependencies: [
+    'tailwindcss',
+    'tw-animate-css',
+    '@radix-ui/react-switch',
+    'input-otp',
+    'react-day-picker',
+    '@tailwindcss/typography',
+  ],
   rules: {
     files: 'off',
     exports: 'off',
@@ -12,7 +19,7 @@ const config: KnipConfig = {
     nsTypes: 'off',
     classMembers: 'off',
     enumMembers: 'off',
-  }
+  },
 };
 
 export default config;

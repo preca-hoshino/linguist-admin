@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { deleteApp } from '@/api/apps';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
-import { useApps, type AppsDialogType } from './apps-context';
+import { type AppsDialogType, useApps } from './apps-context';
 import { AppsMutateDialog } from './apps-mutate-dialog';
 
 export function AppsDialogs(): React.JSX.Element {
