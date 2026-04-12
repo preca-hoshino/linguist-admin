@@ -16,8 +16,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
-import { Badge } from '@/components/ui/Badge';
-import { Switch } from '@/components/ui/Switch';
+import { Checkbox } from '@/components/ui/Checkbox';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/utils/utils';
 import { useVirtualMcps } from './virtual-mcps-context';
@@ -298,20 +297,22 @@ function MutateVirtualMcpDialog({
                   control={form.control}
                   name="name"
                   render={({ field }) => (
-                    <FormItem className="space-y-1.5">
-                      <FormLabel className="flex items-center gap-2 text-muted-foreground">
+                    <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                      <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
                         <Fingerprint className="h-3.5 w-3.5" />
                         <span className="font-medium text-foreground">
                           {t('mcpsPage.virtualMcps.name', 'Name / ID')}
                         </span>
                       </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder={t('mcpsPage.virtualMcps.namePlaceholder', 'e.g. Frontend Tools')}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
+                      <div className="space-y-1.5">
+                        <FormControl>
+                          <Input
+                            placeholder={t('mcpsPage.virtualMcps.namePlaceholder', 'e.g. Frontend Tools')}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </div>
                     </FormItem>
                   )}
                 />
@@ -320,20 +321,22 @@ function MutateVirtualMcpDialog({
                   control={form.control}
                   name="description"
                   render={({ field }) => (
-                    <FormItem className="space-y-1.5">
-                      <FormLabel className="flex items-center gap-2 text-muted-foreground">
+                    <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                      <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
                         <Info className="h-3.5 w-3.5" />
                         <span className="font-medium text-foreground">
                           {t('mcpsPage.virtualMcps.description', 'Description')}
                         </span>
                       </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder={t('mcpsPage.virtualMcps.descPlaceholder', 'Optional description')}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
+                      <div className="space-y-1.5">
+                        <FormControl>
+                          <Input
+                            placeholder={t('mcpsPage.virtualMcps.descPlaceholder', 'Optional description')}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </div>
                     </FormItem>
                   )}
                 />
@@ -342,95 +345,50 @@ function MutateVirtualMcpDialog({
                   control={form.control}
                   name="mcp_provider_id"
                   render={({ field }) => (
-                    <FormItem className="space-y-1.5">
-                      <FormLabel className="flex items-center gap-2 text-muted-foreground">
+                    <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                      <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
                         <Server className="h-3.5 w-3.5" />
                         <span className="font-medium text-foreground">
                           {t('mcpsPage.virtualMcps.backendProvider', 'Backend Provider')}
                         </span>
                       </FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={t('mcpsPage.virtualMcps.selectProvider', 'Select a provider')} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {providers.map((p) => (
-                            <SelectItem key={p.id} value={p.id}>
-                              {p.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
+                      <div className="space-y-1.5">
+                        <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue
+                                placeholder={t('mcpsPage.virtualMcps.selectProvider', 'Select a provider')}
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {providers.map((p) => (
+                              <SelectItem key={p.id} value={p.id}>
+                                {p.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </div>
                     </FormItem>
                   )}
                 />
-
-                <div className="flex flex-col gap-3 rounded-lg border border-dashed border-border/60 bg-muted/20 p-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
-                      {t('mcpsPage.virtualMcps.toolsEnabledCount', 'Enabled Tools')}
-                    </span>
-                    <Badge variant="secondary">{selectedTools.length}</Badge>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {selectedTools.map((tool) => (
-                      <Badge
-                        key={tool}
-                        variant="default"
-                        className="cursor-pointer pr-1 hover:bg-destructive hover:text-destructive-foreground flex items-center gap-1"
-                        onClick={() => {
-                          toggleTool(tool);
-                        }}
-                      >
-                        {tool}
-                        <span className="rounded-full bg-background/20 p-0.5">
-                          <X className="h-3 w-3" />
-                        </span>
-                      </Badge>
-                    ))}
-                    {selectedTools.length === 0 && (
-                      <span className="text-xs text-muted-foreground italic my-1">
-                        {t('mcpsPage.virtualMcps.noToolsSelected', 'No tools active')}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="border-t border-border/40 my-1 pt-3">
-                    <Input
-                      placeholder={t('mcpsPage.virtualMcps.manualToolEntry', 'Type unknown tool name & press Enter...')}
-                      className="h-8 text-xs bg-background"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          const target = e.currentTarget;
-                          const value = target.value.trim();
-                          if (value !== '' && !selectedTools.includes(value)) {
-                            setSelectedTools((prev) => [...prev, value]);
-                            target.value = '';
-                          }
-                        }
-                      }}
-                    />
-                  </div>
-                </div>
               </form>
             </Form>
           </div>
 
           {/* 右栏：Tools Selection List */}
           <div className="flex w-full lg:w-1/2 flex-col overflow-hidden h-full">
-            <div className="flex items-center justify-between border-b px-8 py-[22px] bg-background sticky top-0 z-10 shrink-0">
-              <div className="text-sm font-semibold text-foreground w-1/2">
-                {t('mcpsPage.virtualMcps.availableTools', 'Tool Configuration')}
+            <div className="px-8 pt-5 pb-2 bg-background sticky top-0 z-10 shrink-0">
+              <div className="text-sm font-semibold text-foreground pb-4">
+                {t('mcpsPage.virtualMcps.toolsManagement', '工具管理')}
               </div>
-              <div className="relative w-1/2">
-                <Search className="absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" />
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  className="h-8 pl-8 text-xs bg-muted/30"
-                  placeholder={t('common.search', 'Search...')}
+                  className="pl-9 h-9 bg-background"
+                  placeholder={t('common.search', 'Search tools...')}
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -440,7 +398,31 @@ function MutateVirtualMcpDialog({
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-6 py-4 scrollbar-thin">
+            {tools.length > 0 && providerId !== '' && (
+              <div className="flex items-center justify-between px-8 py-2 bg-background text-sm shrink-0">
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="select-all-tools"
+                    checked={tools.length > 0 && selectedTools.length === tools.length}
+                    onCheckedChange={(checked) => {
+                      if (checked === true) {
+                        setSelectedTools(tools.map((t) => t.name));
+                      } else {
+                        setSelectedTools([]);
+                      }
+                    }}
+                  />
+                  <label htmlFor="select-all-tools" className="font-medium cursor-pointer select-none">
+                    {t('common.selectAll', 'Select All')}
+                  </label>
+                </div>
+                <div className="text-muted-foreground">
+                  {selectedTools.length} / {tools.length} {t('mcpsPage.virtualMcps.toolsSelected', 'Selected')}
+                </div>
+              </div>
+            )}
+
+            <div className="flex-1 overflow-y-auto scrollbar-thin px-8 pb-4 space-y-1">
               {((): React.JSX.Element => {
                 if (providerId === '') {
                   return (
@@ -490,7 +472,7 @@ function MutateVirtualMcpDialog({
                 }
 
                 return (
-                  <div className="flex flex-col gap-2.5 pb-4">
+                  <>
                     {filteredTools.map((tInfo) => {
                       const isSelected = selectedTools.includes(tInfo.name);
 
@@ -502,47 +484,36 @@ function MutateVirtualMcpDialog({
                             toggleTool(tInfo.name);
                           }}
                           className={cn(
-                            'group flex w-full items-start gap-4 rounded-xl border bg-background p-4 text-left shadow-sm transition-all focus-visible:outline-none focusEnd-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                            'w-full text-left px-3 py-3 rounded-md transition-colors text-sm flex items-center gap-3',
                             isSelected
-                              ? 'border-primary/40 bg-primary/5 shadow-md'
-                              : 'hover:border-border hover:bg-muted/30 hover:shadow-md',
+                              ? 'bg-accent text-accent-foreground shadow-sm border border-border/50'
+                              : 'text-foreground hover:bg-muted/50 border border-transparent',
                           )}
                         >
-                          <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-                            <code className="text-sm font-bold text-foreground truncate">{tInfo.name}</code>
-                            {tInfo.description != null && tInfo.description !== '' ? (
-                              <p
-                                className={cn(
-                                  'text-xs line-clamp-2 leading-relaxed transition-colors',
-                                  isSelected ? 'text-primary/70' : 'text-muted-foreground',
-                                )}
-                              >
-                                {tInfo.description}
-                              </p>
-                            ) : (
-                              <p className="text-xs text-muted-foreground/50 italic">
-                                {t('mcpsPage.virtualMcps.noDescription', 'No description available')}
-                              </p>
-                            )}
+                          <div className="shrink-0 mt-0.5">
+                            <Checkbox checked={isSelected} onCheckedChange={undefined} />
                           </div>
-                          <div className="shrink-0 flex items-center pt-0.5">
-                            <Switch
-                              checked={isSelected}
-                              // We let the parent button's onClick handle the toggle, but we also bind it here
-                              // to ensure explicit interaction on the switch works immediately
-                              onCheckedChange={(checked) => {
-                                // To avoid double firing since button propagates, we don't necessarily need this if the button holds it.
-                                // But if we want native Switch handling:
-                                if ((checked && !isSelected) || (!checked && isSelected)) {
-                                  toggleTool(tInfo.name);
-                                }
-                              }}
-                            />
+                          <div className="flex-1 min-w-0">
+                            <div className="truncate font-mono text-[15px] font-bold tracking-tight">{tInfo.name}</div>
+                            <div
+                              className={cn(
+                                'text-[11px] mt-1 line-clamp-1 font-normal leading-relaxed',
+                                isSelected ? 'text-accent-foreground/80' : 'text-muted-foreground',
+                              )}
+                            >
+                              {tInfo.description != null && tInfo.description !== '' ? (
+                                tInfo.description
+                              ) : (
+                                <span className="italic opacity-50">
+                                  {t('mcpsPage.virtualMcps.noDescription', 'No description available')}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </button>
                       );
                     })}
-                  </div>
+                  </>
                 );
               })()}
             </div>
