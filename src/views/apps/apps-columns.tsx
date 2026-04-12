@@ -2,6 +2,7 @@ import type { ColumnDef, Row } from '@tanstack/react-table';
 import { AppWindow } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { DataTableColumnHeader } from '@/components/data-table';
+import { CopyableId } from '@/components/CopyableId';
 import { Badge } from '@/components/ui/Badge';
 import type { App } from '@/types/app';
 import { cn } from '@/utils/utils';
@@ -68,11 +69,10 @@ export function useAppsColumns(): ColumnDef<App>[] {
     {
       accessorKey: 'api_key',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('apps.apiKey', 'API Key')} />,
-      cell: ({ row }): React.JSX.Element => (
-        <span className="font-mono text-xs text-muted-foreground">
-          {row.getValue<string>('api_key').slice(0, 11)}...
-        </span>
-      ),
+      cell: ({ row }): React.JSX.Element => {
+        const apiKey = row.getValue<string>('api_key');
+        return <CopyableId id={apiKey} />;
+      },
       enableSorting: false,
       enableHiding: true,
     },
