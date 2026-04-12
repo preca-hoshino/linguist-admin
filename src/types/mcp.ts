@@ -30,15 +30,12 @@ export interface McpProviderUpdateInput extends Partial<McpProviderCreateInput> 
   is_active?: boolean;
 }
 
-export type McpToolFilterMode = 'allow' | 'deny' | 'all';
-
 export interface McpVirtualServer {
   id: string;
   name: string;
   description: string;
   mcp_provider_id: string;
-  tool_filter_mode: McpToolFilterMode;
-  tool_filter_list: string[];
+  tools: string[];
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -48,8 +45,7 @@ export interface McpVirtualServerCreateInput {
   name: string;
   description?: string;
   mcp_provider_id: string;
-  tool_filter_mode?: McpToolFilterMode;
-  tool_filter_list?: string[];
+  tools?: string[];
 }
 
 export interface McpVirtualServerUpdateInput extends Partial<McpVirtualServerCreateInput> {

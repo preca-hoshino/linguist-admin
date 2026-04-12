@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Badge } from '@/components/ui/Badge';
+import { Switch } from '@/components/ui/Switch';
 import { cn } from '@/utils/utils';
 import { useVirtualMcps } from './virtual-mcps-context';
 import type {
@@ -25,7 +26,6 @@ const virtualMcpSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
   mcp_provider_id: z.string().min(1, 'Provider is required'),
-  tool_filter_mode: z.enum(['all', 'allow', 'deny'] as const),
 });
 
 type VirtualMcpFormValues = z.infer<typeof virtualMcpSchema>;
@@ -133,7 +133,7 @@ function MutateVirtualMcpDialog({
   readonly onSubmit: (data: McpVirtualServerCreateInput | McpVirtualServerUpdateInput) => Promise<void>;
 }): React.JSX.Element {
   const [providers, setProviders] = useState<McpProvider[]>([]);
-  const [toolFilterList, setToolFilterList] = useState<string[]>([]);
+  const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [tools, setTools] = useState<McpToolInfo[]>([]);
   const [toolsLoading, setToolsLoading] = useState(false);
 
@@ -143,13 +143,10 @@ function MutateVirtualMcpDialog({
       name: '',
       description: '',
       mcp_provider_id: '',
-      tool_filter_mode: 'all',
     },
   });
 
   // eslint-disable-next-line react-hooks/incompatible-library
-  const filterMode = form.watch('tool_filter_mode');
-   
   const providerId = form.watch('mcp_provider_id');
 
   useEffect(() => {
@@ -165,17 +162,15 @@ function MutateVirtualMcpDialog({
           name: initialData.name,
           description: initialData.description,
           mcp_provider_id: initialData.mcp_provider_id,
-          tool_filter_mode: initialData.tool_filter_mode,
         });
-        setToolFilterList([...initialData.tool_filter_list]);
+        setSelectedTools([...initialData.tools]);
       } else {
         form.reset({
           name: '',
           description: '',
           mcp_provider_id: '',
-          tool_filter_mode: 'all',
         });
-        setToolFilterList([]);
+        setSelectedTools([]);
       }
     }
   }, [open, mode, initialData, form]);
@@ -206,22 +201,16 @@ function MutateVirtualMcpDialog({
     const payload: Partial<McpVirtualServerCreateInput> = {
       name: values.name,
       mcp_provider_id: values.mcp_provider_id,
-      tool_filter_mode: values.tool_filter_mode,
+      tools: selectedTools,
     };
     if (values.description != null && values.description !== '') {
       payload.description = values.description;
-    }
-    if (values.tool_filter_mode !== 'all') {
-      payload.tool_filter_list = toolFilterList;
     }
     await onSubmit(payload as McpVirtualServerCreateInput | McpVirtualServerUpdateInput);
   });
 
   const toggleTool = (toolName: string): void => {
-    if (filterMode === 'all') {
-      return;
-    }
-    setToolFilterList((prev) => {
+    setSelectedTools((prev) => {
       if (prev.includes(toolName)) {
         return prev.filter((t) => t !== toolName);
       }
@@ -326,68 +315,43 @@ function MutateVirtualMcpDialog({
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="tool_filter_mode"
-                  render={({ field }) => (
-                    <FormItem className="space-y-1.5">
-                      <FormLabel>Tool Filter Mode</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select filter mode" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="all">All (No filtering)</SelectItem>
-                          <SelectItem value="allow">Allow (Whitelist)</SelectItem>
-                          <SelectItem value="deny">Deny (Blacklist)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {filterMode !== 'all' && (
-                  <div className="space-y-2">
-                    <FormLabel>{filterMode === 'allow' ? 'Allowed Tools' : 'Denied Tools'}</FormLabel>
-                    <div className="flex flex-wrap gap-2">
-                      {toolFilterList.map((tool) => (
-                        <Badge
-                          key={tool}
-                          variant="secondary"
-                          className="cursor-pointer hover:bg-destructive/10 hover:text-destructive"
-                          onClick={() => {
-                            toggleTool(tool);
-                          }}
-                        >
-                          {tool} <span className="ml-1 text-muted-foreground">×</span>
-                        </Badge>
-                      ))}
-                    </div>
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Type unknown tool name and press Enter"
-                        className="h-8 text-xs"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            const target = e.currentTarget;
-                            const value = target.value.trim();
-                            if (value !== '' && !toolFilterList.includes(value)) {
-                              setToolFilterList((prev) => [...prev, value]);
-                              target.value = '';
-                            }
-                          }
+                <div className="space-y-2">
+                  <FormLabel>Enabled Tools</FormLabel>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedTools.map((tool) => (
+                      <Badge
+                        key={tool}
+                        variant="secondary"
+                        className="cursor-pointer hover:bg-destructive/10 hover:text-destructive"
+                        onClick={() => {
+                          toggleTool(tool);
                         }}
-                      />
-                    </div>
-                    <p className="text-[11px] text-muted-foreground">
-                      You can click tools in the right panel to toggle them instantly.
-                    </p>
+                      >
+                        {tool} <span className="ml-1 text-muted-foreground">×</span>
+                      </Badge>
+                    ))}
                   </div>
-                )}
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Type unknown tool name and press Enter"
+                      className="h-8 text-xs"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          const target = e.currentTarget;
+                          const value = target.value.trim();
+                          if (value !== '' && !selectedTools.includes(value)) {
+                            setSelectedTools((prev) => [...prev, value]);
+                            target.value = '';
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    You can click tools in the right panel to toggle their active state instantly.
+                  </p>
+                </div>
               </form>
             </Form>
           </div>
@@ -437,44 +401,29 @@ function MutateVirtualMcpDialog({
               return (
                 <div className="flex flex-col gap-3 pb-4">
                   {tools.map((t) => {
-                    const isSelected = filterMode !== 'all' && toolFilterList.includes(t.name);
-                    let badgeText = 'Unselected';
-                    if (isSelected) {
-                      badgeText = filterMode === 'allow' ? 'Allowed' : 'Denied';
-                    }
+                    const isSelected = selectedTools.includes(t.name);
 
                     return (
-                      <button
+                      <div
                         key={t.name}
-                        type="button"
-                        disabled={filterMode === 'all'}
                         className={cn(
-                          'flex w-full flex-col gap-1.5 rounded-lg border bg-background p-3 text-left shadow-sm transition-all disabled:opacity-100 disabled:cursor-default',
-                          filterMode === 'all' ? '' : 'cursor-pointer hover:border-primary/50',
+                          'flex w-full flex-col gap-1.5 rounded-lg border bg-background p-3 text-left shadow-sm transition-all',
                           isSelected ? 'border-primary/40 bg-primary/5 shadow-md' : '',
                         )}
-                        onClick={() => {
-                          toggleTool(t.name);
-                        }}
                       >
                         <div className="flex w-full items-start justify-between gap-2">
                           <code className="text-xs font-bold text-foreground break-all">{t.name}</code>
-                          {filterMode !== 'all' && (
-                            <Badge
-                              variant={isSelected ? 'default' : 'outline'}
-                              className={cn(
-                                'shrink-0 text-[10px] uppercase font-semibold',
-                                isSelected ? 'bg-primary text-primary-foreground shadow-none' : 'text-muted-foreground',
-                              )}
-                            >
-                              {badgeText}
-                            </Badge>
-                          )}
+                          <Switch
+                            checked={isSelected}
+                            onCheckedChange={() => {
+                              toggleTool(t.name);
+                            }}
+                          />
                         </div>
                         {t.description != null && t.description !== '' ? (
                           <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">{t.description}</p>
                         ) : null}
-                      </button>
+                      </div>
                     );
                   })}
                 </div>

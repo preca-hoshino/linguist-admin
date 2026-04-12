@@ -28,25 +28,14 @@ export function getVirtualMcpsColumns(
       ),
     },
     {
-      accessorKey: 'tool_filter_mode',
-      header: 'Filter Mode',
-      cell: ({ row }): React.JSX.Element => {
-        const mode = row.getValue('tool_filter_mode');
-        return <Badge variant={mode === 'all' ? 'secondary' : 'outline'}>{String(mode).toUpperCase()}</Badge>;
-      },
-    },
-    {
       id: 'tools',
       header: 'Tools',
       cell: ({ row }): React.JSX.Element => {
-        const list = row.original.tool_filter_list;
-        if (row.original.tool_filter_mode === 'all') {
-          return <span className="text-muted-foreground">All</span>;
-        }
+        const list = row.original.tools;
         if (list.length === 0) {
           return <span className="text-muted-foreground">-</span>;
         }
-        return <Badge variant="outline">{list.length} Tools</Badge>;
+        return <Badge variant="outline">{list.length} Enabled</Badge>;
       },
     },
     {
