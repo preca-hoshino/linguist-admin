@@ -66,12 +66,14 @@ export function useAppsColumns(): ColumnDef<App>[] {
       enableHiding: true,
     },
     {
-      accessorKey: 'key_count',
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('apps.keyCount', 'Keys')} />,
+      accessorKey: 'api_key',
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('apps.apiKey', 'API Key')} />,
       cell: ({ row }): React.JSX.Element => (
-        <span className="text-muted-foreground">{row.getValue<number>('key_count')}</span>
+        <span className="font-mono text-xs text-muted-foreground">
+          {row.getValue<string>('api_key').slice(0, 11)}...
+        </span>
       ),
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
     {

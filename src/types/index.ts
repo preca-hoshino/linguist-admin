@@ -1,7 +1,7 @@
 // Centralized type definitions
 
 export * from './api';
-export * from './api-key';
+export * from './app';
 export * from './chat';
 export * from './health';
 export * from './provider';
