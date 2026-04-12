@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { Textarea } from '@/components/ui/Textarea';
 
 import { Badge } from '@/components/ui/Badge';
 import { cn } from '@/utils/utils';
@@ -18,6 +19,23 @@ const providerSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   transport_type: z.enum(['stdio', 'streamable_http', 'sse'] as const),
   endpoint_url: z.string().optional(),
+  headers: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (val === undefined || val === '') {
+          return true;
+        }
+        try {
+          JSON.parse(val);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      { message: 'Invalid JSON format' },
+    ),
   stdio_command: z.string().optional(),
   stdio_args: z.string().optional(),
   api_keys: z.array(z.object({ value: z.string() })).optional(),
@@ -163,6 +181,7 @@ function MutateProviderDialog({
       name: '',
       transport_type: 'stdio',
       endpoint_url: '',
+      headers: '{}',
       stdio_command: '',
       stdio_args: '',
       api_keys: [],
@@ -184,6 +203,7 @@ function MutateProviderDialog({
           name: initialData.name,
           transport_type: initialData.transport_type,
           endpoint_url: initialData.endpoint_url,
+          headers: JSON.stringify(initialData.headers, null, 2),
           stdio_command: initialData.stdio_command,
           stdio_args: initialData.stdio_args.join(' '),
           api_keys: initialData.api_keys.map((k: string) => ({ value: k })),
@@ -193,6 +213,7 @@ function MutateProviderDialog({
           name: '',
           transport_type: 'stdio',
           endpoint_url: '',
+          headers: '{}',
           stdio_command: '',
           stdio_args: '',
           api_keys: [],
@@ -202,23 +223,36 @@ function MutateProviderDialog({
   }, [open, isEdit, initialData, form]);
 
   const handleSubmit = form.handleSubmit(async (values) => {
-    const payload: Partial<McpProviderCreateInput> = {
-      name: values.name,
-      transport_type: values.transport_type,
-      api_keys: values.api_keys?.map((k) => k.value).filter(Boolean) ?? [],
-    };
-    if (values.transport_type === 'stdio') {
-      if (values.stdio_command != null && values.stdio_command !== '') {
-        payload.stdio_command = values.stdio_command;
-      }
-      if (values.stdio_args != null && values.stdio_args !== '') {
-        payload.stdio_args = values.stdio_args.split(' ');
-      }
-    } else {
-      if (values.endpoint_url != null && values.endpoint_url !== '') {
-        payload.endpoint_url = values.endpoint_url;
+    let parsedHeaders: Record<string, string> | undefined;
+    if (values.headers !== undefined && values.headers !== '') {
+      try {
+        parsedHeaders = JSON.parse(values.headers) as Record<string, string>;
+      } catch {
+        // refined by zod
       }
     }
+
+    const apiKeysRaw = values.api_keys ?? [];
+    const rawPayload = {
+      name: values.name,
+      transport_type: values.transport_type,
+      api_keys: apiKeysRaw.map((k) => k.value).filter((v) => v !== ''),
+      ...(values.transport_type === 'stdio'
+        ? {
+            stdio_command: values.stdio_command === '' ? undefined : values.stdio_command,
+            stdio_args:
+              values.stdio_args !== '' && values.stdio_args !== undefined ? values.stdio_args.split(' ') : undefined,
+          }
+        : {
+            endpoint_url: values.endpoint_url === '' ? undefined : values.endpoint_url,
+            headers: parsedHeaders,
+          }),
+    };
+
+    const payload = Object.fromEntries(
+      Object.entries(rawPayload).filter(([_, v]) => v !== undefined),
+    ) as Partial<McpProviderCreateInput>;
+
     await onSubmit(payload as McpProviderCreateInput | McpProviderUpdateInput);
   });
 
@@ -385,30 +419,56 @@ function MutateProviderDialog({
                     />
                   </>
                 ) : (
-                  <FormField
-                    control={form.control}
-                    name="endpoint_url"
-                    render={({ field }) => (
-                      <FormItem className="grid grid-cols-[120px_1fr] items-center gap-4 space-y-0">
-                        <FormLabel className="text-muted-foreground">
-                          <span className="font-medium text-foreground">Endpoint URL</span>
-                        </FormLabel>
-                        <div className="space-y-1">
-                          <FormControl>
-                            <Input
-                              placeholder="https://api.example.com/mcp?key={{APIKEY}}"
-                              className="font-mono text-sm"
-                              {...field}
-                            />
-                          </FormControl>
-                          <p className="text-xs text-muted-foreground">
-                            Append {'{{APIKEY}}'} as a query parameter or in auth headers.
-                          </p>
-                          <FormMessage />
-                        </div>
-                      </FormItem>
-                    )}
-                  />
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="endpoint_url"
+                      render={({ field }) => (
+                        <FormItem className="grid grid-cols-[120px_1fr] items-center gap-4 space-y-0">
+                          <FormLabel className="text-muted-foreground">
+                            <span className="font-medium text-foreground">Endpoint URL</span>
+                          </FormLabel>
+                          <div className="space-y-1">
+                            <FormControl>
+                              <Input
+                                placeholder="https://api.example.com/mcp?key={{APIKEY}}"
+                                className="font-mono text-sm"
+                                {...field}
+                              />
+                            </FormControl>
+                            <p className="text-xs text-muted-foreground">
+                              Append {'{{APIKEY}}'} as a query parameter or in auth headers.
+                            </p>
+                            <FormMessage />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="headers"
+                      render={({ field }) => (
+                        <FormItem className="grid grid-cols-[120px_1fr] items-start gap-4 space-y-0">
+                          <FormLabel className="pt-2 text-muted-foreground">
+                            <span className="font-medium text-foreground">Headers (JSON)</span>
+                          </FormLabel>
+                          <div className="space-y-1">
+                            <FormControl>
+                              <Textarea
+                                className="font-mono text-sm min-h-[80px]"
+                                placeholder={'{\n  "Authorization": "Bearer {{APIKEY}}"\n}'}
+                                {...field}
+                              />
+                            </FormControl>
+                            <p className="text-xs text-muted-foreground">
+                              JSON format. Use {'{{APIKEY}}'} for key injection.
+                            </p>
+                            <FormMessage />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </>
                 )}
               </div>
 
