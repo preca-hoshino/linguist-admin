@@ -5,7 +5,7 @@ import { listApps } from '@/api/apps';
 import { useDialogState } from '@/composables/use-dialog-state';
 import type { App } from '@/types/app';
 
-export type AppsDialogType = 'create' | 'update' | 'delete';
+export type AppsDialogType = 'create' | 'update' | 'delete' | 'rotate';
 
 interface AppsContextType {
   open: AppsDialogType | null;

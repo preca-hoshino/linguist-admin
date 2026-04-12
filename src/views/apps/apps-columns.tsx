@@ -1,7 +1,7 @@
 import type { ColumnDef, Row } from '@tanstack/react-table';
-import { AppWindow } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { DataTableColumnHeader } from '@/components/data-table';
+import { CopyableId } from '@/components/CopyableId';
 import { Badge } from '@/components/ui/Badge';
 import type { App } from '@/types/app';
 import { cn } from '@/utils/utils';
@@ -23,13 +23,7 @@ export function useAppsColumns(): ColumnDef<App>[] {
     {
       accessorKey: 'name',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('apps.name', 'Name')} />,
-      cell: ({ row }): React.JSX.Element => (
-        <div className="flex items-center gap-2">
-          {/* 使用统计占位图标 */}
-          <AppWindow className="h-5 w-5 text-muted-foreground mr-1" />
-          <span className="font-medium">{row.getValue<string>('name')}</span>
-        </div>
-      ),
+      cell: ({ row }): React.JSX.Element => <span className="font-medium">{row.getValue<string>('name')}</span>,
       enableSorting: true,
       enableHiding: true,
     },
@@ -66,12 +60,13 @@ export function useAppsColumns(): ColumnDef<App>[] {
       enableHiding: true,
     },
     {
-      accessorKey: 'key_count',
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('apps.keyCount', 'Keys')} />,
-      cell: ({ row }): React.JSX.Element => (
-        <span className="text-muted-foreground">{row.getValue<number>('key_count')}</span>
-      ),
-      enableSorting: true,
+      accessorKey: 'api_key',
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('apps.apiKey', 'API Key')} />,
+      cell: ({ row }): React.JSX.Element => {
+        const apiKey = row.getValue<string>('api_key');
+        return <CopyableId id={apiKey} />;
+      },
+      enableSorting: false,
       enableHiding: true,
     },
     {
