@@ -71,10 +71,14 @@ export function ApiKeysProvider({
 
       // Update cursor map for next page
       if (res.data.data.length > 0) {
-        setCursorMap((prev) => ({
-          ...prev,
-          [pagination.pageIndex + 1]: res.data.data.at(-1)?.id,
-        }));
+        const nextCursor = res.data.data.at(-1)?.id;
+        setCursorMap((prev) => {
+          if (prev[pagination.pageIndex + 1] === nextCursor) return prev;
+          return {
+            ...prev,
+            [pagination.pageIndex + 1]: nextCursor,
+          };
+        });
       }
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : t('common.loadFailed', 'Failed to load data'));

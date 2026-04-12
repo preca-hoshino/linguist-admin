@@ -43,10 +43,14 @@ export function UsersPage(): React.JSX.Element {
       setTotal(res.data.total);
 
       if (res.data.data.length > 0) {
-        setCursorMap((prev) => ({
-          ...prev,
-          [pageIndex + 1]: res.data.data.at(-1)?.id,
-        }));
+        const nextCursor = res.data.data.at(-1)?.id;
+        setCursorMap((prev) => {
+          if (prev[pageIndex + 1] === nextCursor) return prev;
+          return {
+            ...prev,
+            [pageIndex + 1]: nextCursor,
+          };
+        });
       }
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : 'Failed to load users');
