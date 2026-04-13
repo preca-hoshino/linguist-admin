@@ -1,4 +1,5 @@
-import { Edit, MoreHorizontal, Trash } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
+import { Edit, Eye, MoreHorizontal, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
@@ -10,8 +11,11 @@ import {
 import type { McpProvider } from '@/types/mcp';
 import { useProviders } from './providers-context';
 
+import { useTranslation } from 'react-i18next';
+
 export function ProvidersRowActions({ provider }: { readonly provider: McpProvider }): React.JSX.Element {
   const { setDialogState } = useProviders();
+  const { t } = useTranslation();
 
   return (
     <DropdownMenu>
@@ -22,6 +26,13 @@ export function ProvidersRowActions({ provider }: { readonly provider: McpProvid
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
+        <DropdownMenuItem asChild>
+          <Link to="/mcps/providers/$id" params={{ id: provider.id }}>
+            <Eye className="mr-2 h-4 w-4" />
+            {t('common.viewDetails', 'View Details')}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
             setDialogState((prev) => ({ ...prev, editOpen: true, selectedProvider: provider }));

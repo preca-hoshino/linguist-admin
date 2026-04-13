@@ -1,14 +1,14 @@
 import type { ApiResult, DeletedResponse, ListResponse } from '../types';
-import type { McpVirtualServer, McpVirtualServerCreateInput, McpVirtualServerUpdateInput } from '../types/mcp';
+import type { VirtualMcp, VirtualMcpCreateInput, VirtualMcpUpdateInput } from '../types/mcp';
 import { request } from './client';
 
-export const listMcpVirtualServers = async (params?: {
+export const listVirtualMcps = async (params?: {
   limit?: number;
   offset?: number;
   search?: string;
   is_active?: boolean;
   mcp_provider_id?: string;
-}): Promise<ApiResult<ListResponse<McpVirtualServer>>> => {
+}): Promise<ApiResult<ListResponse<VirtualMcp>>> => {
   const qs = new URLSearchParams();
   if (params?.limit !== undefined) {
     qs.set('limit', String(params.limit));
@@ -27,26 +27,21 @@ export const listMcpVirtualServers = async (params?: {
   }
 
   const queryStr = qs.toString() ? `?${qs.toString()}` : '';
-  return await request<ListResponse<McpVirtualServer>>('GET', `/mcp-virtual-servers${queryStr}`);
+  return await request<ListResponse<VirtualMcp>>('GET', `/virtual-mcps${queryStr}`);
 };
 
-export const getMcpVirtualServer = async (id: string): Promise<ApiResult<McpVirtualServer>> => {
-  return await request<McpVirtualServer>('GET', `/mcp-virtual-servers/${id}`);
+export const getVirtualMcp = async (id: string): Promise<ApiResult<VirtualMcp>> => {
+  return await request<VirtualMcp>('GET', `/virtual-mcps/${id}`);
 };
 
-export const createMcpVirtualServer = async (
-  data: McpVirtualServerCreateInput,
-): Promise<ApiResult<McpVirtualServer>> => {
-  return await request<McpVirtualServer>('POST', '/mcp-virtual-servers', data);
+export const createVirtualMcp = async (data: VirtualMcpCreateInput): Promise<ApiResult<VirtualMcp>> => {
+  return await request<VirtualMcp>('POST', '/virtual-mcps', data);
 };
 
-export const updateMcpVirtualServer = async (
-  id: string,
-  data: McpVirtualServerUpdateInput,
-): Promise<ApiResult<McpVirtualServer>> => {
-  return await request<McpVirtualServer>('PATCH', `/mcp-virtual-servers/${id}`, data);
+export const updateVirtualMcp = async (id: string, data: VirtualMcpUpdateInput): Promise<ApiResult<VirtualMcp>> => {
+  return await request<VirtualMcp>('PATCH', `/virtual-mcps/${id}`, data);
 };
 
-export const deleteMcpVirtualServer = async (id: string): Promise<ApiResult<DeletedResponse>> => {
-  return await request<DeletedResponse>('DELETE', `/mcp-virtual-servers/${id}`);
+export const deleteVirtualMcp = async (id: string): Promise<ApiResult<DeletedResponse>> => {
+  return await request<DeletedResponse>('DELETE', `/virtual-mcps/${id}`);
 };

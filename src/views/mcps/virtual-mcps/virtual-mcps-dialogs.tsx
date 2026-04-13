@@ -22,10 +22,11 @@ import { cn } from '@/utils/utils';
 import { useVirtualMcps } from './virtual-mcps-context';
 import type {
   McpProvider,
-  McpVirtualServer,
-  McpVirtualServerCreateInput,
-  McpVirtualServerUpdateInput,
+  VirtualMcp,
+  VirtualMcpCreateInput,
+  VirtualMcpUpdateInput,
   McpToolInfo,
+  VirtualMcpConfig,
 } from '@/types/mcp';
 import { listMcpProviders, listMcpProviderTools } from '@/api/mcp-providers';
 
@@ -63,7 +64,7 @@ export function VirtualMcpsDialogs(): React.JSX.Element {
         }}
         mode="create"
         onSubmit={async (data) => {
-          const success = await createServer(data as McpVirtualServerCreateInput);
+          const success = await createServer(data as VirtualMcpCreateInput);
           if (success) {
             toast.success(t('mcpsPage.virtualMcps.createdSuccess', 'Virtual MCP created'));
             closeCreate();
@@ -84,7 +85,7 @@ export function VirtualMcpsDialogs(): React.JSX.Element {
           if (!selectedServer) {
             return;
           }
-          const success = await updateServer(selectedServer.id, data as McpVirtualServerUpdateInput);
+          const success = await updateServer(selectedServer.id, data as VirtualMcpUpdateInput);
           if (success) {
             toast.success(t('mcpsPage.virtualMcps.updatedSuccess', 'Virtual MCP updated'));
             closeEdit();
@@ -139,8 +140,8 @@ function MutateVirtualMcpDialog({
   readonly open: boolean;
   readonly onOpenChange: (open: boolean) => void;
   readonly mode: 'create' | 'edit';
-  readonly initialData?: McpVirtualServer | null;
-  readonly onSubmit: (data: McpVirtualServerCreateInput | McpVirtualServerUpdateInput) => Promise<void>;
+  readonly initialData?: VirtualMcp | null;
+  readonly onSubmit: (data: VirtualMcpCreateInput | VirtualMcpUpdateInput) => Promise<void>;
 }): React.JSX.Element {
   const { t } = useTranslation();
   const [providers, setProviders] = useState<McpProvider[]>([]);
@@ -176,7 +177,7 @@ function MutateVirtualMcpDialog({
           description: initialData.description,
           mcp_provider_id: initialData.mcp_provider_id,
         });
-        setSelectedTools([...initialData.tools]);
+        setSelectedTools([...((initialData.config as VirtualMcpConfig | undefined)?.tools ?? [])]);
       } else {
         form.reset({
           name: '',
@@ -219,15 +220,15 @@ function MutateVirtualMcpDialog({
   }, [tools, searchQuery]);
 
   const handleSubmit = form.handleSubmit(async (values) => {
-    const payload: Partial<McpVirtualServerCreateInput> = {
+    const payload: Partial<VirtualMcpCreateInput> = {
       name: values.name,
       mcp_provider_id: values.mcp_provider_id,
-      tools: selectedTools,
+      config: { tools: selectedTools },
     };
     if (values.description != null && values.description !== '') {
       payload.description = values.description;
     }
-    await onSubmit(payload as McpVirtualServerCreateInput | McpVirtualServerUpdateInput);
+    await onSubmit(payload as VirtualMcpCreateInput | VirtualMcpUpdateInput);
   });
 
   const toggleTool = (toolName: string): void => {

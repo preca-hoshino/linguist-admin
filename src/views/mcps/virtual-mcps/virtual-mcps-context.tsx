@@ -1,16 +1,11 @@
 import type { ColumnFiltersState, PaginationState } from '@tanstack/react-table';
 import type React from 'react';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import type { McpVirtualServer, McpVirtualServerCreateInput, McpVirtualServerUpdateInput } from '@/types/mcp';
-import {
-  listMcpVirtualServers,
-  createMcpVirtualServer,
-  updateMcpVirtualServer,
-  deleteMcpVirtualServer,
-} from '@/api/mcp-virtual-servers';
+import type { VirtualMcp, VirtualMcpCreateInput, VirtualMcpUpdateInput } from '@/types/mcp';
+import { listVirtualMcps, createVirtualMcp, updateVirtualMcp, deleteVirtualMcp } from '@/api/mcp-virtual-servers';
 
 interface VirtualMcpsContextType {
-  servers: McpVirtualServer[];
+  servers: VirtualMcp[];
   isLoading: boolean;
   error: string | null;
   total: number;
@@ -24,14 +19,14 @@ interface VirtualMcpsContextType {
   setGlobalFilter: React.Dispatch<React.SetStateAction<string>>;
 
   fetchServers: () => Promise<void>;
-  createServer: (data: McpVirtualServerCreateInput) => Promise<boolean>;
-  updateServer: (id: string, data: McpVirtualServerUpdateInput) => Promise<boolean>;
+  createServer: (data: VirtualMcpCreateInput) => Promise<boolean>;
+  updateServer: (id: string, data: VirtualMcpUpdateInput) => Promise<boolean>;
   deleteServer: (id: string) => Promise<boolean>;
   dialogState: {
     createOpen: boolean;
     editOpen: boolean;
     deleteOpen: boolean;
-    selectedServer: McpVirtualServer | null;
+    selectedServer: VirtualMcp | null;
   };
   setDialogState: React.Dispatch<React.SetStateAction<VirtualMcpsContextType['dialogState']>>;
 }
@@ -39,7 +34,7 @@ interface VirtualMcpsContextType {
 const VirtualMcpsContext = createContext<VirtualMcpsContextType | undefined>(undefined);
 
 export function VirtualMcpsProvider({ children }: { readonly children: React.ReactNode }): React.JSX.Element {
-  const [servers, setServers] = useState<McpVirtualServer[]>([]);
+  const [servers, setServers] = useState<VirtualMcp[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [total, setTotal] = useState(0);
@@ -70,9 +65,9 @@ export function VirtualMcpsProvider({ children }: { readonly children: React.Rea
 
       const payload = Object.fromEntries(
         Object.entries(rawPayload).filter(([_, v]) => v !== undefined && v !== ''),
-      ) as Parameters<typeof listMcpVirtualServers>[0];
+      ) as Parameters<typeof listVirtualMcps>[0];
 
-      const res = await listMcpVirtualServers(payload);
+      const res = await listVirtualMcps(payload);
       if (res.ok) {
         setServers(res.data.data);
         setTotal(res.data.total);
@@ -102,9 +97,9 @@ export function VirtualMcpsProvider({ children }: { readonly children: React.Rea
   }, [fetchServers]);
 
   const createServer = useCallback(
-    async (data: McpVirtualServerCreateInput) => {
+    async (data: VirtualMcpCreateInput) => {
       try {
-        const res = await createMcpVirtualServer(data);
+        const res = await createVirtualMcp(data);
         if (res.ok) {
           await fetchServers();
           return true;
@@ -120,9 +115,9 @@ export function VirtualMcpsProvider({ children }: { readonly children: React.Rea
   );
 
   const updateServer = useCallback(
-    async (id: string, data: McpVirtualServerUpdateInput) => {
+    async (id: string, data: VirtualMcpUpdateInput) => {
       try {
-        const res = await updateMcpVirtualServer(id, data);
+        const res = await updateVirtualMcp(id, data);
         if (res.ok) {
           await fetchServers();
           return true;
@@ -140,7 +135,7 @@ export function VirtualMcpsProvider({ children }: { readonly children: React.Rea
   const deleteServerFn = useCallback(
     async (id: string) => {
       try {
-        const res = await deleteMcpVirtualServer(id);
+        const res = await deleteVirtualMcp(id);
         if (res.ok) {
           await fetchServers();
           return true;

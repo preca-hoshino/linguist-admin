@@ -1,6 +1,7 @@
+import { Link } from '@tanstack/react-router';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/Badge';
-import type { McpProvider } from '@/types/mcp';
+import type { McpProvider, McpProviderConfig } from '@/types/mcp';
 import { ProvidersRowActions } from './providers-row-actions';
 import { DataTableColumnHeader } from '@/components/data-table';
 import type { TFunction } from 'i18next';
@@ -11,9 +12,13 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
       accessorKey: 'id',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('common.id', 'ID')} />,
       cell: ({ row }): React.JSX.Element => (
-        <code className="text-[11px] font-mono bg-muted px-1.5 py-0.5 rounded text-muted-foreground">
-          {row.getValue('id')}
-        </code>
+        <Link
+          to={`/mcps/providers/$id`}
+          params={{ id: row.original.id }}
+          className="text-[11px] font-mono bg-muted px-1.5 py-0.5 rounded text-primary hover:underline"
+        >
+          {row.original.id}
+        </Link>
       ),
       enableSorting: true,
     },
@@ -24,12 +29,12 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
       enableSorting: true,
     },
     {
-      accessorKey: 'transport_type',
+      accessorKey: 'kind',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.providers.transportType', 'Transport')} />
       ),
       cell: ({ row }): React.JSX.Element => {
-        const type = row.getValue('transport_type');
+        const type = row.getValue('kind');
         return (
           <Badge variant={type === 'stdio' ? 'secondary' : 'outline'}>
             {type === 'streamable_http' ? 'HTTP' : String(type).toUpperCase()}
@@ -43,16 +48,17 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
       header: t('mcpsPage.providers.endpointOrCommand', 'Endpoint / Command'),
       cell: ({ row }): React.JSX.Element => {
         const provider = row.original;
-        if (provider.transport_type === 'stdio') {
+        if (provider.kind === 'stdio') {
+          const configSafe = provider.config as Partial<McpProviderConfig> | undefined;
           return (
-            <div className="max-w-[200px] truncate text-muted-foreground" title={provider.stdio_command}>
-              {provider.stdio_command} {provider.stdio_args.join(' ')}
+            <div className="max-w-[200px] truncate text-muted-foreground" title={configSafe?.stdio_command}>
+              {configSafe?.stdio_command} {(configSafe?.stdio_args ?? []).join(' ')}
             </div>
           );
         }
         return (
-          <div className="max-w-[200px] truncate text-muted-foreground" title={provider.endpoint_url}>
-            {provider.endpoint_url}
+          <div className="max-w-[200px] truncate text-muted-foreground" title={provider.base_url}>
+            {provider.base_url}
           </div>
         );
       },
@@ -62,7 +68,7 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
       id: 'api_keys',
       header: t('mcpsPage.providers.apiKeys', 'API Keys'),
       cell: ({ row }): React.JSX.Element => {
-        const keys = row.original.api_keys;
+        const keys = (row.original.credential as string[] | undefined) ?? [];
         if (keys.length === 0) {
           return <span className="text-muted-foreground">-</span>;
         }

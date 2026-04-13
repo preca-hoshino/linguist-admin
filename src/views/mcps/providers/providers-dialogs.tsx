@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/utils/utils';
 import { useProviders } from './providers-context';
-import type { McpProvider, McpProviderCreateInput, McpProviderUpdateInput } from '@/types/mcp';
+import type { McpProvider, McpProviderCreateInput, McpProviderUpdateInput, McpProviderConfig } from '@/types/mcp';
 
 // -------------------------
 // Zod Schema
@@ -227,14 +227,18 @@ function MutateProviderDialog({
   useEffect(() => {
     if (open) {
       if (isEdit && initialData) {
+        const configSafe = initialData.config as Partial<McpProviderConfig> | undefined;
         form.reset({
           name: initialData.name,
-          transport_type: initialData.transport_type,
-          endpoint_url: initialData.endpoint_url || '',
-          headers: Object.entries(initialData.headers).map(([k, v]) => ({ key: k, value: v })),
-          stdio_command: initialData.stdio_command || '',
-          stdio_args: initialData.stdio_args.map((v: string) => ({ value: v })),
-          api_keys: initialData.api_keys.map((k: string) => ({ value: k })),
+          transport_type: initialData.kind,
+          endpoint_url: (initialData.base_url as string | undefined) ?? '',
+          headers: Object.entries(configSafe?.headers ?? {}).map(([k, v]) => ({
+            key: k,
+            value: v,
+          })),
+          stdio_command: configSafe?.stdio_command ?? '',
+          stdio_args: (configSafe?.stdio_args ?? []).map((v: string) => ({ value: v })),
+          api_keys: ((initialData.credential as string[] | undefined) ?? []).map((k: string) => ({ value: k })),
         });
       } else {
         form.reset({
@@ -263,24 +267,28 @@ function MutateProviderDialog({
 
     const payload: Partial<McpProviderCreateInput> = {
       name: values.name,
-      transport_type: values.transport_type,
-      api_keys: (values.api_keys ?? []).map((k) => k.value).filter((v) => v !== ''),
+      kind: values.transport_type,
+      credential: (values.api_keys ?? []).map((k) => k.value).filter((v) => v !== ''),
     };
 
     if (isStdio) {
+      const configStdio: McpProviderCreateInput['config'] = {};
       if ((values.stdio_command ?? '') !== '') {
-        payload.stdio_command = values.stdio_command as string;
+        configStdio.stdio_command = values.stdio_command as string;
       }
       if (parsedArgs.length > 0) {
-        payload.stdio_args = parsedArgs;
+        configStdio.stdio_args = parsedArgs;
       }
+      payload.config = configStdio;
     } else {
+      const configHttp: McpProviderCreateInput['config'] = {};
       if ((values.endpoint_url ?? '') !== '') {
-        payload.endpoint_url = values.endpoint_url as string;
+        payload.base_url = values.endpoint_url as string;
       }
       if (Object.keys(parsedHeaders).length > 0) {
-        payload.headers = parsedHeaders;
+        configHttp.headers = parsedHeaders;
       }
+      payload.config = configHttp;
     }
 
     await onSubmit(payload as McpProviderCreateInput | McpProviderUpdateInput);

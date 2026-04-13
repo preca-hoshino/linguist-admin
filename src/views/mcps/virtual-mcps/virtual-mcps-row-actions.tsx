@@ -1,4 +1,5 @@
-import { Edit, MoreHorizontal, Trash, Power, PowerOff } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
+import { Edit, Eye, MoreHorizontal, Trash, Power, PowerOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
@@ -7,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
-import type { McpVirtualServer } from '@/types/mcp';
+import type { VirtualMcp } from '@/types/mcp';
 import { useVirtualMcps } from './virtual-mcps-context';
 import { useTranslation } from 'react-i18next';
 
@@ -15,7 +16,7 @@ export function VirtualMcpsRowActions({
   server,
   onToggleActive,
 }: {
-  readonly server: McpVirtualServer;
+  readonly server: VirtualMcp;
   readonly onToggleActive: (id: string, current: boolean) => void;
 }): React.JSX.Element {
   const { setDialogState } = useVirtualMcps();
@@ -30,6 +31,13 @@ export function VirtualMcpsRowActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
+        <DropdownMenuItem asChild>
+          <Link to="/mcps/virtual-mcps/$id" params={{ id: server.id }}>
+            <Eye className="mr-2 h-4 w-4" />
+            {t('common.viewDetails', 'View Details')}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
             onToggleActive(server.id, server.is_active);
