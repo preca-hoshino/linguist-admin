@@ -3,9 +3,11 @@ import { Button } from '@/components/ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/DropdownMenu';
 import type { McpLog } from '@/types/mcp';
 import { useMcpLogs } from './mcp-logs-context';
+import { useTranslation } from 'react-i18next';
 
 export function McpLogsRowActions({ log }: { readonly log: McpLog }): React.JSX.Element {
-  const { setDialogState } = useMcpLogs();
+  const { setOpen, setCurrentRow } = useMcpLogs();
+  const { t } = useTranslation();
 
   return (
     <DropdownMenu>
@@ -18,11 +20,12 @@ export function McpLogsRowActions({ log }: { readonly log: McpLog }): React.JSX.
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem
           onClick={() => {
-            setDialogState({ detailOpen: true, selectedLog: log });
+            setCurrentRow(log);
+            setOpen('detail');
           }}
         >
           <Eye className="mr-2 h-4 w-4" />
-          View Details
+          {t('common.viewDetails', 'View Details')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

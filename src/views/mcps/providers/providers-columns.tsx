@@ -2,25 +2,32 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/Badge';
 import type { McpProvider } from '@/types/mcp';
 import { ProvidersRowActions } from './providers-row-actions';
+import { DataTableColumnHeader } from '@/components/data-table';
 import type { TFunction } from 'i18next';
 
 export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
   return [
     {
       accessorKey: 'id',
-      header: t('common.id', 'ID'),
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('common.id', 'ID')} />,
       cell: ({ row }): React.JSX.Element => (
-        <code className="text-xs bg-muted px-1.5 py-0.5 rounded text-muted-foreground">{row.getValue('id')}</code>
+        <code className="text-[11px] font-mono bg-muted px-1.5 py-0.5 rounded text-muted-foreground">
+          {row.getValue('id')}
+        </code>
       ),
+      enableSorting: true,
     },
     {
       accessorKey: 'name',
-      header: t('mcpsPage.providers.name', 'Name'),
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('mcpsPage.providers.name', 'Name')} />,
       cell: ({ row }): React.JSX.Element => <div className="font-medium">{row.getValue('name')}</div>,
+      enableSorting: true,
     },
     {
       accessorKey: 'transport_type',
-      header: t('mcpsPage.providers.transportType', 'Transport'),
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('mcpsPage.providers.transportType', 'Transport')} />
+      ),
       cell: ({ row }): React.JSX.Element => {
         const type = row.getValue('transport_type');
         return (
@@ -29,6 +36,7 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
           </Badge>
         );
       },
+      enableSorting: true,
     },
     {
       id: 'endpoint_or_command',
@@ -48,6 +56,7 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
           </div>
         );
       },
+      enableSorting: false,
     },
     {
       id: 'api_keys',
@@ -59,6 +68,7 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
         }
         return <Badge variant="outline">{keys.length} Keys</Badge>;
       },
+      enableSorting: false,
     },
     {
       id: 'actions',

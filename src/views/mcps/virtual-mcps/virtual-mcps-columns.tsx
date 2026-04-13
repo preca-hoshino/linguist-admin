@@ -2,6 +2,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/Badge';
 import type { McpVirtualServer } from '@/types/mcp';
 import { VirtualMcpsRowActions } from './virtual-mcps-row-actions';
+import { DataTableColumnHeader } from '@/components/data-table';
 import type { TFunction } from 'i18next';
 
 export function getVirtualMcpsColumns(
@@ -12,38 +13,51 @@ export function getVirtualMcpsColumns(
   return [
     {
       accessorKey: 'id',
-      header: t('common.id', 'ID'),
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('common.id', 'ID')} />,
       cell: ({ row }): React.JSX.Element => (
-        <code className="text-xs bg-muted px-1.5 py-0.5 rounded text-muted-foreground">{row.getValue('id')}</code>
+        <code className="text-[11px] font-mono bg-muted px-1.5 py-0.5 rounded text-muted-foreground">
+          {row.getValue('id')}
+        </code>
       ),
+      enableSorting: true,
     },
     {
       accessorKey: 'name',
-      header: t('mcpsPage.virtualMcps.name', 'Name'),
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('mcpsPage.virtualMcps.name', 'Name')} />,
       cell: ({ row }): React.JSX.Element => <div className="font-medium">{row.getValue('name')}</div>,
+      enableSorting: true,
     },
     {
       accessorKey: 'description',
-      header: t('mcpsPage.virtualMcps.description', 'Description'),
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('mcpsPage.virtualMcps.description', 'Description')} />
+      ),
       cell: ({ row }): React.JSX.Element => (
         <div className="max-w-[200px] truncate text-muted-foreground">{row.getValue('description')}</div>
       ),
+      enableSorting: true,
     },
     {
       accessorKey: 'mcp_provider_id',
-      header: t('mcpsPage.virtualMcps.backendProvider', 'Provider'),
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('mcpsPage.virtualMcps.backendProvider', 'Provider')} />
+      ),
       cell: ({ row }): React.JSX.Element => {
         const id = String(row.getValue('mcp_provider_id'));
         return (
-          <code className="text-xs bg-muted px-1.5 py-0.5 rounded" title={id}>
+          <Badge variant="secondary" className="font-mono text-xs" title={id}>
             {providerMap[id] ?? id}
-          </code>
+          </Badge>
         );
       },
+      enableSorting: false,
     },
     {
       id: 'tools',
-      header: t('mcpsPage.virtualMcps.tools', 'Tools Count'),
+      accessorFn: (row) => row.tools.length,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('mcpsPage.virtualMcps.tools', 'Tools Count')} />
+      ),
       cell: ({ row }): React.JSX.Element => {
         const list = row.original.tools;
         if (list.length === 0) {
@@ -55,10 +69,11 @@ export function getVirtualMcpsColumns(
           </Badge>
         );
       },
+      enableSorting: true,
     },
     {
       accessorKey: 'is_active',
-      header: t('common.status', 'Status'),
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('common.status', 'Status')} />,
       cell: ({ row }): React.JSX.Element => {
         const isActive = row.original.is_active;
         if (isActive) {
@@ -74,6 +89,7 @@ export function getVirtualMcpsColumns(
           </Badge>
         );
       },
+      enableSorting: true,
     },
     {
       id: 'actions',
