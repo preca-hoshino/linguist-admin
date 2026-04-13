@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/Badge';
-import type { McpProvider } from '@/types/mcp';
+import type { McpProvider, McpProviderConfig } from '@/types/mcp';
 import { ProvidersRowActions } from './providers-row-actions';
 import { DataTableColumnHeader } from '@/components/data-table';
 import type { TFunction } from 'i18next';
@@ -44,9 +44,10 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
       cell: ({ row }): React.JSX.Element => {
         const provider = row.original;
         if (provider.kind === 'stdio') {
+          const configSafe = provider.config as Partial<McpProviderConfig> | undefined;
           return (
-            <div className="max-w-[200px] truncate text-muted-foreground" title={provider.config.stdio_command}>
-              {provider.config.stdio_command} {(provider.config.stdio_args ?? []).join(' ')}
+            <div className="max-w-[200px] truncate text-muted-foreground" title={configSafe?.stdio_command}>
+              {configSafe?.stdio_command} {(configSafe?.stdio_args ?? []).join(' ')}
             </div>
           );
         }
@@ -62,7 +63,7 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
       id: 'api_keys',
       header: t('mcpsPage.providers.apiKeys', 'API Keys'),
       cell: ({ row }): React.JSX.Element => {
-        const keys = row.original.credential;
+        const keys = (row.original.credential as string[] | undefined) ?? [];
         if (keys.length === 0) {
           return <span className="text-muted-foreground">-</span>;
         }

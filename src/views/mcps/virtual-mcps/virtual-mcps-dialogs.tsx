@@ -20,7 +20,14 @@ import { Checkbox } from '@/components/ui/Checkbox';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/utils/utils';
 import { useVirtualMcps } from './virtual-mcps-context';
-import type { McpProvider, VirtualMcp, VirtualMcpCreateInput, VirtualMcpUpdateInput, McpToolInfo } from '@/types/mcp';
+import type {
+  McpProvider,
+  VirtualMcp,
+  VirtualMcpCreateInput,
+  VirtualMcpUpdateInput,
+  McpToolInfo,
+  VirtualMcpConfig,
+} from '@/types/mcp';
 import { listMcpProviders, listMcpProviderTools } from '@/api/mcp-providers';
 
 const virtualMcpSchema = z.object({
@@ -170,7 +177,7 @@ function MutateVirtualMcpDialog({
           description: initialData.description,
           mcp_provider_id: initialData.mcp_provider_id,
         });
-        setSelectedTools([...(initialData.config.tools ?? [])]);
+        setSelectedTools([...((initialData.config as VirtualMcpConfig | undefined)?.tools ?? [])]);
       } else {
         form.reset({
           name: '',

@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/utils/utils';
 import { useProviders } from './providers-context';
-import type { McpProvider, McpProviderCreateInput, McpProviderUpdateInput } from '@/types/mcp';
+import type { McpProvider, McpProviderCreateInput, McpProviderUpdateInput, McpProviderConfig } from '@/types/mcp';
 
 // -------------------------
 // Zod Schema
@@ -227,14 +227,18 @@ function MutateProviderDialog({
   useEffect(() => {
     if (open) {
       if (isEdit && initialData) {
+        const configSafe = initialData.config as Partial<McpProviderConfig> | undefined;
         form.reset({
           name: initialData.name,
           transport_type: initialData.kind,
-          endpoint_url: initialData.base_url,
-          headers: Object.entries(initialData.config.headers ?? {}).map(([k, v]) => ({ key: k, value: v })),
-          stdio_command: initialData.config.stdio_command ?? '',
-          stdio_args: (initialData.config.stdio_args ?? []).map((v: string) => ({ value: v })),
-          api_keys: initialData.credential.map((k: string) => ({ value: k })),
+          endpoint_url: (initialData.base_url as string | undefined) ?? '',
+          headers: Object.entries(configSafe?.headers ?? {}).map(([k, v]) => ({
+            key: k,
+            value: v,
+          })),
+          stdio_command: configSafe?.stdio_command ?? '',
+          stdio_args: (configSafe?.stdio_args ?? []).map((v: string) => ({ value: v })),
+          api_keys: ((initialData.credential as string[] | undefined) ?? []).map((k: string) => ({ value: k })),
         });
       } else {
         form.reset({

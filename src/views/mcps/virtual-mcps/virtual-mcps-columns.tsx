@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/Badge';
-import type { VirtualMcp } from '@/types/mcp';
+import type { VirtualMcp, VirtualMcpConfig } from '@/types/mcp';
 import { VirtualMcpsRowActions } from './virtual-mcps-row-actions';
 import { DataTableColumnHeader } from '@/components/data-table';
 import type { TFunction } from 'i18next';
@@ -54,12 +54,12 @@ export function getVirtualMcpsColumns(
     },
     {
       id: 'tools',
-      accessorFn: (row) => row.config.tools?.length ?? 0,
+      accessorFn: (row) => (row.config as VirtualMcpConfig | undefined)?.tools?.length ?? 0,
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.virtualMcps.tools', 'Tools Count')} />
       ),
       cell: ({ row }): React.JSX.Element => {
-        const list = row.original.config.tools ?? [];
+        const list = (row.original.config as VirtualMcpConfig | undefined)?.tools ?? [];
         if (list.length === 0) {
           return <span className="text-muted-foreground">-</span>;
         }
