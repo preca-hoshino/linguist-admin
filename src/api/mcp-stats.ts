@@ -31,6 +31,8 @@ export interface McpStatsTimeSeriesPoint {
   requests: number;
   errors: number;
   avg_duration_ms: number | null;
+  p95_duration_ms: number | null;
+  p99_duration_ms: number | null;
 }
 
 export interface McpTimeSeriesResult {
