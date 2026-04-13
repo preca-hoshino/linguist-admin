@@ -1,5 +1,5 @@
 import { Link, useLoaderData } from '@tanstack/react-router';
-import { ChevronLeft, Cloud, BarChart2, Server, Wrench } from 'lucide-react';
+import { BarChart2, ChevronLeft, Cloud, Server, Wrench } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CopyableId } from '@/components/CopyableId';
@@ -8,11 +8,12 @@ import { Button } from '@/components/ui/Button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { usePageTitle } from '@/composables/use-page-title';
 import { Main } from '@/layouts/Main';
-
+import type { GlobalTimeRange } from '@/types/dashboard';
 import { cn } from '@/utils/utils';
+import { TimeRangePicker } from '@/views/dashboard/components/TimeRangePicker';
+import { McpPerformanceTab } from '../shared/McpPerformanceTab';
 import { McpProviderOverviewTab } from './detail-tabs/McpProviderOverviewTab';
 import { McpProviderToolsTab } from './detail-tabs/McpProviderToolsTab';
-import { McpPerformanceTab } from '../shared/McpPerformanceTab';
 
 const PROVIDER_TABS = ['overview', 'performance', 'tools'] as const;
 type ProviderTab = (typeof PROVIDER_TABS)[number];
@@ -25,6 +26,7 @@ export function McpProviderDetailPage(): React.JSX.Element {
   usePageTitle(`MCP Providers - ${provider.name}`);
 
   const [activeTab, setActiveTab] = useState<ProviderTab>('overview');
+  const [timeRange, setTimeRange] = useState<GlobalTimeRange>('today');
 
   return (
     <Main className="flex flex-1 flex-col gap-6">
@@ -63,6 +65,11 @@ export function McpProviderDetailPage(): React.JSX.Element {
               </Badge>
             </div>
           </div>
+        </div>
+
+        {/* 右侧操作区 */}
+        <div className="flex shrink-0 items-center gap-2">
+          <TimeRangePicker value={timeRange} onChange={setTimeRange} />
         </div>
       </div>
 
@@ -105,7 +112,7 @@ export function McpProviderDetailPage(): React.JSX.Element {
         </TabsContent>
 
         <TabsContent value="performance" className="space-y-6 outline-none">
-          <McpPerformanceTab dimension="mcp_provider" id={provider.id} />
+          <McpPerformanceTab dimension="mcp_provider" id={provider.id} timeRange={timeRange} />
         </TabsContent>
 
         <TabsContent value="tools" className="space-y-6 outline-none">
