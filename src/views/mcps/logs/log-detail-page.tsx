@@ -1,5 +1,5 @@
 import { Link, useLoaderData } from '@tanstack/react-router';
-import { ArrowRight, ChevronLeft, Clock, Cloud, Code2, Database, FileText, RouterIcon, User } from 'lucide-react';
+import { ArrowRight, ChevronLeft, Clock, Cloud, Code2, Database, FileText, RouterIcon, User, Info } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CopyableId } from '@/components/CopyableId';
@@ -10,11 +10,12 @@ import { usePageTitle } from '@/composables/use-page-title';
 import { Main } from '@/layouts/Main';
 import type { McpLog } from '@/types/mcp';
 import { cn } from '@/utils/utils';
-import { McpLogParamsTab } from './detail-tabs/McpLogParamsTab';
-import { McpLogResultTab } from './detail-tabs/McpLogResultTab';
-import { McpLogErrorTab } from './detail-tabs/McpLogErrorTab';
+import { McpLogContentTab } from './detail-tabs/McpLogContentTab';
+import { McpLogRawDataTab } from './detail-tabs/McpLogRawDataTab';
+import { McpLogMetadataTab } from './detail-tabs/McpLogMetadataTab';
 
-type LogTab = 'params' | 'result' | 'error';
+const LOG_TABS = ['content', 'payload', 'metadata'] as const;
+type LogTab = (typeof LOG_TABS)[number];
 
 function relativeTime(dateStr: string): string {
   const now = Date.now();
@@ -45,7 +46,9 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
       <div className="flex flex-col items-center text-center">
         <span className="text-sm font-semibold text-foreground">{title}</span>
         {desc1 != null && desc1 !== '' && (
-          <span className="text-[11px] font-mono text-muted-foreground mt-0.5 truncate max-w-[100px]">{desc1}</span>
+          <span className="text-[11px] font-mono text-muted-foreground mt-0.5 truncate max-w-[100px]" title={desc1}>
+            {desc1}
+          </span>
         )}
       </div>
     </div>
@@ -101,7 +104,7 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
               <h1 className="text-2xl font-bold tracking-tight font-mono">{log.id.slice(0, 8)}</h1>
               <CopyableId id={log.id} />
             </div>
-            <div className="mt-1.5 flex items-center gap-2">
+            <div className="mt-1.5 flex flex-wrap items-center gap-2">
               <Badge
                 variant="outline"
                 className={cn(
@@ -121,7 +124,10 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
               >
                 {log.method}
               </Badge>
-              <Badge variant="outline" className="text-[11px] font-mono">
+              <Badge
+                variant="outline"
+                className={cn('text-[11px] font-mono', log.duration_ms > 2000 && 'border-amber-400 text-amber-600')}
+              >
                 {log.duration_ms}ms
               </Badge>
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground ml-1">
@@ -153,13 +159,14 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
 }
 
 export function McpLogDetailPage(): React.JSX.Element {
+  const { t } = useTranslation();
   const { log } = useLoaderData({
     from: '/_authenticated/mcps/logs/$id',
   });
 
   usePageTitle(`MCP Logs - ${log.id.slice(0, 8)}`);
 
-  const [activeTab, setActiveTab] = useState<LogTab>('params');
+  const [activeTab, setActiveTab] = useState<LogTab>('content');
 
   return (
     <Main className="flex flex-1 flex-col gap-6">
@@ -172,48 +179,45 @@ export function McpLogDetailPage(): React.JSX.Element {
         }}
         className="space-y-6"
       >
-        <div className="overflow-x-auto -mb-1 pb-1 scrollbar-hide">
-          <TabsList className="h-9 w-auto justify-start bg-transparent p-0 border-b rounded-none">
+        <div className="scrollbar-hide -mb-1 flex items-center justify-between overflow-x-auto pb-1">
+          <TabsList className="h-9 w-auto justify-start rounded-none border-b bg-transparent p-0">
             <TabsTrigger
-              value="params"
-              className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+              value="content"
+              className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pt-2 pb-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
             >
-              <Code2 className="mr-1.5 h-3.5 w-3.5" />
-              Parameters
+              <FileText className="mr-2 h-4 w-4" />
+              {t('modelsPage.logs.detail.content', 'Content')}
             </TabsTrigger>
 
             <TabsTrigger
-              value="result"
-              className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+              value="payload"
+              className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pt-2 pb-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
             >
-              <FileText className="mr-1.5 h-3.5 w-3.5" />
-              Result
+              <Code2 className="mr-2 h-4 w-4" />
+              {t('modelsPage.logs.detail.rawData', 'Payload')}
             </TabsTrigger>
 
-            {log.error && (
-              <TabsTrigger
-                value="error"
-                className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-medium text-destructive shadow-none transition-none data-[state=active]:border-b-destructive data-[state=active]:text-destructive data-[state=active]:shadow-none"
-              >
-                Error
-              </TabsTrigger>
-            )}
+            <TabsTrigger
+              value="metadata"
+              className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pt-2 pb-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+            >
+              <Info className="mr-2 h-4 w-4" />
+              {t('modelsPage.logs.detail.metadata', 'Metadata')}
+            </TabsTrigger>
           </TabsList>
         </div>
 
-        <TabsContent value="params" className="outline-none">
-          <McpLogParamsTab log={log} />
+        <TabsContent value="content" className="outline-none">
+          <McpLogContentTab log={log} />
         </TabsContent>
 
-        <TabsContent value="result" className="outline-none">
-          <McpLogResultTab log={log} />
+        <TabsContent value="payload" className="outline-none">
+          <McpLogRawDataTab log={log} />
         </TabsContent>
 
-        {log.error && (
-          <TabsContent value="error" className="outline-none">
-            <McpLogErrorTab log={log} />
-          </TabsContent>
-        )}
+        <TabsContent value="metadata" className="outline-none">
+          <McpLogMetadataTab log={log} />
+        </TabsContent>
       </Tabs>
     </Main>
   );
