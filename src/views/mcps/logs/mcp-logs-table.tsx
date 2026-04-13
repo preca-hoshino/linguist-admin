@@ -9,7 +9,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { listMcpProviders } from '@/api/mcp-providers';
-import { listMcpVirtualServers } from '@/api/mcp-virtual-servers';
+import { listVirtualMcps } from '@/api/mcp-virtual-servers';
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
 import { DataTableBulkActions } from '@/components/data-table/BulkActions';
 import { Button } from '@/components/ui/Button';
@@ -49,7 +49,7 @@ export function McpLogsTable(): React.JSX.Element {
         // ignore errors
       });
 
-    listMcpVirtualServers({ limit: 100 })
+    listVirtualMcps({ limit: 100 })
       .then((res) => {
         if (res.ok) {
           setVirtualMcpOptions(res.data.data.map((v) => ({ label: v.name || v.id, value: v.id })));

@@ -24,12 +24,12 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
       enableSorting: true,
     },
     {
-      accessorKey: 'transport_type',
+      accessorKey: 'kind',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.providers.transportType', 'Transport')} />
       ),
       cell: ({ row }): React.JSX.Element => {
-        const type = row.getValue('transport_type');
+        const type = row.getValue('kind');
         return (
           <Badge variant={type === 'stdio' ? 'secondary' : 'outline'}>
             {type === 'streamable_http' ? 'HTTP' : String(type).toUpperCase()}
@@ -43,16 +43,16 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
       header: t('mcpsPage.providers.endpointOrCommand', 'Endpoint / Command'),
       cell: ({ row }): React.JSX.Element => {
         const provider = row.original;
-        if (provider.transport_type === 'stdio') {
+        if (provider.kind === 'stdio') {
           return (
-            <div className="max-w-[200px] truncate text-muted-foreground" title={provider.stdio_command}>
-              {provider.stdio_command} {provider.stdio_args.join(' ')}
+            <div className="max-w-[200px] truncate text-muted-foreground" title={provider.config.stdio_command}>
+              {provider.config.stdio_command} {(provider.config.stdio_args ?? []).join(' ')}
             </div>
           );
         }
         return (
-          <div className="max-w-[200px] truncate text-muted-foreground" title={provider.endpoint_url}>
-            {provider.endpoint_url}
+          <div className="max-w-[200px] truncate text-muted-foreground" title={provider.base_url}>
+            {provider.base_url}
           </div>
         );
       },
@@ -62,7 +62,7 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
       id: 'api_keys',
       header: t('mcpsPage.providers.apiKeys', 'API Keys'),
       cell: ({ row }): React.JSX.Element => {
-        const keys = row.original.api_keys;
+        const keys = row.original.credential;
         if (keys.length === 0) {
           return <span className="text-muted-foreground">-</span>;
         }

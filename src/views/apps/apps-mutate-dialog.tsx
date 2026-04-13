@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { createApp, updateApp } from '@/api/apps';
 import { listVirtualModels } from '@/api/virtual-models';
-import { listMcpVirtualServers } from '@/api/mcp-virtual-servers';
+import { listVirtualMcps } from '@/api/mcp-virtual-servers';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
@@ -158,7 +158,7 @@ export function AppsMutateDialog({
   const { data: virtualMcps = [] } = useQuery({
     queryKey: ['virtual-mcps-list'],
     queryFn: async () => {
-      const res = await listMcpVirtualServers();
+      const res = await listVirtualMcps();
       if (!res.ok) {
         throw new Error('Failed to load virtual MCPs');
       }

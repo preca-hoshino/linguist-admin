@@ -229,12 +229,12 @@ function MutateProviderDialog({
       if (isEdit && initialData) {
         form.reset({
           name: initialData.name,
-          transport_type: initialData.transport_type,
-          endpoint_url: initialData.endpoint_url || '',
-          headers: Object.entries(initialData.headers).map(([k, v]) => ({ key: k, value: v })),
-          stdio_command: initialData.stdio_command || '',
-          stdio_args: initialData.stdio_args.map((v: string) => ({ value: v })),
-          api_keys: initialData.api_keys.map((k: string) => ({ value: k })),
+          transport_type: initialData.kind,
+          endpoint_url: initialData.base_url,
+          headers: Object.entries(initialData.config.headers ?? {}).map(([k, v]) => ({ key: k, value: v })),
+          stdio_command: initialData.config.stdio_command ?? '',
+          stdio_args: (initialData.config.stdio_args ?? []).map((v: string) => ({ value: v })),
+          api_keys: initialData.credential.map((k: string) => ({ value: k })),
         });
       } else {
         form.reset({
@@ -263,24 +263,28 @@ function MutateProviderDialog({
 
     const payload: Partial<McpProviderCreateInput> = {
       name: values.name,
-      transport_type: values.transport_type,
-      api_keys: (values.api_keys ?? []).map((k) => k.value).filter((v) => v !== ''),
+      kind: values.transport_type,
+      credential: (values.api_keys ?? []).map((k) => k.value).filter((v) => v !== ''),
     };
 
     if (isStdio) {
+      const configStdio: McpProviderCreateInput['config'] = {};
       if ((values.stdio_command ?? '') !== '') {
-        payload.stdio_command = values.stdio_command as string;
+        configStdio.stdio_command = values.stdio_command as string;
       }
       if (parsedArgs.length > 0) {
-        payload.stdio_args = parsedArgs;
+        configStdio.stdio_args = parsedArgs;
       }
+      payload.config = configStdio;
     } else {
+      const configHttp: McpProviderCreateInput['config'] = {};
       if ((values.endpoint_url ?? '') !== '') {
-        payload.endpoint_url = values.endpoint_url as string;
+        payload.base_url = values.endpoint_url as string;
       }
       if (Object.keys(parsedHeaders).length > 0) {
-        payload.headers = parsedHeaders;
+        configHttp.headers = parsedHeaders;
       }
+      payload.config = configHttp;
     }
 
     await onSubmit(payload as McpProviderCreateInput | McpProviderUpdateInput);

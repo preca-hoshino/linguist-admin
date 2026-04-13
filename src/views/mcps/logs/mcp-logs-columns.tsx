@@ -72,13 +72,13 @@ export function getMcpLogsColumns(t: TFunction): ColumnDef<McpLog>[] {
       enableColumnFilter: true,
     },
     {
-      accessorKey: 'provider_mcp_id',
+      accessorKey: 'mcp_provider_id',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.logs.providerMcp', 'Provider MCP')} />
       ),
       meta: { className: 'ps-1 w-24', tdClassName: 'ps-4' },
       cell: ({ row }): React.JSX.Element => {
-        const val = row.original.provider_mcp_id;
+        const val = row.original.mcp_provider_id;
         return (
           <div className="w-[80px] truncate font-mono text-xs text-muted-foreground" title={val ?? ''}>
             {val != null && val !== '' ? val.slice(0, 8) : '-'}

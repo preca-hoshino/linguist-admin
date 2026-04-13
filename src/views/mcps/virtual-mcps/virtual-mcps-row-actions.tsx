@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
-import type { McpVirtualServer } from '@/types/mcp';
+import type { VirtualMcp } from '@/types/mcp';
 import { useVirtualMcps } from './virtual-mcps-context';
 import { useTranslation } from 'react-i18next';
 
@@ -15,7 +15,7 @@ export function VirtualMcpsRowActions({
   server,
   onToggleActive,
 }: {
-  readonly server: McpVirtualServer;
+  readonly server: VirtualMcp;
   readonly onToggleActive: (id: string, current: boolean) => void;
 }): React.JSX.Element {
   const { setDialogState } = useVirtualMcps();

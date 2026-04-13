@@ -7,7 +7,7 @@ export const listMcpLogs = async (params?: {
   offset?: number;
   search?: string;
   virtual_mcp_id?: string;
-  provider_mcp_id?: string;
+  mcp_provider_id?: string;
   method?: string;
   direction?: 'inbound' | 'outbound';
 }): Promise<ApiResult<ListResponse<McpLog>>> => {
@@ -24,8 +24,8 @@ export const listMcpLogs = async (params?: {
   if (params?.virtual_mcp_id != null && params.virtual_mcp_id !== '') {
     qs.set('virtual_mcp_id', params.virtual_mcp_id);
   }
-  if (params?.provider_mcp_id != null && params.provider_mcp_id !== '') {
-    qs.set('provider_mcp_id', params.provider_mcp_id);
+  if (params?.mcp_provider_id != null && params.mcp_provider_id !== '') {
+    qs.set('mcp_provider_id', params.mcp_provider_id);
   }
   if (params?.method != null && params.method !== '') {
     qs.set('method', params.method);
