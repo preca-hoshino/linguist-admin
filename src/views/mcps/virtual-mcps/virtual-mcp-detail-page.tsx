@@ -1,5 +1,5 @@
 import { Link, useLoaderData } from '@tanstack/react-router';
-import { ChevronLeft, Database, Settings } from 'lucide-react';
+import { BarChart2, ChevronLeft, Database, Settings, Wrench } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CopyableId } from '@/components/CopyableId';
@@ -12,9 +12,9 @@ import { cn } from '@/utils/utils';
 import { VirtualMcpOverviewTab } from './detail-tabs/VirtualMcpOverviewTab';
 import { VirtualMcpSettingsTab } from './detail-tabs/VirtualMcpSettingsTab';
 import { VirtualMcpToolsTab } from './detail-tabs/VirtualMcpToolsTab';
-import { Wrench } from 'lucide-react';
+import { McpPerformanceTab } from '../shared/McpPerformanceTab';
 
-const VMCP_TABS = ['overview', 'tools', 'settings'] as const;
+const VMCP_TABS = ['overview', 'performance', 'tools', 'settings'] as const;
 type VmcpTab = (typeof VMCP_TABS)[number];
 
 export function VirtualMcpDetailPage(): React.JSX.Element {
@@ -89,6 +89,13 @@ export function VirtualMcpDetailPage(): React.JSX.Element {
               Tools
             </TabsTrigger>
             <TabsTrigger
+              value="performance"
+              className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pt-2 pb-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+            >
+              <BarChart2 className="mr-2 h-4 w-4" />
+              Performance
+            </TabsTrigger>
+            <TabsTrigger
               value="settings"
               className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pt-2 pb-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
             >
@@ -104,6 +111,10 @@ export function VirtualMcpDetailPage(): React.JSX.Element {
 
         <TabsContent value="tools" className="space-y-6 outline-none">
           <VirtualMcpToolsTab virtualMcp={virtualMcp} />
+        </TabsContent>
+
+        <TabsContent value="performance" className="space-y-6 outline-none">
+          <McpPerformanceTab dimension="virtual_mcp" id={virtualMcp.id} />
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-6 outline-none">
