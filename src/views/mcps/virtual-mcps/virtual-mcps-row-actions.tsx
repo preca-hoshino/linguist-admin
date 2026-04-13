@@ -1,4 +1,5 @@
-import { Edit, MoreHorizontal, Trash, Power, PowerOff } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
+import { Edit, Eye, MoreHorizontal, Trash, Power, PowerOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
@@ -30,6 +31,13 @@ export function VirtualMcpsRowActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
+        <DropdownMenuItem asChild>
+          <Link to="/mcps/virtual-mcps/$id" params={{ id: server.id }}>
+            <Eye className="mr-2 h-4 w-4" />
+            {t('common.viewDetails', 'View Details')}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
             onToggleActive(server.id, server.is_active);
