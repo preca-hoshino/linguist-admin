@@ -1,5 +1,5 @@
 import { Link, useLoaderData } from '@tanstack/react-router';
-import { ChevronLeft, Cloud, Server, Wrench } from 'lucide-react';
+import { ChevronLeft, Cloud, BarChart2, Server, Wrench } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CopyableId } from '@/components/CopyableId';
@@ -12,8 +12,9 @@ import { Main } from '@/layouts/Main';
 import { cn } from '@/utils/utils';
 import { McpProviderOverviewTab } from './detail-tabs/McpProviderOverviewTab';
 import { McpProviderToolsTab } from './detail-tabs/McpProviderToolsTab';
+import { McpPerformanceTab } from '../shared/McpPerformanceTab';
 
-const PROVIDER_TABS = ['overview', 'tools'] as const;
+const PROVIDER_TABS = ['overview', 'performance', 'tools'] as const;
 type ProviderTab = (typeof PROVIDER_TABS)[number];
 
 export function McpProviderDetailPage(): React.JSX.Element {
@@ -83,6 +84,13 @@ export function McpProviderDetailPage(): React.JSX.Element {
               Overview
             </TabsTrigger>
             <TabsTrigger
+              value="performance"
+              className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pt-2 pb-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+            >
+              <BarChart2 className="mr-2 h-4 w-4" />
+              Performance
+            </TabsTrigger>
+            <TabsTrigger
               value="tools"
               className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pt-2 pb-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
             >
@@ -94,6 +102,10 @@ export function McpProviderDetailPage(): React.JSX.Element {
 
         <TabsContent value="overview" className="space-y-6 outline-none">
           <McpProviderOverviewTab provider={provider} />
+        </TabsContent>
+
+        <TabsContent value="performance" className="space-y-6 outline-none">
+          <McpPerformanceTab dimension="mcp_provider" id={provider.id} />
         </TabsContent>
 
         <TabsContent value="tools" className="space-y-6 outline-none">
