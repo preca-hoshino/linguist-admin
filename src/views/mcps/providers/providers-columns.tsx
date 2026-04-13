@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/Badge';
 import type { McpProvider, McpProviderConfig } from '@/types/mcp';
@@ -11,9 +12,13 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
       accessorKey: 'id',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('common.id', 'ID')} />,
       cell: ({ row }): React.JSX.Element => (
-        <code className="text-[11px] font-mono bg-muted px-1.5 py-0.5 rounded text-muted-foreground">
-          {row.getValue('id')}
-        </code>
+        <Link
+          to={`/mcps/providers/$id`}
+          params={{ id: row.original.id }}
+          className="text-[11px] font-mono bg-muted px-1.5 py-0.5 rounded text-primary hover:underline"
+        >
+          {row.original.id}
+        </Link>
       ),
       enableSorting: true,
     },

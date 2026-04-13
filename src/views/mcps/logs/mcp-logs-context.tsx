@@ -54,7 +54,7 @@ export function McpLogsProvider({ children }: { readonly children: React.ReactNo
   // 提取 API 参数
   const methodFilter = extractFilterValue(columnFilters, 'method');
   const directionFilter = extractFilterValue(columnFilters, 'direction');
-  const providerIdFilter = extractFilterValue(columnFilters, 'provider_mcp_id');
+  const providerIdFilter = extractFilterValue(columnFilters, 'mcp_provider_id');
   const virtualIdFilter = extractFilterValue(columnFilters, 'virtual_mcp_id');
 
   const load = useCallback(async () => {
@@ -68,7 +68,7 @@ export function McpLogsProvider({ children }: { readonly children: React.ReactNo
         search: globalFilter === '' ? undefined : globalFilter,
         method: methodFilter,
         direction: directionFilter === undefined ? undefined : (directionFilter as 'inbound' | 'outbound'),
-        provider_mcp_id: providerIdFilter,
+        mcp_provider_id: providerIdFilter,
         virtual_mcp_id: virtualIdFilter,
       };
 

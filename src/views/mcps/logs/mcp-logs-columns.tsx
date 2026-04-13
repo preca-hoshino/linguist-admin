@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/Badge';
 import { Checkbox } from '@/components/ui/Checkbox';
@@ -47,9 +48,14 @@ export function getMcpLogsColumns(t: TFunction): ColumnDef<McpLog>[] {
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.id', 'ID')} />,
       meta: { className: 'ps-1', tdClassName: 'ps-4' },
       cell: ({ row }) => (
-        <div className="w-[70px] truncate font-mono text-xs text-muted-foreground" title={row.original.id}>
+        <Link
+          to={`/mcps/logs/$id`}
+          params={{ id: row.original.id }}
+          className="w-[70px] truncate font-mono text-xs text-primary hover:underline"
+          title={row.original.id}
+        >
           {row.original.id.slice(0, 8)}
-        </div>
+        </Link>
       ),
       enableSorting: true,
       enableColumnFilter: false,

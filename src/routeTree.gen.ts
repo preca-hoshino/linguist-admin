@@ -38,6 +38,9 @@ import { Route as AuthenticatedModelsVirtualModelsIdRouteImport } from './router
 import { Route as AuthenticatedModelsProvidersIdRouteImport } from './router/_authenticated/models/providers/$id'
 import { Route as AuthenticatedModelsProviderModelsIdRouteImport } from './router/_authenticated/models/provider-models/$id'
 import { Route as AuthenticatedModelsLogsIdRouteImport } from './router/_authenticated/models/logs/$id'
+import { Route as AuthenticatedMcpsVirtualMcpsIdRouteImport } from './router/_authenticated/mcps/virtual-mcps/$id'
+import { Route as AuthenticatedMcpsProvidersIdRouteImport } from './router/_authenticated/mcps/providers/$id'
+import { Route as AuthenticatedMcpsLogsIdRouteImport } from './router/_authenticated/mcps/logs/$id'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -202,6 +205,23 @@ const AuthenticatedModelsLogsIdRoute =
     path: '/logs/$id',
     getParentRoute: () => AuthenticatedModelsRoute,
   } as any)
+const AuthenticatedMcpsVirtualMcpsIdRoute =
+  AuthenticatedMcpsVirtualMcpsIdRouteImport.update({
+    id: '/virtual-mcps/$id',
+    path: '/virtual-mcps/$id',
+    getParentRoute: () => AuthenticatedMcpsRoute,
+  } as any)
+const AuthenticatedMcpsProvidersIdRoute =
+  AuthenticatedMcpsProvidersIdRouteImport.update({
+    id: '/providers/$id',
+    path: '/providers/$id',
+    getParentRoute: () => AuthenticatedMcpsRoute,
+  } as any)
+const AuthenticatedMcpsLogsIdRoute = AuthenticatedMcpsLogsIdRouteImport.update({
+  id: '/logs/$id',
+  path: '/logs/$id',
+  getParentRoute: () => AuthenticatedMcpsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -221,6 +241,9 @@ export interface FileRoutesByFullPath {
   '/models/': typeof AuthenticatedModelsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/users/': typeof AuthenticatedUsersIndexRoute
+  '/mcps/logs/$id': typeof AuthenticatedMcpsLogsIdRoute
+  '/mcps/providers/$id': typeof AuthenticatedMcpsProvidersIdRoute
+  '/mcps/virtual-mcps/$id': typeof AuthenticatedMcpsVirtualMcpsIdRoute
   '/models/logs/$id': typeof AuthenticatedModelsLogsIdRoute
   '/models/provider-models/$id': typeof AuthenticatedModelsProviderModelsIdRoute
   '/models/providers/$id': typeof AuthenticatedModelsProvidersIdRoute
@@ -248,6 +271,9 @@ export interface FileRoutesByTo {
   '/models': typeof AuthenticatedModelsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/mcps/logs/$id': typeof AuthenticatedMcpsLogsIdRoute
+  '/mcps/providers/$id': typeof AuthenticatedMcpsProvidersIdRoute
+  '/mcps/virtual-mcps/$id': typeof AuthenticatedMcpsVirtualMcpsIdRoute
   '/models/logs/$id': typeof AuthenticatedModelsLogsIdRoute
   '/models/provider-models/$id': typeof AuthenticatedModelsProviderModelsIdRoute
   '/models/providers/$id': typeof AuthenticatedModelsProvidersIdRoute
@@ -280,6 +306,9 @@ export interface FileRoutesById {
   '/_authenticated/models/': typeof AuthenticatedModelsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/_authenticated/mcps/logs/$id': typeof AuthenticatedMcpsLogsIdRoute
+  '/_authenticated/mcps/providers/$id': typeof AuthenticatedMcpsProvidersIdRoute
+  '/_authenticated/mcps/virtual-mcps/$id': typeof AuthenticatedMcpsVirtualMcpsIdRoute
   '/_authenticated/models/logs/$id': typeof AuthenticatedModelsLogsIdRoute
   '/_authenticated/models/provider-models/$id': typeof AuthenticatedModelsProviderModelsIdRoute
   '/_authenticated/models/providers/$id': typeof AuthenticatedModelsProvidersIdRoute
@@ -312,6 +341,9 @@ export interface FileRouteTypes {
     | '/models/'
     | '/settings/'
     | '/users/'
+    | '/mcps/logs/$id'
+    | '/mcps/providers/$id'
+    | '/mcps/virtual-mcps/$id'
     | '/models/logs/$id'
     | '/models/provider-models/$id'
     | '/models/providers/$id'
@@ -339,6 +371,9 @@ export interface FileRouteTypes {
     | '/models'
     | '/settings'
     | '/users'
+    | '/mcps/logs/$id'
+    | '/mcps/providers/$id'
+    | '/mcps/virtual-mcps/$id'
     | '/models/logs/$id'
     | '/models/provider-models/$id'
     | '/models/providers/$id'
@@ -370,6 +405,9 @@ export interface FileRouteTypes {
     | '/_authenticated/models/'
     | '/_authenticated/settings/'
     | '/_authenticated/users/'
+    | '/_authenticated/mcps/logs/$id'
+    | '/_authenticated/mcps/providers/$id'
+    | '/_authenticated/mcps/virtual-mcps/$id'
     | '/_authenticated/models/logs/$id'
     | '/_authenticated/models/provider-models/$id'
     | '/_authenticated/models/providers/$id'
@@ -593,6 +631,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedModelsLogsIdRouteImport
       parentRoute: typeof AuthenticatedModelsRoute
     }
+    '/_authenticated/mcps/virtual-mcps/$id': {
+      id: '/_authenticated/mcps/virtual-mcps/$id'
+      path: '/virtual-mcps/$id'
+      fullPath: '/mcps/virtual-mcps/$id'
+      preLoaderRoute: typeof AuthenticatedMcpsVirtualMcpsIdRouteImport
+      parentRoute: typeof AuthenticatedMcpsRoute
+    }
+    '/_authenticated/mcps/providers/$id': {
+      id: '/_authenticated/mcps/providers/$id'
+      path: '/providers/$id'
+      fullPath: '/mcps/providers/$id'
+      preLoaderRoute: typeof AuthenticatedMcpsProvidersIdRouteImport
+      parentRoute: typeof AuthenticatedMcpsRoute
+    }
+    '/_authenticated/mcps/logs/$id': {
+      id: '/_authenticated/mcps/logs/$id'
+      path: '/logs/$id'
+      fullPath: '/mcps/logs/$id'
+      preLoaderRoute: typeof AuthenticatedMcpsLogsIdRouteImport
+      parentRoute: typeof AuthenticatedMcpsRoute
+    }
   }
 }
 
@@ -623,6 +682,9 @@ const AuthenticatedSettingsRouteRouteWithChildren =
 
 interface AuthenticatedMcpsRouteChildren {
   AuthenticatedMcpsIndexRoute: typeof AuthenticatedMcpsIndexRoute
+  AuthenticatedMcpsLogsIdRoute: typeof AuthenticatedMcpsLogsIdRoute
+  AuthenticatedMcpsProvidersIdRoute: typeof AuthenticatedMcpsProvidersIdRoute
+  AuthenticatedMcpsVirtualMcpsIdRoute: typeof AuthenticatedMcpsVirtualMcpsIdRoute
   AuthenticatedMcpsLogsIndexRoute: typeof AuthenticatedMcpsLogsIndexRoute
   AuthenticatedMcpsProvidersIndexRoute: typeof AuthenticatedMcpsProvidersIndexRoute
   AuthenticatedMcpsVirtualMcpsIndexRoute: typeof AuthenticatedMcpsVirtualMcpsIndexRoute
@@ -630,6 +692,9 @@ interface AuthenticatedMcpsRouteChildren {
 
 const AuthenticatedMcpsRouteChildren: AuthenticatedMcpsRouteChildren = {
   AuthenticatedMcpsIndexRoute: AuthenticatedMcpsIndexRoute,
+  AuthenticatedMcpsLogsIdRoute: AuthenticatedMcpsLogsIdRoute,
+  AuthenticatedMcpsProvidersIdRoute: AuthenticatedMcpsProvidersIdRoute,
+  AuthenticatedMcpsVirtualMcpsIdRoute: AuthenticatedMcpsVirtualMcpsIdRoute,
   AuthenticatedMcpsLogsIndexRoute: AuthenticatedMcpsLogsIndexRoute,
   AuthenticatedMcpsProvidersIndexRoute: AuthenticatedMcpsProvidersIndexRoute,
   AuthenticatedMcpsVirtualMcpsIndexRoute:

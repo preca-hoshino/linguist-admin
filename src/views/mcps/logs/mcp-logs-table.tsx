@@ -115,7 +115,7 @@ export function McpLogsTable(): React.JSX.Element {
             ],
           },
           {
-            columnId: 'provider_mcp_id',
+            columnId: 'mcp_provider_id',
             title: t('mcpsPage.logs.providerMcp', 'Provider MCP'),
             options: providerOptions,
           },
