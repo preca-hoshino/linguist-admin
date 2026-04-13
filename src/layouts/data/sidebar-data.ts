@@ -86,11 +86,6 @@ export function getSidebarData(_language?: string): SidebarData {
                 icon: Database,
               },
               {
-                title: i18n.t('nav.providerMcps'),
-                url: '/mcps/provider-mcps',
-                icon: Box,
-              },
-              {
                 title: i18n.t('nav.virtualMcps'),
                 url: '/mcps/virtual-mcps',
                 icon: Box,
