@@ -98,7 +98,7 @@ export function McpLogsDialogs(): React.JSX.Element {
 
                 <div className="space-y-2">
                   <span className="text-muted-foreground">{t('mcpsPage.logs.params', 'Parameters')}:</span>
-                  <pre className="max-h-[300px] overflow-y-auto w-full bg-muted/50 rounded-lg p-4 font-mono text-xs border border-border/50">
+                  <pre className="max-h-[300px] overflow-y-auto overflow-x-auto w-full bg-muted/50 rounded-lg p-4 font-mono text-xs border border-border/50">
                     {JSON.stringify(currentRow.params, null, 2)}
                   </pre>
                 </div>
@@ -106,7 +106,7 @@ export function McpLogsDialogs(): React.JSX.Element {
                 {Object.keys(currentRow.result).length > 0 && (
                   <div className="space-y-2">
                     <span className="text-muted-foreground">{t('mcpsPage.logs.result', 'Result')}:</span>
-                    <pre className="max-h-[400px] overflow-y-auto w-full bg-muted/50 rounded-lg p-4 font-mono text-xs border border-border/50">
+                    <pre className="max-h-[400px] overflow-y-auto overflow-x-auto w-full bg-muted/50 rounded-lg p-4 font-mono text-xs border border-border/50">
                       {JSON.stringify(currentRow.result, null, 2)}
                     </pre>
                   </div>
@@ -117,7 +117,7 @@ export function McpLogsDialogs(): React.JSX.Element {
                     <span className="text-muted-foreground text-destructive">
                       {t('mcpsPage.logs.error', 'Error Options')}:
                     </span>
-                    <pre className="max-h-[300px] overflow-y-auto w-full bg-destructive/10 text-destructive border border-destructive/20 p-4 font-mono text-xs rounded-lg">
+                    <pre className="max-h-[300px] overflow-y-auto overflow-x-auto w-full bg-destructive/10 text-destructive border border-destructive/20 p-4 font-mono text-xs rounded-lg">
                       {JSON.stringify(currentRow.error, null, 2)}
                     </pre>
                   </div>

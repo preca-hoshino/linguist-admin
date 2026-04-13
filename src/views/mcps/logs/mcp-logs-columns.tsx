@@ -91,10 +91,15 @@ export function getMcpLogsColumns(t: TFunction): ColumnDef<McpLog>[] {
     {
       accessorKey: 'method',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('mcpsPage.logs.method', 'Method')} />,
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
-      cell: ({ row }): React.JSX.Element => (
-        <span className="truncate font-mono font-bold text-xs">{row.getValue('method')}</span>
-      ),
+      meta: { className: 'ps-1 w-[160px]', tdClassName: 'ps-4 w-[160px]' },
+      cell: ({ row }): React.JSX.Element => {
+        const method = String(row.getValue('method'));
+        return (
+          <div className="w-[140px] truncate font-mono font-bold text-xs" title={method}>
+            {method}
+          </div>
+        );
+      },
       enableSorting: true,
     },
     {
