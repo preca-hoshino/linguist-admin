@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import type { VirtualMcp } from '@/types/mcp';
 
-export function VirtualMcpConfigTab({ virtualMcp }: { readonly virtualMcp: VirtualMcp }): React.JSX.Element {
+export function VirtualMcpSettingsTab({ virtualMcp }: { readonly virtualMcp: VirtualMcp }): React.JSX.Element {
   return (
     <div className="grid gap-6">
       <Card>
