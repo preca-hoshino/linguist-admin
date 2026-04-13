@@ -6,28 +6,6 @@ export function VirtualMcpConfigTab({ virtualMcp }: { readonly virtualMcp: Virtu
     <div className="grid gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>Whitelisted Tools</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {virtualMcp.config.tools != null && virtualMcp.config.tools.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {virtualMcp.config.tools.map((tool) => (
-                <div key={tool} className="bg-muted px-2 py-1 rounded text-sm text-foreground">
-                  {tool}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-sm">
-              No tools are configured. All tools from the provider might be denied or accessible depending on backend
-              policy.
-            </p>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
           <CardTitle>Raw Configuration</CardTitle>
         </CardHeader>
         <CardContent>

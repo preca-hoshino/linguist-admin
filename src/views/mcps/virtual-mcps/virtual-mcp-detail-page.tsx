@@ -11,8 +11,10 @@ import { Main } from '@/layouts/Main';
 import { cn } from '@/utils/utils';
 import { VirtualMcpOverviewTab } from './detail-tabs/VirtualMcpOverviewTab';
 import { VirtualMcpConfigTab } from './detail-tabs/VirtualMcpConfigTab';
+import { VirtualMcpToolsTab } from './detail-tabs/VirtualMcpToolsTab';
+import { Wrench } from 'lucide-react';
 
-const VMCP_TABS = ['overview', 'config'] as const;
+const VMCP_TABS = ['overview', 'tools', 'config'] as const;
 type VmcpTab = (typeof VMCP_TABS)[number];
 
 export function VirtualMcpDetailPage(): React.JSX.Element {
@@ -80,6 +82,13 @@ export function VirtualMcpDetailPage(): React.JSX.Element {
               Overview
             </TabsTrigger>
             <TabsTrigger
+              value="tools"
+              className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pt-2 pb-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+            >
+              <Wrench className="mr-2 h-4 w-4" />
+              Tools
+            </TabsTrigger>
+            <TabsTrigger
               value="config"
               className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pt-2 pb-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
             >
@@ -91,6 +100,10 @@ export function VirtualMcpDetailPage(): React.JSX.Element {
 
         <TabsContent value="overview" className="space-y-6 outline-none">
           <VirtualMcpOverviewTab virtualMcp={virtualMcp} />
+        </TabsContent>
+
+        <TabsContent value="tools" className="space-y-6 outline-none">
+          <VirtualMcpToolsTab virtualMcp={virtualMcp} />
         </TabsContent>
 
         <TabsContent value="config" className="space-y-6 outline-none">
