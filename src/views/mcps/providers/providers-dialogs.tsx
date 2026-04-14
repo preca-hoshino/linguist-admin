@@ -165,7 +165,7 @@ export function ProvidersDialogs(): React.JSX.Element {
 // -------------------------
 // Form Dialog
 // -------------------------
-function MutateProviderDialog({
+export function MutateProviderDialog({
   open,
   onOpenChange,
   mode,

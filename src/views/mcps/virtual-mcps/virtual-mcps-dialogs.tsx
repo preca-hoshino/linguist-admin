@@ -130,7 +130,7 @@ export function VirtualMcpsDialogs(): React.JSX.Element {
   );
 }
 
-function MutateVirtualMcpDialog({
+export function MutateVirtualMcpDialog({
   open,
   onOpenChange,
   mode,

@@ -1,7 +1,9 @@
-import { Link, useLoaderData } from '@tanstack/react-router';
-import { BarChart2, ChevronLeft, Cloud, Server, Wrench } from 'lucide-react';
+import { Link, useLoaderData, useRouter } from '@tanstack/react-router';
+import { ChevronLeft, Server, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { updateMcpProvider } from '@/api/mcp-providers';
 import { CopyableId } from '@/components/CopyableId';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -9,17 +11,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { usePageTitle } from '@/composables/use-page-title';
 import { Main } from '@/layouts/Main';
 import type { GlobalTimeRange } from '@/types/dashboard';
+import type { McpProviderUpdateInput } from '@/types/mcp';
 import { cn } from '@/utils/utils';
 import { TimeRangePicker } from '@/views/dashboard/components/TimeRangePicker';
 import { McpPerformanceTab } from '../shared/McpPerformanceTab';
-import { McpProviderOverviewTab } from './detail-tabs/McpProviderOverviewTab';
+import { McpProviderSettingsTab } from './detail-tabs/McpProviderSettingsTab';
 import { McpProviderToolsTab } from './detail-tabs/McpProviderToolsTab';
+import { MutateProviderDialog } from './providers-dialogs';
 
-const PROVIDER_TABS = ['overview', 'performance', 'tools'] as const;
+const PROVIDER_TABS = ['overview', 'tools', 'settings'] as const;
 type ProviderTab = (typeof PROVIDER_TABS)[number];
 
 export function McpProviderDetailPage(): React.JSX.Element {
   const { t } = useTranslation();
+  const router = useRouter();
   const { provider } = useLoaderData({
     from: '/_authenticated/mcps/providers/$id',
   });
@@ -27,6 +32,7 @@ export function McpProviderDetailPage(): React.JSX.Element {
 
   const [activeTab, setActiveTab] = useState<ProviderTab>('overview');
   const [timeRange, setTimeRange] = useState<GlobalTimeRange>('today');
+  const [editOpen, setEditOpen] = useState(false);
 
   return (
     <Main className="flex flex-1 flex-col gap-6">
@@ -70,6 +76,17 @@ export function McpProviderDetailPage(): React.JSX.Element {
         {/* 右侧操作区 */}
         <div className="flex shrink-0 items-center gap-2">
           <TimeRangePicker value={timeRange} onChange={setTimeRange} />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setEditOpen(true);
+            }}
+            className="h-9"
+          >
+            <Settings className="mr-2 h-4 w-4" />
+            {t('common.edit', 'Edit')}
+          </Button>
         </div>
       </div>
 
@@ -87,38 +104,53 @@ export function McpProviderDetailPage(): React.JSX.Element {
               value="overview"
               className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pt-2 pb-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
             >
-              <Cloud className="mr-2 h-4 w-4" />
-              Overview
-            </TabsTrigger>
-            <TabsTrigger
-              value="performance"
-              className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pt-2 pb-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
-            >
-              <BarChart2 className="mr-2 h-4 w-4" />
-              Performance
+              {t('mcpsPage.providers.tabs.overview', 'Overview')}
             </TabsTrigger>
             <TabsTrigger
               value="tools"
               className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pt-2 pb-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
             >
-              <Wrench className="mr-2 h-4 w-4" />
-              Tools
+              {t('mcpsPage.providers.tabs.tools', 'Tools')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="settings"
+              className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pt-2 pb-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+            >
+              {t('mcpsPage.providers.tabs.settings', 'Settings')}
             </TabsTrigger>
           </TabsList>
         </div>
 
         <TabsContent value="overview" className="space-y-6 outline-none">
-          <McpProviderOverviewTab provider={provider} />
-        </TabsContent>
-
-        <TabsContent value="performance" className="space-y-6 outline-none">
           <McpPerformanceTab dimension="mcp_provider" id={provider.id} timeRange={timeRange} />
         </TabsContent>
 
         <TabsContent value="tools" className="space-y-6 outline-none">
           <McpProviderToolsTab providerId={provider.id} />
         </TabsContent>
+
+        <TabsContent value="settings" className="space-y-6 outline-none">
+          <McpProviderSettingsTab provider={provider} />
+        </TabsContent>
       </Tabs>
+
+      {/* 编辑弹窗 */}
+      <MutateProviderDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        mode="edit"
+        initialData={provider}
+        onSubmit={async (data) => {
+          const res = await updateMcpProvider(provider.id, data as McpProviderUpdateInput);
+          if (res.ok) {
+            toast.success(t('mcpsPage.providers.updatedSuccess', 'Provider updated successfully'));
+            void router.invalidate();
+            setEditOpen(false);
+          } else {
+            toast.error(res.error.message);
+          }
+        }}
+      />
     </Main>
   );
 }
