@@ -154,7 +154,7 @@ function ToolWorkspace({ tools }: { readonly tools: McpToolInfo[] }): React.JSX.
                     {tInfo.description != null && tInfo.description !== '' ? (
                       tInfo.description
                     ) : (
-                      <span className="italic opacity-50">无描述</span>
+                      <span className="italic opacity-50">{t('common.noDescription', '无描述')}</span>
                     )}
                   </div>
                 </div>
@@ -281,7 +281,7 @@ function ToolWorkspace({ tools }: { readonly tools: McpToolInfo[] }): React.JSX.
 
               {!showRaw && properties.length === 0 && (
                 <div className="p-4 border border-dashed rounded-md text-sm text-muted-foreground text-center bg-muted/10">
-                  无参数定义或无法解析为标准属性列表
+                  {t('mcpsPage.tools.noParams', '无参数定义或无法解析为标准属性列表')}
                 </div>
               )}
             </div>
