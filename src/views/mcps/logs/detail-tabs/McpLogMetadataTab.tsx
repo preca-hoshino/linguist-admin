@@ -36,11 +36,12 @@ function MetadataItem({
   readonly copyable?: boolean | undefined;
   readonly linkTo?: string | undefined;
 }): React.JSX.Element {
+  const { t } = useTranslation();
   const { copied, copy } = useCopy();
 
   const valueDisplay =
     value == null || value === '' ? (
-      <span className="text-muted-foreground opacity-50 italic">未提供 / Unknown</span>
+      <span className="text-muted-foreground opacity-50 italic">{t('common.notProvided', '未提供 / Unknown')}</span>
     ) : (
       value
     );
@@ -95,10 +96,10 @@ export function McpLogMetadataTab({ log }: McpLogMetadataTabProps): React.JSX.El
           </h3>
         </div>
         <CardContent className="p-0">
-          <MetadataItem label="Log ID" value={log.id} copyable />
-          <MetadataItem label="Session ID" value={log.session_id} copyable />
-          <MetadataItem label="Direction" value={log.direction.toUpperCase()} />
-          <MetadataItem label="Protocol Method" value={log.method} copyable />
+          <MetadataItem label={t('mcpsPage.logs.logId', 'Log ID')} value={log.id} copyable />
+          <MetadataItem label={t('mcpsPage.logs.sessionId', 'Session ID')} value={log.session_id} copyable />
+          <MetadataItem label={t('mcpsPage.logs.direction', 'Direction')} value={log.direction.toUpperCase()} />
+          <MetadataItem label={t('mcpsPage.logs.protocolMethod', 'Protocol Method')} value={log.method} copyable />
         </CardContent>
       </Card>
 
@@ -110,9 +111,14 @@ export function McpLogMetadataTab({ log }: McpLogMetadataTabProps): React.JSX.El
           </h3>
         </div>
         <CardContent className="p-0">
-          <MetadataItem label="App ID (Client)" value={log.app_id} copyable icon={<Box className="h-4 w-4" />} />
           <MetadataItem
-            label="Virtual MCP"
+            label={t('mcpsPage.logs.appId', 'App ID (Client)')}
+            value={log.app_id}
+            copyable
+            icon={<Box className="h-4 w-4" />}
+          />
+          <MetadataItem
+            label={t('mcpsPage.logs.virtualMcpLabel', 'Virtual MCP')}
             value={log.virtual_mcp_id}
             copyable
             linkTo={
@@ -123,7 +129,7 @@ export function McpLogMetadataTab({ log }: McpLogMetadataTabProps): React.JSX.El
             icon={<RouterIcon className="h-4 w-4" />}
           />
           <MetadataItem
-            label="MCP Provider"
+            label={t('mcpsPage.logs.mcpProviderLabel', 'MCP Provider')}
             value={log.mcp_provider_id}
             copyable
             linkTo={
@@ -144,16 +150,19 @@ export function McpLogMetadataTab({ log }: McpLogMetadataTabProps): React.JSX.El
           </h3>
         </div>
         <CardContent className="p-0">
-          <MetadataItem label="Created At" value={new Date(log.created_at).toLocaleString()} />
           <MetadataItem
-            label="Duration"
+            label={t('mcpsPage.logs.createdAt', 'Created At')}
+            value={new Date(log.created_at).toLocaleString()}
+          />
+          <MetadataItem
+            label={t('mcpsPage.logs.duration', 'Duration')}
             value={`${log.duration_ms} ms`}
             icon={
               <Badge
                 variant="outline"
                 className={log.duration_ms > 2000 ? 'border-amber-400 text-amber-600' : 'border-muted'}
               >
-                {log.duration_ms > 2000 ? 'Slow' : 'Fast'}
+                {log.duration_ms > 2000 ? t('mcpsPage.logs.slow', 'Slow') : t('mcpsPage.logs.fast', 'Fast')}
               </Badge>
             }
           />
