@@ -13,7 +13,7 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
       cell: ({ row }): React.JSX.Element => (
         <span className="text-[11px] font-mono text-muted-foreground px-1 py-0.5">{row.original.id}</span>
       ),
-      enableSorting: true,
+      enableSorting: false,
     },
     {
       accessorKey: 'name',
