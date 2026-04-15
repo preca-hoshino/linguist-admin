@@ -28,6 +28,7 @@ export default {
     actions: 'Actions',
     selectAll: 'Select all',
     selectRow: 'Select row',
+    selected: 'Selected',
     // Search & empty states
     search: 'Search',
     noResults: 'No results found',

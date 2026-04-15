@@ -28,6 +28,7 @@ export default {
     actions: '操作',
     selectAll: '全选',
     selectRow: '选择行',
+    selected: '已选择',
     // 搜索与空态
     search: '搜索',
     noResults: '未找到相关结果',

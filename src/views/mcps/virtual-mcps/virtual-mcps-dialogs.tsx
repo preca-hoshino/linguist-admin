@@ -418,7 +418,7 @@ export function MutateVirtualMcpDialog({
                   </label>
                 </div>
                 <div className="text-muted-foreground">
-                  {selectedTools.length} / {tools.length} {t('mcpsPage.virtualMcps.toolsSelected', 'Selected')}
+                  {selectedTools.length} / {tools.length} {t('common.selected', 'Selected')}
                 </div>
               </div>
             )}
