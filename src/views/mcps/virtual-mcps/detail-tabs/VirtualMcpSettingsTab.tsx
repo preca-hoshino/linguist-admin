@@ -1,31 +1,33 @@
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import type { VirtualMcp } from '@/types/mcp';
 
 export function VirtualMcpSettingsTab({ virtualMcp }: { readonly virtualMcp: VirtualMcp }): React.JSX.Element {
+  const { t } = useTranslation();
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle>Basic Information</CardTitle>
+          <CardTitle>{t('mcpsPage.virtualMcps.basicInfo', 'Basic Information')}</CardTitle>
         </CardHeader>
         <CardContent>
           <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 text-sm">
             <div className="flex flex-col gap-1">
-              <dt className="text-muted-foreground">Description</dt>
+              <dt className="text-muted-foreground">{t('mcpsPage.virtualMcps.description', 'Description')}</dt>
               <dd className="font-medium">{virtualMcp.description || 'N/A'}</dd>
             </div>
             <div className="flex flex-col gap-1">
-              <dt className="text-muted-foreground">Provider ID</dt>
+              <dt className="text-muted-foreground">{t('mcpsPage.virtualMcps.providerId', 'Provider ID')}</dt>
               <dd className="font-medium">
                 <code className="bg-muted px-1 py-0.5 rounded text-xs">{virtualMcp.mcp_provider_id}</code>
               </dd>
             </div>
             <div className="flex flex-col gap-1">
-              <dt className="text-muted-foreground">Created At</dt>
+              <dt className="text-muted-foreground">{t('mcpsPage.virtualMcps.createdAt', 'Created At')}</dt>
               <dd className="font-medium">{new Date(virtualMcp.created_at).toLocaleString()}</dd>
             </div>
             <div className="flex flex-col gap-1">
-              <dt className="text-muted-foreground">Updated At</dt>
+              <dt className="text-muted-foreground">{t('mcpsPage.virtualMcps.updatedAt', 'Updated At')}</dt>
               <dd className="font-medium">{new Date(virtualMcp.updated_at).toLocaleString()}</dd>
             </div>
           </dl>
@@ -34,7 +36,7 @@ export function VirtualMcpSettingsTab({ virtualMcp }: { readonly virtualMcp: Vir
 
       <Card>
         <CardHeader>
-          <CardTitle>Raw Configuration</CardTitle>
+          <CardTitle>{t('mcpsPage.virtualMcps.rawConfig', 'Raw Configuration')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="p-4 bg-muted/50 rounded-lg overflow-x-auto text-xs font-mono text-muted-foreground whitespace-pre-wrap">
