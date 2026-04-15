@@ -12,28 +12,28 @@ export function McpProviderSettingsTab({ provider }: { readonly provider: McpPro
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Configuration</CardTitle>
+            <CardTitle>{t('mcpsPage.providers.configuration', 'Configuration')}</CardTitle>
           </CardHeader>
           <CardContent>
             <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 text-sm">
               <div className="flex flex-col gap-1">
-                <dt className="text-muted-foreground">Kind</dt>
+                <dt className="text-muted-foreground">{t('mcpsPage.providers.kind', 'Kind')}</dt>
                 <dd className="font-medium">{provider.kind}</dd>
               </div>
               <div className="flex flex-col gap-1">
-                <dt className="text-muted-foreground">Base URL</dt>
+                <dt className="text-muted-foreground">{t('mcpsPage.providers.baseUrl', 'Base URL')}</dt>
                 <dd className="font-medium">{provider.base_url || 'N/A'}</dd>
               </div>
               <div className="flex flex-col gap-1">
-                <dt className="text-muted-foreground">Credential Type</dt>
+                <dt className="text-muted-foreground">{t('mcpsPage.providers.credentialType', 'Credential Type')}</dt>
                 <dd className="font-medium">{provider.credential_type}</dd>
               </div>
               <div className="flex flex-col gap-1">
-                <dt className="text-muted-foreground">Created At</dt>
+                <dt className="text-muted-foreground">{t('mcpsPage.providers.createdAt', 'Created At')}</dt>
                 <dd className="font-medium">{new Date(provider.created_at).toLocaleString()}</dd>
               </div>
               <div className="flex flex-col gap-1">
-                <dt className="text-muted-foreground">Updated At</dt>
+                <dt className="text-muted-foreground">{t('mcpsPage.providers.updatedAt', 'Updated At')}</dt>
                 <dd className="font-medium">{new Date(provider.updated_at).toLocaleString()}</dd>
               </div>
             </dl>
@@ -42,7 +42,7 @@ export function McpProviderSettingsTab({ provider }: { readonly provider: McpPro
 
         <Card>
           <CardHeader>
-            <CardTitle>Transport Settings</CardTitle>
+            <CardTitle>{t('mcpsPage.providers.transportSettings', 'Transport Settings')}</CardTitle>
           </CardHeader>
           <CardContent>
             <pre className="p-4 bg-muted/50 rounded-lg overflow-x-auto text-xs font-mono text-muted-foreground whitespace-pre-wrap">
