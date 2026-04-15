@@ -8,11 +8,38 @@ export default {
     loading: 'Loading...',
     saving: 'Saving...',
     save: 'Save',
+    create: 'Create',
+    delete: 'Delete',
     optional: 'optional',
     enabled: 'Enabled',
     disabled: 'Disabled',
     edit: 'Edit',
     realtime: 'Live',
+    // Status
+    active: 'Active',
+    inactive: 'Inactive',
+    success: 'Success',
+    error: 'Error',
+    // Navigation
+    backToList: 'Back to List',
+    // Table
+    id: 'ID',
+    status: 'Status',
+    actions: 'Actions',
+    selectAll: 'Select all',
+    selectRow: 'Select row',
+    // Search & empty states
+    search: 'Search',
+    noResults: 'No results found',
+    noItems: 'No items to display',
+    noDescription: 'No description',
+    noParams: 'No parameters defined or unable to parse as standard properties',
+    noParam: 'No parameters',
+    noResult: 'No result content',
+    notProvided: 'Not provided',
+    // Confirm
+    cannotBeUndone: 'This action cannot be undone.',
+    deletedSuccess: 'Successfully deleted',
   },
   nav: {
     general: 'General',
@@ -534,6 +561,27 @@ export default {
         markdownView: 'Preview',
         field: 'Field',
         value: 'Value',
+        type: 'Type',
+        description: 'Description',
+        // MCP log tabs
+        content: 'Content',
+        rawData: 'Payload',
+        metadata: 'Metadata',
+        // MCP log content tab
+        mcpArguments: 'Call Arguments',
+        noArguments: 'No arguments',
+        mcpToolResult: 'Tool Result',
+        noToolResult: 'No result content extracted',
+        mcpNotToolCall:
+          'This request is not a standard tools/call. Content highlight view is not available. Switch to Payload or Metadata for details.',
+        // MCP log metadata tab
+        mcpBasicInfo: 'Basic Request Info',
+        mcpRoutingInfo: 'Routing Resources',
+        mcpTimingInfo: 'Timing',
+        // MCP log raw data tab
+        mcpRequestParams: 'Request Params',
+        mcpResponseResult: 'Response Result',
+        mcpError: 'Error Details',
 
         timingStart: 'Request Received',
         timingAdapted: 'Request Adapted',
@@ -575,7 +623,7 @@ export default {
         phaseGeneration: 'Streaming Output',
         phaseGatewayOut: 'Gateway Post-processing',
 
-        // Tools
+        // Tools (model log panel)
         totalToolsDefined: 'Tools Defined',
         toolsInvoked: 'Tools Invoked',
         availableTools: 'Tool Definitions',
@@ -586,6 +634,12 @@ export default {
         paramType: 'Type',
         paramRequired: 'Required',
         paramDescription: 'Description',
+        // Tool viewer (MCP tool detail panel)
+        noDescription: 'No description',
+        structuredTable: 'View structured table',
+        rawJson: 'View raw JSON Schema',
+        downloadJson: 'Download JSON Schema',
+        noToolsDefined: 'No tools are provided by this MCP server.',
 
         // Billing receipt
         billingNoRecord: 'No cost billed for this request',
@@ -615,18 +669,150 @@ export default {
     providers: {
       title: 'MCPs — Providers',
       desc: 'Configure and manage MCP service providers.',
+      // Detail page tabs
+      tabs: {
+        overview: 'Overview',
+        tools: 'Tools',
+        settings: 'Settings',
+      },
+      // Settings tab card labels
+      configuration: 'Configuration',
+      kind: 'Kind',
+      baseUrl: 'Base URL',
+      credentialType: 'Credential Type',
+      createdAt: 'Created At',
+      updatedAt: 'Updated At',
+      transportSettings: 'Transport Settings',
+      settingsVirtualMcps: 'Associated Virtual MCPs',
+      // Form
+      basicConfig: 'Basic Configuration',
+      name: 'Name',
+      namePlaceholder: 'e.g. Local Search Tools',
+      transportType: 'Transport',
+      command: 'Command',
+      commandPlaceholder: 'e.g. npx or /usr/bin/python3',
+      arguments: 'Arguments',
+      addArgument: 'Add Argument',
+      endpointUrl: 'Endpoint URL',
+      endpointPlaceholder: 'https://api.example.com/mcp?key={{APIKEY}}',
+      headersRow: 'Headers',
+      addHeader: 'Add Header',
+      // Credential pool
+      apiKeyManagement: 'API Key Management',
+      apiKeyHintTitle: 'Supports {{APIKEY}} placeholder',
+      apiKeyHintDesc:
+        'Insert this token in any URL / command / argument field. The gateway will automatically rotate and inject a real API Key from the pool on each connection.',
+      key: 'Key',
+      addKey: 'Add API Key',
+      noCredentials: 'No credentials yet',
+      noCredentialsDesc: 'Required if you use {{APIKEY}} in config',
+      // CRUD messages
+      create: 'Add MCP Provider',
+      createDesc: 'Configure a new MCP backend. Use {{APIKEY}} in fields to enable automatic key rotation.',
+      edit: 'Edit MCP Provider',
+      editDesc: 'Update transport settings and API key credentials for this provider.',
+      deleteTitle: 'Delete MCP Provider',
+      deleteConfirm: 'Are you sure you want to delete this provider? All associated connections will be terminated.',
+      createdSuccess: 'Provider created successfully',
+      updatedSuccess: 'Provider updated successfully',
+      deletedSuccess: 'Provider deleted',
     },
     providerMcps: {
       title: 'MCPs — Provider Tools',
       desc: 'Manage tools exposed by MCP providers.',
     },
+    tools: {
+      noParams: 'No parameters defined or unable to parse as standard properties',
+    },
     virtualMcps: {
       title: 'MCPs — Virtual Tools',
       desc: 'Manage and configure internally integrated virtual MCP tools.',
+      // Detail page tabs
+      tabs: {
+        overview: 'Overview',
+        tools: 'Tools',
+        settings: 'Settings',
+      },
+      // Settings tab card labels
+      basicInfo: 'Basic Information',
+      description: 'Description',
+      providerId: 'Provider ID',
+      createdAt: 'Created At',
+      updatedAt: 'Updated At',
+      rawConfig: 'Raw Configuration',
+      // Tools tab
+      toolsOverview: 'Tool Overview & Status',
+      disabledInVmcp: 'Disabled in this Virtual MCP',
+      // Form
+      name: 'Name / ID',
+      namePlaceholder: 'e.g. Frontend Tools',
+      descPlaceholder: 'Optional description',
+      backendProvider: 'Backend Provider',
+      selectProvider: 'Select a provider',
+      toolsManagement: 'Tools Management',
+      toolsSelected: '{{count}} Selected',
+      noProviderSelected: 'No Provider Selected',
+      selectProviderHint: 'Select a provider on the left to configure its tools.',
+      noToolsFound: 'No Tools Exposed',
+      noToolsFoundHint: 'This backend does not advertise any MCP tools.',
+      noDescription: 'No description available',
+      // CRUD messages
+      create: 'Add Virtual MCP',
+      createDesc: 'Create a new virtual MCP server to route to a backend provider and filter its tools.',
+      edit: 'Edit Virtual MCP',
+      editDesc: 'Update settings and tool filters for this virtual MCP server.',
+      deleteTitle: 'Delete Virtual MCP',
+      deleteConfirm: 'Are you sure you want to delete this virtual MCP?',
+      createdSuccess: 'Virtual MCP created',
+      updatedSuccess: 'Virtual MCP updated',
+      deletedSuccess: 'Virtual MCP deleted',
     },
     logs: {
       title: 'MCPs — Logs',
       desc: 'View access records for all MCP tool calls.',
+      // Table
+      searchPlaceholder: 'Search methods...',
+      empty: 'No logs found',
+      logName: 'log',
+      // Columns
+      virtualMcp: 'Virtual MCP',
+      providerMcp: 'Provider MCP',
+      method: 'Method',
+      direction: 'Direction',
+      session: 'Session',
+      inbound: '↓ IN',
+      outbound: '↑ OUT',
+      // Node labels in topology diagram
+      clientNode: 'Client',
+      virtualMcpNode: 'Virtual MCP',
+      gatewayNode: 'Linguist Gateway',
+      mcpServerNode: 'MCP Server',
+      // Relative time
+      justNow: 'Just now',
+      minutesAgo: '{{count}} minutes ago',
+      hoursAgo: '{{count}} hours ago',
+      daysAgo: '{{count}} days ago',
+      // Detail dialog
+      detailTitle: 'MCP Log Detail',
+      batchDeleteTitle: 'Delete Selected Logs',
+      batchDeleteConfirm: 'Are you sure you want to delete the selected MCP logs? This action cannot be undone.',
+      params: 'Parameters',
+      result: 'Result',
+      error: 'Error',
+      // Metadata tab labels
+      logId: 'Log ID',
+      sessionId: 'Session ID',
+      appId: 'App ID (Client)',
+      virtualMcpLabel: 'Virtual MCP',
+      mcpProviderLabel: 'MCP Provider',
+      createdAt: 'Created At',
+      duration: 'Duration',
+      slow: 'Slow',
+      fast: 'Fast',
+      protocolMethod: 'Protocol Method',
+      // Content tab
+      textBlock: 'Text Block',
+      rawBlock: 'Raw Block',
     },
   },
   command: {
