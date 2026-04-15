@@ -74,7 +74,7 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
     },
     {
       id: 'actions',
-      header: t('common.actions', 'Actions'),
+      header: () => <span className="sr-only">{t('common.actions', 'Actions')}</span>,
       cell: ({ row }): React.JSX.Element => <ProvidersRowActions provider={row.original} />,
     },
   ];
