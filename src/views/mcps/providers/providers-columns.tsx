@@ -59,13 +59,16 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
     },
     {
       id: 'api_keys',
-      header: t('mcpsPage.providers.apiKeys', 'API Keys'),
+      accessorFn: (row) => (row.credential as string[] | undefined)?.length ?? 0,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('mcpsPage.providers.apiKeys', 'API Keys')} />
+      ),
       cell: ({ row }): React.JSX.Element => {
-        const keys = (row.original.credential as string[] | undefined) ?? [];
-        if (keys.length === 0) {
+        const count = row.getValue<number>('api_keys');
+        if (count === 0) {
           return <span className="text-muted-foreground">-</span>;
         }
-        return <span className="font-medium text-sm">{keys.length}</span>;
+        return <span className="font-medium text-sm">{String(count)}</span>;
       },
       enableSorting: true,
     },
