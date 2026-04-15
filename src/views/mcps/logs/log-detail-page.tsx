@@ -17,22 +17,21 @@ import { McpLogMetadataTab } from './detail-tabs/McpLogMetadataTab';
 const LOG_TABS = ['content', 'payload', 'metadata'] as const;
 type LogTab = (typeof LOG_TABS)[number];
 
-function relativeTime(dateStr: string): string {
-  const now = Date.now();
-  const diff = now - new Date(dateStr).getTime();
+function relativeTime(dateStr: string, t: ReturnType<typeof useTranslation>['t']): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
   const min = Math.floor(diff / 60_000);
   const hr = Math.floor(diff / 3_600_000);
   const day = Math.floor(diff / 86_400_000);
   if (min < 1) {
-    return 'Just now';
+    return t('mcpsPage.logs.justNow', { defaultValue: 'Just now' });
   }
   if (min < 60) {
-    return `${min} minutes ago`;
+    return t('mcpsPage.logs.minutesAgo', { count: min, defaultValue: '{{count}} minutes ago' });
   }
   if (hr < 24) {
-    return `${hr} hours ago`;
+    return t('mcpsPage.logs.hoursAgo', { count: hr, defaultValue: '{{count}} hours ago' });
   }
-  return `${day} days ago`;
+  return t('mcpsPage.logs.daysAgo', { count: day, defaultValue: '{{count}} days ago' });
 }
 
 function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
@@ -132,7 +131,7 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
               </Badge>
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground ml-1">
                 <Clock className="h-3.5 w-3.5" />
-                <span>{relativeTime(log.created_at)}</span>
+                <span>{relativeTime(log.created_at, t)}</span>
               </div>
             </div>
           </div>
@@ -142,15 +141,23 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
       <div className="flex items-center justify-center px-4 py-8 relative max-w-full overflow-x-auto">
         {log.direction === 'inbound' ? (
           <>
-            {renderNode(<User className="h-5 w-5" />, 'Client', log.app_id ?? 'Unknown')}
+            {renderNode(<User className="h-5 w-5" />, t('mcpsPage.logs.clientNode', 'Client'), log.app_id ?? 'Unknown')}
             {renderEdge(log.method, isError)}
-            {renderNode(<Database className="h-5 w-5" />, 'Virtual MCP', log.virtual_mcp_id ?? 'Unknown')}
+            {renderNode(
+              <Database className="h-5 w-5" />,
+              t('mcpsPage.logs.virtualMcpNode', 'Virtual MCP'),
+              log.virtual_mcp_id ?? 'Unknown',
+            )}
           </>
         ) : (
           <>
-            {renderNode(<RouterIcon className="h-5 w-5" />, 'Linguist Gateway')}
+            {renderNode(<RouterIcon className="h-5 w-5" />, t('mcpsPage.logs.gatewayNode', 'Linguist Gateway'))}
             {renderEdge(log.method, isError)}
-            {renderNode(<Cloud className="h-5 w-5" />, 'MCP Server', log.mcp_provider_id ?? 'Unknown')}
+            {renderNode(
+              <Cloud className="h-5 w-5" />,
+              t('mcpsPage.logs.mcpServerNode', 'MCP Server'),
+              log.mcp_provider_id ?? 'Unknown',
+            )}
           </>
         )}
       </div>
