@@ -31,7 +31,7 @@ export function McpLogRawDataTab({ log }: McpLogRawDataTabProps): React.JSX.Elem
               }}
             />
           ) : (
-            <span className="text-muted-foreground text-sm italic">无参数</span>
+            <span className="text-muted-foreground text-sm italic">{t('common.noParam', '无参数')}</span>
           )}
         </div>
       </div>
@@ -53,7 +53,7 @@ export function McpLogRawDataTab({ log }: McpLogRawDataTabProps): React.JSX.Elem
               }}
             />
           ) : (
-            <span className="text-muted-foreground text-sm italic">无返回内容</span>
+            <span className="text-muted-foreground text-sm italic">{t('common.noResult', '无返回内容')}</span>
           )}
         </div>
       </div>
