@@ -35,7 +35,7 @@ export function getVirtualMcpsColumns(
           {row.getValue('description')}
         </div>
       ),
-      enableSorting: true,
+      enableSorting: false,
     },
     {
       accessorKey: 'mcp_provider_id',
