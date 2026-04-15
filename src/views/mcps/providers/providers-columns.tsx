@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/Badge';
 import type { McpProvider, McpProviderConfig } from '@/types/mcp';
@@ -12,13 +11,7 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
       accessorKey: 'id',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('common.id', 'ID')} />,
       cell: ({ row }): React.JSX.Element => (
-        <Link
-          to={`/mcps/providers/$id`}
-          params={{ id: row.original.id }}
-          className="text-[11px] font-mono bg-muted px-1.5 py-0.5 rounded text-primary hover:underline"
-        >
-          {row.original.id}
-        </Link>
+        <span className="text-[11px] font-mono text-muted-foreground px-1 py-0.5">{row.original.id}</span>
       ),
       enableSorting: true,
     },
@@ -51,13 +44,13 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
         if (provider.kind === 'stdio') {
           const configSafe = provider.config as Partial<McpProviderConfig> | undefined;
           return (
-            <div className="max-w-[200px] truncate text-muted-foreground" title={configSafe?.stdio_command}>
+            <div className="whitespace-normal break-all sm:break-words text-muted-foreground text-sm leading-snug">
               {configSafe?.stdio_command} {(configSafe?.stdio_args ?? []).join(' ')}
             </div>
           );
         }
         return (
-          <div className="max-w-[200px] truncate text-muted-foreground" title={provider.base_url}>
+          <div className="whitespace-normal break-all sm:break-words text-muted-foreground text-sm leading-snug">
             {provider.base_url}
           </div>
         );
@@ -72,9 +65,9 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
         if (keys.length === 0) {
           return <span className="text-muted-foreground">-</span>;
         }
-        return <Badge variant="outline">{keys.length} Keys</Badge>;
+        return <span className="font-medium text-sm">{keys.length}</span>;
       },
-      enableSorting: false,
+      enableSorting: true,
     },
     {
       id: 'actions',

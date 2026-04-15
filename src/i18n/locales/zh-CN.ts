@@ -684,6 +684,8 @@ export default {
       name: '名称',
       namePlaceholder: '例如：本地搜索工具',
       transportType: '传输方式',
+      endpointOrCommand: 'Endpoint / Command',
+      apiKeys: 'API Keys',
       command: '命令',
       commandPlaceholder: '例如：npx 或 /usr/bin/python3',
       arguments: '启动参数',

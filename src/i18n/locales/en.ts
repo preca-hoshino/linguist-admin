@@ -690,6 +690,8 @@ export default {
       name: 'Name',
       namePlaceholder: 'e.g. Local Search Tools',
       transportType: 'Transport',
+      endpointOrCommand: 'Endpoint / Command',
+      apiKeys: 'API Keys',
       command: 'Command',
       commandPlaceholder: 'e.g. npx or /usr/bin/python3',
       arguments: 'Arguments',
