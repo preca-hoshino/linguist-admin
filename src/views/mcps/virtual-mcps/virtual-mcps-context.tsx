@@ -63,11 +63,13 @@ export function VirtualMcpsProvider({
     setIsLoading(true);
     setError(null);
     try {
+      const filterProviderId = columnFilters.find((f) => f.id === 'mcp_provider_id')?.value as string | undefined;
+
       const rawPayload = {
         limit: pagination.pageSize,
         offset: pagination.pageIndex * pagination.pageSize,
         search: globalFilter || undefined,
-        mcp_provider_id: providerId,
+        mcp_provider_id: filterProviderId !== undefined && filterProviderId !== '' ? filterProviderId : providerId,
       };
 
       const payload = Object.fromEntries(
@@ -87,12 +89,12 @@ export function VirtualMcpsProvider({
     } finally {
       setIsLoading(false);
     }
-  }, [pagination.pageIndex, pagination.pageSize, globalFilter, providerId]);
+  }, [pagination.pageIndex, pagination.pageSize, globalFilter, providerId, columnFilters]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset pagination when globalFilter changes
   useEffect(() => {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, [globalFilter, pagination.pageSize]);
+  }, [globalFilter, columnFilters, pagination.pageSize]);
 
   useEffect((): (() => void) => {
     const timeout = setTimeout((): void => {
