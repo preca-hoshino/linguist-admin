@@ -79,7 +79,9 @@ export function McpLogContentTab({ log }: McpLogContentTabProps): React.JSX.Elem
                 return (
                   // biome-ignore lint/suspicious/noArrayIndexKey: Safe because result content is stable
                   <div key={idx} className="p-4 w-full max-w-full overflow-x-hidden flex flex-col gap-2">
-                    <span className="text-[10px] uppercase font-bold text-muted-foreground w-fit">Text Block</span>
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground w-fit">
+                      {t('mcpsPage.logs.textBlock', 'Text Block')}
+                    </span>
                     <SmartContentViewer
                       content={typeof contentBlock.text === 'string' ? contentBlock.text : ''}
                       exportFileName={`tool-result-block-${idx}`}
@@ -91,7 +93,8 @@ export function McpLogContentTab({ log }: McpLogContentTabProps): React.JSX.Elem
                 // biome-ignore lint/suspicious/noArrayIndexKey: Safe because result content is stable
                 <div key={idx} className="p-4 w-full overflow-x-auto flex flex-col gap-2">
                   <span className="text-[10px] uppercase font-bold text-muted-foreground w-fit">
-                    Raw Block ({typeof contentBlock?.type === 'string' ? contentBlock.type : 'unknown'})
+                    {t('mcpsPage.logs.rawBlock', 'Raw Block')} (
+                    {typeof contentBlock?.type === 'string' ? contentBlock.type : 'unknown'})
                   </span>
                   <JsonView
                     src={contentBlock as object}
