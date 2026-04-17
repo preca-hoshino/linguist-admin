@@ -7,6 +7,7 @@ export const listMcpProviders = async (params?: {
   offset?: number;
   search?: string;
   is_active?: boolean;
+  kind?: string;
 }): Promise<ApiResult<ListResponse<McpProvider>>> => {
   const qs = new URLSearchParams();
   if (params?.limit !== undefined) {
@@ -20,6 +21,9 @@ export const listMcpProviders = async (params?: {
   }
   if (params?.is_active !== undefined) {
     qs.set('is_active', String(params.is_active));
+  }
+  if (params?.kind != null && params.kind !== '') {
+    qs.set('kind', params.kind);
   }
 
   const queryStr = qs.toString() ? `?${qs.toString()}` : '';

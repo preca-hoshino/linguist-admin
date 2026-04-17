@@ -122,11 +122,11 @@ function VirtualMcpToolWorkspace({ tools }: { readonly tools: VmcpToolInfo[] }):
               </TabsTrigger>
               <TabsTrigger value="enabled" className="flex-1 text-xs">
                 <span className="text-emerald-500 mr-1.5 text-[10px]">●</span>
-                已启用
+                {t('common.enabled', '已启用')}
               </TabsTrigger>
               <TabsTrigger value="disabled" className="flex-1 text-xs">
                 <span className="text-red-500/80 mr-1.5 text-[10px]">●</span>
-                已禁用
+                {t('common.disabled', '已禁用')}
               </TabsTrigger>
             </TabsList>
           </UiTabs>
@@ -176,7 +176,7 @@ function VirtualMcpToolWorkspace({ tools }: { readonly tools: VmcpToolInfo[] }):
                       {tInfo.description != null && tInfo.description !== '' ? (
                         tInfo.description
                       ) : (
-                        <span className="italic opacity-50">无描述</span>
+                        <span className="italic opacity-50">{t('common.noDescription', '无描述')}</span>
                       )}
                     </div>
                   </div>
@@ -190,7 +190,7 @@ function VirtualMcpToolWorkspace({ tools }: { readonly tools: VmcpToolInfo[] }):
       {/* 右侧详情 */}
       {selectedToolInfo == null ? (
         <div className="flex-1 flex items-center justify-center bg-background">
-          <span className="text-muted-foreground">无可展示项</span>
+          <span className="text-muted-foreground">{t('common.noItems', '无可展示项')}</span>
         </div>
       ) : (
         <div className="flex-1 min-w-0 bg-background overflow-y-auto scrollbar-thin h-full relative">
@@ -213,7 +213,7 @@ function VirtualMcpToolWorkspace({ tools }: { readonly tools: VmcpToolInfo[] }):
                     variant="outline"
                     className="border-emerald-300 text-emerald-600 dark:text-emerald-400 font-mono tracking-tight"
                   >
-                    已启用
+                    {t('common.enabled', '已启用')}
                   </Badge>
                 ) : (
                   <Badge
@@ -221,7 +221,7 @@ function VirtualMcpToolWorkspace({ tools }: { readonly tools: VmcpToolInfo[] }):
                     className="font-mono tracking-tight gap-1 bg-red-500/10 text-red-600 hover:bg-red-500/20 border-0"
                   >
                     <ShieldAlert className="h-3 w-3" />
-                    已在此虚拟 MCP 中禁用
+                    {t('mcpsPage.virtualMcps.disabledInVmcp', '已在此虚拟 MCP 中禁用')}
                   </Badge>
                 )}
               </div>
@@ -337,7 +337,7 @@ function VirtualMcpToolWorkspace({ tools }: { readonly tools: VmcpToolInfo[] }):
 
               {!showRaw && parseToolProperties(selectedToolInfo.inputSchema).properties.length === 0 && (
                 <div className="p-4 border border-dashed rounded-md text-sm text-muted-foreground text-center bg-muted/10">
-                  无参数定义或无法解析为标准属性列表
+                  {t('mcpsPage.tools.noParams', '无参数定义或无法解析为标准属性列表')}
                 </div>
               )}
             </div>
@@ -410,7 +410,7 @@ export function VirtualMcpToolsTab({ virtualMcp }: { readonly virtualMcp: Virtua
     <div className="pt-4 pb-6 overflow-x-hidden">
       <div className="flex flex-col gap-2">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-          <h3 className="text-sm font-semibold">工具概览与启停状态</h3>
+          <h3 className="text-sm font-semibold">{t('mcpsPage.virtualMcps.toolsOverview', '工具概览与启停状态')}</h3>
         </div>
         <VirtualMcpToolWorkspace tools={processedTools} />
       </div>

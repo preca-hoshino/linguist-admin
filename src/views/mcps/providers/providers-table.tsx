@@ -1,6 +1,8 @@
 import {
   flexRender,
   getCoreRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
   getSortedRowModel,
   type SortingState,
   useReactTable,
@@ -14,7 +16,17 @@ import { useProviders } from './providers-context';
 import { cn } from '@/utils/utils';
 
 export function ProvidersTable(): React.JSX.Element {
-  const { providers, isLoading, hasMore, pagination, setPagination, globalFilter, setGlobalFilter } = useProviders();
+  const {
+    providers,
+    isLoading,
+    hasMore,
+    pagination,
+    setPagination,
+    globalFilter,
+    setGlobalFilter,
+    columnFilters,
+    setColumnFilters,
+  } = useProviders();
   const { t } = useTranslation();
 
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -30,6 +42,7 @@ export function ProvidersTable(): React.JSX.Element {
       pagination,
       sorting,
       globalFilter,
+      columnFilters,
     },
     manualPagination: true,
     manualFiltering: true,
@@ -37,8 +50,11 @@ export function ProvidersTable(): React.JSX.Element {
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
     onGlobalFilterChange: setGlobalFilter,
+    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
   const pageCount = table.getPageCount();
@@ -54,7 +70,16 @@ export function ProvidersTable(): React.JSX.Element {
       <DataTableToolbar
         table={table}
         searchPlaceholder={t('mcpsPage.providers.searchPlaceholder', 'Search providers...')}
-        filters={[]}
+        filters={[
+          {
+            columnId: 'kind',
+            title: t('mcpsPage.providers.transportType', 'Transport'),
+            options: [
+              { label: 'HTTP', value: 'streamable_http' },
+              { label: 'STDIO', value: 'stdio' },
+            ],
+          },
+        ]}
       />
       <div className="overflow-x-auto rounded-md border text-sm">
         <Table className="min-w-full">

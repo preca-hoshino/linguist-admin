@@ -57,10 +57,13 @@ export function ProvidersProvider({ children }: { readonly children: React.React
     setIsLoading(true);
     setError(null);
     try {
+      const kindFilter = columnFilters.find((f) => f.id === 'kind')?.value as string | undefined;
+
       const rawPayload = {
         limit: pagination.pageSize,
         offset: pagination.pageIndex * pagination.pageSize,
         search: globalFilter || undefined,
+        kind: kindFilter,
       };
       const payload = Object.fromEntries(
         Object.entries(rawPayload).filter(([_, v]) => v !== undefined && v !== ''),
@@ -79,13 +82,13 @@ export function ProvidersProvider({ children }: { readonly children: React.React
     } finally {
       setIsLoading(false);
     }
-  }, [pagination.pageIndex, pagination.pageSize, globalFilter]);
+  }, [pagination.pageIndex, pagination.pageSize, globalFilter, columnFilters]);
 
   // Reset to first page on search
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset pagination when globalFilter changes
   useEffect(() => {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, [globalFilter, pagination.pageSize]);
+  }, [globalFilter, columnFilters, pagination.pageSize]);
 
   useEffect((): (() => void) => {
     const timeout = setTimeout((): void => {

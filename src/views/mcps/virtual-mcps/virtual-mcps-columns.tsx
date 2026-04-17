@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/Badge';
 import type { VirtualMcp, VirtualMcpConfig } from '@/types/mcp';
@@ -16,15 +15,9 @@ export function getVirtualMcpsColumns(
       accessorKey: 'id',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('common.id', 'ID')} />,
       cell: ({ row }): React.JSX.Element => (
-        <Link
-          to={`/mcps/virtual-mcps/$id`}
-          params={{ id: row.original.id }}
-          className="text-[11px] font-mono bg-muted px-1.5 py-0.5 rounded text-primary hover:underline"
-        >
-          {row.original.id}
-        </Link>
+        <span className="text-[11px] font-mono text-muted-foreground">{row.original.id}</span>
       ),
-      enableSorting: true,
+      enableSorting: false,
     },
     {
       accessorKey: 'name',
@@ -38,9 +31,11 @@ export function getVirtualMcpsColumns(
         <DataTableColumnHeader column={column} title={t('mcpsPage.virtualMcps.description', 'Description')} />
       ),
       cell: ({ row }): React.JSX.Element => (
-        <div className="max-w-[200px] truncate text-muted-foreground">{row.getValue('description')}</div>
+        <div className="whitespace-normal break-all sm:break-words text-muted-foreground text-sm leading-snug">
+          {row.getValue('description')}
+        </div>
       ),
-      enableSorting: true,
+      enableSorting: false,
     },
     {
       accessorKey: 'mcp_provider_id',
@@ -64,15 +59,11 @@ export function getVirtualMcpsColumns(
         <DataTableColumnHeader column={column} title={t('mcpsPage.virtualMcps.tools', 'Tools Count')} />
       ),
       cell: ({ row }): React.JSX.Element => {
-        const list = (row.original.config as VirtualMcpConfig | undefined)?.tools ?? [];
-        if (list.length === 0) {
+        const count = row.getValue<number>('tools');
+        if (count === 0) {
           return <span className="text-muted-foreground">-</span>;
         }
-        return (
-          <Badge variant="outline">
-            {t('mcpsPage.virtualMcps.toolsSelected', '{{count}} Selected', { count: list.length })}
-          </Badge>
-        );
+        return <span className="font-medium text-sm">{String(count)}</span>;
       },
       enableSorting: true,
     },
@@ -98,7 +89,7 @@ export function getVirtualMcpsColumns(
     },
     {
       id: 'actions',
-      header: t('common.actions', 'Actions'),
+      header: () => <span className="sr-only">{t('common.actions', 'Actions')}</span>,
       cell: ({ row }): React.JSX.Element => (
         <VirtualMcpsRowActions server={row.original} onToggleActive={onToggleActive} />
       ),

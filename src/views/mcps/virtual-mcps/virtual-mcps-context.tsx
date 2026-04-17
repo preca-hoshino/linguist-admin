@@ -33,7 +33,13 @@ interface VirtualMcpsContextType {
 
 const VirtualMcpsContext = createContext<VirtualMcpsContextType | undefined>(undefined);
 
-export function VirtualMcpsProvider({ children }: { readonly children: React.ReactNode }): React.JSX.Element {
+export function VirtualMcpsProvider({
+  children,
+  providerId,
+}: {
+  readonly children: React.ReactNode;
+  readonly providerId?: string;
+}): React.JSX.Element {
   const [servers, setServers] = useState<VirtualMcp[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,10 +63,13 @@ export function VirtualMcpsProvider({ children }: { readonly children: React.Rea
     setIsLoading(true);
     setError(null);
     try {
+      const filterProviderId = columnFilters.find((f) => f.id === 'mcp_provider_id')?.value as string | undefined;
+
       const rawPayload = {
         limit: pagination.pageSize,
         offset: pagination.pageIndex * pagination.pageSize,
         search: globalFilter || undefined,
+        mcp_provider_id: filterProviderId !== undefined && filterProviderId !== '' ? filterProviderId : providerId,
       };
 
       const payload = Object.fromEntries(
@@ -80,12 +89,12 @@ export function VirtualMcpsProvider({ children }: { readonly children: React.Rea
     } finally {
       setIsLoading(false);
     }
-  }, [pagination.pageIndex, pagination.pageSize, globalFilter]);
+  }, [pagination.pageIndex, pagination.pageSize, globalFilter, providerId, columnFilters]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset pagination when globalFilter changes
   useEffect(() => {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, [globalFilter, pagination.pageSize]);
+  }, [globalFilter, columnFilters, pagination.pageSize]);
 
   useEffect((): (() => void) => {
     const timeout = setTimeout((): void => {
