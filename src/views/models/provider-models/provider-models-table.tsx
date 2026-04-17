@@ -8,8 +8,10 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { listProviderModels } from '@/api/provider-models';
+import { listProviders } from '@/api/providers';
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { cn } from '@/utils/utils';
@@ -18,7 +20,17 @@ import { useProviderModels } from './provider-models-context';
 
 export function ProviderModelsTable(): React.JSX.Element {
   const { t } = useTranslation();
-  const { providerModels, loading, pagination, setPagination, search, setSearch, hasMore } = useProviderModels();
+  const {
+    providerModels,
+    loading,
+    pagination,
+    setPagination,
+    search,
+    setSearch,
+    columnFilters,
+    setColumnFilters,
+    hasMore,
+  } = useProviderModels();
   const columns = useProviderModelsColumns();
 
   const [rowSelection, setRowSelection] = useState({});
@@ -31,18 +43,46 @@ export function ProviderModelsTable(): React.JSX.Element {
     created_at: false,
   });
 
-  const filteredData = useMemo(() => providerModels, [providerModels]);
+  // 动态生成筛选选项（通过独立请求获取全量列表）
+  const [modelTypeOptions, setModelTypeOptions] = useState<{ label: string; value: string }[]>([]);
+  const [providerOptions, setProviderOptions] = useState<{ label: string; value: string }[]>([]);
+
+  useEffect(() => {
+    // 拉取所有 provider 供过滤使用
+    listProviders({ limit: 500 })
+      .then((res) => {
+        if (res.ok) {
+          setProviderOptions(res.data.data.map((p) => ({ label: p.name, value: p.id })));
+        }
+      })
+      .catch(() => {
+        // ignore
+      });
+
+    // 拉取一些模型以推断 model_type，或者可以硬编码。这里按现有数据推断
+    listProviderModels({ limit: 500 })
+      .then((res) => {
+        if (res.ok) {
+          const types = [...new Set(res.data.data.map((m) => m.model_type))];
+          setModelTypeOptions(types.map((k) => ({ label: k, value: k })));
+        }
+      })
+      .catch(() => {
+        // ignore
+      });
+  }, []);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
-    data: filteredData,
+    data: providerModels,
     columns,
-    pageCount: hasMore ? -1 : pagination.pageIndex + 1,
+    pageCount: hasMore ? pagination.pageIndex + 2 : pagination.pageIndex + 1,
     state: {
       sorting,
       columnVisibility,
       rowSelection,
       globalFilter: search,
+      columnFilters,
       pagination,
     },
     manualPagination: true,
@@ -51,6 +91,7 @@ export function ProviderModelsTable(): React.JSX.Element {
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
     onGlobalFilterChange: setSearch,
+    onColumnFiltersChange: setColumnFilters,
     onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -67,6 +108,48 @@ export function ProviderModelsTable(): React.JSX.Element {
     }
   }, [pageCount, table]);
 
+  const renderTableBody = (): React.JSX.Element => {
+    if (loading) {
+      return (
+        <TableRow>
+          <TableCell colSpan={columns.length} className="h-24 text-center">
+            <span className="inline-flex items-center gap-2 text-muted-foreground">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              {t('common.loading', 'Loading...')}
+            </span>
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    if (table.getRowModel().rows.length === 0) {
+      return (
+        <TableRow>
+          <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
+            {t('modelsPage.providerModels.empty', 'No provider models found')}
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    return (
+      <>
+        {table.getRowModel().rows.map((row) => (
+          <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+            {row.getVisibleCells().map((cell) => (
+              <TableCell
+                key={cell.id}
+                className={cn(cell.column.columnDef.meta?.className, cell.column.columnDef.meta?.tdClassName)}
+              >
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </>
+    );
+  };
+
   return (
     <div className={cn('flex flex-1 flex-col gap-4')}>
       <DataTableToolbar
@@ -76,20 +159,12 @@ export function ProviderModelsTable(): React.JSX.Element {
           {
             columnId: 'model_type',
             title: t('modelsPage.providerModels.type', 'Type'),
-            options: [...new Set(providerModels.map((p) => p.model_type))].map((type) => ({
-              label: type,
-              value: type,
-            })),
+            options: modelTypeOptions,
           },
           {
             columnId: 'provider_id',
             title: t('modelsPage.providerModels.provider', 'Provider'),
-            options: [
-              ...new Map(providerModels.map((p) => [p.provider_id, p.provider_name ?? p.provider_id])).entries(),
-            ].map(([value, label]) => ({
-              label,
-              value,
-            })),
+            options: providerOptions,
           },
         ]}
       />
@@ -102,12 +177,7 @@ export function ProviderModelsTable(): React.JSX.Element {
                   <TableHead
                     key={header.id}
                     colSpan={header.colSpan}
-                    className={cn(
-                      (header.column.columnDef.meta as { className?: string; thClassName?: string } | undefined)
-                        ?.className,
-                      (header.column.columnDef.meta as { className?: string; thClassName?: string } | undefined)
-                        ?.thClassName,
-                    )}
+                    className={cn(header.column.columnDef.meta?.className, header.column.columnDef.meta?.thClassName)}
                   >
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
@@ -115,44 +185,7 @@ export function ProviderModelsTable(): React.JSX.Element {
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
-            {loading && (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  <span className="inline-flex items-center gap-2 text-muted-foreground">
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                    {t('common.loading', 'Loading...')}
-                  </span>
-                </TableCell>
-              </TableRow>
-            )}
-            {!loading &&
-              table.getRowModel().rows.length > 0 &&
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={cn(
-                        (cell.column.columnDef.meta as { className?: string; tdClassName?: string } | undefined)
-                          ?.className,
-                        (cell.column.columnDef.meta as { className?: string; tdClassName?: string } | undefined)
-                          ?.tdClassName,
-                      )}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            {!loading && table.getRowModel().rows.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
-                  {t('modelsPage.providerModels.empty', 'No provider models found')}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
+          <TableBody>{renderTableBody()}</TableBody>
         </Table>
       </div>
       <DataTablePagination table={table} className="mt-auto" />

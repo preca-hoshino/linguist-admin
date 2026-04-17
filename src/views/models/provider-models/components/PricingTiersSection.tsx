@@ -8,11 +8,11 @@ import { Input } from '@/components/ui/Input';
 import { Slider } from '@/components/ui/Slider';
 
 interface PricingTier {
-  startTokens: number;
-  maxTokens: number;
-  inputPrice: number;
-  outputPrice: number;
-  cachePrice: number;
+  start_tokens: number;
+  max_tokens: number;
+  input_price: number;
+  output_price: number;
+  cache_price: number;
 }
 
 interface FormWithPricing {
@@ -93,7 +93,7 @@ export function PricingTiersSection<T extends FormWithPricing>({
                   {t('modelsPage.providerModels.tierRange', 'Tier {{num}}', { num: idx + 1 })}
                 </span>
                 <span className="text-sm leading-snug font-medium text-foreground">
-                  {tier.startTokens}K&nbsp;&ndash;&nbsp;{tier.maxTokens}K
+                  {tier.start_tokens}K&nbsp;&ndash;&nbsp;{tier.max_tokens}K
                 </span>
                 <span className="text-xs text-muted-foreground/70">/ 1M Tokens</span>
               </div>
@@ -111,7 +111,7 @@ export function PricingTiersSection<T extends FormWithPricing>({
                     type="number"
                     step="0.000001"
                     min={0}
-                    {...form.register(`pricing_tiers.${idx}.inputPrice` as Parameters<typeof form.register>[0], {
+                    {...form.register(`pricing_tiers.${idx}.input_price` as Parameters<typeof form.register>[0], {
                       valueAsNumber: true,
                     })}
                     placeholder="0.000000"
@@ -133,7 +133,7 @@ export function PricingTiersSection<T extends FormWithPricing>({
                     type="number"
                     step="0.000001"
                     min={0}
-                    {...form.register(`pricing_tiers.${idx}.outputPrice` as Parameters<typeof form.register>[0], {
+                    {...form.register(`pricing_tiers.${idx}.output_price` as Parameters<typeof form.register>[0], {
                       valueAsNumber: true,
                     })}
                     placeholder="0.000000"
@@ -156,7 +156,7 @@ export function PricingTiersSection<T extends FormWithPricing>({
                       type="number"
                       step="0.000001"
                       min={0}
-                      {...form.register(`pricing_tiers.${idx}.cachePrice` as Parameters<typeof form.register>[0], {
+                      {...form.register(`pricing_tiers.${idx}.cache_price` as Parameters<typeof form.register>[0], {
                         valueAsNumber: true,
                       })}
                       placeholder="0.000000"
@@ -206,7 +206,7 @@ export function usePricingTiersLogic<T extends FormWithPricing>({
     if (currentPricingTiers.length <= 1) {
       return [];
     }
-    return currentPricingTiers.slice(0, -1).map((tier) => tier.maxTokens || 0);
+    return currentPricingTiers.slice(0, -1).map((tier) => tier.max_tokens || 0);
   }, [currentPricingTiers]);
 
   const handleSliderChange = useCallback(
@@ -218,15 +218,15 @@ export function usePricingTiersLogic<T extends FormWithPricing>({
         const start = i === 0 ? 0 : sortedSplits[i - 1];
         const max = i === sortedSplits.length ? currentMaxTokens : sortedSplits[i];
 
-        const defaultPricing = { inputPrice: 0, outputPrice: 0, cachePrice: 0 };
+        const defaultPricing = { input_price: 0, output_price: 0, cache_price: 0 };
         const oldPrices = currentPricingTiers[i] ?? currentPricingTiers.at(-1) ?? defaultPricing;
 
         newTiers.push({
-          startTokens: start ?? 0,
-          maxTokens: Math.max(start ?? 0, max ?? 1),
-          inputPrice: oldPrices.inputPrice,
-          outputPrice: oldPrices.outputPrice,
-          cachePrice: oldPrices.cachePrice,
+          start_tokens: start ?? 0,
+          max_tokens: Math.max(start ?? 0, max ?? 1),
+          input_price: oldPrices.input_price,
+          output_price: oldPrices.output_price,
+          cache_price: oldPrices.cache_price,
         });
       }
       setValue('pricing_tiers' as Path<T>, newTiers as PathValue<T, Path<T>>, {
@@ -242,16 +242,15 @@ export function usePricingTiersLogic<T extends FormWithPricing>({
     if (currentPricingTiers.length === 0) {
       setValue(
         'pricing_tiers' as Path<T>,
-        [{ startTokens: 0, maxTokens: currentMaxTokens, inputPrice: 0, outputPrice: 0, cachePrice: 0 }] as PathValue<
-          T,
-          Path<T>
-        >,
+        [
+          { start_tokens: 0, max_tokens: currentMaxTokens, input_price: 0, output_price: 0, cache_price: 0 },
+        ] as PathValue<T, Path<T>>,
       );
       return;
     }
 
     const lastTier = currentPricingTiers.at(-1);
-    if (lastTier && lastTier.maxTokens !== currentMaxTokens) {
+    if (lastTier && lastTier.max_tokens !== currentMaxTokens) {
       const validSplits = splitPoints.filter((p) => p < currentMaxTokens);
       const uniqueSplits = [...new Set(validSplits)];
       handleSliderChange(uniqueSplits);

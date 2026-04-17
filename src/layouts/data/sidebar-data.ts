@@ -1,4 +1,5 @@
 import {
+  AppWindow,
   BarChart,
   Box,
   Command,
@@ -8,7 +9,6 @@ import {
   Settings as SettingsIcon,
   Users,
   Wrench,
-  AppWindow,
 } from 'lucide-react';
 import i18n from '@/i18n';
 import type { SidebarData } from '../types';
@@ -84,11 +84,6 @@ export function getSidebarData(_language?: string): SidebarData {
                 title: i18n.t('nav.providers'),
                 url: '/mcps/providers',
                 icon: Database,
-              },
-              {
-                title: i18n.t('nav.providerMcps'),
-                url: '/mcps/provider-mcps',
-                icon: Box,
               },
               {
                 title: i18n.t('nav.virtualMcps'),

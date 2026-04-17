@@ -8,8 +8,9 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { listProviders } from '@/api/providers';
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { cn } from '@/utils/utils';
@@ -18,25 +19,40 @@ import { useProviders } from './providers-context';
 
 export function ProvidersTable(): React.JSX.Element {
   const { t } = useTranslation();
-  const { providers, loading, pagination, setPagination, search, setSearch, hasMore } = useProviders();
+  const { providers, loading, pagination, setPagination, search, setSearch, columnFilters, setColumnFilters, hasMore } =
+    useProviders();
   const columns = useProvidersColumns();
 
   const [rowSelection, setRowSelection] = useState({});
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
-  const filteredData = useMemo(() => providers, [providers]);
+  // 动态生成 kind 筛选选项（通过独立请求获取全量 kind 列表）
+  const [kindOptions, setKindOptions] = useState<{ label: string; value: string }[]>([]);
+  useEffect(() => {
+    listProviders({ limit: 500 })
+      .then((res) => {
+        if (res.ok) {
+          const kinds = [...new Set(res.data.data.map((p) => p.kind))];
+          setKindOptions(kinds.map((k) => ({ label: k, value: k })));
+        }
+      })
+      .catch(() => {
+        // ignore
+      });
+  }, []);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
-    data: filteredData,
+    data: providers,
     columns,
-    pageCount: hasMore ? -1 : pagination.pageIndex + 1,
+    pageCount: hasMore ? pagination.pageIndex + 2 : pagination.pageIndex + 1,
     state: {
       sorting,
       columnVisibility,
       rowSelection,
       globalFilter: search,
+      columnFilters,
       pagination,
     },
     manualPagination: true,
@@ -45,6 +61,7 @@ export function ProvidersTable(): React.JSX.Element {
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
     onGlobalFilterChange: setSearch,
+    onColumnFiltersChange: setColumnFilters,
     onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -70,10 +87,7 @@ export function ProvidersTable(): React.JSX.Element {
           {
             columnId: 'kind',
             title: t('modelsPage.providers.kind', 'Kind'),
-            options: [...new Set(providers.map((p) => p.kind))].map((kind) => ({
-              label: kind,
-              value: kind,
-            })),
+            options: kindOptions,
           },
         ]}
       />

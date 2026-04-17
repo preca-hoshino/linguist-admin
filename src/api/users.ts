@@ -30,7 +30,7 @@ export async function fetchUsers(params?: {
   if (params?.limit !== undefined) {
     qs.set('limit', String(params.limit));
   }
-  if (params?.starting_after !== undefined) {
+  if (params?.starting_after != null && params.starting_after !== '') {
     qs.set('starting_after', params.starting_after);
   }
   if (params?.search != null && params.search !== '') {

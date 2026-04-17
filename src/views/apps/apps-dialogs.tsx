@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { deleteApp } from '@/api/apps';
+import { deleteApp, rotateAppKey } from '@/api/apps';
+import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
-import { useApps, type AppsDialogType } from './apps-context';
+import { type AppsDialogType, useApps } from './apps-context';
 import { AppsMutateDialog } from './apps-mutate-dialog';
 
 export function AppsDialogs(): React.JSX.Element {
@@ -12,6 +13,7 @@ export function AppsDialogs(): React.JSX.Element {
   const { open, setOpen, currentRow, loadApps, setCurrentRow } = useApps();
 
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isRotating, setIsRotating] = useState(false);
 
   const handleOpenChange = (type: AppsDialogType, isOpen: boolean): void => {
     if (isOpen) {
@@ -37,6 +39,23 @@ export function AppsDialogs(): React.JSX.Element {
       // Ignored here, assume interceptors or toast handled the error
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleRotateKey = async (): Promise<void> => {
+    if (currentRow?.id === undefined || currentRow.id === '') {
+      return;
+    }
+    try {
+      setIsRotating(true);
+      await rotateAppKey(currentRow.id);
+      toast.success(t('apps.rotateSuccess', 'API Key rotated successfully'));
+      await loadApps();
+      handleOpenChange('rotate', false);
+    } catch {
+      toast.error(t('apps.rotateFailed', 'Failed to rotate API Key'));
+    } finally {
+      setIsRotating(false);
     }
   };
 
@@ -68,6 +87,24 @@ export function AppsDialogs(): React.JSX.Element {
           void handleDelete();
         }}
         confirmText={isDeleting ? t('common.deleting', 'Deleting...') : t('common.delete', 'Delete')}
+      />
+
+      <ConfirmDialog
+        open={open === 'rotate'}
+        onOpenChange={(v) => {
+          handleOpenChange('rotate', v);
+        }}
+        title={t('apps.rotateConfirmTitle', 'Rotate API Key?')}
+        desc={t(
+          'apps.rotateConfirmDesc',
+          'Rotating the API key will immediately invalidate the current key. All existing integrations using the old key will stop working until they are updated with the new key. This action cannot be undone.',
+        )}
+        destructive={true}
+        isLoading={isRotating}
+        handleConfirm={() => {
+          void handleRotateKey();
+        }}
+        confirmText={isRotating ? t('common.updating', 'Updating...') : t('apps.rotateConfirmBtn', 'Yes, Rotate Key')}
       />
     </>
   );

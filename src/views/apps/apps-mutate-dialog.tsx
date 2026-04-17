@@ -3,11 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { Box, Braces, Fingerprint, ListFilter, MessageSquare, Plus, Trash2, X } from 'lucide-react';
 import { useEffect } from 'react';
-import { useFieldArray, useForm, type UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn, useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { createApp, updateApp } from '@/api/apps';
 import { listVirtualModels } from '@/api/virtual-models';
+import { listVirtualMcps } from '@/api/mcp-virtual-servers';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
@@ -78,9 +79,8 @@ function AppAllowedList({ form, name, options, isSelect, t, itemName }: AppAllow
                       </FormControl>
                       <SelectContent>
                         {options.map((opt) => {
-                          const IconComp = (
-                            opt.type != null && MODEL_TYPE_ICON[opt.type] ? MODEL_TYPE_ICON[opt.type] : Box
-                          ) as typeof Box;
+                          const customIcon = (opt.type ?? '') === '' ? undefined : MODEL_TYPE_ICON[opt.type as string];
+                          const Icon = customIcon ?? Box;
                           return (
                             <SelectItem key={opt.id} value={opt.id}>
                               <div className="flex items-center gap-2">
@@ -155,6 +155,19 @@ export function AppsMutateDialog({
     staleTime: 60_000,
   });
 
+  const { data: virtualMcps = [] } = useQuery({
+    queryKey: ['virtual-mcps-list'],
+    queryFn: async () => {
+      const res = await listVirtualMcps();
+      if (!res.ok) {
+        throw new Error('Failed to load virtual MCPs');
+      }
+      return res.data.data;
+    },
+    enabled: open,
+    staleTime: 60_000,
+  });
+
   const form = useForm<AppForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -170,7 +183,7 @@ export function AppsMutateDialog({
         form.reset({
           name: currentRow.name,
           allowed_model_ids: currentRow.allowed_model_ids.map((id) => ({ id })),
-          allowed_mcp_ids: [],
+          allowed_mcp_ids: currentRow.allowed_mcp_ids?.map((id) => ({ id })) ?? [],
         });
       } else {
         form.reset({
@@ -185,11 +198,13 @@ export function AppsMutateDialog({
   const onSubmit = async (values: AppForm): Promise<void> => {
     try {
       const allowedModelsArray = values.allowed_model_ids.map((m) => m.id.trim()).filter((id) => id !== '');
+      const allowedMcpsArray = values.allowed_mcp_ids.map((m) => m.id.trim()).filter((id) => id !== '');
 
       if (currentRow) {
         const res = await updateApp(currentRow.id, {
           name: values.name,
           allowed_model_ids: allowedModelsArray,
+          allowed_mcp_ids: allowedMcpsArray,
         });
         if (!res.ok) {
           throw new Error(res.error.message || 'Update failed');
@@ -198,6 +213,7 @@ export function AppsMutateDialog({
         const res = await createApp({
           name: values.name,
           allowed_model_ids: allowedModelsArray,
+          allowed_mcp_ids: allowedMcpsArray,
         });
         if (!res.ok) {
           throw new Error(res.error.message || 'Creation failed');
@@ -316,7 +332,14 @@ export function AppsMutateDialog({
                         </div>
                       </AccordionTrigger>
                       <AccordionContent className="px-1 pt-4 pb-2">
-                        <AppAllowedList form={form} name="allowed_mcp_ids" isSelect={false} t={t} itemName="MCP" />
+                        <AppAllowedList
+                          form={form}
+                          name="allowed_mcp_ids"
+                          isSelect={true}
+                          options={virtualMcps.map((vmcp) => ({ id: vmcp.id, name: vmcp.name }))}
+                          t={t}
+                          itemName="MCP"
+                        />
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>

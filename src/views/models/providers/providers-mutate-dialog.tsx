@@ -160,7 +160,8 @@ export function ProvidersMutateDialog({
 
         if (isCopilotKind) {
           // Copilot 类型：不提交 base_url，仅当有新凭证时才提交 credential
-          if (copilotAuthData !== null) {
+          // 防止将作为 UI 占位符的 '(saved)' 发送给后端覆盖真实 Token
+          if (copilotAuthData !== null && copilotAuthData.accessToken !== '(saved)') {
             payload.credential_type = 'copilot';
             payload.credential = { accessToken: copilotAuthData.accessToken };
           }

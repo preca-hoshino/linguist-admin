@@ -1,9 +1,9 @@
 import {
   type ColumnFiltersState,
-  type SortingState,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
+  type SortingState,
   useReactTable,
 } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
@@ -30,9 +30,9 @@ export function AppsTable(): React.JSX.Element {
         setStatusFilter('all');
       }
     } else {
-      const val = (activeF.value as unknown[])[0];
-      if (typeof val === 'string' && statusFilter !== val) {
-        setStatusFilter(val);
+      const val = (activeF.value as string[])[0];
+      if (statusFilter !== val) {
+        setStatusFilter(val as 'all' | 'true' | 'false');
       }
     }
   }, [columnFilters, statusFilter, setStatusFilter]);

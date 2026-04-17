@@ -6,7 +6,7 @@ export interface App {
   is_active: boolean;
   created_at: string;
   updated_at: string;
-  key_count: number;
+  api_key: string;
   allowed_model_ids: string[];
   allowed_mcp_ids?: string[];
 }

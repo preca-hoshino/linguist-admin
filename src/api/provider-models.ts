@@ -10,6 +10,8 @@ export const listProviderModels = async (params?: {
   limit?: number;
   starting_after?: string;
   search?: string;
+  model_type?: string;
+  is_active?: boolean;
 }): Promise<ApiResult<ListResponse<ProviderModel>>> => {
   const qs = new URLSearchParams();
   if (params?.provider_id != null && params.provider_id !== '') {
@@ -18,11 +20,17 @@ export const listProviderModels = async (params?: {
   if (params?.limit !== undefined) {
     qs.set('limit', String(params.limit));
   }
-  if (params?.starting_after !== undefined) {
-    qs.set('starting_after', String(params.starting_after));
+  if (params?.starting_after != null && params.starting_after !== '') {
+    qs.set('starting_after', params.starting_after);
   }
   if (params?.search != null && params.search !== '') {
     qs.set('search', params.search);
+  }
+  if (params?.model_type != null && params.model_type !== '') {
+    qs.set('model_type', params.model_type);
+  }
+  if (params?.is_active !== undefined) {
+    qs.set('is_active', String(params.is_active));
   }
   const query = qs.toString();
   const queryStr = query ? `?${query}` : '';

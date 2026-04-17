@@ -27,6 +27,7 @@ export default {
     virtualMcps: '虚拟 MCP',
     logs: '日志',
     management: '管理',
+    apps: '应用',
     apiKeys: 'API Key',
     users: '用户',
     preferences: '偏好',
@@ -267,7 +268,7 @@ export default {
     providers: {
       title: '模型 — 提供商',
       desc: '配置并管理 LLM 模型提供商。',
-      id: '提供商 ID',
+      id: 'ID',
       name: '名称',
       nameRequired: '名称为必填项',
       kind: '类型',

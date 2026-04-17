@@ -1,6 +1,6 @@
+import { BarChart2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/utils/utils';
-import { BarChart2 } from 'lucide-react';
 
 // ── 组件：Token 用量卡片
 interface TokenUsage {

@@ -8,37 +8,39 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './router/__root';
-import { Route as AuthenticatedRouteImport } from './router/_authenticated';
-import { Route as AuthenticatedIndexRouteImport } from './router/_authenticated/index';
-import { Route as AuthenticatedModelsRouteImport } from './router/_authenticated/models';
-import { Route as AuthenticatedMcpsRouteImport } from './router/_authenticated/mcps';
-import { Route as authLoginRouteImport } from './router/(auth)/login';
-import { Route as AuthenticatedSettingsRouteRouteImport } from './router/_authenticated/settings/route';
-import { Route as AuthenticatedUsersIndexRouteImport } from './router/_authenticated/users/index';
-import { Route as AuthenticatedSettingsIndexRouteImport } from './router/_authenticated/settings/index';
-import { Route as AuthenticatedModelsIndexRouteImport } from './router/_authenticated/models/index';
-import { Route as AuthenticatedMcpsIndexRouteImport } from './router/_authenticated/mcps/index';
-import { Route as AuthenticatedDataIndexRouteImport } from './router/_authenticated/data/index';
-import { Route as AuthenticatedAppsIndexRouteImport } from './router/_authenticated/apps/index';
-import { Route as AuthenticatedSettingsNotificationsRouteImport } from './router/_authenticated/settings/notifications';
-import { Route as AuthenticatedSettingsDisplayRouteImport } from './router/_authenticated/settings/display';
-import { Route as AuthenticatedSettingsAppearanceRouteImport } from './router/_authenticated/settings/appearance';
-import { Route as AuthenticatedSettingsAccountRouteImport } from './router/_authenticated/settings/account';
-import { Route as AuthenticatedSettingsAboutRouteImport } from './router/_authenticated/settings/about';
-import { Route as AuthenticatedAppsIdRouteImport } from './router/_authenticated/apps/$id';
-import { Route as AuthenticatedModelsVirtualModelsIndexRouteImport } from './router/_authenticated/models/virtual-models/index';
-import { Route as AuthenticatedModelsProvidersIndexRouteImport } from './router/_authenticated/models/providers/index';
-import { Route as AuthenticatedModelsProviderModelsIndexRouteImport } from './router/_authenticated/models/provider-models/index';
-import { Route as AuthenticatedModelsLogsIndexRouteImport } from './router/_authenticated/models/logs/index';
-import { Route as AuthenticatedMcpsVirtualMcpsIndexRouteImport } from './router/_authenticated/mcps/virtual-mcps/index';
-import { Route as AuthenticatedMcpsProvidersIndexRouteImport } from './router/_authenticated/mcps/providers/index';
-import { Route as AuthenticatedMcpsProviderMcpsIndexRouteImport } from './router/_authenticated/mcps/provider-mcps/index';
-import { Route as AuthenticatedMcpsLogsIndexRouteImport } from './router/_authenticated/mcps/logs/index';
-import { Route as AuthenticatedModelsVirtualModelsIdRouteImport } from './router/_authenticated/models/virtual-models/$id';
-import { Route as AuthenticatedModelsProvidersIdRouteImport } from './router/_authenticated/models/providers/$id';
-import { Route as AuthenticatedModelsProviderModelsIdRouteImport } from './router/_authenticated/models/provider-models/$id';
-import { Route as AuthenticatedModelsLogsIdRouteImport } from './router/_authenticated/models/logs/$id';
+import { Route as rootRouteImport } from './router/__root'
+import { Route as AuthenticatedRouteImport } from './router/_authenticated'
+import { Route as AuthenticatedIndexRouteImport } from './router/_authenticated/index'
+import { Route as AuthenticatedModelsRouteImport } from './router/_authenticated/models'
+import { Route as AuthenticatedMcpsRouteImport } from './router/_authenticated/mcps'
+import { Route as authLoginRouteImport } from './router/(auth)/login'
+import { Route as AuthenticatedSettingsRouteRouteImport } from './router/_authenticated/settings/route'
+import { Route as AuthenticatedUsersIndexRouteImport } from './router/_authenticated/users/index'
+import { Route as AuthenticatedSettingsIndexRouteImport } from './router/_authenticated/settings/index'
+import { Route as AuthenticatedModelsIndexRouteImport } from './router/_authenticated/models/index'
+import { Route as AuthenticatedMcpsIndexRouteImport } from './router/_authenticated/mcps/index'
+import { Route as AuthenticatedDataIndexRouteImport } from './router/_authenticated/data/index'
+import { Route as AuthenticatedAppsIndexRouteImport } from './router/_authenticated/apps/index'
+import { Route as AuthenticatedSettingsNotificationsRouteImport } from './router/_authenticated/settings/notifications'
+import { Route as AuthenticatedSettingsDisplayRouteImport } from './router/_authenticated/settings/display'
+import { Route as AuthenticatedSettingsAppearanceRouteImport } from './router/_authenticated/settings/appearance'
+import { Route as AuthenticatedSettingsAccountRouteImport } from './router/_authenticated/settings/account'
+import { Route as AuthenticatedSettingsAboutRouteImport } from './router/_authenticated/settings/about'
+import { Route as AuthenticatedAppsIdRouteImport } from './router/_authenticated/apps/$id'
+import { Route as AuthenticatedModelsVirtualModelsIndexRouteImport } from './router/_authenticated/models/virtual-models/index'
+import { Route as AuthenticatedModelsProvidersIndexRouteImport } from './router/_authenticated/models/providers/index'
+import { Route as AuthenticatedModelsProviderModelsIndexRouteImport } from './router/_authenticated/models/provider-models/index'
+import { Route as AuthenticatedModelsLogsIndexRouteImport } from './router/_authenticated/models/logs/index'
+import { Route as AuthenticatedMcpsVirtualMcpsIndexRouteImport } from './router/_authenticated/mcps/virtual-mcps/index'
+import { Route as AuthenticatedMcpsProvidersIndexRouteImport } from './router/_authenticated/mcps/providers/index'
+import { Route as AuthenticatedMcpsLogsIndexRouteImport } from './router/_authenticated/mcps/logs/index'
+import { Route as AuthenticatedModelsVirtualModelsIdRouteImport } from './router/_authenticated/models/virtual-models/$id'
+import { Route as AuthenticatedModelsProvidersIdRouteImport } from './router/_authenticated/models/providers/$id'
+import { Route as AuthenticatedModelsProviderModelsIdRouteImport } from './router/_authenticated/models/provider-models/$id'
+import { Route as AuthenticatedModelsLogsIdRouteImport } from './router/_authenticated/models/logs/$id'
+import { Route as AuthenticatedMcpsVirtualMcpsIdRouteImport } from './router/_authenticated/mcps/virtual-mcps/$id'
+import { Route as AuthenticatedMcpsProvidersIdRouteImport } from './router/_authenticated/mcps/providers/$id'
+import { Route as AuthenticatedMcpsLogsIdRouteImport } from './router/_authenticated/mcps/logs/$id'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -128,193 +130,224 @@ const AuthenticatedAppsIdRoute = AuthenticatedAppsIdRouteImport.update({
   id: '/apps/$id',
   path: '/apps/$id',
   getParentRoute: () => AuthenticatedRoute,
-} as any);
-const AuthenticatedModelsVirtualModelsIndexRoute = AuthenticatedModelsVirtualModelsIndexRouteImport.update({
-  id: '/virtual-models/',
-  path: '/virtual-models/',
-  getParentRoute: () => AuthenticatedModelsRoute,
-} as any);
-const AuthenticatedModelsProvidersIndexRoute = AuthenticatedModelsProvidersIndexRouteImport.update({
-  id: '/providers/',
-  path: '/providers/',
-  getParentRoute: () => AuthenticatedModelsRoute,
-} as any);
-const AuthenticatedModelsProviderModelsIndexRoute = AuthenticatedModelsProviderModelsIndexRouteImport.update({
-  id: '/provider-models/',
-  path: '/provider-models/',
-  getParentRoute: () => AuthenticatedModelsRoute,
-} as any);
-const AuthenticatedModelsLogsIndexRoute = AuthenticatedModelsLogsIndexRouteImport.update({
-  id: '/logs/',
-  path: '/logs/',
-  getParentRoute: () => AuthenticatedModelsRoute,
-} as any);
-const AuthenticatedMcpsVirtualMcpsIndexRoute = AuthenticatedMcpsVirtualMcpsIndexRouteImport.update({
-  id: '/virtual-mcps/',
-  path: '/virtual-mcps/',
-  getParentRoute: () => AuthenticatedMcpsRoute,
-} as any);
-const AuthenticatedMcpsProvidersIndexRoute = AuthenticatedMcpsProvidersIndexRouteImport.update({
-  id: '/providers/',
-  path: '/providers/',
-  getParentRoute: () => AuthenticatedMcpsRoute,
-} as any);
-const AuthenticatedMcpsProviderMcpsIndexRoute = AuthenticatedMcpsProviderMcpsIndexRouteImport.update({
-  id: '/provider-mcps/',
-  path: '/provider-mcps/',
-  getParentRoute: () => AuthenticatedMcpsRoute,
-} as any);
-const AuthenticatedMcpsLogsIndexRoute = AuthenticatedMcpsLogsIndexRouteImport.update({
-  id: '/logs/',
-  path: '/logs/',
-  getParentRoute: () => AuthenticatedMcpsRoute,
-} as any);
-const AuthenticatedModelsVirtualModelsIdRoute = AuthenticatedModelsVirtualModelsIdRouteImport.update({
-  id: '/virtual-models/$id',
-  path: '/virtual-models/$id',
-  getParentRoute: () => AuthenticatedModelsRoute,
-} as any);
-const AuthenticatedModelsProvidersIdRoute = AuthenticatedModelsProvidersIdRouteImport.update({
-  id: '/providers/$id',
-  path: '/providers/$id',
-  getParentRoute: () => AuthenticatedModelsRoute,
-} as any);
-const AuthenticatedModelsProviderModelsIdRoute = AuthenticatedModelsProviderModelsIdRouteImport.update({
-  id: '/provider-models/$id',
-  path: '/provider-models/$id',
-  getParentRoute: () => AuthenticatedModelsRoute,
-} as any);
-const AuthenticatedModelsLogsIdRoute = AuthenticatedModelsLogsIdRouteImport.update({
+} as any)
+const AuthenticatedModelsVirtualModelsIndexRoute =
+  AuthenticatedModelsVirtualModelsIndexRouteImport.update({
+    id: '/virtual-models/',
+    path: '/virtual-models/',
+    getParentRoute: () => AuthenticatedModelsRoute,
+  } as any)
+const AuthenticatedModelsProvidersIndexRoute =
+  AuthenticatedModelsProvidersIndexRouteImport.update({
+    id: '/providers/',
+    path: '/providers/',
+    getParentRoute: () => AuthenticatedModelsRoute,
+  } as any)
+const AuthenticatedModelsProviderModelsIndexRoute =
+  AuthenticatedModelsProviderModelsIndexRouteImport.update({
+    id: '/provider-models/',
+    path: '/provider-models/',
+    getParentRoute: () => AuthenticatedModelsRoute,
+  } as any)
+const AuthenticatedModelsLogsIndexRoute =
+  AuthenticatedModelsLogsIndexRouteImport.update({
+    id: '/logs/',
+    path: '/logs/',
+    getParentRoute: () => AuthenticatedModelsRoute,
+  } as any)
+const AuthenticatedMcpsVirtualMcpsIndexRoute =
+  AuthenticatedMcpsVirtualMcpsIndexRouteImport.update({
+    id: '/virtual-mcps/',
+    path: '/virtual-mcps/',
+    getParentRoute: () => AuthenticatedMcpsRoute,
+  } as any)
+const AuthenticatedMcpsProvidersIndexRoute =
+  AuthenticatedMcpsProvidersIndexRouteImport.update({
+    id: '/providers/',
+    path: '/providers/',
+    getParentRoute: () => AuthenticatedMcpsRoute,
+  } as any)
+const AuthenticatedMcpsLogsIndexRoute =
+  AuthenticatedMcpsLogsIndexRouteImport.update({
+    id: '/logs/',
+    path: '/logs/',
+    getParentRoute: () => AuthenticatedMcpsRoute,
+  } as any)
+const AuthenticatedModelsVirtualModelsIdRoute =
+  AuthenticatedModelsVirtualModelsIdRouteImport.update({
+    id: '/virtual-models/$id',
+    path: '/virtual-models/$id',
+    getParentRoute: () => AuthenticatedModelsRoute,
+  } as any)
+const AuthenticatedModelsProvidersIdRoute =
+  AuthenticatedModelsProvidersIdRouteImport.update({
+    id: '/providers/$id',
+    path: '/providers/$id',
+    getParentRoute: () => AuthenticatedModelsRoute,
+  } as any)
+const AuthenticatedModelsProviderModelsIdRoute =
+  AuthenticatedModelsProviderModelsIdRouteImport.update({
+    id: '/provider-models/$id',
+    path: '/provider-models/$id',
+    getParentRoute: () => AuthenticatedModelsRoute,
+  } as any)
+const AuthenticatedModelsLogsIdRoute =
+  AuthenticatedModelsLogsIdRouteImport.update({
+    id: '/logs/$id',
+    path: '/logs/$id',
+    getParentRoute: () => AuthenticatedModelsRoute,
+  } as any)
+const AuthenticatedMcpsVirtualMcpsIdRoute =
+  AuthenticatedMcpsVirtualMcpsIdRouteImport.update({
+    id: '/virtual-mcps/$id',
+    path: '/virtual-mcps/$id',
+    getParentRoute: () => AuthenticatedMcpsRoute,
+  } as any)
+const AuthenticatedMcpsProvidersIdRoute =
+  AuthenticatedMcpsProvidersIdRouteImport.update({
+    id: '/providers/$id',
+    path: '/providers/$id',
+    getParentRoute: () => AuthenticatedMcpsRoute,
+  } as any)
+const AuthenticatedMcpsLogsIdRoute = AuthenticatedMcpsLogsIdRouteImport.update({
   id: '/logs/$id',
   path: '/logs/$id',
-  getParentRoute: () => AuthenticatedModelsRoute,
-} as any);
+  getParentRoute: () => AuthenticatedMcpsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren;
-  '/login': typeof authLoginRoute;
-  '/mcps': typeof AuthenticatedMcpsRouteWithChildren;
-  '/models': typeof AuthenticatedModelsRouteWithChildren;
-  '/': typeof AuthenticatedIndexRoute;
-  '/apps/$id': typeof AuthenticatedAppsIdRoute;
-  '/settings/about': typeof AuthenticatedSettingsAboutRoute;
-  '/settings/account': typeof AuthenticatedSettingsAccountRoute;
-  '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute;
-  '/settings/display': typeof AuthenticatedSettingsDisplayRoute;
-  '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute;
-  '/apps': typeof AuthenticatedAppsIndexRoute;
-  '/data': typeof AuthenticatedDataIndexRoute;
-  '/mcps/': typeof AuthenticatedMcpsIndexRoute;
-  '/models/': typeof AuthenticatedModelsIndexRoute;
-  '/settings/': typeof AuthenticatedSettingsIndexRoute;
-  '/users': typeof AuthenticatedUsersIndexRoute;
-  '/models/logs/$id': typeof AuthenticatedModelsLogsIdRoute;
-  '/models/provider-models/$id': typeof AuthenticatedModelsProviderModelsIdRoute;
-  '/models/providers/$id': typeof AuthenticatedModelsProvidersIdRoute;
-  '/models/virtual-models/$id': typeof AuthenticatedModelsVirtualModelsIdRoute;
-  '/mcps/logs': typeof AuthenticatedMcpsLogsIndexRoute;
-  '/mcps/provider-mcps': typeof AuthenticatedMcpsProviderMcpsIndexRoute;
-  '/mcps/providers': typeof AuthenticatedMcpsProvidersIndexRoute;
-  '/mcps/virtual-mcps': typeof AuthenticatedMcpsVirtualMcpsIndexRoute;
-  '/models/logs': typeof AuthenticatedModelsLogsIndexRoute;
-  '/models/provider-models': typeof AuthenticatedModelsProviderModelsIndexRoute;
-  '/models/providers': typeof AuthenticatedModelsProvidersIndexRoute;
-  '/models/virtual-models': typeof AuthenticatedModelsVirtualModelsIndexRoute;
+  '/': typeof AuthenticatedIndexRoute
+  '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
+  '/login': typeof authLoginRoute
+  '/mcps': typeof AuthenticatedMcpsRouteWithChildren
+  '/models': typeof AuthenticatedModelsRouteWithChildren
+  '/apps/$id': typeof AuthenticatedAppsIdRoute
+  '/settings/about': typeof AuthenticatedSettingsAboutRoute
+  '/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
+  '/settings/display': typeof AuthenticatedSettingsDisplayRoute
+  '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/apps/': typeof AuthenticatedAppsIndexRoute
+  '/data/': typeof AuthenticatedDataIndexRoute
+  '/mcps/': typeof AuthenticatedMcpsIndexRoute
+  '/models/': typeof AuthenticatedModelsIndexRoute
+  '/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/users/': typeof AuthenticatedUsersIndexRoute
+  '/mcps/logs/$id': typeof AuthenticatedMcpsLogsIdRoute
+  '/mcps/providers/$id': typeof AuthenticatedMcpsProvidersIdRoute
+  '/mcps/virtual-mcps/$id': typeof AuthenticatedMcpsVirtualMcpsIdRoute
+  '/models/logs/$id': typeof AuthenticatedModelsLogsIdRoute
+  '/models/provider-models/$id': typeof AuthenticatedModelsProviderModelsIdRoute
+  '/models/providers/$id': typeof AuthenticatedModelsProvidersIdRoute
+  '/models/virtual-models/$id': typeof AuthenticatedModelsVirtualModelsIdRoute
+  '/mcps/logs/': typeof AuthenticatedMcpsLogsIndexRoute
+  '/mcps/providers/': typeof AuthenticatedMcpsProvidersIndexRoute
+  '/mcps/virtual-mcps/': typeof AuthenticatedMcpsVirtualMcpsIndexRoute
+  '/models/logs/': typeof AuthenticatedModelsLogsIndexRoute
+  '/models/provider-models/': typeof AuthenticatedModelsProviderModelsIndexRoute
+  '/models/providers/': typeof AuthenticatedModelsProvidersIndexRoute
+  '/models/virtual-models/': typeof AuthenticatedModelsVirtualModelsIndexRoute
 }
 export interface FileRoutesByTo {
-  '/login': typeof authLoginRoute;
-  '/': typeof AuthenticatedIndexRoute;
-  '/apps/$id': typeof AuthenticatedAppsIdRoute;
-  '/settings/about': typeof AuthenticatedSettingsAboutRoute;
-  '/settings/account': typeof AuthenticatedSettingsAccountRoute;
-  '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute;
-  '/settings/display': typeof AuthenticatedSettingsDisplayRoute;
-  '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute;
-  '/apps': typeof AuthenticatedAppsIndexRoute;
-  '/data': typeof AuthenticatedDataIndexRoute;
-  '/mcps': typeof AuthenticatedMcpsIndexRoute;
-  '/models': typeof AuthenticatedModelsIndexRoute;
-  '/settings': typeof AuthenticatedSettingsIndexRoute;
-  '/users': typeof AuthenticatedUsersIndexRoute;
-  '/models/logs/$id': typeof AuthenticatedModelsLogsIdRoute;
-  '/models/provider-models/$id': typeof AuthenticatedModelsProviderModelsIdRoute;
-  '/models/providers/$id': typeof AuthenticatedModelsProvidersIdRoute;
-  '/models/virtual-models/$id': typeof AuthenticatedModelsVirtualModelsIdRoute;
-  '/mcps/logs': typeof AuthenticatedMcpsLogsIndexRoute;
-  '/mcps/provider-mcps': typeof AuthenticatedMcpsProviderMcpsIndexRoute;
-  '/mcps/providers': typeof AuthenticatedMcpsProvidersIndexRoute;
-  '/mcps/virtual-mcps': typeof AuthenticatedMcpsVirtualMcpsIndexRoute;
-  '/models/logs': typeof AuthenticatedModelsLogsIndexRoute;
-  '/models/provider-models': typeof AuthenticatedModelsProviderModelsIndexRoute;
-  '/models/providers': typeof AuthenticatedModelsProvidersIndexRoute;
-  '/models/virtual-models': typeof AuthenticatedModelsVirtualModelsIndexRoute;
+  '/login': typeof authLoginRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/apps/$id': typeof AuthenticatedAppsIdRoute
+  '/settings/about': typeof AuthenticatedSettingsAboutRoute
+  '/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
+  '/settings/display': typeof AuthenticatedSettingsDisplayRoute
+  '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/apps': typeof AuthenticatedAppsIndexRoute
+  '/data': typeof AuthenticatedDataIndexRoute
+  '/mcps': typeof AuthenticatedMcpsIndexRoute
+  '/models': typeof AuthenticatedModelsIndexRoute
+  '/settings': typeof AuthenticatedSettingsIndexRoute
+  '/users': typeof AuthenticatedUsersIndexRoute
+  '/mcps/logs/$id': typeof AuthenticatedMcpsLogsIdRoute
+  '/mcps/providers/$id': typeof AuthenticatedMcpsProvidersIdRoute
+  '/mcps/virtual-mcps/$id': typeof AuthenticatedMcpsVirtualMcpsIdRoute
+  '/models/logs/$id': typeof AuthenticatedModelsLogsIdRoute
+  '/models/provider-models/$id': typeof AuthenticatedModelsProviderModelsIdRoute
+  '/models/providers/$id': typeof AuthenticatedModelsProvidersIdRoute
+  '/models/virtual-models/$id': typeof AuthenticatedModelsVirtualModelsIdRoute
+  '/mcps/logs': typeof AuthenticatedMcpsLogsIndexRoute
+  '/mcps/providers': typeof AuthenticatedMcpsProvidersIndexRoute
+  '/mcps/virtual-mcps': typeof AuthenticatedMcpsVirtualMcpsIndexRoute
+  '/models/logs': typeof AuthenticatedModelsLogsIndexRoute
+  '/models/provider-models': typeof AuthenticatedModelsProviderModelsIndexRoute
+  '/models/providers': typeof AuthenticatedModelsProvidersIndexRoute
+  '/models/virtual-models': typeof AuthenticatedModelsVirtualModelsIndexRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  '/_authenticated': typeof AuthenticatedRouteWithChildren;
-  '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren;
-  '/(auth)/login': typeof authLoginRoute;
-  '/_authenticated/mcps': typeof AuthenticatedMcpsRouteWithChildren;
-  '/_authenticated/models': typeof AuthenticatedModelsRouteWithChildren;
-  '/_authenticated/': typeof AuthenticatedIndexRoute;
-  '/_authenticated/apps/$id': typeof AuthenticatedAppsIdRoute;
-  '/_authenticated/settings/about': typeof AuthenticatedSettingsAboutRoute;
-  '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute;
-  '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute;
-  '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute;
-  '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute;
-  '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute;
-  '/_authenticated/data/': typeof AuthenticatedDataIndexRoute;
-  '/_authenticated/mcps/': typeof AuthenticatedMcpsIndexRoute;
-  '/_authenticated/models/': typeof AuthenticatedModelsIndexRoute;
-  '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute;
-  '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute;
-  '/_authenticated/models/logs/$id': typeof AuthenticatedModelsLogsIdRoute;
-  '/_authenticated/models/provider-models/$id': typeof AuthenticatedModelsProviderModelsIdRoute;
-  '/_authenticated/models/providers/$id': typeof AuthenticatedModelsProvidersIdRoute;
-  '/_authenticated/models/virtual-models/$id': typeof AuthenticatedModelsVirtualModelsIdRoute;
-  '/_authenticated/mcps/logs/': typeof AuthenticatedMcpsLogsIndexRoute;
-  '/_authenticated/mcps/provider-mcps/': typeof AuthenticatedMcpsProviderMcpsIndexRoute;
-  '/_authenticated/mcps/providers/': typeof AuthenticatedMcpsProvidersIndexRoute;
-  '/_authenticated/mcps/virtual-mcps/': typeof AuthenticatedMcpsVirtualMcpsIndexRoute;
-  '/_authenticated/models/logs/': typeof AuthenticatedModelsLogsIndexRoute;
-  '/_authenticated/models/provider-models/': typeof AuthenticatedModelsProviderModelsIndexRoute;
-  '/_authenticated/models/providers/': typeof AuthenticatedModelsProvidersIndexRoute;
-  '/_authenticated/models/virtual-models/': typeof AuthenticatedModelsVirtualModelsIndexRoute;
+  __root__: typeof rootRouteImport
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
+  '/(auth)/login': typeof authLoginRoute
+  '/_authenticated/mcps': typeof AuthenticatedMcpsRouteWithChildren
+  '/_authenticated/models': typeof AuthenticatedModelsRouteWithChildren
+  '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/apps/$id': typeof AuthenticatedAppsIdRoute
+  '/_authenticated/settings/about': typeof AuthenticatedSettingsAboutRoute
+  '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
+  '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
+  '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
+  '/_authenticated/data/': typeof AuthenticatedDataIndexRoute
+  '/_authenticated/mcps/': typeof AuthenticatedMcpsIndexRoute
+  '/_authenticated/models/': typeof AuthenticatedModelsIndexRoute
+  '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/_authenticated/mcps/logs/$id': typeof AuthenticatedMcpsLogsIdRoute
+  '/_authenticated/mcps/providers/$id': typeof AuthenticatedMcpsProvidersIdRoute
+  '/_authenticated/mcps/virtual-mcps/$id': typeof AuthenticatedMcpsVirtualMcpsIdRoute
+  '/_authenticated/models/logs/$id': typeof AuthenticatedModelsLogsIdRoute
+  '/_authenticated/models/provider-models/$id': typeof AuthenticatedModelsProviderModelsIdRoute
+  '/_authenticated/models/providers/$id': typeof AuthenticatedModelsProvidersIdRoute
+  '/_authenticated/models/virtual-models/$id': typeof AuthenticatedModelsVirtualModelsIdRoute
+  '/_authenticated/mcps/logs/': typeof AuthenticatedMcpsLogsIndexRoute
+  '/_authenticated/mcps/providers/': typeof AuthenticatedMcpsProvidersIndexRoute
+  '/_authenticated/mcps/virtual-mcps/': typeof AuthenticatedMcpsVirtualMcpsIndexRoute
+  '/_authenticated/models/logs/': typeof AuthenticatedModelsLogsIndexRoute
+  '/_authenticated/models/provider-models/': typeof AuthenticatedModelsProviderModelsIndexRoute
+  '/_authenticated/models/providers/': typeof AuthenticatedModelsProvidersIndexRoute
+  '/_authenticated/models/virtual-models/': typeof AuthenticatedModelsVirtualModelsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
+    | '/'
     | '/settings'
     | '/login'
     | '/mcps'
     | '/models'
-    | '/'
     | '/apps/$id'
     | '/settings/about'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
-    | '/apps'
-    | '/data'
+    | '/apps/'
+    | '/data/'
     | '/mcps/'
     | '/models/'
     | '/settings/'
-    | '/users'
+    | '/users/'
+    | '/mcps/logs/$id'
+    | '/mcps/providers/$id'
+    | '/mcps/virtual-mcps/$id'
     | '/models/logs/$id'
     | '/models/provider-models/$id'
     | '/models/providers/$id'
     | '/models/virtual-models/$id'
-    | '/mcps/logs'
-    | '/mcps/provider-mcps'
-    | '/mcps/providers'
-    | '/mcps/virtual-mcps'
-    | '/models/logs'
-    | '/models/provider-models'
-    | '/models/providers'
-    | '/models/virtual-models';
-  fileRoutesByTo: FileRoutesByTo;
+    | '/mcps/logs/'
+    | '/mcps/providers/'
+    | '/mcps/virtual-mcps/'
+    | '/models/logs/'
+    | '/models/provider-models/'
+    | '/models/providers/'
+    | '/models/virtual-models/'
+  fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
     | '/'
@@ -330,12 +363,14 @@ export interface FileRouteTypes {
     | '/models'
     | '/settings'
     | '/users'
+    | '/mcps/logs/$id'
+    | '/mcps/providers/$id'
+    | '/mcps/virtual-mcps/$id'
     | '/models/logs/$id'
     | '/models/provider-models/$id'
     | '/models/providers/$id'
     | '/models/virtual-models/$id'
     | '/mcps/logs'
-    | '/mcps/provider-mcps'
     | '/mcps/providers'
     | '/mcps/virtual-mcps'
     | '/models/logs'
@@ -362,12 +397,14 @@ export interface FileRouteTypes {
     | '/_authenticated/models/'
     | '/_authenticated/settings/'
     | '/_authenticated/users/'
+    | '/_authenticated/mcps/logs/$id'
+    | '/_authenticated/mcps/providers/$id'
+    | '/_authenticated/mcps/virtual-mcps/$id'
     | '/_authenticated/models/logs/$id'
     | '/_authenticated/models/provider-models/$id'
     | '/_authenticated/models/providers/$id'
     | '/_authenticated/models/virtual-models/$id'
     | '/_authenticated/mcps/logs/'
-    | '/_authenticated/mcps/provider-mcps/'
     | '/_authenticated/mcps/providers/'
     | '/_authenticated/mcps/virtual-mcps/'
     | '/_authenticated/models/logs/'
@@ -384,12 +421,12 @@ export interface RootRouteChildren {
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/_authenticated': {
-      id: '/_authenticated';
-      path: '';
-      fullPath: '';
-      preLoaderRoute: typeof AuthenticatedRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/': {
       id: '/_authenticated/';
       path: '/';
@@ -426,12 +463,12 @@ declare module '@tanstack/react-router' {
       parentRoute: typeof AuthenticatedRoute;
     };
     '/_authenticated/users/': {
-      id: '/_authenticated/users/';
-      path: '/users';
-      fullPath: '/users';
-      preLoaderRoute: typeof AuthenticatedUsersIndexRouteImport;
-      parentRoute: typeof AuthenticatedRoute;
-    };
+      id: '/_authenticated/users/'
+      path: '/users'
+      fullPath: '/users/'
+      preLoaderRoute: typeof AuthenticatedUsersIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/settings/': {
       id: '/_authenticated/settings/';
       path: '/';
@@ -454,19 +491,19 @@ declare module '@tanstack/react-router' {
       parentRoute: typeof AuthenticatedMcpsRoute;
     };
     '/_authenticated/data/': {
-      id: '/_authenticated/data/';
-      path: '/data';
-      fullPath: '/data';
-      preLoaderRoute: typeof AuthenticatedDataIndexRouteImport;
-      parentRoute: typeof AuthenticatedRoute;
-    };
+      id: '/_authenticated/data/'
+      path: '/data'
+      fullPath: '/data/'
+      preLoaderRoute: typeof AuthenticatedDataIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/apps/': {
-      id: '/_authenticated/apps/';
-      path: '/apps';
-      fullPath: '/apps';
-      preLoaderRoute: typeof AuthenticatedAppsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRoute;
-    };
+      id: '/_authenticated/apps/'
+      path: '/apps'
+      fullPath: '/apps/'
+      preLoaderRoute: typeof AuthenticatedAppsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/settings/notifications': {
       id: '/_authenticated/settings/notifications';
       path: '/notifications';
@@ -510,61 +547,54 @@ declare module '@tanstack/react-router' {
       parentRoute: typeof AuthenticatedRoute;
     };
     '/_authenticated/models/virtual-models/': {
-      id: '/_authenticated/models/virtual-models/';
-      path: '/virtual-models';
-      fullPath: '/models/virtual-models';
-      preLoaderRoute: typeof AuthenticatedModelsVirtualModelsIndexRouteImport;
-      parentRoute: typeof AuthenticatedModelsRoute;
-    };
+      id: '/_authenticated/models/virtual-models/'
+      path: '/virtual-models'
+      fullPath: '/models/virtual-models/'
+      preLoaderRoute: typeof AuthenticatedModelsVirtualModelsIndexRouteImport
+      parentRoute: typeof AuthenticatedModelsRoute
+    }
     '/_authenticated/models/providers/': {
-      id: '/_authenticated/models/providers/';
-      path: '/providers';
-      fullPath: '/models/providers';
-      preLoaderRoute: typeof AuthenticatedModelsProvidersIndexRouteImport;
-      parentRoute: typeof AuthenticatedModelsRoute;
-    };
+      id: '/_authenticated/models/providers/'
+      path: '/providers'
+      fullPath: '/models/providers/'
+      preLoaderRoute: typeof AuthenticatedModelsProvidersIndexRouteImport
+      parentRoute: typeof AuthenticatedModelsRoute
+    }
     '/_authenticated/models/provider-models/': {
-      id: '/_authenticated/models/provider-models/';
-      path: '/provider-models';
-      fullPath: '/models/provider-models';
-      preLoaderRoute: typeof AuthenticatedModelsProviderModelsIndexRouteImport;
-      parentRoute: typeof AuthenticatedModelsRoute;
-    };
+      id: '/_authenticated/models/provider-models/'
+      path: '/provider-models'
+      fullPath: '/models/provider-models/'
+      preLoaderRoute: typeof AuthenticatedModelsProviderModelsIndexRouteImport
+      parentRoute: typeof AuthenticatedModelsRoute
+    }
     '/_authenticated/models/logs/': {
-      id: '/_authenticated/models/logs/';
-      path: '/logs';
-      fullPath: '/models/logs';
-      preLoaderRoute: typeof AuthenticatedModelsLogsIndexRouteImport;
-      parentRoute: typeof AuthenticatedModelsRoute;
-    };
+      id: '/_authenticated/models/logs/'
+      path: '/logs'
+      fullPath: '/models/logs/'
+      preLoaderRoute: typeof AuthenticatedModelsLogsIndexRouteImport
+      parentRoute: typeof AuthenticatedModelsRoute
+    }
     '/_authenticated/mcps/virtual-mcps/': {
-      id: '/_authenticated/mcps/virtual-mcps/';
-      path: '/virtual-mcps';
-      fullPath: '/mcps/virtual-mcps';
-      preLoaderRoute: typeof AuthenticatedMcpsVirtualMcpsIndexRouteImport;
-      parentRoute: typeof AuthenticatedMcpsRoute;
-    };
+      id: '/_authenticated/mcps/virtual-mcps/'
+      path: '/virtual-mcps'
+      fullPath: '/mcps/virtual-mcps/'
+      preLoaderRoute: typeof AuthenticatedMcpsVirtualMcpsIndexRouteImport
+      parentRoute: typeof AuthenticatedMcpsRoute
+    }
     '/_authenticated/mcps/providers/': {
-      id: '/_authenticated/mcps/providers/';
-      path: '/providers';
-      fullPath: '/mcps/providers';
-      preLoaderRoute: typeof AuthenticatedMcpsProvidersIndexRouteImport;
-      parentRoute: typeof AuthenticatedMcpsRoute;
-    };
-    '/_authenticated/mcps/provider-mcps/': {
-      id: '/_authenticated/mcps/provider-mcps/';
-      path: '/provider-mcps';
-      fullPath: '/mcps/provider-mcps';
-      preLoaderRoute: typeof AuthenticatedMcpsProviderMcpsIndexRouteImport;
-      parentRoute: typeof AuthenticatedMcpsRoute;
-    };
+      id: '/_authenticated/mcps/providers/'
+      path: '/providers'
+      fullPath: '/mcps/providers/'
+      preLoaderRoute: typeof AuthenticatedMcpsProvidersIndexRouteImport
+      parentRoute: typeof AuthenticatedMcpsRoute
+    }
     '/_authenticated/mcps/logs/': {
-      id: '/_authenticated/mcps/logs/';
-      path: '/logs';
-      fullPath: '/mcps/logs';
-      preLoaderRoute: typeof AuthenticatedMcpsLogsIndexRouteImport;
-      parentRoute: typeof AuthenticatedMcpsRoute;
-    };
+      id: '/_authenticated/mcps/logs/'
+      path: '/logs'
+      fullPath: '/mcps/logs/'
+      preLoaderRoute: typeof AuthenticatedMcpsLogsIndexRouteImport
+      parentRoute: typeof AuthenticatedMcpsRoute
+    }
     '/_authenticated/models/virtual-models/$id': {
       id: '/_authenticated/models/virtual-models/$id';
       path: '/virtual-models/$id';
@@ -587,12 +617,33 @@ declare module '@tanstack/react-router' {
       parentRoute: typeof AuthenticatedModelsRoute;
     };
     '/_authenticated/models/logs/$id': {
-      id: '/_authenticated/models/logs/$id';
-      path: '/logs/$id';
-      fullPath: '/models/logs/$id';
-      preLoaderRoute: typeof AuthenticatedModelsLogsIdRouteImport;
-      parentRoute: typeof AuthenticatedModelsRoute;
-    };
+      id: '/_authenticated/models/logs/$id'
+      path: '/logs/$id'
+      fullPath: '/models/logs/$id'
+      preLoaderRoute: typeof AuthenticatedModelsLogsIdRouteImport
+      parentRoute: typeof AuthenticatedModelsRoute
+    }
+    '/_authenticated/mcps/virtual-mcps/$id': {
+      id: '/_authenticated/mcps/virtual-mcps/$id'
+      path: '/virtual-mcps/$id'
+      fullPath: '/mcps/virtual-mcps/$id'
+      preLoaderRoute: typeof AuthenticatedMcpsVirtualMcpsIdRouteImport
+      parentRoute: typeof AuthenticatedMcpsRoute
+    }
+    '/_authenticated/mcps/providers/$id': {
+      id: '/_authenticated/mcps/providers/$id'
+      path: '/providers/$id'
+      fullPath: '/mcps/providers/$id'
+      preLoaderRoute: typeof AuthenticatedMcpsProvidersIdRouteImport
+      parentRoute: typeof AuthenticatedMcpsRoute
+    }
+    '/_authenticated/mcps/logs/$id': {
+      id: '/_authenticated/mcps/logs/$id'
+      path: '/logs/$id'
+      fullPath: '/mcps/logs/$id'
+      preLoaderRoute: typeof AuthenticatedMcpsLogsIdRouteImport
+      parentRoute: typeof AuthenticatedMcpsRoute
+    }
   }
 }
 
@@ -619,17 +670,21 @@ const AuthenticatedSettingsRouteRouteWithChildren = AuthenticatedSettingsRouteRo
 );
 
 interface AuthenticatedMcpsRouteChildren {
-  AuthenticatedMcpsIndexRoute: typeof AuthenticatedMcpsIndexRoute;
-  AuthenticatedMcpsLogsIndexRoute: typeof AuthenticatedMcpsLogsIndexRoute;
-  AuthenticatedMcpsProviderMcpsIndexRoute: typeof AuthenticatedMcpsProviderMcpsIndexRoute;
-  AuthenticatedMcpsProvidersIndexRoute: typeof AuthenticatedMcpsProvidersIndexRoute;
-  AuthenticatedMcpsVirtualMcpsIndexRoute: typeof AuthenticatedMcpsVirtualMcpsIndexRoute;
+  AuthenticatedMcpsIndexRoute: typeof AuthenticatedMcpsIndexRoute
+  AuthenticatedMcpsLogsIdRoute: typeof AuthenticatedMcpsLogsIdRoute
+  AuthenticatedMcpsProvidersIdRoute: typeof AuthenticatedMcpsProvidersIdRoute
+  AuthenticatedMcpsVirtualMcpsIdRoute: typeof AuthenticatedMcpsVirtualMcpsIdRoute
+  AuthenticatedMcpsLogsIndexRoute: typeof AuthenticatedMcpsLogsIndexRoute
+  AuthenticatedMcpsProvidersIndexRoute: typeof AuthenticatedMcpsProvidersIndexRoute
+  AuthenticatedMcpsVirtualMcpsIndexRoute: typeof AuthenticatedMcpsVirtualMcpsIndexRoute
 }
 
 const AuthenticatedMcpsRouteChildren: AuthenticatedMcpsRouteChildren = {
   AuthenticatedMcpsIndexRoute: AuthenticatedMcpsIndexRoute,
+  AuthenticatedMcpsLogsIdRoute: AuthenticatedMcpsLogsIdRoute,
+  AuthenticatedMcpsProvidersIdRoute: AuthenticatedMcpsProvidersIdRoute,
+  AuthenticatedMcpsVirtualMcpsIdRoute: AuthenticatedMcpsVirtualMcpsIdRoute,
   AuthenticatedMcpsLogsIndexRoute: AuthenticatedMcpsLogsIndexRoute,
-  AuthenticatedMcpsProviderMcpsIndexRoute: AuthenticatedMcpsProviderMcpsIndexRoute,
   AuthenticatedMcpsProvidersIndexRoute: AuthenticatedMcpsProvidersIndexRoute,
   AuthenticatedMcpsVirtualMcpsIndexRoute: AuthenticatedMcpsVirtualMcpsIndexRoute,
 };

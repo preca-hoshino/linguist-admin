@@ -1,11 +1,11 @@
 import type { PaginationState } from '@tanstack/react-table';
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { listApps } from '@/api/apps';
 import { useDialogState } from '@/composables/use-dialog-state';
 import type { App } from '@/types/app';
 
-export type AppsDialogType = 'create' | 'update' | 'delete';
+export type AppsDialogType = 'create' | 'update' | 'delete' | 'rotate';
 
 interface AppsContextType {
   open: AppsDialogType | null;

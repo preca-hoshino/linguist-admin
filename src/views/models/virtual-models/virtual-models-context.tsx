@@ -1,4 +1,4 @@
-import type { PaginationState } from '@tanstack/react-table';
+import type { ColumnFiltersState, PaginationState } from '@tanstack/react-table';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { listVirtualModels } from '@/api/virtual-models';
@@ -17,6 +17,8 @@ interface VirtualModelsContextType {
   setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
+  columnFilters: ColumnFiltersState;
+  setColumnFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>;
   loading: boolean;
   error: string;
   hasMore: boolean;
@@ -24,6 +26,8 @@ interface VirtualModelsContextType {
 }
 
 const VirtualModelsContext = React.createContext<VirtualModelsContextType | null>(null);
+
+import { extractFilterValue } from '@/utils/table';
 
 export function VirtualModelsProvider({ children }: { readonly children: React.ReactNode }): React.JSX.Element {
   const { t } = useTranslation();
@@ -38,9 +42,15 @@ export function VirtualModelsProvider({ children }: { readonly children: React.R
     pageSize: 10,
   });
   const [search, setSearch] = useState('');
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // 从 columnFilters 提取 API 参数
+  const modelTypeFilter = extractFilterValue(columnFilters, 'model_type');
+  const routingStrategyFilter = extractFilterValue(columnFilters, 'routing_strategy');
+  const isActiveFilter = extractFilterValue(columnFilters, 'is_active');
 
   const load = useCallback(async () => {
     try {
@@ -54,6 +64,15 @@ export function VirtualModelsProvider({ children }: { readonly children: React.R
       }
       if (search) {
         payload.search = search;
+      }
+      if (modelTypeFilter !== undefined) {
+        payload.model_type = modelTypeFilter;
+      }
+      if (routingStrategyFilter !== undefined) {
+        payload.routing_strategy = routingStrategyFilter;
+      }
+      if (isActiveFilter !== undefined) {
+        payload.is_active = isActiveFilter === 'true';
       }
 
       const res = await listVirtualModels(payload);
@@ -74,13 +93,14 @@ export function VirtualModelsProvider({ children }: { readonly children: React.R
     } finally {
       setLoading(false);
     }
-  }, [t, pagination.pageSize, pagination.pageIndex, search]);
+  }, [t, pagination.pageSize, pagination.pageIndex, search, modelTypeFilter, routingStrategyFilter, isActiveFilter]);
 
-  // Reset to first page on search change
+  // Reset to first page on search/filter change
+  // biome-ignore lint/correctness/useExhaustiveDependencies: react to search/filter change
   useEffect(() => {
     cursorsRef.current = [undefined];
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, [search]);
+  }, [search, modelTypeFilter, routingStrategyFilter, isActiveFilter, pagination.pageSize]);
 
   useEffect(() => {
     void load();
@@ -98,6 +118,8 @@ export function VirtualModelsProvider({ children }: { readonly children: React.R
         setPagination,
         search,
         setSearch,
+        columnFilters,
+        setColumnFilters,
         loading,
         error,
         hasMore,

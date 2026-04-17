@@ -17,9 +17,9 @@ export function UsersPage(): React.JSX.Element {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const cursorsRef = useRef<(string | undefined)[]>([undefined]);
+  const [cursorMap, setCursorMap] = useState<Record<number, string | undefined>>({ 0: undefined });
   const [pageIndex, setPageIndex] = useState(0);
-  const [hasMore, setHasMore] = useState(false);
+  const [total, setTotal] = useState(0);
   const limit = 10;
 
   // Mutate Dialog state
@@ -34,33 +34,32 @@ export function UsersPage(): React.JSX.Element {
     try {
       setLoading(true);
       setError('');
-
-      const startingAfter = cursorsRef.current[pageIndex];
-      const payload: Parameters<typeof fetchUsers>[0] = { limit };
-      if (startingAfter !== undefined) {
-        payload.starting_after = startingAfter;
-      }
-
-      const res = await fetchUsers(payload);
-
+      const startingAfter = cursorMap[pageIndex];
+      const res = await fetchUsers({ limit, ...(startingAfter == null ? {} : { starting_after: startingAfter }) });
       if (!res.ok) {
         throw new Error(res.error.message);
       }
       setUsers(res.data.data);
-      setHasMore(res.data.has_more);
+      setTotal(res.data.total);
 
-      if (res.data.has_more && res.data.data.length > 0) {
-        const lastItem = res.data.data.at(-1);
-        if (lastItem) {
-          cursorsRef.current[pageIndex + 1] = lastItem.id;
-        }
+      if (res.data.data.length > 0) {
+        const nextCursor = res.data.data.at(-1)?.id;
+        setCursorMap((prev) => {
+          if (prev[pageIndex + 1] === nextCursor) {
+            return prev;
+          }
+          return {
+            ...prev,
+            [pageIndex + 1]: nextCursor,
+          };
+        });
       }
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : 'Failed to load users');
     } finally {
       setLoading(false);
     }
-  }, [pageIndex]);
+  }, [pageIndex, cursorMap]);
 
   useEffect(() => {
     void loadUsers();
@@ -135,7 +134,7 @@ export function UsersPage(): React.JSX.Element {
             onClick={() => {
               setPageIndex((old) => old + 1);
             }}
-            disabled={!hasMore}
+            disabled={pageIndex * limit + users.length >= total}
           >
             {t('common.next', 'Next')}
           </Button>
