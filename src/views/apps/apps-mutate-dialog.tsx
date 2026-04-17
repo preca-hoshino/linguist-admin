@@ -41,7 +41,7 @@ interface AppAllowedListProps {
   readonly itemName: string;
 }
 
-const MODEL_TYPE_ICON: Record<string, React.ElementType> = {
+const MODEL_TYPE_ICON: Record<string, typeof Box> = {
   chat: MessageSquare,
   embedding: Braces,
 };
@@ -84,7 +84,7 @@ function AppAllowedList({ form, name, options, isSelect, t, itemName }: AppAllow
                           return (
                             <SelectItem key={opt.id} value={opt.id}>
                               <div className="flex items-center gap-2">
-                                <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
+                                <IconComp className="h-4 w-4 shrink-0 text-muted-foreground" />
                                 <span className="block w-full truncate">{opt.name}</span>
                               </div>
                             </SelectItem>

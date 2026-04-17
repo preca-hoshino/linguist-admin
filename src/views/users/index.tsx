@@ -1,5 +1,5 @@
 import { Plus } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { deleteUserApi, fetchUsers, type User } from '@/api/users';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
@@ -115,7 +115,7 @@ export function UsersPage(): React.JSX.Element {
 
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {t('common.total', 'Total: {{count}}', { count: total })}
+          {t('common.cursorPage', 'Current Page: {{page}}', { page: pageIndex + 1 })}
         </div>
         <div className="space-x-2">
           <Button

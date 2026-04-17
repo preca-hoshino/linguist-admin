@@ -51,20 +51,22 @@ export function DataTablePagination<TData>({ table, className }: DataTablePagina
 
       <div className="flex items-center sm:space-x-6 lg:space-x-8">
         <div className="flex w-[100px] items-center justify-center text-sm font-medium @max-3xl/content:hidden">
-          Page {currentPage} of {totalPages}
+          {totalPages > 0 ? `Page ${currentPage} of ${totalPages}` : `Page ${currentPage}`}
         </div>
         <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            className="size-8 p-0 @max-md/content:hidden"
-            onClick={() => {
-              table.setPageIndex(0);
-            }}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <span className="sr-only">Go to first page</span>
-            <DoubleArrowLeftIcon className="h-4 w-4" />
-          </Button>
+          {totalPages > 0 && (
+            <Button
+              variant="outline"
+              className="size-8 p-0 @max-md/content:hidden"
+              onClick={() => {
+                table.setPageIndex(0);
+              }}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <span className="sr-only">Go to first page</span>
+              <DoubleArrowLeftIcon className="h-4 w-4" />
+            </Button>
+          )}
           <Button
             variant="outline"
             className="size-8 p-0"
@@ -77,26 +79,34 @@ export function DataTablePagination<TData>({ table, className }: DataTablePagina
             <ChevronLeftIcon className="h-4 w-4" />
           </Button>
 
-          {/* Page number buttons */}
-          {pageNumbers.map((pageNumber, index) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: pageNumber can be duplicate '...', index required for unique keys
-            <div key={`${pageNumber}-${index}`} className="flex items-center">
-              {pageNumber === '...' ? (
-                <span className="px-1 text-sm text-muted-foreground">...</span>
-              ) : (
-                <Button
-                  variant={currentPage === pageNumber ? 'default' : 'outline'}
-                  className="h-8 min-w-8 px-2"
-                  onClick={() => {
-                    table.setPageIndex(pageNumber - 1);
-                  }}
-                >
-                  <span className="sr-only">Go to page {pageNumber}</span>
-                  {pageNumber}
-                </Button>
-              )}
+          {/* 如果提供了具体总数则展示具体的跳页数字；否则为游标模式只显示一个当前标签 */}
+          {totalPages > 0 ? (
+            pageNumbers.map((pageNumber, index) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: pageNumber can be duplicate '...', index required for unique keys
+              <div key={`${pageNumber}-${index}`} className="flex items-center">
+                {pageNumber === '...' ? (
+                  <span className="px-1 text-sm text-muted-foreground">...</span>
+                ) : (
+                  <Button
+                    variant={currentPage === pageNumber ? 'default' : 'outline'}
+                    className="h-8 min-w-8 px-2"
+                    onClick={() => {
+                      table.setPageIndex(pageNumber - 1);
+                    }}
+                  >
+                    <span className="sr-only">Go to page {pageNumber}</span>
+                    {pageNumber}
+                  </Button>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="flex items-center">
+              <Button variant="default" className="h-8 min-w-8 px-2" disabled>
+                {currentPage}
+              </Button>
             </div>
-          ))}
+          )}
 
           <Button
             variant="outline"
@@ -109,17 +119,20 @@ export function DataTablePagination<TData>({ table, className }: DataTablePagina
             <span className="sr-only">Go to next page</span>
             <ChevronRightIcon className="h-4 w-4" />
           </Button>
-          <Button
-            variant="outline"
-            className="size-8 p-0 @max-md/content:hidden"
-            onClick={() => {
-              table.setPageIndex(table.getPageCount() - 1);
-            }}
-            disabled={!table.getCanNextPage()}
-          >
-            <span className="sr-only">Go to last page</span>
-            <DoubleArrowRightIcon className="h-4 w-4" />
-          </Button>
+
+          {totalPages > 0 && (
+            <Button
+              variant="outline"
+              className="size-8 p-0 @max-md/content:hidden"
+              onClick={() => {
+                table.setPageIndex(table.getPageCount() - 1);
+              }}
+              disabled={!table.getCanNextPage()}
+            >
+              <span className="sr-only">Go to last page</span>
+              <DoubleArrowRightIcon className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
     </div>

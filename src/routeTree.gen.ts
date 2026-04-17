@@ -45,95 +45,87 @@ import { Route as AuthenticatedMcpsLogsIdRouteImport } from './router/_authentic
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
-} as any)
+} as any);
 const AuthenticatedModelsRoute = AuthenticatedModelsRouteImport.update({
   id: '/models',
   path: '/models',
   getParentRoute: () => AuthenticatedRoute,
-} as any)
+} as any);
 const AuthenticatedMcpsRoute = AuthenticatedMcpsRouteImport.update({
   id: '/mcps',
   path: '/mcps',
   getParentRoute: () => AuthenticatedRoute,
-} as any)
+} as any);
 const authLoginRoute = authLoginRouteImport.update({
   id: '/(auth)/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedSettingsRouteRoute =
-  AuthenticatedSettingsRouteRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
+} as any);
+const AuthenticatedSettingsRouteRoute = AuthenticatedSettingsRouteRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any);
 const AuthenticatedUsersIndexRoute = AuthenticatedUsersIndexRouteImport.update({
   id: '/users/',
   path: '/users/',
   getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedSettingsIndexRoute =
-  AuthenticatedSettingsIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedSettingsRouteRoute,
-  } as any)
-const AuthenticatedModelsIndexRoute =
-  AuthenticatedModelsIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedModelsRoute,
-  } as any)
+} as any);
+const AuthenticatedSettingsIndexRoute = AuthenticatedSettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedSettingsRouteRoute,
+} as any);
+const AuthenticatedModelsIndexRoute = AuthenticatedModelsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedModelsRoute,
+} as any);
 const AuthenticatedMcpsIndexRoute = AuthenticatedMcpsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedMcpsRoute,
-} as any)
+} as any);
 const AuthenticatedDataIndexRoute = AuthenticatedDataIndexRouteImport.update({
   id: '/data/',
   path: '/data/',
   getParentRoute: () => AuthenticatedRoute,
-} as any)
+} as any);
 const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexRouteImport.update({
   id: '/apps/',
   path: '/apps/',
   getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedSettingsNotificationsRoute =
-  AuthenticatedSettingsNotificationsRouteImport.update({
-    id: '/notifications',
-    path: '/notifications',
-    getParentRoute: () => AuthenticatedSettingsRouteRoute,
-  } as any)
-const AuthenticatedSettingsDisplayRoute =
-  AuthenticatedSettingsDisplayRouteImport.update({
-    id: '/display',
-    path: '/display',
-    getParentRoute: () => AuthenticatedSettingsRouteRoute,
-  } as any)
-const AuthenticatedSettingsAppearanceRoute =
-  AuthenticatedSettingsAppearanceRouteImport.update({
-    id: '/appearance',
-    path: '/appearance',
-    getParentRoute: () => AuthenticatedSettingsRouteRoute,
-  } as any)
-const AuthenticatedSettingsAccountRoute =
-  AuthenticatedSettingsAccountRouteImport.update({
-    id: '/account',
-    path: '/account',
-    getParentRoute: () => AuthenticatedSettingsRouteRoute,
-  } as any)
-const AuthenticatedSettingsAboutRoute =
-  AuthenticatedSettingsAboutRouteImport.update({
-    id: '/about',
-    path: '/about',
-    getParentRoute: () => AuthenticatedSettingsRouteRoute,
-  } as any)
+} as any);
+const AuthenticatedSettingsNotificationsRoute = AuthenticatedSettingsNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AuthenticatedSettingsRouteRoute,
+} as any);
+const AuthenticatedSettingsDisplayRoute = AuthenticatedSettingsDisplayRouteImport.update({
+  id: '/display',
+  path: '/display',
+  getParentRoute: () => AuthenticatedSettingsRouteRoute,
+} as any);
+const AuthenticatedSettingsAppearanceRoute = AuthenticatedSettingsAppearanceRouteImport.update({
+  id: '/appearance',
+  path: '/appearance',
+  getParentRoute: () => AuthenticatedSettingsRouteRoute,
+} as any);
+const AuthenticatedSettingsAccountRoute = AuthenticatedSettingsAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedSettingsRouteRoute,
+} as any);
+const AuthenticatedSettingsAboutRoute = AuthenticatedSettingsAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => AuthenticatedSettingsRouteRoute,
+} as any);
 const AuthenticatedAppsIdRoute = AuthenticatedAppsIdRouteImport.update({
   id: '/apps/$id',
   path: '/apps/$id',
@@ -322,7 +314,7 @@ export interface FileRoutesById {
   '/_authenticated/models/virtual-models/': typeof AuthenticatedModelsVirtualModelsIndexRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
+  fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
     | '/'
     | '/settings'
@@ -384,7 +376,7 @@ export interface FileRouteTypes {
     | '/models/logs'
     | '/models/provider-models'
     | '/models/providers'
-    | '/models/virtual-models'
+    | '/models/virtual-models';
   id:
     | '__root__'
     | '/_authenticated'
@@ -418,12 +410,12 @@ export interface FileRouteTypes {
     | '/_authenticated/models/logs/'
     | '/_authenticated/models/provider-models/'
     | '/_authenticated/models/providers/'
-    | '/_authenticated/models/virtual-models/'
-  fileRoutesById: FileRoutesById
+    | '/_authenticated/models/virtual-models/';
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  authLoginRoute: typeof authLoginRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren;
+  authLoginRoute: typeof authLoginRoute;
 }
 
 declare module '@tanstack/react-router' {
@@ -436,40 +428,40 @@ declare module '@tanstack/react-router' {
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/': {
-      id: '/_authenticated/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
+      id: '/_authenticated/';
+      path: '/';
+      fullPath: '/';
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport;
+      parentRoute: typeof AuthenticatedRoute;
+    };
     '/_authenticated/models': {
-      id: '/_authenticated/models'
-      path: '/models'
-      fullPath: '/models'
-      preLoaderRoute: typeof AuthenticatedModelsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
+      id: '/_authenticated/models';
+      path: '/models';
+      fullPath: '/models';
+      preLoaderRoute: typeof AuthenticatedModelsRouteImport;
+      parentRoute: typeof AuthenticatedRoute;
+    };
     '/_authenticated/mcps': {
-      id: '/_authenticated/mcps'
-      path: '/mcps'
-      fullPath: '/mcps'
-      preLoaderRoute: typeof AuthenticatedMcpsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
+      id: '/_authenticated/mcps';
+      path: '/mcps';
+      fullPath: '/mcps';
+      preLoaderRoute: typeof AuthenticatedMcpsRouteImport;
+      parentRoute: typeof AuthenticatedRoute;
+    };
     '/(auth)/login': {
-      id: '/(auth)/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof authLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/(auth)/login';
+      path: '/login';
+      fullPath: '/login';
+      preLoaderRoute: typeof authLoginRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/_authenticated/settings': {
-      id: '/_authenticated/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AuthenticatedSettingsRouteRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
+      id: '/_authenticated/settings';
+      path: '/settings';
+      fullPath: '/settings';
+      preLoaderRoute: typeof AuthenticatedSettingsRouteRouteImport;
+      parentRoute: typeof AuthenticatedRoute;
+    };
     '/_authenticated/users/': {
       id: '/_authenticated/users/'
       path: '/users'
@@ -478,26 +470,26 @@ declare module '@tanstack/react-router' {
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/settings/': {
-      id: '/_authenticated/settings/'
-      path: '/'
-      fullPath: '/settings/'
-      preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
-      parentRoute: typeof AuthenticatedSettingsRouteRoute
-    }
+      id: '/_authenticated/settings/';
+      path: '/';
+      fullPath: '/settings/';
+      preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport;
+      parentRoute: typeof AuthenticatedSettingsRouteRoute;
+    };
     '/_authenticated/models/': {
-      id: '/_authenticated/models/'
-      path: '/'
-      fullPath: '/models/'
-      preLoaderRoute: typeof AuthenticatedModelsIndexRouteImport
-      parentRoute: typeof AuthenticatedModelsRoute
-    }
+      id: '/_authenticated/models/';
+      path: '/';
+      fullPath: '/models/';
+      preLoaderRoute: typeof AuthenticatedModelsIndexRouteImport;
+      parentRoute: typeof AuthenticatedModelsRoute;
+    };
     '/_authenticated/mcps/': {
-      id: '/_authenticated/mcps/'
-      path: '/'
-      fullPath: '/mcps/'
-      preLoaderRoute: typeof AuthenticatedMcpsIndexRouteImport
-      parentRoute: typeof AuthenticatedMcpsRoute
-    }
+      id: '/_authenticated/mcps/';
+      path: '/';
+      fullPath: '/mcps/';
+      preLoaderRoute: typeof AuthenticatedMcpsIndexRouteImport;
+      parentRoute: typeof AuthenticatedMcpsRoute;
+    };
     '/_authenticated/data/': {
       id: '/_authenticated/data/'
       path: '/data'
@@ -513,47 +505,47 @@ declare module '@tanstack/react-router' {
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/settings/notifications': {
-      id: '/_authenticated/settings/notifications'
-      path: '/notifications'
-      fullPath: '/settings/notifications'
-      preLoaderRoute: typeof AuthenticatedSettingsNotificationsRouteImport
-      parentRoute: typeof AuthenticatedSettingsRouteRoute
-    }
+      id: '/_authenticated/settings/notifications';
+      path: '/notifications';
+      fullPath: '/settings/notifications';
+      preLoaderRoute: typeof AuthenticatedSettingsNotificationsRouteImport;
+      parentRoute: typeof AuthenticatedSettingsRouteRoute;
+    };
     '/_authenticated/settings/display': {
-      id: '/_authenticated/settings/display'
-      path: '/display'
-      fullPath: '/settings/display'
-      preLoaderRoute: typeof AuthenticatedSettingsDisplayRouteImport
-      parentRoute: typeof AuthenticatedSettingsRouteRoute
-    }
+      id: '/_authenticated/settings/display';
+      path: '/display';
+      fullPath: '/settings/display';
+      preLoaderRoute: typeof AuthenticatedSettingsDisplayRouteImport;
+      parentRoute: typeof AuthenticatedSettingsRouteRoute;
+    };
     '/_authenticated/settings/appearance': {
-      id: '/_authenticated/settings/appearance'
-      path: '/appearance'
-      fullPath: '/settings/appearance'
-      preLoaderRoute: typeof AuthenticatedSettingsAppearanceRouteImport
-      parentRoute: typeof AuthenticatedSettingsRouteRoute
-    }
+      id: '/_authenticated/settings/appearance';
+      path: '/appearance';
+      fullPath: '/settings/appearance';
+      preLoaderRoute: typeof AuthenticatedSettingsAppearanceRouteImport;
+      parentRoute: typeof AuthenticatedSettingsRouteRoute;
+    };
     '/_authenticated/settings/account': {
-      id: '/_authenticated/settings/account'
-      path: '/account'
-      fullPath: '/settings/account'
-      preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
-      parentRoute: typeof AuthenticatedSettingsRouteRoute
-    }
+      id: '/_authenticated/settings/account';
+      path: '/account';
+      fullPath: '/settings/account';
+      preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport;
+      parentRoute: typeof AuthenticatedSettingsRouteRoute;
+    };
     '/_authenticated/settings/about': {
-      id: '/_authenticated/settings/about'
-      path: '/about'
-      fullPath: '/settings/about'
-      preLoaderRoute: typeof AuthenticatedSettingsAboutRouteImport
-      parentRoute: typeof AuthenticatedSettingsRouteRoute
-    }
+      id: '/_authenticated/settings/about';
+      path: '/about';
+      fullPath: '/settings/about';
+      preLoaderRoute: typeof AuthenticatedSettingsAboutRouteImport;
+      parentRoute: typeof AuthenticatedSettingsRouteRoute;
+    };
     '/_authenticated/apps/$id': {
-      id: '/_authenticated/apps/$id'
-      path: '/apps/$id'
-      fullPath: '/apps/$id'
-      preLoaderRoute: typeof AuthenticatedAppsIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
+      id: '/_authenticated/apps/$id';
+      path: '/apps/$id';
+      fullPath: '/apps/$id';
+      preLoaderRoute: typeof AuthenticatedAppsIdRouteImport;
+      parentRoute: typeof AuthenticatedRoute;
+    };
     '/_authenticated/models/virtual-models/': {
       id: '/_authenticated/models/virtual-models/'
       path: '/virtual-models'
@@ -604,26 +596,26 @@ declare module '@tanstack/react-router' {
       parentRoute: typeof AuthenticatedMcpsRoute
     }
     '/_authenticated/models/virtual-models/$id': {
-      id: '/_authenticated/models/virtual-models/$id'
-      path: '/virtual-models/$id'
-      fullPath: '/models/virtual-models/$id'
-      preLoaderRoute: typeof AuthenticatedModelsVirtualModelsIdRouteImport
-      parentRoute: typeof AuthenticatedModelsRoute
-    }
+      id: '/_authenticated/models/virtual-models/$id';
+      path: '/virtual-models/$id';
+      fullPath: '/models/virtual-models/$id';
+      preLoaderRoute: typeof AuthenticatedModelsVirtualModelsIdRouteImport;
+      parentRoute: typeof AuthenticatedModelsRoute;
+    };
     '/_authenticated/models/providers/$id': {
-      id: '/_authenticated/models/providers/$id'
-      path: '/providers/$id'
-      fullPath: '/models/providers/$id'
-      preLoaderRoute: typeof AuthenticatedModelsProvidersIdRouteImport
-      parentRoute: typeof AuthenticatedModelsRoute
-    }
+      id: '/_authenticated/models/providers/$id';
+      path: '/providers/$id';
+      fullPath: '/models/providers/$id';
+      preLoaderRoute: typeof AuthenticatedModelsProvidersIdRouteImport;
+      parentRoute: typeof AuthenticatedModelsRoute;
+    };
     '/_authenticated/models/provider-models/$id': {
-      id: '/_authenticated/models/provider-models/$id'
-      path: '/provider-models/$id'
-      fullPath: '/models/provider-models/$id'
-      preLoaderRoute: typeof AuthenticatedModelsProviderModelsIdRouteImport
-      parentRoute: typeof AuthenticatedModelsRoute
-    }
+      id: '/_authenticated/models/provider-models/$id';
+      path: '/provider-models/$id';
+      fullPath: '/models/provider-models/$id';
+      preLoaderRoute: typeof AuthenticatedModelsProviderModelsIdRouteImport;
+      parentRoute: typeof AuthenticatedModelsRoute;
+    };
     '/_authenticated/models/logs/$id': {
       id: '/_authenticated/models/logs/$id'
       path: '/logs/$id'
@@ -656,29 +648,26 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedSettingsRouteRouteChildren {
-  AuthenticatedSettingsAboutRoute: typeof AuthenticatedSettingsAboutRoute
-  AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
-  AuthenticatedSettingsAppearanceRoute: typeof AuthenticatedSettingsAppearanceRoute
-  AuthenticatedSettingsDisplayRoute: typeof AuthenticatedSettingsDisplayRoute
-  AuthenticatedSettingsNotificationsRoute: typeof AuthenticatedSettingsNotificationsRoute
-  AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
+  AuthenticatedSettingsAboutRoute: typeof AuthenticatedSettingsAboutRoute;
+  AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute;
+  AuthenticatedSettingsAppearanceRoute: typeof AuthenticatedSettingsAppearanceRoute;
+  AuthenticatedSettingsDisplayRoute: typeof AuthenticatedSettingsDisplayRoute;
+  AuthenticatedSettingsNotificationsRoute: typeof AuthenticatedSettingsNotificationsRoute;
+  AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute;
 }
 
-const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteChildren =
-  {
-    AuthenticatedSettingsAboutRoute: AuthenticatedSettingsAboutRoute,
-    AuthenticatedSettingsAccountRoute: AuthenticatedSettingsAccountRoute,
-    AuthenticatedSettingsAppearanceRoute: AuthenticatedSettingsAppearanceRoute,
-    AuthenticatedSettingsDisplayRoute: AuthenticatedSettingsDisplayRoute,
-    AuthenticatedSettingsNotificationsRoute:
-      AuthenticatedSettingsNotificationsRoute,
-    AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
-  }
+const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteChildren = {
+  AuthenticatedSettingsAboutRoute: AuthenticatedSettingsAboutRoute,
+  AuthenticatedSettingsAccountRoute: AuthenticatedSettingsAccountRoute,
+  AuthenticatedSettingsAppearanceRoute: AuthenticatedSettingsAppearanceRoute,
+  AuthenticatedSettingsDisplayRoute: AuthenticatedSettingsDisplayRoute,
+  AuthenticatedSettingsNotificationsRoute: AuthenticatedSettingsNotificationsRoute,
+  AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
+};
 
-const AuthenticatedSettingsRouteRouteWithChildren =
-  AuthenticatedSettingsRouteRoute._addFileChildren(
-    AuthenticatedSettingsRouteRouteChildren,
-  )
+const AuthenticatedSettingsRouteRouteWithChildren = AuthenticatedSettingsRouteRoute._addFileChildren(
+  AuthenticatedSettingsRouteRouteChildren,
+);
 
 interface AuthenticatedMcpsRouteChildren {
   AuthenticatedMcpsIndexRoute: typeof AuthenticatedMcpsIndexRoute
@@ -697,54 +686,48 @@ const AuthenticatedMcpsRouteChildren: AuthenticatedMcpsRouteChildren = {
   AuthenticatedMcpsVirtualMcpsIdRoute: AuthenticatedMcpsVirtualMcpsIdRoute,
   AuthenticatedMcpsLogsIndexRoute: AuthenticatedMcpsLogsIndexRoute,
   AuthenticatedMcpsProvidersIndexRoute: AuthenticatedMcpsProvidersIndexRoute,
-  AuthenticatedMcpsVirtualMcpsIndexRoute:
-    AuthenticatedMcpsVirtualMcpsIndexRoute,
-}
+  AuthenticatedMcpsVirtualMcpsIndexRoute: AuthenticatedMcpsVirtualMcpsIndexRoute,
+};
 
-const AuthenticatedMcpsRouteWithChildren =
-  AuthenticatedMcpsRoute._addFileChildren(AuthenticatedMcpsRouteChildren)
+const AuthenticatedMcpsRouteWithChildren = AuthenticatedMcpsRoute._addFileChildren(AuthenticatedMcpsRouteChildren);
 
 interface AuthenticatedModelsRouteChildren {
-  AuthenticatedModelsIndexRoute: typeof AuthenticatedModelsIndexRoute
-  AuthenticatedModelsLogsIdRoute: typeof AuthenticatedModelsLogsIdRoute
-  AuthenticatedModelsProviderModelsIdRoute: typeof AuthenticatedModelsProviderModelsIdRoute
-  AuthenticatedModelsProvidersIdRoute: typeof AuthenticatedModelsProvidersIdRoute
-  AuthenticatedModelsVirtualModelsIdRoute: typeof AuthenticatedModelsVirtualModelsIdRoute
-  AuthenticatedModelsLogsIndexRoute: typeof AuthenticatedModelsLogsIndexRoute
-  AuthenticatedModelsProviderModelsIndexRoute: typeof AuthenticatedModelsProviderModelsIndexRoute
-  AuthenticatedModelsProvidersIndexRoute: typeof AuthenticatedModelsProvidersIndexRoute
-  AuthenticatedModelsVirtualModelsIndexRoute: typeof AuthenticatedModelsVirtualModelsIndexRoute
+  AuthenticatedModelsIndexRoute: typeof AuthenticatedModelsIndexRoute;
+  AuthenticatedModelsLogsIdRoute: typeof AuthenticatedModelsLogsIdRoute;
+  AuthenticatedModelsProviderModelsIdRoute: typeof AuthenticatedModelsProviderModelsIdRoute;
+  AuthenticatedModelsProvidersIdRoute: typeof AuthenticatedModelsProvidersIdRoute;
+  AuthenticatedModelsVirtualModelsIdRoute: typeof AuthenticatedModelsVirtualModelsIdRoute;
+  AuthenticatedModelsLogsIndexRoute: typeof AuthenticatedModelsLogsIndexRoute;
+  AuthenticatedModelsProviderModelsIndexRoute: typeof AuthenticatedModelsProviderModelsIndexRoute;
+  AuthenticatedModelsProvidersIndexRoute: typeof AuthenticatedModelsProvidersIndexRoute;
+  AuthenticatedModelsVirtualModelsIndexRoute: typeof AuthenticatedModelsVirtualModelsIndexRoute;
 }
 
 const AuthenticatedModelsRouteChildren: AuthenticatedModelsRouteChildren = {
   AuthenticatedModelsIndexRoute: AuthenticatedModelsIndexRoute,
   AuthenticatedModelsLogsIdRoute: AuthenticatedModelsLogsIdRoute,
-  AuthenticatedModelsProviderModelsIdRoute:
-    AuthenticatedModelsProviderModelsIdRoute,
+  AuthenticatedModelsProviderModelsIdRoute: AuthenticatedModelsProviderModelsIdRoute,
   AuthenticatedModelsProvidersIdRoute: AuthenticatedModelsProvidersIdRoute,
-  AuthenticatedModelsVirtualModelsIdRoute:
-    AuthenticatedModelsVirtualModelsIdRoute,
+  AuthenticatedModelsVirtualModelsIdRoute: AuthenticatedModelsVirtualModelsIdRoute,
   AuthenticatedModelsLogsIndexRoute: AuthenticatedModelsLogsIndexRoute,
-  AuthenticatedModelsProviderModelsIndexRoute:
-    AuthenticatedModelsProviderModelsIndexRoute,
-  AuthenticatedModelsProvidersIndexRoute:
-    AuthenticatedModelsProvidersIndexRoute,
-  AuthenticatedModelsVirtualModelsIndexRoute:
-    AuthenticatedModelsVirtualModelsIndexRoute,
-}
+  AuthenticatedModelsProviderModelsIndexRoute: AuthenticatedModelsProviderModelsIndexRoute,
+  AuthenticatedModelsProvidersIndexRoute: AuthenticatedModelsProvidersIndexRoute,
+  AuthenticatedModelsVirtualModelsIndexRoute: AuthenticatedModelsVirtualModelsIndexRoute,
+};
 
-const AuthenticatedModelsRouteWithChildren =
-  AuthenticatedModelsRoute._addFileChildren(AuthenticatedModelsRouteChildren)
+const AuthenticatedModelsRouteWithChildren = AuthenticatedModelsRoute._addFileChildren(
+  AuthenticatedModelsRouteChildren,
+);
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
-  AuthenticatedMcpsRoute: typeof AuthenticatedMcpsRouteWithChildren
-  AuthenticatedModelsRoute: typeof AuthenticatedModelsRouteWithChildren
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
-  AuthenticatedAppsIdRoute: typeof AuthenticatedAppsIdRoute
-  AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
-  AuthenticatedDataIndexRoute: typeof AuthenticatedDataIndexRoute
-  AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
+  AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren;
+  AuthenticatedMcpsRoute: typeof AuthenticatedMcpsRouteWithChildren;
+  AuthenticatedModelsRoute: typeof AuthenticatedModelsRouteWithChildren;
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute;
+  AuthenticatedAppsIdRoute: typeof AuthenticatedAppsIdRoute;
+  AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute;
+  AuthenticatedDataIndexRoute: typeof AuthenticatedDataIndexRoute;
+  AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute;
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -756,16 +739,12 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedDataIndexRoute: AuthenticatedDataIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
-}
+};
 
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
-)
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(AuthenticatedRouteChildren);
 
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   authLoginRoute: authLoginRoute,
-}
-export const routeTree = rootRouteImport
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+};
+export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>();
