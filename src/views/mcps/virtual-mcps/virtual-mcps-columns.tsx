@@ -1,15 +1,10 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/Badge';
 import type { VirtualMcp, VirtualMcpConfig } from '@/types/mcp';
-import { VirtualMcpsRowActions } from './virtual-mcps-row-actions';
 import { DataTableColumnHeader } from '@/components/data-table';
 import type { TFunction } from 'i18next';
 
-export function getVirtualMcpsColumns(
-  t: TFunction,
-  onToggleActive: (id: string, current: boolean) => void,
-  providerMap: Record<string, string>,
-): ColumnDef<VirtualMcp>[] {
+export function getVirtualMcpsColumns(t: TFunction, providerMap: Record<string, string>): ColumnDef<VirtualMcp>[] {
   return [
     {
       accessorKey: 'id',
@@ -86,13 +81,6 @@ export function getVirtualMcpsColumns(
         );
       },
       enableSorting: true,
-    },
-    {
-      id: 'actions',
-      header: () => <span className="sr-only">{t('common.actions', 'Actions')}</span>,
-      cell: ({ row }): React.JSX.Element => (
-        <VirtualMcpsRowActions server={row.original} onToggleActive={onToggleActive} />
-      ),
     },
   ];
 }

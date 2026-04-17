@@ -12,7 +12,6 @@ import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { getVirtualMcpsColumns } from './virtual-mcps-columns';
 import { useVirtualMcps } from './virtual-mcps-context';
-import { toast } from 'sonner';
 import { cn } from '@/utils/utils';
 
 export function VirtualMcpsTable(): React.JSX.Element {
@@ -20,7 +19,6 @@ export function VirtualMcpsTable(): React.JSX.Element {
     servers,
     isLoading,
     hasMore,
-    updateServer,
     pagination,
     setPagination,
     globalFilter,
@@ -50,18 +48,7 @@ export function VirtualMcpsTable(): React.JSX.Element {
 
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const onToggleActive = async (id: string, current: boolean): Promise<void> => {
-    const success = await updateServer(id, { is_active: !current });
-    if (success) {
-      toast.success(
-        current
-          ? t('mcpsPage.virtualMcps.disabledSuccess', 'Virtual MCP disabled')
-          : t('mcpsPage.virtualMcps.enabledSuccess', 'Virtual MCP enabled'),
-      );
-    }
-  };
-
-  const columns = getVirtualMcpsColumns(t, onToggleActive, providerMap);
+  const columns = getVirtualMcpsColumns(t, providerMap);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
