@@ -118,17 +118,21 @@ function LogPageHeader({ log }: { readonly log: RequestLog }): React.JSX.Element
     desc1?: string | null,
     desc2?: string | null,
   ): React.JSX.Element => (
-    <div className="flex flex-col items-center gap-2 shrink-0 z-10 w-24">
+    <div className="flex flex-col items-center gap-2 shrink-0 z-10 min-w-24 max-w-[250px]">
       <div className="flex h-12 w-12 items-center justify-center rounded-full border bg-background text-muted-foreground shadow-sm">
         {icon}
       </div>
       <div className="flex flex-col items-center text-center">
         <span className="text-sm font-semibold text-foreground">{title}</span>
         {desc1 != null && desc1 !== '' && (
-          <span className="text-[11px] font-mono text-muted-foreground mt-0.5 truncate max-w-[100px]">{desc1}</span>
+          <span className="text-[11px] font-mono text-muted-foreground mt-0.5 truncate max-w-full">{desc1}</span>
         )}
         {desc2 != null && desc2 !== '' && (
-          <Badge variant="secondary" className="text-[10px] mt-1 hover:bg-secondary font-normal truncate max-w-[100px]">
+          <Badge
+            variant="secondary"
+            className="text-[10px] mt-1 hover:bg-secondary font-normal truncate max-w-full"
+            title={desc2}
+          >
             {desc2}
           </Badge>
         )}
