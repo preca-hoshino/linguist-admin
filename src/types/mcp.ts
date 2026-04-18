@@ -68,8 +68,6 @@ export interface VirtualMcpUpdateInput extends Partial<VirtualMcpCreateInput> {
   is_active?: boolean;
 }
 
-export type McpLogDirection = 'inbound' | 'outbound';
-
 export interface McpLog {
   id: string;
   virtual_mcp_id: string | null;
@@ -77,7 +75,6 @@ export interface McpLog {
   mcp_provider_id: string | null;
   app_id: string | null;
   session_id: string;
-  direction: McpLogDirection;
   method: string;
   params: Record<string, unknown>;
   result: Record<string, unknown>;
