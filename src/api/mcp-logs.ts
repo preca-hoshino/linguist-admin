@@ -9,7 +9,6 @@ export const listMcpLogs = async (params?: {
   virtual_mcp_id?: string;
   mcp_provider_id?: string;
   method?: string;
-  direction?: 'inbound' | 'outbound';
 }): Promise<ApiResult<ListResponse<McpLog>>> => {
   const qs = new URLSearchParams();
   if (params?.limit !== undefined) {
@@ -29,9 +28,6 @@ export const listMcpLogs = async (params?: {
   }
   if (params?.method != null && params.method !== '') {
     qs.set('method', params.method);
-  }
-  if (params?.direction != null) {
-    qs.set('direction', params.direction);
   }
 
   const queryStr = qs.toString() ? `?${qs.toString()}` : '';
