@@ -1,7 +1,9 @@
-import { Link, useLoaderData } from '@tanstack/react-router';
-import { ArrowRight, ChevronLeft, Clock, Cloud, Code2, Database, FileText, User, Info } from 'lucide-react';
+import { Link, useLoaderData, useRouter } from '@tanstack/react-router';
+import { ArrowRight, ChevronLeft, Clock, Cloud, Code2, Database, FileText, Trash2, User, Info } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { deleteMcpLog } from '@/api/mcp-logs';
 import { CopyableId } from '@/components/CopyableId';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -36,6 +38,17 @@ function relativeTime(dateStr: string, t: ReturnType<typeof useTranslation>['t']
 
 function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
   const { t } = useTranslation();
+  const router = useRouter();
+
+  const handleDelete = async (): Promise<void> => {
+    try {
+      await deleteMcpLog(log.id);
+      toast.success(t('mcpsPage.logs.deleteSuccess', 'MCP 日志已删除'));
+      void router.navigate({ to: '/mcps/logs' });
+    } catch {
+      toast.error(t('mcpsPage.logs.deleteError', '删除失败'));
+    }
+  };
 
   const renderNode = (icon: React.ReactNode, title: string, desc1?: string | null): React.JSX.Element => (
     <div className="flex flex-col items-center gap-2 shrink-0 z-10 w-24">
@@ -132,6 +145,19 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* 右侧操作区 */}
+        <div className="flex items-center gap-2 shrink-0">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 text-destructive border-destructive/20 hover:bg-destructive/10 hover:text-destructive"
+            onClick={() => void handleDelete()}
+          >
+            <Trash2 className="h-4 w-4 mr-1.5" />
+            {t('common.delete', '删除')}
+          </Button>
         </div>
       </div>
 

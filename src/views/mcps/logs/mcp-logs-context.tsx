@@ -7,7 +7,7 @@ import { extractFilterValue } from '@/utils/table';
 import { useTranslation } from 'react-i18next';
 import { useDialogState } from '@/composables/use-dialog-state';
 
-export type McpLogsDialogType = 'batch-delete' | 'detail';
+export type McpLogsDialogType = 'delete' | 'batch-delete' | 'detail';
 
 interface McpLogsContextType {
   open: McpLogsDialogType | null;

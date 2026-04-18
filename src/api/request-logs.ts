@@ -34,11 +34,3 @@ export const getRequestLog = async (id: string): Promise<ApiResult<RequestLog>> 
 export const deleteRequestLog = async (id: string): Promise<ApiResult<DeletedResponse>> => {
   return await request<DeletedResponse>('DELETE', `/request-logs/${id}`);
 };
-
-export const deleteRequestLogsBatch = async (
-  ids: string[],
-): Promise<ApiResult<{ deleted_count: number; requested_count: number }>> => {
-  return await request<{ deleted_count: number; requested_count: number }>('POST', '/request-logs/batch-delete', {
-    body: JSON.stringify({ ids }),
-  });
-};
