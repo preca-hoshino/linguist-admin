@@ -40,7 +40,7 @@ export function UsersPage(): React.JSX.Element {
         throw new Error(res.error.message);
       }
       setUsers(res.data.data);
-      setTotal(Number(res.data.total));
+      setTotal(res.data.total);
 
       if (res.data.data.length > 0) {
         const nextCursor = res.data.data.at(-1)?.id;
