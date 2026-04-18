@@ -95,47 +95,44 @@ function PricingContextCard({
 
   return (
     <Card className="shadow-sm border-border/60">
-      <CardHeader className="pb-3 border-b border-border/40">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 border-b border-border/40">
         <CardTitle className="text-sm font-semibold text-foreground/90">
           {t('modelsPage.logs.detail.billingContext', '计费参数矩阵')}
         </CardTitle>
+        {providerModelId != null && (
+          <Button variant="outline" size="sm" className="h-7 text-xs font-semibold" asChild>
+            <Link to="/models/provider-models/$id" params={{ id: providerModelId }}>
+              <ExternalLink className="mr-1.5 h-3 w-3" />
+              {t('common.detail', 'Detail')}
+            </Link>
+          </Button>
+        )}
       </CardHeader>
       <CardContent className="pt-5 flex flex-col gap-6">
         {/* Top Provider Model Rendering */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-background shadow-sm">
-              {(ctx.route?.providerKind != null && ctx.route.providerKind !== '') ||
-              (ctx.route?.providerName != null && ctx.route.providerName !== '') ? (
-                <ProviderLogo
-                  provider={(ctx.route.providerKind === '' ? ctx.route.providerName : ctx.route.providerKind) as string}
-                  size={20}
-                  className="opacity-80"
-                />
-              ) : (
-                <div className="h-2 w-2 rounded-full bg-border" />
-              )}
-            </div>
-            <div className="flex min-w-0 flex-col gap-0.5">
-              <span className="truncate text-xs text-muted-foreground/80">
-                {ctx.route?.providerName != null && ctx.route.providerName !== ''
-                  ? ctx.route.providerName
-                  : 'Unknown Provider'}
-              </span>
-              <div className="truncate text-sm font-bold text-foreground/90" title={ctx.route?.model}>
-                {ctx.route?.model != null && ctx.route.model !== '' ? ctx.route.model : '—'}
-              </div>
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-background shadow-sm">
+            {(ctx.route?.providerKind != null && ctx.route.providerKind !== '') ||
+            (ctx.route?.providerName != null && ctx.route.providerName !== '') ? (
+              <ProviderLogo
+                provider={(ctx.route.providerKind === '' ? ctx.route.providerName : ctx.route.providerKind) as string}
+                size={20}
+                className="opacity-80"
+              />
+            ) : (
+              <div className="h-2 w-2 rounded-full bg-border" />
+            )}
+          </div>
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <span className="truncate text-xs text-muted-foreground/80">
+              {ctx.route?.providerName != null && ctx.route.providerName !== ''
+                ? ctx.route.providerName
+                : 'Unknown Provider'}
+            </span>
+            <div className="truncate text-sm font-bold text-foreground/90" title={ctx.route?.model}>
+              {ctx.route?.model != null && ctx.route.model !== '' ? ctx.route.model : '—'}
             </div>
           </div>
-
-          {providerModelId != null && (
-            <Button variant="outline" size="sm" className="h-8 text-xs font-semibold" asChild>
-              <Link to="/models/provider-models/$id" params={{ id: providerModelId }}>
-                <ExternalLink className="mr-1.5 h-3 w-3" />
-                Detail
-              </Link>
-            </Button>
-          )}
         </div>
 
         <div className="flex border-t border-border/40 pt-5 flex-col gap-3">
