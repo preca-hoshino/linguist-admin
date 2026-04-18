@@ -6,6 +6,7 @@ export interface ListResponse<T> {
   readonly object: 'list';
   readonly data: T[];
   readonly has_more: boolean;
+  readonly total: number;
 }
 
 /** 删除确认响应结构 */
