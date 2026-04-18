@@ -38,6 +38,6 @@ export const getMcpLog = async (id: string): Promise<ApiResult<McpLog>> => {
   return await request<McpLog>('GET', `/mcp-logs/${id}`);
 };
 
-export const batchDeleteMcpLogs = async (ids: string[]): Promise<ApiResult<{ deleted_count: number }>> => {
-  return await request<{ deleted_count: number }>('POST', '/mcp-logs/batch-delete', { ids });
+export const deleteMcpLog = async (id: string): Promise<ApiResult<{ id: string; deleted: boolean }>> => {
+  return await request<{ id: string; deleted: boolean }>('DELETE', `/mcp-logs/${id}`);
 };
