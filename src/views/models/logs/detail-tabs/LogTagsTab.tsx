@@ -254,12 +254,8 @@ export function LogTagsTab({ log }: LogTagsTabProps): React.JSX.Element {
                   (ctxExtended.appName == null || ctxExtended.appName === '') && (
                     <span className="font-medium">{ctx.apiKeyName}</span>
                   )}
-                {ctx.apiKeyPrefix != null && ctx.apiKeyPrefix !== '' && (
-                  <span className="ml-2 font-mono text-xs text-muted-foreground">{ctx.apiKeyPrefix}…</span>
-                )}
                 {(ctxExtended.appName == null || ctxExtended.appName === '') &&
-                  (ctx.apiKeyName == null || ctx.apiKeyName === '') &&
-                  (ctx.apiKeyPrefix == null || ctx.apiKeyPrefix === '') && (
+                  (ctx.apiKeyName == null || ctx.apiKeyName === '') && (
                     <span className="text-muted-foreground opacity-50">未追踪到明确的 App / 或匿名请求</span>
                   )}
               </span>
