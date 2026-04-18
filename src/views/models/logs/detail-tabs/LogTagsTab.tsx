@@ -141,139 +141,141 @@ export function LogTagsTab({ log }: LogTagsTabProps): React.JSX.Element {
         </div>
       )}
 
-      {/* 路由信息卡片 */}
-      <div className="rounded-lg border bg-card p-5">
-        <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
-          <Network className="h-4 w-4 text-muted-foreground" />
-          网关与路由特征
-        </h3>
-        <div>
-          <InfoRow label={t('modelsPage.logs.detail.status', '状态')} icon={StatusIcon}>
-            <Badge
-              variant="outline"
-              className={cn(
-                'font-medium',
-                log.status === 'completed' &&
-                  'border-green-300 text-green-700 bg-green-50/50 dark:border-green-900 dark:text-green-400 dark:bg-green-900/20',
-                log.status === 'error' && 'border-destructive/40 text-destructive bg-destructive/5',
-                log.status !== 'completed' && log.status !== 'error' && 'text-muted-foreground',
-              )}
-            >
-              {((): string => {
-                if (log.status === 'completed') {
-                  return t('modelsPage.logs.statusCompleted', '成功');
-                }
-                if (log.status === 'error') {
-                  return t('modelsPage.logs.statusError', '失败');
-                }
-                return t('modelsPage.logs.statusProcessing', '处理中');
-              })()}
-            </Badge>
-          </InfoRow>
-          <InfoRow label={t('modelsPage.logs.detail.requestModel', '请求型号')} icon={Layers}>
-            <InfoText text={ctx.requestModel} mono />
-          </InfoRow>
-          {route && (
-            <>
-              <InfoRow label={t('modelsPage.logs.detail.providerModel', '最后执行的提供商型号')} icon={Cpu}>
-                <InfoText text={route.model} mono />
-              </InfoRow>
-              <InfoRow label={t('modelsPage.logs.detail.provider', '提供商实体')}>
-                <span className="text-sm">
-                  {route.providerName === '' ? route.providerId : route.providerName}
-                  {route.providerKind !== '' && (
-                    <span className="ml-2 text-xs text-muted-foreground font-mono">({route.providerKind})</span>
-                  )}
-                </span>
-              </InfoRow>
-              <InfoRow label={t('modelsPage.logs.detail.strategy', '选用策略')}>
-                <Badge variant="secondary" className="text-xs font-mono capitalize">
-                  {route.strategy || '—'}
-                </Badge>
-              </InfoRow>
-              {route.capabilities.length > 0 && (
-                <InfoRow label={t('modelsPage.logs.detail.capabilities', '能力标签')}>
-                  <div className="flex flex-wrap gap-1">
-                    {route.capabilities.map((cap) => (
-                      <Badge
-                        key={cap}
-                        variant="outline"
-                        className={cn(
-                          'text-[10px] font-medium rounded-full whitespace-nowrap',
-                          CAP_STYLE[cap] != null && CAP_STYLE[cap] !== ''
-                            ? CAP_STYLE[cap]
-                            : 'bg-muted/50 border-border/40 text-muted-foreground',
-                        )}
-                      >
-                        {cap}
-                      </Badge>
-                    ))}
-                  </div>
-                </InfoRow>
-              )}
-              <InfoRow label={t('modelsPage.logs.detail.modelType', '模型类型')}>
-                <Badge variant="outline" className="text-xs capitalize">
-                  {route.modelType}
-                </Badge>
-              </InfoRow>
-            </>
-          )}
-          <InfoRow label={t('modelsPage.logs.detail.stream', '工作模式 (Stream)')}>
-            <Badge
-              variant="outline"
-              className={
-                ctx.stream
-                  ? 'border-blue-200 text-blue-600 bg-blue-50/50 dark:bg-blue-500/10 dark:border-blue-500/20 dark:text-blue-400'
-                  : 'text-muted-foreground'
-              }
-            >
-              {ctx.stream ? t('modelsPage.logs.stream', '流式工作') : t('modelsPage.logs.nonStream', '阻断响应')}
-            </Badge>
-          </InfoRow>
-          <InfoRow label={t('modelsPage.logs.detail.userFormat', '用户下发格式')}>
-            <InfoText text={ctx.userFormat} mono />
-          </InfoRow>
-        </div>
-      </div>
-
-      {/* 客户端追踪 */}
-      <div className="rounded-lg border bg-card p-5">
-        <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
-          <Globe className="h-4 w-4 text-muted-foreground" />
-          下发来源追踪追踪
-        </h3>
-        <div>
-          <InfoRow label={t('modelsPage.logs.detail.app', '归属应用 (App)')} icon={Key}>
-            <span className="text-sm">
-              {ctxExtended.appName != null && ctxExtended.appName !== '' && (
-                <span className="font-medium">{ctxExtended.appName}</span>
-              )}
-              {ctx.apiKeyName != null &&
-                ctx.apiKeyName !== '' &&
-                (ctxExtended.appName == null || ctxExtended.appName === '') && (
-                  <span className="font-medium">{ctx.apiKeyName}</span>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {/* 路由信息卡片 */}
+        <div className="rounded-lg border bg-card p-5 h-full">
+          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
+            <Network className="h-4 w-4 text-muted-foreground" />
+            网关与路由特征
+          </h3>
+          <div>
+            <InfoRow label={t('modelsPage.logs.detail.status', '状态')} icon={StatusIcon}>
+              <Badge
+                variant="outline"
+                className={cn(
+                  'font-medium',
+                  log.status === 'completed' &&
+                    'border-green-300 text-green-700 bg-green-50/50 dark:border-green-900 dark:text-green-400 dark:bg-green-900/20',
+                  log.status === 'error' && 'border-destructive/40 text-destructive bg-destructive/5',
+                  log.status !== 'completed' && log.status !== 'error' && 'text-muted-foreground',
                 )}
-              {ctx.apiKeyPrefix != null && ctx.apiKeyPrefix !== '' && (
-                <span className="ml-2 font-mono text-xs text-muted-foreground">{ctx.apiKeyPrefix}…</span>
-              )}
-              {(ctxExtended.appName == null || ctxExtended.appName === '') &&
-                (ctx.apiKeyName == null || ctx.apiKeyName === '') &&
-                (ctx.apiKeyPrefix == null || ctx.apiKeyPrefix === '') && (
-                  <span className="text-muted-foreground opacity-50">未追踪到明确的 App / 或匿名请求</span>
-                )}
-            </span>
-          </InfoRow>
-          <InfoRow label={t('modelsPage.logs.detail.ip', '客户端原始 IP')}>
-            <InfoText text={ctx.ip} mono />
-          </InfoRow>
-          <InfoRow label={t('modelsPage.logs.detail.httpPath', '网关接受路径')}>
-            <InfoText text={`${ctx.http.method} ${ctx.http.path}`} mono />
-          </InfoRow>
-          {ctx.http.userAgent != null && ctx.http.userAgent !== '' && (
-            <InfoRow label={t('modelsPage.logs.detail.userAgent', '识别出的 User-Agent')}>
-              <InfoText text={ctx.http.userAgent} />
+              >
+                {((): string => {
+                  if (log.status === 'completed') {
+                    return t('modelsPage.logs.statusCompleted', '成功');
+                  }
+                  if (log.status === 'error') {
+                    return t('modelsPage.logs.statusError', '失败');
+                  }
+                  return t('modelsPage.logs.statusProcessing', '处理中');
+                })()}
+              </Badge>
             </InfoRow>
-          )}
+            <InfoRow label={t('modelsPage.logs.detail.requestModel', '请求型号')} icon={Layers}>
+              <InfoText text={ctx.requestModel} mono />
+            </InfoRow>
+            {route && (
+              <>
+                <InfoRow label={t('modelsPage.logs.detail.providerModel', '最后执行的提供商型号')} icon={Cpu}>
+                  <InfoText text={route.model} mono />
+                </InfoRow>
+                <InfoRow label={t('modelsPage.logs.detail.provider', '提供商实体')}>
+                  <span className="text-sm">
+                    {route.providerName === '' ? route.providerId : route.providerName}
+                    {route.providerKind !== '' && (
+                      <span className="ml-2 text-xs text-muted-foreground font-mono">({route.providerKind})</span>
+                    )}
+                  </span>
+                </InfoRow>
+                <InfoRow label={t('modelsPage.logs.detail.strategy', '选用策略')}>
+                  <Badge variant="secondary" className="text-xs font-mono capitalize">
+                    {route.strategy || '—'}
+                  </Badge>
+                </InfoRow>
+                {route.capabilities.length > 0 && (
+                  <InfoRow label={t('modelsPage.logs.detail.capabilities', '能力标签')}>
+                    <div className="flex flex-wrap gap-1">
+                      {route.capabilities.map((cap) => (
+                        <Badge
+                          key={cap}
+                          variant="outline"
+                          className={cn(
+                            'text-[10px] font-medium rounded-full whitespace-nowrap',
+                            CAP_STYLE[cap] != null && CAP_STYLE[cap] !== ''
+                              ? CAP_STYLE[cap]
+                              : 'bg-muted/50 border-border/40 text-muted-foreground',
+                          )}
+                        >
+                          {cap}
+                        </Badge>
+                      ))}
+                    </div>
+                  </InfoRow>
+                )}
+                <InfoRow label={t('modelsPage.logs.detail.modelType', '模型类型')}>
+                  <Badge variant="outline" className="text-xs capitalize">
+                    {route.modelType}
+                  </Badge>
+                </InfoRow>
+              </>
+            )}
+            <InfoRow label={t('modelsPage.logs.detail.stream', '工作模式 (Stream)')}>
+              <Badge
+                variant="outline"
+                className={
+                  ctx.stream
+                    ? 'border-blue-200 text-blue-600 bg-blue-50/50 dark:bg-blue-500/10 dark:border-blue-500/20 dark:text-blue-400'
+                    : 'text-muted-foreground'
+                }
+              >
+                {ctx.stream ? t('modelsPage.logs.stream', '流式工作') : t('modelsPage.logs.nonStream', '阻断响应')}
+              </Badge>
+            </InfoRow>
+            <InfoRow label={t('modelsPage.logs.detail.userFormat', '用户下发格式')}>
+              <InfoText text={ctx.userFormat} mono />
+            </InfoRow>
+          </div>
+        </div>
+
+        {/* 客户端追踪 */}
+        <div className="rounded-lg border bg-card p-5 h-full">
+          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
+            <Globe className="h-4 w-4 text-muted-foreground" />
+            下发来源追踪追踪
+          </h3>
+          <div>
+            <InfoRow label={t('modelsPage.logs.detail.app', '归属应用 (App)')} icon={Key}>
+              <span className="text-sm">
+                {ctxExtended.appName != null && ctxExtended.appName !== '' && (
+                  <span className="font-medium">{ctxExtended.appName}</span>
+                )}
+                {ctx.apiKeyName != null &&
+                  ctx.apiKeyName !== '' &&
+                  (ctxExtended.appName == null || ctxExtended.appName === '') && (
+                    <span className="font-medium">{ctx.apiKeyName}</span>
+                  )}
+                {ctx.apiKeyPrefix != null && ctx.apiKeyPrefix !== '' && (
+                  <span className="ml-2 font-mono text-xs text-muted-foreground">{ctx.apiKeyPrefix}…</span>
+                )}
+                {(ctxExtended.appName == null || ctxExtended.appName === '') &&
+                  (ctx.apiKeyName == null || ctx.apiKeyName === '') &&
+                  (ctx.apiKeyPrefix == null || ctx.apiKeyPrefix === '') && (
+                    <span className="text-muted-foreground opacity-50">未追踪到明确的 App / 或匿名请求</span>
+                  )}
+              </span>
+            </InfoRow>
+            <InfoRow label={t('modelsPage.logs.detail.ip', '客户端原始 IP')}>
+              <InfoText text={ctx.ip} mono />
+            </InfoRow>
+            <InfoRow label={t('modelsPage.logs.detail.httpPath', '网关接受路径')}>
+              <InfoText text={`${ctx.http.method} ${ctx.http.path}`} mono />
+            </InfoRow>
+            {ctx.http.userAgent != null && ctx.http.userAgent !== '' && (
+              <InfoRow label={t('modelsPage.logs.detail.userAgent', '识别出的 User-Agent')}>
+                <InfoText text={ctx.http.userAgent} />
+              </InfoRow>
+            )}
+          </div>
         </div>
       </div>
     </div>
