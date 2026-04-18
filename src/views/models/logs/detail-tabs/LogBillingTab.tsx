@@ -94,7 +94,7 @@ function PricingContextCard({
   }
 
   return (
-    <Card className="shadow-sm border-border/60">
+    <Card className="shadow-sm border-border/60 h-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 border-b border-border/40">
         <CardTitle className="text-sm font-semibold text-foreground/90">
           {t('modelsPage.logs.detail.billingContext', '计费参数矩阵')}
@@ -220,9 +220,9 @@ export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* 2. Breakdown Table */}
-        <Card className="lg:col-span-2 shadow-sm border-border/60">
+        <Card className="lg:col-span-2 shadow-sm border-border/60 h-full">
           <CardHeader className="pb-3 border-b border-border/40">
             <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground/90">
               {t('modelsPage.logs.detail.billingBreakdown', '费用明细')}
