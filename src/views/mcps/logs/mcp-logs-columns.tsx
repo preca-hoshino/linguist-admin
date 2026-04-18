@@ -17,7 +17,11 @@ function formatDateTime(dateStr: string): React.JSX.Element {
   );
 }
 
-export function getMcpLogsColumns(t: TFunction): ColumnDef<McpLog>[] {
+export function getMcpLogsColumns(
+  t: TFunction,
+  virtualMcpOptions: { label: string; value: string }[],
+  providerOptions: { label: string; value: string }[],
+): ColumnDef<McpLog>[] {
   return [
     {
       id: 'select',
@@ -65,12 +69,14 @@ export function getMcpLogsColumns(t: TFunction): ColumnDef<McpLog>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.logs.virtualMcp', 'Virtual MCP')} />
       ),
-      meta: { className: 'ps-1 w-24', tdClassName: 'ps-4' },
+      meta: { className: 'ps-1 w-40', tdClassName: 'ps-4' },
       cell: ({ row }): React.JSX.Element => {
         const val = row.original.virtual_mcp_id;
+        const name = virtualMcpOptions.find((o) => o.value === val)?.label;
+        const displayVal = name ?? (val != null && val !== '' ? val.slice(0, 8) : '-');
         return (
-          <div className="w-[80px] truncate font-mono text-xs text-muted-foreground" title={val ?? ''}>
-            {val != null && val !== '' ? val.slice(0, 8) : '-'}
+          <div className="w-[140px] truncate text-xs text-muted-foreground" title={name ?? val ?? ''}>
+            {displayVal}
           </div>
         );
       },
@@ -82,12 +88,14 @@ export function getMcpLogsColumns(t: TFunction): ColumnDef<McpLog>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.logs.providerMcp', 'Provider MCP')} />
       ),
-      meta: { className: 'ps-1 w-24', tdClassName: 'ps-4' },
+      meta: { className: 'ps-1 w-40', tdClassName: 'ps-4' },
       cell: ({ row }): React.JSX.Element => {
         const val = row.original.mcp_provider_id;
+        const name = providerOptions.find((o) => o.value === val)?.label;
+        const displayVal = name ?? (val != null && val !== '' ? val.slice(0, 8) : '-');
         return (
-          <div className="w-[80px] truncate font-mono text-xs text-muted-foreground" title={val ?? ''}>
-            {val != null && val !== '' ? val.slice(0, 8) : '-'}
+          <div className="w-[140px] truncate text-xs text-muted-foreground" title={name ?? val ?? ''}>
+            {displayVal}
           </div>
         );
       },

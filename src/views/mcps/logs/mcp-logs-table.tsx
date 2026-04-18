@@ -6,7 +6,7 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { listMcpProviders } from '@/api/mcp-providers';
 import { listVirtualMcps } from '@/api/mcp-virtual-servers';
@@ -64,7 +64,10 @@ export function McpLogsTable(): React.JSX.Element {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
-  const columns = getMcpLogsColumns(t);
+  const columns = useMemo(
+    () => getMcpLogsColumns(t, virtualMcpOptions, providerOptions),
+    [t, virtualMcpOptions, providerOptions],
+  );
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
