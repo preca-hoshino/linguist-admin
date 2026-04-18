@@ -72,7 +72,7 @@ export function ProvidersProvider({ children }: { readonly children: React.React
       const res = await listMcpProviders(payload);
       if (res.ok) {
         setProviders(res.data.data);
-        setTotal(Number(res.data.total));
+        setTotal(res.data.total);
         setHasMore(res.data.has_more);
       } else {
         setError(res.error.message);
