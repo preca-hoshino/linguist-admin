@@ -135,28 +135,47 @@ function PricingContextCard({
           </div>
         </div>
 
-        <div className="flex border-t border-border/40 pt-5 flex-col gap-3">
+        <div className="flex border-t border-border/40 pt-5 flex-col gap-5">
           <span className="text-xs font-medium text-muted-foreground">Pricing Tier Metadata</span>
-          <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm">
+
+          {/* Row 1: Token Range Line */}
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between items-end text-[11px] text-muted-foreground px-0.5">
+              <div className="flex flex-col gap-1">
+                <span>起始 Token (Start)</span>
+                <span className="font-mono text-xs font-semibold text-foreground/90">
+                  {tierStartTokens.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex flex-col gap-1 text-right">
+                <span>终止 Token (Max)</span>
+                <span className="font-mono text-xs font-semibold text-foreground/60">{maxTokensDisplay}</span>
+              </div>
+            </div>
+            <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
+              <div className="h-full w-full bg-primary/20 dark:bg-primary/30" />
+            </div>
+          </div>
+
+          {/* Row 2: 3-column Prices */}
+          <div className="grid grid-cols-3 gap-3">
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-muted-foreground">起始 Token (Start)</span>
-              <span className="font-mono text-xs">{tierStartTokens.toLocaleString()}</span>
+              <span className="text-[11px] text-muted-foreground truncate" title="请求单价 / 1M (Prompt)">
+                请求 / 1M (Prompt)
+              </span>
+              <span className="font-mono text-xs font-medium">{inputCostDisplay}</span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-muted-foreground">终止 Token (Max)</span>
-              <span className="font-mono text-xs text-muted-foreground">{maxTokensDisplay}</span>
+              <span className="text-[11px] text-muted-foreground truncate" title="响应单价 / 1M (Completion)">
+                响应 / 1M (Complete)
+              </span>
+              <span className="font-mono text-xs font-medium">{outputCostDisplay}</span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-muted-foreground">请求单价 / 1M (Prompt)</span>
-              <span className="font-mono text-xs">{inputCostDisplay}</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-muted-foreground">响应单价 / 1M (Completion)</span>
-              <span className="font-mono text-xs">{outputCostDisplay}</span>
-            </div>
-            <div className="col-span-2 flex flex-col gap-1">
-              <span className="text-[11px] text-muted-foreground">缓存单价 / 1M (Cache)</span>
-              <span className="font-mono text-xs">{cacheCostDisplay}</span>
+              <span className="text-[11px] text-muted-foreground truncate" title="缓存单价 / 1M (Cache)">
+                缓存 / 1M (Cache)
+              </span>
+              <span className="font-mono text-xs font-medium">{cacheCostDisplay}</span>
             </div>
           </div>
         </div>
