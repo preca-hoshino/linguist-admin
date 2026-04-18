@@ -110,14 +110,6 @@ export function McpLogsTable(): React.JSX.Element {
         searchPlaceholder={t('mcpsPage.logs.searchPlaceholder', 'Search methods...')}
         filters={[
           {
-            columnId: 'direction',
-            title: t('mcpsPage.logs.direction', 'Direction'),
-            options: [
-              { label: t('mcpsPage.logs.inbound', 'Inbound'), value: 'inbound' },
-              { label: t('mcpsPage.logs.outbound', 'Outbound'), value: 'outbound' },
-            ],
-          },
-          {
             columnId: 'mcp_provider_id',
             title: t('mcpsPage.logs.providerMcp', 'Provider MCP'),
             options: providerOptions,
