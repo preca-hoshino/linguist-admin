@@ -55,17 +55,11 @@ export function McpLogsDialogs(): React.JSX.Element {
               <div className="space-y-6">
                 <div>
                   <h3 className="font-semibold text-lg mb-4">{t('modelsPage.logs.detailBase', 'Base Info')}</h3>
-                  <div className="grid grid-cols-2 gap-x-12 gap-y-6 bg-muted/30 p-6 rounded-xl border border-border/50">
-                    <div>
-                      <div className="text-sm text-muted-foreground mb-1">{t('common.id', 'ID')}</div>
-                      <code className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded text-foreground">
-                        {currentRow.id}
-                      </code>
-                    </div>
-                    <div>
-                      <div className="text-sm text-muted-foreground mb-1">{t('mcpsPage.logs.session', 'Session')}</div>
-                      <code className="text-xs font-mono text-muted-foreground">{currentRow.session_id}</code>
-                    </div>
+                  <div className="bg-muted/30 p-6 rounded-xl border border-border/50">
+                    <div className="text-sm text-muted-foreground mb-1">{t('common.id', 'ID')}</div>
+                    <code className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded text-foreground">
+                      {currentRow.id}
+                    </code>
                   </div>
                 </div>
 
