@@ -136,19 +136,21 @@ function PricingContextCard({
         </div>
 
         <div className="flex border-t border-border/40 pt-5 flex-col gap-5">
-          <span className="text-xs font-medium text-muted-foreground">Pricing Tier Metadata</span>
+          <span className="text-xs font-medium text-muted-foreground">
+            {t('modelsPage.logs.detail.tierMetadata', '计费参数元数据')}
+          </span>
 
           {/* Row 1: Token Range Line */}
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-end text-[11px] text-muted-foreground px-0.5">
               <div className="flex flex-col gap-1">
-                <span>起始 Token (Start)</span>
+                <span>{t('modelsPage.logs.detail.tierStart', '起始 Token')}</span>
                 <span className="font-mono text-xs font-semibold text-foreground/90">
                   {tierStartTokens.toLocaleString()}
                 </span>
               </div>
               <div className="flex flex-col gap-1 text-right">
-                <span>终止 Token (Max)</span>
+                <span>{t('modelsPage.logs.detail.tierMax', '终止 Token')}</span>
                 <span className="font-mono text-xs font-semibold text-foreground/60">{maxTokensDisplay}</span>
               </div>
             </div>
@@ -160,20 +162,29 @@ function PricingContextCard({
           {/* Row 2: 3-column Prices */}
           <div className="grid grid-cols-3 gap-3">
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-muted-foreground truncate" title="请求单价 / 1M (Prompt)">
-                请求 / 1M (Prompt)
+              <span
+                className="text-[11px] text-muted-foreground truncate"
+                title={t('modelsPage.logs.detail.tierPrompt', '请求单价 / 1M')}
+              >
+                {t('modelsPage.logs.detail.tierPrompt', '请求单价 / 1M')}
               </span>
               <span className="font-mono text-xs font-medium">{inputCostDisplay}</span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-muted-foreground truncate" title="响应单价 / 1M (Completion)">
-                响应 / 1M (Complete)
+              <span
+                className="text-[11px] text-muted-foreground truncate"
+                title={t('modelsPage.logs.detail.tierCompletion', '响应单价 / 1M')}
+              >
+                {t('modelsPage.logs.detail.tierCompletion', '响应单价 / 1M')}
               </span>
               <span className="font-mono text-xs font-medium">{outputCostDisplay}</span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-muted-foreground truncate" title="缓存单价 / 1M (Cache)">
-                缓存 / 1M (Cache)
+              <span
+                className="text-[11px] text-muted-foreground truncate"
+                title={t('modelsPage.logs.detail.tierCache', '缓存单价 / 1M')}
+              >
+                {t('modelsPage.logs.detail.tierCache', '缓存单价 / 1M')}
               </span>
               <span className="font-mono text-xs font-medium">{cacheCostDisplay}</span>
             </div>
