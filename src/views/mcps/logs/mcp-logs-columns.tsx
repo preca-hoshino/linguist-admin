@@ -117,24 +117,6 @@ export function getMcpLogsColumns(
       enableSorting: true,
     },
     {
-      accessorKey: 'session_id',
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('mcpsPage.logs.session', 'Session')} />,
-      meta: { className: 'ps-4 w-24' },
-      cell: ({ row }): React.JSX.Element => {
-        const val = String(row.getValue('session_id'));
-        let displayVal = '-';
-        if (val !== '') {
-          displayVal = val.length > 8 ? `${val.slice(0, 8)}...` : val;
-        }
-        return (
-          <code className="text-[11px] font-medium w-[80px] truncate block" title={val}>
-            {displayVal}
-          </code>
-        );
-      },
-      enableSorting: false,
-    },
-    {
       id: 'error',
       accessorFn: (row) => row.error,
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.status', 'Status')} />,
