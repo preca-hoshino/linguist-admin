@@ -244,9 +244,6 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
         if (ctx.apiKeyName != null && ctx.apiKeyName !== '') {
           return ctx.apiKeyName;
         }
-        if (ctx.apiKeyPrefix != null && ctx.apiKeyPrefix !== '') {
-          return ctx.apiKeyPrefix;
-        }
         return '-';
       },
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.app', 'App')} />,

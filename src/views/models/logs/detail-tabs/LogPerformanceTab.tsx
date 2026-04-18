@@ -144,7 +144,10 @@ function WaterfallChart({ ctx }: { readonly ctx: GatewayContextSnapshot }): Reac
 
               {/* 时长说明 */}
               <div className="w-16 shrink-0 text-right">
-                <span className={cn('text-sm font-bold', b.colorText)}>{duration}ms</span>
+                <span className={cn('text-sm font-bold', b.colorText)}>
+                  {formatDuration(duration)}
+                  {formatDurationUnit(duration)}
+                </span>
               </div>
             </div>
           );
@@ -157,8 +160,14 @@ function WaterfallChart({ ctx }: { readonly ctx: GatewayContextSnapshot }): Reac
         style={{ paddingLeft: '140px' }}
       >
         <span>0ms</span>
-        <span>{Math.round(e2eTotalMs / 2)}ms</span>
-        <span>{e2eTotalMs}ms</span>
+        <span>
+          {formatDuration(Math.round(e2eTotalMs / 2))}
+          {formatDurationUnit(Math.round(e2eTotalMs / 2))}
+        </span>
+        <span>
+          {formatDuration(e2eTotalMs)}
+          {formatDurationUnit(e2eTotalMs)}
+        </span>
       </div>
     </div>
   );
@@ -224,60 +233,63 @@ function PerformanceCardsList({
   const { totalMs, ttftMs, providerTimeMs, gatewayOverheadMs, itlMs, genRate } = metrics;
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {/* 1. E2E 卡片 */}
-      <MetricCard
-        title={t('dashboard.perf.stat_e2e', 'E2E')}
-        {...getDurationProps(totalMs)}
-        desc={t('modelsPage.logs.detail.perfE2EDesc', '网关及大模型全局端到端响应耗时')}
-        icon={Clock}
-      />
+    <div>
+      <h3 className="text-sm font-semibold mb-4">{t('modelsPage.logs.detail.perfMetricsTitle', '性能指标')}</h3>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {/* 1. E2E 卡片 */}
+        <MetricCard
+          title={t('dashboard.perf.stat_e2e', 'E2E')}
+          {...getDurationProps(totalMs)}
+          desc={t('modelsPage.logs.detail.perfE2EDesc', '网关及大模型全局端到端响应耗时')}
+          icon={Clock}
+        />
 
-      {/* 2. TTFT 或 Provider Time 卡片 */}
-      {isStream ? (
-        <MetricCard
-          title={t('dashboard.perf.stat_ttft', 'TTFT')}
-          {...getDurationProps(ttftMs)}
-          desc={t('modelsPage.logs.detail.perfTTFTDesc', '从网关接收请求至大模型响应首个有效 Token')}
-          icon={Timer}
-        />
-      ) : (
-        <MetricCard
-          title={t('modelsPage.logs.detail.perfProviderTime', 'Provider Time')}
-          {...getDurationProps(providerTimeMs)}
-          desc={t('modelsPage.logs.detail.perfProviderTimeDesc', '大模型处理请求的完整耗时（包含推理与生成）')}
-          icon={Timer}
-        />
-      )}
+        {/* 2. TTFT 或 Provider Time 卡片 */}
+        {isStream ? (
+          <MetricCard
+            title={t('dashboard.perf.stat_ttft', 'TTFT')}
+            {...getDurationProps(ttftMs)}
+            desc={t('modelsPage.logs.detail.perfTTFTDesc', '从网关接收请求至大模型响应首个有效 Token')}
+            icon={Timer}
+          />
+        ) : (
+          <MetricCard
+            title={t('modelsPage.logs.detail.perfProviderTime', 'Provider Time')}
+            {...getDurationProps(providerTimeMs)}
+            desc={t('modelsPage.logs.detail.perfProviderTimeDesc', '大模型处理请求的完整耗时（包含推理与生成）')}
+            icon={Timer}
+          />
+        )}
 
-      {/* 3. ITL 或 网关损耗 卡片 */}
-      {isStream ? (
-        <MetricCard
-          title={t('dashboard.perf.stat_itl', 'ITL')}
-          {...getDurationProps(itlMs)}
-          desc={t('modelsPage.logs.detail.perfITLDescSingle', '流式响应中每次字间生成的平均耗时')}
-          icon={Gauge}
-        />
-      ) : (
-        <MetricCard
-          title={t('modelsPage.logs.detail.perfGatewayOverhead', 'Gateway Overhead')}
-          {...getDurationProps(gatewayOverheadMs)}
-          desc={t(
-            'modelsPage.logs.detail.perfGatewayOverheadDesc',
-            '网关执行鉴权、上下文编排及出入参映射产生的额外耗时',
-          )}
-          icon={Server}
-        />
-      )}
+        {/* 3. ITL 或 网关损耗 卡片 */}
+        {isStream ? (
+          <MetricCard
+            title={t('dashboard.perf.stat_itl', 'ITL')}
+            {...getDurationProps(itlMs)}
+            desc={t('modelsPage.logs.detail.perfITLDescSingle', '流式响应中每次字间生成的平均耗时')}
+            icon={Gauge}
+          />
+        ) : (
+          <MetricCard
+            title={t('modelsPage.logs.detail.perfGatewayOverhead', 'Gateway Overhead')}
+            {...getDurationProps(gatewayOverheadMs)}
+            desc={t(
+              'modelsPage.logs.detail.perfGatewayOverheadDesc',
+              '网关执行鉴权、上下文编排及出入参映射产生的额外耗时',
+            )}
+            icon={Server}
+          />
+        )}
 
-      {/* 4. Token 生成速率 卡片 */}
-      <MetricCard
-        title={t('dashboard.perf.stat_tok_s', 'Generation Rate')}
-        value={isStream && genRate != null ? genRate.toLocaleString() : null}
-        unit={isStream && genRate != null ? 'Tok/s' : ''}
-        desc={t('modelsPage.logs.detail.perfGenRateDescSingle', '流式持续阶段单位时间内生成的 Token 数量')}
-        icon={Zap}
-      />
+        {/* 4. Token 生成速率 卡片 */}
+        <MetricCard
+          title={t('dashboard.perf.stat_tok_s', 'Generation Rate')}
+          value={isStream && genRate != null ? genRate.toLocaleString() : null}
+          unit={isStream && genRate != null ? 'Tok/s' : ''}
+          desc={t('modelsPage.logs.detail.perfGenRateDescSingle', '流式持续阶段单位时间内生成的 Token 数量')}
+          icon={Zap}
+        />
+      </div>
     </div>
   );
 }

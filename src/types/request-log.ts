@@ -105,7 +105,6 @@ export interface AuditEnvelope {
 export interface GatewayContextSnapshot {
   id: string;
   ip: string;
-  apiKeyPrefix?: string;
   apiKeyName?: string;
   userFormat: string;
   http: { method: string; path: string; userAgent?: string };

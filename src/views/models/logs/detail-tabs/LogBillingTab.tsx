@@ -94,72 +94,99 @@ function PricingContextCard({
   }
 
   return (
-    <Card className="shadow-sm border-border/60">
-      <CardHeader className="pb-3 border-b border-border/40">
+    <Card className="shadow-sm border-border/60 h-full">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 border-b border-border/40">
         <CardTitle className="text-sm font-semibold text-foreground/90">
           {t('modelsPage.logs.detail.billingContext', '计费参数矩阵')}
         </CardTitle>
+        {providerModelId != null && (
+          <Button variant="outline" size="sm" className="h-7 text-xs font-semibold" asChild>
+            <Link to="/models/provider-models/$id" params={{ id: providerModelId }}>
+              <ExternalLink className="mr-1.5 h-3 w-3" />
+              {t('common.detail', 'Detail')}
+            </Link>
+          </Button>
+        )}
       </CardHeader>
       <CardContent className="pt-5 flex flex-col gap-6">
         {/* Top Provider Model Rendering */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-background shadow-sm">
-              {(ctx.route?.providerKind != null && ctx.route.providerKind !== '') ||
-              (ctx.route?.providerName != null && ctx.route.providerName !== '') ? (
-                <ProviderLogo
-                  provider={(ctx.route.providerKind === '' ? ctx.route.providerName : ctx.route.providerKind) as string}
-                  size={20}
-                  className="opacity-80"
-                />
-              ) : (
-                <div className="h-2 w-2 rounded-full bg-border" />
-              )}
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-background shadow-sm">
+            {(ctx.route?.providerKind != null && ctx.route.providerKind !== '') ||
+            (ctx.route?.providerName != null && ctx.route.providerName !== '') ? (
+              <ProviderLogo
+                provider={(ctx.route.providerKind === '' ? ctx.route.providerName : ctx.route.providerKind) as string}
+                size={20}
+                className="opacity-80"
+              />
+            ) : (
+              <div className="h-2 w-2 rounded-full bg-border" />
+            )}
+          </div>
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <span className="truncate text-xs text-muted-foreground/80">
+              {ctx.route?.providerName != null && ctx.route.providerName !== ''
+                ? ctx.route.providerName
+                : 'Unknown Provider'}
+            </span>
+            <div className="truncate text-sm font-bold text-foreground/90" title={ctx.route?.model}>
+              {ctx.route?.model != null && ctx.route.model !== '' ? ctx.route.model : '—'}
             </div>
-            <div className="flex min-w-0 flex-col gap-0.5">
-              <span className="truncate text-xs text-muted-foreground/80">
-                {ctx.route?.providerName != null && ctx.route.providerName !== ''
-                  ? ctx.route.providerName
-                  : 'Unknown Provider'}
-              </span>
-              <div className="truncate text-sm font-bold text-foreground/90" title={ctx.route?.model}>
-                {ctx.route?.model != null && ctx.route.model !== '' ? ctx.route.model : '—'}
+          </div>
+        </div>
+
+        <div className="flex border-t border-border/40 pt-5 flex-col gap-5">
+          <span className="text-xs font-medium text-muted-foreground">
+            {t('modelsPage.logs.detail.tierMetadata', '计费参数元数据')}
+          </span>
+
+          {/* Row 1: Token Range Line */}
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between items-end text-[11px] text-muted-foreground px-0.5">
+              <div className="flex flex-col gap-1">
+                <span>{t('modelsPage.logs.detail.tierStart', '起始 Token')}</span>
+                <span className="font-mono text-xs font-semibold text-foreground/90">
+                  {tierStartTokens.toLocaleString()}
+                </span>
               </div>
+              <div className="flex flex-col gap-1 text-right">
+                <span>{t('modelsPage.logs.detail.tierMax', '终止 Token')}</span>
+                <span className="font-mono text-xs font-semibold text-foreground/60">{maxTokensDisplay}</span>
+              </div>
+            </div>
+            <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
+              <div className="h-full w-full bg-primary/20 dark:bg-primary/30" />
             </div>
           </div>
 
-          {providerModelId != null && (
-            <Button variant="outline" size="sm" className="h-8 text-xs font-semibold" asChild>
-              <Link to="/models/provider-models/$id" params={{ id: providerModelId }}>
-                <ExternalLink className="mr-1.5 h-3 w-3" />
-                Detail
-              </Link>
-            </Button>
-          )}
-        </div>
-
-        <div className="flex border-t border-border/40 pt-5 flex-col gap-3">
-          <span className="text-xs font-medium text-muted-foreground">Pricing Tier Metadata</span>
-          <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm">
+          {/* Row 2: 3-column Prices */}
+          <div className="grid grid-cols-3 gap-3">
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-muted-foreground">起始 Token (Start)</span>
-              <span className="font-mono text-xs">{tierStartTokens.toLocaleString()}</span>
+              <span
+                className="text-[11px] text-muted-foreground truncate"
+                title={t('modelsPage.logs.detail.tierPrompt', '请求单价 / 1M')}
+              >
+                {t('modelsPage.logs.detail.tierPrompt', '请求单价 / 1M')}
+              </span>
+              <span className="font-mono text-xs font-medium">{inputCostDisplay}</span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-muted-foreground">终止 Token (Max)</span>
-              <span className="font-mono text-xs text-muted-foreground">{maxTokensDisplay}</span>
+              <span
+                className="text-[11px] text-muted-foreground truncate"
+                title={t('modelsPage.logs.detail.tierCompletion', '响应单价 / 1M')}
+              >
+                {t('modelsPage.logs.detail.tierCompletion', '响应单价 / 1M')}
+              </span>
+              <span className="font-mono text-xs font-medium">{outputCostDisplay}</span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-muted-foreground">请求单价 / 1M (Prompt)</span>
-              <span className="font-mono text-xs">{inputCostDisplay}</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-muted-foreground">响应单价 / 1M (Completion)</span>
-              <span className="font-mono text-xs">{outputCostDisplay}</span>
-            </div>
-            <div className="col-span-2 flex flex-col gap-1">
-              <span className="text-[11px] text-muted-foreground">缓存单价 / 1M (Cache)</span>
-              <span className="font-mono text-xs">{cacheCostDisplay}</span>
+              <span
+                className="text-[11px] text-muted-foreground truncate"
+                title={t('modelsPage.logs.detail.tierCache', '缓存单价 / 1M')}
+              >
+                {t('modelsPage.logs.detail.tierCache', '缓存单价 / 1M')}
+              </span>
+              <span className="font-mono text-xs font-medium">{cacheCostDisplay}</span>
             </div>
           </div>
         </div>
@@ -223,9 +250,9 @@ export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* 2. Breakdown Table */}
-        <Card className="lg:col-span-2 shadow-sm border-border/60">
+        <Card className="lg:col-span-2 shadow-sm border-border/60 h-full">
           <CardHeader className="pb-3 border-b border-border/40">
             <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground/90">
               {t('modelsPage.logs.detail.billingBreakdown', '费用明细')}

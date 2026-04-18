@@ -239,7 +239,7 @@ function LogPageHeader({ log }: { readonly log: RequestLog }): React.JSX.Element
         {/* Client */}
         {renderNode(
           <User className="h-5 w-5" />,
-          appNameFromCtx ?? ctx?.apiKeyName ?? ctx?.apiKeyPrefix ?? 'Unknown Client',
+          appNameFromCtx ?? ctx?.apiKeyName ?? 'Unknown Client',
           null,
           ctx?.requestModel,
         )}
