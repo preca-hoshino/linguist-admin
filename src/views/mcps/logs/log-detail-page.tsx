@@ -1,5 +1,5 @@
 import { Link, useLoaderData } from '@tanstack/react-router';
-import { ArrowRight, ChevronLeft, Clock, Cloud, Code2, Database, FileText, RouterIcon, User, Info } from 'lucide-react';
+import { ArrowRight, ChevronLeft, Clock, Cloud, Code2, Database, FileText, User, Info } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CopyableId } from '@/components/CopyableId';
@@ -114,9 +114,6 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
               >
                 {isCompleted ? t('common.success', 'Success') : t('common.error', 'Error')}
               </Badge>
-              <Badge variant="outline" className="text-xs font-mono text-muted-foreground uppercase">
-                {log.direction}
-              </Badge>
               <Badge
                 variant="outline"
                 className="text-xs font-mono text-blue-600/90 border-blue-400 dark:text-blue-400 dark:border-blue-900"
@@ -139,26 +136,18 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
       </div>
 
       <div className="flex items-center justify-center px-4 py-8 relative max-w-full overflow-x-auto">
-        {log.direction === 'inbound' ? (
-          <>
-            {renderNode(<User className="h-5 w-5" />, t('mcpsPage.logs.clientNode', 'Client'), log.app_id ?? 'Unknown')}
-            {renderEdge(log.method, isError)}
-            {renderNode(
-              <Database className="h-5 w-5" />,
-              t('mcpsPage.logs.virtualMcpNode', 'Virtual MCP'),
-              log.virtual_mcp_id ?? 'Unknown',
-            )}
-          </>
-        ) : (
-          <>
-            {renderNode(<RouterIcon className="h-5 w-5" />, t('mcpsPage.logs.gatewayNode', 'Linguist Gateway'))}
-            {renderEdge(log.method, isError)}
-            {renderNode(
-              <Cloud className="h-5 w-5" />,
-              t('mcpsPage.logs.mcpServerNode', 'MCP Server'),
-              log.mcp_provider_id ?? 'Unknown',
-            )}
-          </>
+        {renderNode(<User className="h-5 w-5" />, t('mcpsPage.logs.clientNode', 'Client'), log.app_id ?? 'Unknown')}
+        {renderEdge(log.method, isError)}
+        {renderNode(
+          <Database className="h-5 w-5" />,
+          t('mcpsPage.logs.virtualMcpNode', 'Virtual MCP'),
+          log.virtual_mcp_id ?? 'Unknown',
+        )}
+        {renderEdge(log.method, isError)}
+        {renderNode(
+          <Cloud className="h-5 w-5" />,
+          t('mcpsPage.logs.mcpServerNode', 'MCP Server'),
+          log.mcp_provider_id ?? 'Unknown',
         )}
       </div>
     </div>

@@ -53,7 +53,6 @@ export function McpLogsProvider({ children }: { readonly children: React.ReactNo
 
   // 提取 API 参数
   const methodFilter = extractFilterValue(columnFilters, 'method');
-  const directionFilter = extractFilterValue(columnFilters, 'direction');
   const providerIdFilter = extractFilterValue(columnFilters, 'mcp_provider_id');
   const virtualIdFilter = extractFilterValue(columnFilters, 'virtual_mcp_id');
 
@@ -67,7 +66,6 @@ export function McpLogsProvider({ children }: { readonly children: React.ReactNo
         offset: pagination.pageIndex * pagination.pageSize,
         search: globalFilter === '' ? undefined : globalFilter,
         method: methodFilter,
-        direction: directionFilter === undefined ? undefined : (directionFilter as 'inbound' | 'outbound'),
         mcp_provider_id: providerIdFilter,
         virtual_mcp_id: virtualIdFilter,
       };
@@ -87,22 +85,13 @@ export function McpLogsProvider({ children }: { readonly children: React.ReactNo
     } finally {
       setLoading(false);
     }
-  }, [
-    pagination.pageIndex,
-    pagination.pageSize,
-    globalFilter,
-    methodFilter,
-    directionFilter,
-    providerIdFilter,
-    virtualIdFilter,
-    t,
-  ]);
+  }, [pagination.pageIndex, pagination.pageSize, globalFilter, methodFilter, providerIdFilter, virtualIdFilter, t]);
 
   // Reset to first page on search/filter change
   // biome-ignore lint/correctness/useExhaustiveDependencies: react to search/filter change
   useEffect(() => {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, [globalFilter, methodFilter, directionFilter, providerIdFilter, virtualIdFilter, pagination.pageSize]);
+  }, [globalFilter, methodFilter, providerIdFilter, virtualIdFilter, pagination.pageSize]);
 
   // Reload when triggered
   useEffect((): (() => void) => {

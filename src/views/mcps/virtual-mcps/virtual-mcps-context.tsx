@@ -79,7 +79,7 @@ export function VirtualMcpsProvider({
       const res = await listVirtualMcps(payload);
       if (res.ok) {
         setServers(res.data.data);
-        setTotal(res.data.total);
+        setTotal(Number(res.data.total));
         setHasMore(res.data.has_more);
       } else {
         setError(res.error.message);

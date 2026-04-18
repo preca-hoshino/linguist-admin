@@ -1,5 +1,5 @@
 import { Plus } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { deleteUserApi, fetchUsers, type User } from '@/api/users';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
@@ -40,7 +40,7 @@ export function UsersPage(): React.JSX.Element {
         throw new Error(res.error.message);
       }
       setUsers(res.data.data);
-      setTotal(res.data.total);
+      setTotal(Number(res.data.total));
 
       if (res.data.data.length > 0) {
         const nextCursor = res.data.data.at(-1)?.id;

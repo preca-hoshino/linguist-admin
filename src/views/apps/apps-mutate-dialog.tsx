@@ -79,8 +79,7 @@ function AppAllowedList({ form, name, options, isSelect, t, itemName }: AppAllow
                       </FormControl>
                       <SelectContent>
                         {options.map((opt) => {
-                          const customIcon = (opt.type ?? '') === '' ? undefined : MODEL_TYPE_ICON[opt.type as string];
-                          const Icon = customIcon ?? Box;
+                          const IconComp = (opt.type ?? '') === '' ? Box : (MODEL_TYPE_ICON[opt.type as string] ?? Box);
                           return (
                             <SelectItem key={opt.id} value={opt.id}>
                               <div className="flex items-center gap-2">

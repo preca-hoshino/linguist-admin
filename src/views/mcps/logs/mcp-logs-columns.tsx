@@ -117,29 +117,6 @@ export function getMcpLogsColumns(
       enableSorting: true,
     },
     {
-      accessorKey: 'direction',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('mcpsPage.logs.direction', 'Direction')} />
-      ),
-      meta: { className: 'ps-1 w-24', tdClassName: 'ps-4' },
-      cell: ({ row }): React.JSX.Element => {
-        const dir = row.getValue('direction');
-        return (
-          <Badge
-            variant={dir === 'inbound' ? 'outline' : 'secondary'}
-            className={
-              dir === 'inbound'
-                ? 'border-blue-200 text-blue-600 bg-blue-50/50 dark:bg-blue-500/10 dark:border-blue-500/20 dark:text-blue-400'
-                : 'text-muted-foreground'
-            }
-          >
-            {dir === 'inbound' ? t('mcpsPage.logs.inbound', '↓ IN') : t('mcpsPage.logs.outbound', '↑ OUT')}
-          </Badge>
-        );
-      },
-      enableSorting: true,
-    },
-    {
       accessorKey: 'session_id',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('mcpsPage.logs.session', 'Session')} />,
       meta: { className: 'ps-1 w-24', tdClassName: 'ps-4' },
