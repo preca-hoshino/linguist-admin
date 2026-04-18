@@ -98,7 +98,6 @@ export function McpLogMetadataTab({ log }: McpLogMetadataTabProps): React.JSX.El
         <CardContent className="p-0">
           <MetadataItem label={t('mcpsPage.logs.logId', 'Log ID')} value={log.id} copyable />
           <MetadataItem label={t('mcpsPage.logs.sessionId', 'Session ID')} value={log.session_id} copyable />
-          <MetadataItem label={t('mcpsPage.logs.direction', 'Direction')} value={log.direction.toUpperCase()} />
           <MetadataItem label={t('mcpsPage.logs.protocolMethod', 'Protocol Method')} value={log.method} copyable />
         </CardContent>
       </Card>

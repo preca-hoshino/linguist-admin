@@ -63,20 +63,6 @@ export function McpLogsDialogs(): React.JSX.Element {
                       </code>
                     </div>
                     <div>
-                      <div className="text-sm text-muted-foreground mb-1">{t('mcpsPage.logs.method', 'Method')}</div>
-                      <div className="font-medium text-sm">{currentRow.method}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-muted-foreground mb-1">
-                        {t('mcpsPage.logs.direction', 'Direction')}
-                      </div>
-                      <Badge variant={currentRow.direction === 'inbound' ? 'outline' : 'secondary'}>
-                        {currentRow.direction === 'inbound'
-                          ? t('mcpsPage.logs.inbound', '↓ IN')
-                          : t('mcpsPage.logs.outbound', '↑ OUT')}
-                      </Badge>
-                    </div>
-                    <div>
                       <div className="text-sm text-muted-foreground mb-1">{t('mcpsPage.logs.session', 'Session')}</div>
                       <code className="text-xs font-mono text-muted-foreground">{currentRow.session_id}</code>
                     </div>
