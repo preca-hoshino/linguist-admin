@@ -41,6 +41,10 @@ export default {
     // Confirm
     cannotBeUndone: 'This action cannot be undone.',
     deletedSuccess: 'Successfully deleted',
+    // Misc
+    empty: 'Empty',
+    copy: 'Copy',
+    copied: 'Copied',
   },
   nav: {
     general: 'General',
@@ -687,6 +691,11 @@ export default {
         pricingTier: 'Tier Start Threshold',
         baseTier: 'Base Pricing Tier',
         pricingType: 'Model Execution Type',
+        // Metadata Tab
+        metadataDesc:
+          'Full protocol snapshot and low-level metadata for the request lifecycle, useful for framework debugging and auditing.',
+        gatewayContextSnapshot: 'Gateway Context Snapshot',
+        gatewayContextSnapshotDesc: 'All internal state context produced by Linguist during request processing',
       },
     },
   },
