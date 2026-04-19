@@ -75,7 +75,7 @@ export function useVirtualModelsColumns(): ColumnDef<VirtualModel>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.virtualModels.name', 'Name')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }) => (
         <div className="flex flex-col gap-1">
           <span className="font-medium">{row.getValue('name')}</span>
@@ -89,7 +89,7 @@ export function useVirtualModelsColumns(): ColumnDef<VirtualModel>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.virtualModels.type', 'Type')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const typeStr = row.getValue<string>('model_type');
         const Icon = MODEL_TYPE_ICON[typeStr as 'chat' | 'embedding'] ?? Box;
@@ -114,7 +114,7 @@ export function useVirtualModelsColumns(): ColumnDef<VirtualModel>[] {
           title={t('modelsPage.virtualModels.routingStrategy', 'Routing Strategy')}
         />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const strategy = row.getValue<string | null | undefined>('routing_strategy');
         return (
@@ -137,7 +137,7 @@ export function useVirtualModelsColumns(): ColumnDef<VirtualModel>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.virtualModels.status', 'Status')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const isActive = row.getValue<boolean>('is_active');
         return (
@@ -159,7 +159,7 @@ export function useVirtualModelsColumns(): ColumnDef<VirtualModel>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.virtualModels.throughput', 'Throughput')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const model = row.original;
         return (
@@ -177,7 +177,7 @@ export function useVirtualModelsColumns(): ColumnDef<VirtualModel>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('dashboard.stats.errorRate', 'Error Rate')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: () => null,
       enableSorting: false,
       enableHiding: true,
@@ -187,7 +187,7 @@ export function useVirtualModelsColumns(): ColumnDef<VirtualModel>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('dashboard.stats.avgLatency', 'Latency')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: () => null,
       enableSorting: false,
       enableHiding: true,
@@ -197,7 +197,7 @@ export function useVirtualModelsColumns(): ColumnDef<VirtualModel>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.virtualModels.createdAt', 'Created')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }) => (
         <span className="text-sm text-muted-foreground">{formatDate(row.getValue('created_at'))}</span>
       ),
