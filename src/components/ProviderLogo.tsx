@@ -17,7 +17,14 @@ export const ProviderLogo = forwardRef<SVGSVGElement, ProviderLogoProps>(
     if (provider == null || provider === '') {
       return null;
     }
-    const kindValue = provider.toLowerCase();
+
+    // 规范化：将 API 格式标识符 / 内部别名映射到对应的 icon key
+    const ALIAS: Record<string, string> = {
+      openaicompat: 'openai', // OpenAI-compatible API format → OpenAI icon
+    };
+
+    const rawKind = provider.toLowerCase();
+    const kindValue = ALIAS[rawKind] ?? rawKind;
 
     // @lobehub/icons exports these specific branded icons natively.
     if (kindValue === 'gemini') {
