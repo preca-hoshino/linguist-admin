@@ -109,7 +109,7 @@ export function useProviderModelsColumns(): ColumnDef<ProviderModel>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.providerModels.name', 'Name')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }) => <span className="font-medium">{row.getValue<string>('name')}</span>,
       enableSorting: true,
       enableHiding: true,
@@ -119,7 +119,7 @@ export function useProviderModelsColumns(): ColumnDef<ProviderModel>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.providerModels.provider', 'Provider')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const model = row.original;
         return <ProviderCell kind={model.provider_kind} id={model.provider_id} name={model.provider_name} />;
@@ -135,7 +135,7 @@ export function useProviderModelsColumns(): ColumnDef<ProviderModel>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.providerModels.type', 'Type')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const typeStr = row.getValue<string>('model_type');
         const Icon = MODEL_TYPE_ICON[typeStr] ?? Box;
@@ -157,7 +157,7 @@ export function useProviderModelsColumns(): ColumnDef<ProviderModel>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.providerModels.status', 'Status')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const isActive = row.getValue<boolean>('is_active');
         return (
@@ -179,7 +179,7 @@ export function useProviderModelsColumns(): ColumnDef<ProviderModel>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.providerModels.capabilities', 'Capabilities')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const caps = row.getValue<string[] | undefined>('capabilities');
         if (caps == null || caps.length === 0) {
@@ -214,7 +214,7 @@ export function useProviderModelsColumns(): ColumnDef<ProviderModel>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.providerModels.throughput', 'Throughput')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const model = row.original;
         return (
@@ -232,7 +232,7 @@ export function useProviderModelsColumns(): ColumnDef<ProviderModel>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('dashboard.stats.errorRate', 'Error Rate')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: () => null,
       enableSorting: false,
       enableHiding: true,
@@ -242,7 +242,7 @@ export function useProviderModelsColumns(): ColumnDef<ProviderModel>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('dashboard.stats.avgLatency', 'Latency')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: () => null,
       enableSorting: false,
       enableHiding: true,
@@ -252,7 +252,7 @@ export function useProviderModelsColumns(): ColumnDef<ProviderModel>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.providerModels.createdAt', 'Created')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }) => (
         <span className="text-sm text-muted-foreground">{formatDate(row.getValue('created_at'))}</span>
       ),
