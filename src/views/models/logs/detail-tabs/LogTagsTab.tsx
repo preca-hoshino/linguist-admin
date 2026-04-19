@@ -1,6 +1,7 @@
 import { AlertTriangle, CheckCircle2, Cpu, Globe, Key, Layers, Loader2, Network, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/Badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import type { RequestLog } from '@/types';
 import { cn } from '@/utils/utils';
 
@@ -33,7 +34,7 @@ function InfoRow({
   return (
     <div
       className={cn(
-        'grid grid-cols-[160px_1fr] items-start gap-3 py-2.5 border-b border-border/50 last:border-0',
+        'grid grid-cols-[140px_1fr] items-start gap-3 py-2.5 border-b border-border/50 last:border-0',
         className,
       )}
     >
@@ -129,7 +130,7 @@ export function LogTagsTab({ log }: LogTagsTabProps): React.JSX.Element {
   const ctxExtended = ctx as typeof ctx & { appName?: string };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       {/* 错误信息（置顶） */}
       <ErrorSection log={log} />
 
@@ -141,14 +142,16 @@ export function LogTagsTab({ log }: LogTagsTabProps): React.JSX.Element {
         </div>
       )}
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {/* 路由信息卡片 */}
-        <div className="rounded-lg border bg-card p-5 h-full">
-          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
-            <Network className="h-4 w-4 text-muted-foreground" />
-            {t('modelsPage.logs.detail.tagsGatewaySection', '网关与路由特征')}
-          </h3>
-          <div>
+        <Card className="shadow-sm border-border/60 h-full gap-0 py-0">
+          <CardHeader className="flex flex-row items-center gap-2 space-y-0 px-6 py-4 border-b border-border/40">
+            <Network className="h-4 w-4 text-muted-foreground shrink-0" />
+            <CardTitle className="text-sm font-semibold text-foreground/90">
+              {t('modelsPage.logs.detail.tagsGatewaySection', '网关与路由特征')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-6 pt-0 pb-2">
             <InfoRow label={t('modelsPage.logs.detail.status', '状态')} icon={StatusIcon}>
               <Badge
                 variant="outline"
@@ -234,16 +237,18 @@ export function LogTagsTab({ log }: LogTagsTabProps): React.JSX.Element {
             <InfoRow label={t('modelsPage.logs.detail.userFormat', '用户下发格式')}>
               <InfoText text={ctx.userFormat} mono />
             </InfoRow>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        {/* 客户端追踪 */}
-        <div className="rounded-lg border bg-card p-5 h-full">
-          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
-            <Globe className="h-4 w-4 text-muted-foreground" />
-            {t('modelsPage.logs.detail.tagsSourceSection', '下发来源追踪')}
-          </h3>
-          <div>
+        {/* 客户端追踪卡片 */}
+        <Card className="shadow-sm border-border/60 h-full gap-0 py-0">
+          <CardHeader className="flex flex-row items-center gap-2 space-y-0 px-6 py-4 border-b border-border/40">
+            <Globe className="h-4 w-4 text-muted-foreground shrink-0" />
+            <CardTitle className="text-sm font-semibold text-foreground/90">
+              {t('modelsPage.logs.detail.tagsSourceSection', '下发来源追踪')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-6 pt-0 pb-2">
             <InfoRow label={t('modelsPage.logs.detail.app', '归属应用 (App)')} icon={Key}>
               <span className="text-sm">
                 {ctxExtended.appName != null && ctxExtended.appName !== '' && (
@@ -273,8 +278,8 @@ export function LogTagsTab({ log }: LogTagsTabProps): React.JSX.Element {
                 <InfoText text={ctx.http.userAgent} />
               </InfoRow>
             )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
