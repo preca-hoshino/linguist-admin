@@ -19,7 +19,7 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
     {
       accessorKey: 'name',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('mcpsPage.providers.name', 'Name')} />,
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => <div className="font-medium">{row.getValue('name')}</div>,
       enableSorting: true,
     },
@@ -28,7 +28,7 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.providers.transportType', 'Transport')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const type = row.getValue('kind');
         return (
@@ -47,7 +47,7 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
           title={t('mcpsPage.providers.endpointOrCommand', 'Endpoint / Command')}
         />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const provider = row.original;
         if (provider.kind === 'stdio') {
@@ -72,7 +72,7 @@ export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.providers.apiKeys', 'API Keys')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const count = row.getValue<number>('api_keys');
         if (count === 0) {
