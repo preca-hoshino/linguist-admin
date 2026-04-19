@@ -198,7 +198,7 @@ function PricingContextCard({
 export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.Element {
   const { t } = useTranslation();
   const ctx = log.gateway_context;
-  const breakdown = log.cost_breakdown;
+  const breakdown = ctx?.billing?.costBreakdown ?? log.cost_breakdown;
   const isEmbedding = ctx?.route?.modelType === 'embedding';
 
   const hasBreakdown = breakdown != null && typeof breakdown === 'object' && 'inputCost' in breakdown;
@@ -217,7 +217,7 @@ export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.
     );
   }
 
-  const { calculated_cost } = log;
+  const calculatedCost = ctx.billing?.calculatedCost ?? log.calculated_cost;
   const inputCost = breakdown.inputCost;
   const outputCost = breakdown.outputCost;
   const cacheCost = breakdown.cacheCost;
@@ -243,7 +243,7 @@ export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.
             <div className="flex items-baseline gap-1 text-foreground">
               <span className="text-lg font-semibold opacity-70">¥</span>
               <span className="text-3xl font-bold font-mono tracking-tighter">
-                {calculated_cost == null ? '0.000000' : Number(calculated_cost).toFixed(6)}
+                {calculatedCost == null ? '0.000000' : Number(calculatedCost).toFixed(6)}
               </span>
             </div>
           </div>

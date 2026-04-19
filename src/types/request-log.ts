@@ -154,6 +154,10 @@ export interface GatewayContextSnapshot {
     end?: number;
     [key: string]: number | undefined;
   };
+  billing?: {
+    calculatedCost: number;
+    costBreakdown: CostBreakdown;
+  };
   error?: string;
   providerError?: {
     statusCode: number;
