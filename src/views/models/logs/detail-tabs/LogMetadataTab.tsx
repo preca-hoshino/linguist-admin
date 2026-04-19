@@ -2,6 +2,7 @@ import { Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import JsonView from 'react18-json-view';
 import 'react18-json-view/src/style.css';
+import { Button } from '@/components/ui/Button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { useTheme } from '@/providers/ThemeProvider';
 import type { RequestLog } from '@/types';
@@ -77,7 +78,7 @@ function HeadersCard({ headers }: { readonly headers: AuditHeaderMap | undefined
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between px-0.5">
+      <div className="flex items-center px-0.5">
         <div className="flex items-center gap-2">
           <div className="text-sm font-semibold text-foreground/90">
             {t('modelsPage.logs.detail.headers', 'Headers')}
@@ -89,9 +90,10 @@ function HeadersCard({ headers }: { readonly headers: AuditHeaderMap | undefined
           )}
         </div>
         {!isEmpty && (
-          <button
-            type="button"
-            className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 ml-1 text-muted-foreground hover:text-foreground shrink-0"
             title={t('common.download', '下载')}
             onClick={() => {
               const str = Object.entries(headers as Record<string, string | string[]>)
@@ -107,7 +109,7 @@ function HeadersCard({ headers }: { readonly headers: AuditHeaderMap | undefined
             }}
           >
             <Download className="h-4 w-4" />
-          </button>
+          </Button>
         )}
       </div>
       <div className="rounded-lg border border-border/60 bg-card p-4 shadow-sm overflow-x-auto">
@@ -140,7 +142,7 @@ function BodyCard({ data, title }: { readonly data: unknown; readonly title: str
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between px-0.5">
+      <div className="flex items-center px-0.5">
         <div className="flex items-center gap-2">
           <div className="text-sm font-semibold text-foreground/90">{title}</div>
           {sizeAnnotation != null && (
@@ -148,9 +150,10 @@ function BodyCard({ data, title }: { readonly data: unknown; readonly title: str
           )}
         </div>
         {!isEmpty && (
-          <button
-            type="button"
-            className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 ml-1 text-muted-foreground hover:text-foreground shrink-0"
             title={t('common.download', '下载')}
             onClick={() => {
               const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -163,7 +166,7 @@ function BodyCard({ data, title }: { readonly data: unknown; readonly title: str
             }}
           >
             <Download className="h-4 w-4" />
-          </button>
+          </Button>
         )}
       </div>
       <div className="w-full min-w-0 overflow-x-auto rounded-lg border border-border/60 bg-zinc-50/50 p-4 shadow-sm dark:bg-zinc-900/50">
