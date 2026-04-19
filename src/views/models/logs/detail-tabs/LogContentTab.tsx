@@ -83,12 +83,12 @@ function ChatContent({
   }, [allMessages]);
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      <div className="px-4 pt-4 shrink-0">
+    <div className="flex flex-col h-full bg-background pt-4 pb-6 w-full gap-6">
+      <div className="shrink-0">
         <TokenUsageBar usage={usage} mode="chat" />
       </div>
 
-      <div className="flex flex-col flex-1 overflow-y-auto p-4 w-full pt-4">
+      <div className="flex flex-col flex-1 overflow-y-auto w-full">
         {systemItems.length > 0 && (
           <div className="flex flex-col mb-2">
             {systemItems.map((sys) => (
@@ -172,8 +172,8 @@ function EmbeddingContent({
   }
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      <div className="px-4 pt-4 shrink-0">
+    <div className="flex flex-col h-full bg-background pt-4 pb-6 w-full gap-6">
+      <div className="shrink-0">
         <TokenUsageBar usage={usage} mode="embedding" />
       </div>
       {inputs.length === 0 ? (
@@ -181,7 +181,7 @@ function EmbeddingContent({
           {t('modelsPage.logs.detail.noEmbeddingInput', '暂无向量输入数据')}
         </div>
       ) : (
-        <div className="flex flex-col gap-3 p-4 w-full">
+        <div className="flex flex-col gap-3 w-full">
           {inputs.map((text, i) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: Array values might not be unique
             <div key={i} className="rounded-xl border bg-card p-4 shadow-sm">

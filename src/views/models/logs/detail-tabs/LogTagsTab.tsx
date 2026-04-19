@@ -338,7 +338,7 @@ export function LogTagsTab({ log }: LogTagsTabProps): React.JSX.Element {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6 pt-4 pb-6 w-full">
       {/* 错误信息（置顶） */}
       <ErrorSection log={log} />
 

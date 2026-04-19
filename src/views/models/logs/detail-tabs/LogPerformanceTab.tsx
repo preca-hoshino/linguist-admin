@@ -310,7 +310,7 @@ export function LogPerformanceTab({ log }: { readonly log: RequestLog }): React.
   const metrics = computeMetrics(ctx);
 
   return (
-    <div className="flex flex-col gap-6 pt-2 pb-6">
+    <div className="flex flex-col gap-6 pt-4 pb-6 w-full">
       <PerformanceCardsList isStream={isStream ?? false} metrics={metrics} t={t} />
       <WaterfallChart ctx={ctx} />
     </div>

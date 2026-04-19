@@ -203,7 +203,7 @@ export function LogMetadataTab({ log }: LogMetadataTabProps): React.JSX.Element 
   const audit = ctx?.audit;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6 pt-4 pb-6 w-full">
       <Tabs defaultValue="userRequest" className="w-full">
         <div className="overflow-x-auto pb-1 mb-2">
           <TabsList className="grid w-[600px] sm:w-full grid-cols-5 h-auto py-1">

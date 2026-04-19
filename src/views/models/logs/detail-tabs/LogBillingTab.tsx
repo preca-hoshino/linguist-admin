@@ -224,7 +224,7 @@ export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.
   const tierStartTokens = breakdown.tierStartTokens;
 
   return (
-    <div className="flex flex-col gap-4 w-full">
+    <div className="flex flex-col gap-6 pt-4 pb-6 w-full">
       {/* 1. Header (Highlight Cost) */}
       <Card className="border-border/60 shadow-sm">
         <CardContent className="pt-6 pb-6">
