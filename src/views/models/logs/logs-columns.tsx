@@ -1,4 +1,4 @@
-import { Anthropic, DeepSeek, Gemini, Github, OpenAI, ProviderIcon, Volcengine } from '@lobehub/icons';
+import { ProviderCell } from '@/components/ProviderCell';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { DataTableColumnHeader } from '@/components/data-table';
@@ -110,52 +110,13 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
         if (fmt == null || fmt === '') {
           return <span className="text-muted-foreground">-</span>;
         }
-
-        let label = fmt;
-        switch (fmt) {
-          case 'openaicompat': {
-            label = 'OpenAI Compat';
-            break;
-          }
-          case 'anthropic': {
-            label = 'Anthropic';
-            break;
-          }
-          case 'gemini': {
-            label = 'Gemini';
-            break;
-          }
-        }
-        let iconNode: React.ReactNode;
-        switch (fmt) {
-          case 'anthropic': {
-            iconNode = <Anthropic size={12} className="fill-current" />;
-            break;
-          }
-          case 'openaicompat': {
-            iconNode = <OpenAI size={12} className="fill-current" />;
-            break;
-          }
-          case 'gemini': {
-            iconNode = <Gemini size={12} className="fill-current" />;
-            break;
-          }
-          default: {
-            iconNode = <ProviderIcon provider={fmt} size={12} type="mono" className="fill-current" />;
-            break;
-          }
-        }
-
-        return (
-          <div className="flex items-center gap-1.5">
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] border bg-background text-muted-foreground shadow-sm">
-              {iconNode}
-            </span>
-            <span className="truncate text-xs text-foreground max-w-[110px]" title={label}>
-              {label}
-            </span>
-          </div>
-        );
+        const FMT_LABEL: Record<string, string> = {
+          openaicompat: 'OpenAI Compat',
+          anthropic: 'Anthropic',
+          gemini: 'Gemini',
+        };
+        const label = FMT_LABEL[fmt] ?? fmt;
+        return <ProviderCell kind={fmt} id={fmt} name={label} size="sm" />;
       },
       enableSorting: true,
     },
@@ -186,50 +147,11 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       meta: { className: 'ps-1 w-32', tdClassName: 'ps-4' },
       cell: ({ row }): React.JSX.Element => {
         const route = row.original.gateway_context?.route;
-        const kindValue = route?.providerKind;
-        let providerName = kindValue;
-        if (route?.providerName != null && route.providerName !== '') {
-          providerName = route.providerName;
-        } else if (route?.providerId != null && route.providerId !== '') {
-          providerName = route.providerId;
-        }
-
-        if (kindValue == null || kindValue === '') {
+        if (route?.providerKind == null || route.providerKind === '') {
           return <span className="text-muted-foreground">-</span>;
         }
-        let iconNode: React.ReactNode;
-        switch (kindValue) {
-          case 'gemini': {
-            iconNode = <Gemini size={12} className="fill-current" />;
-            break;
-          }
-          case 'deepseek': {
-            iconNode = <DeepSeek size={12} className="fill-current" />;
-            break;
-          }
-          case 'volcengine': {
-            iconNode = <Volcengine size={12} className="fill-current" />;
-            break;
-          }
-          case 'copilot': {
-            iconNode = <Github size={12} className="fill-current" />;
-            break;
-          }
-          default: {
-            iconNode = <ProviderIcon provider={kindValue} size={12} type="mono" className="fill-current" />;
-            break;
-          }
-        }
-
         return (
-          <div className="flex items-center gap-1.5">
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] border bg-background text-muted-foreground shadow-sm">
-              {iconNode}
-            </span>
-            <span className="truncate text-xs text-foreground max-w-[110px]" title={providerName}>
-              {providerName}
-            </span>
-          </div>
+          <ProviderCell kind={route.providerKind} id={route.providerId} name={route.providerName ?? ''} size="sm" />
         );
       },
       enableSorting: true,

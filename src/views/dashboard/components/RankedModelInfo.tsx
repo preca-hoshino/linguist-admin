@@ -12,14 +12,9 @@ export function RankedModelInfo({ providerName, providerKind, modelName }: Ranke
     <div className="flex items-center gap-3">
       {/* 遮罩/Icon容器 */}
       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border bg-background shadow-sm">
-        {(providerKind !== null && providerKind !== undefined && providerKind !== '') ||
-        (providerName !== null && providerName !== '') ? (
+        {(providerKind != null && providerKind !== '') || (providerName !== null && providerName !== '') ? (
           <ProviderLogo
-            provider={
-              (providerKind !== undefined && providerKind !== null && providerKind !== ''
-                ? providerKind
-                : providerName) as string
-            }
+            provider={providerKind != null && providerKind !== '' ? providerKind : providerName}
             size={16}
             className="opacity-80"
           />

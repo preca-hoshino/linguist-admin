@@ -15,7 +15,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine } from '@lobehub/icons';
+
 import type { TFunction } from 'i18next';
 import { GripVertical, Plus, Trash2 } from 'lucide-react';
 import { useMemo } from 'react';
@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/Button';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
+import { ProviderLogo } from '@/components/ProviderLogo';
 import type { ProviderModel } from '@/types';
 import type { VirtualModelForm } from '../virtual-models-mutate-dialog';
 
@@ -101,26 +102,6 @@ export const STRATEGY_CONFIG = {
     ),
   },
 } satisfies Record<string, StrategyConfig>;
-
-// ── 工具函数 ──
-function renderProviderLogo(kind?: string): React.ReactNode {
-  if ((kind ?? '') === '') {
-    return null;
-  }
-  if (kind === 'gemini') {
-    return <Gemini size={14} className="fill-current" />;
-  }
-  if (kind === 'deepseek') {
-    return <DeepSeek size={14} className="fill-current" />;
-  }
-  if (kind === 'volcengine') {
-    return <Volcengine size={14} className="fill-current" />;
-  }
-  if (kind === 'copilot') {
-    return <Github size={14} className="fill-current" />;
-  }
-  return <ProviderIcon provider={kind as 'openai'} size={14} type="mono" className="fill-current" />;
-}
 
 // ── 拖拽项组件 ──
 interface SortableBackendItemProps {
@@ -201,7 +182,7 @@ function SortableBackendItem({
                         <div className="flex w-full items-center gap-2 overflow-hidden">
                           {(p.kind ?? p.id) !== '' && (
                             <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border bg-background text-muted-foreground shadow-sm">
-                              {renderProviderLogo(p.kind ?? p.id)}
+                              <ProviderLogo provider={p.kind ?? p.id} size={14} type="mono" className="fill-current" />
                             </span>
                           )}
                           <span className="truncate">{p.name}</span>

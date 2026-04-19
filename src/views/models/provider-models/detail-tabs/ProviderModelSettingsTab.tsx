@@ -1,4 +1,3 @@
-import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine } from '@lobehub/icons';
 import { Link, useRouter } from '@tanstack/react-router';
 import {
   Box,
@@ -23,30 +22,8 @@ import { Label } from '@/components/ui/Label';
 import { Separator } from '@/components/ui/Separator';
 import type { ProviderModel } from '@/types';
 import { cn } from '@/utils/utils';
+import { ProviderLogo } from '@/components/ProviderLogo';
 import { ProviderModelsMutateDialog } from '../provider-models-mutate-dialog';
-
-/* Provider Icon 渲染 */
-function SettingsProviderIcon({ kind }: { readonly kind: string }): React.JSX.Element {
-  const props = { size: 14, className: 'fill-current shrink-0' } as const;
-  switch (kind) {
-    case 'gemini': {
-      return <Gemini {...props} />;
-    }
-    case 'deepseek': {
-      return <DeepSeek {...props} />;
-    }
-    case 'volcengine': {
-      return <Volcengine {...props} />;
-    }
-    case 'copilot': {
-      return <Github {...props} />;
-    }
-
-    default: {
-      return <ProviderIcon provider={kind} size={14} type="mono" className="shrink-0 fill-current" />;
-    }
-  }
-}
 
 /* 能力 Badge 体系 */
 const CAP_TO_I18N: Record<string, string> = {
@@ -232,7 +209,12 @@ export function ProviderModelSettingsTab({ model }: ProviderModelSettingsTabProp
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted/50 text-foreground">
                 {model.provider_kind != null && model.provider_kind !== '' ? (
-                  <SettingsProviderIcon kind={model.provider_kind} />
+                  <ProviderLogo
+                    provider={model.provider_kind}
+                    size={14}
+                    type="mono"
+                    className="fill-current shrink-0"
+                  />
                 ) : (
                   <Box className="h-4 w-4" />
                 )}

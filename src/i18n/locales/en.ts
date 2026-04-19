@@ -41,6 +41,10 @@ export default {
     // Confirm
     cannotBeUndone: 'This action cannot be undone.',
     deletedSuccess: 'Successfully deleted',
+    // Misc
+    empty: 'Empty',
+    copy: 'Copy',
+    copied: 'Copied',
   },
   nav: {
     general: 'General',
@@ -552,6 +556,30 @@ export default {
         tabMetadata: 'Metadata',
         noContext: 'No context data available',
         userFormat: 'Source',
+        // Tags tab — gateway & routing card
+        tagsGatewaySection: 'Gateway & Routing',
+        tagsSourceSection: 'Request Source',
+        tagsAnonymousApp: 'Anonymous request',
+        status: 'Status',
+        requestModel: 'Request Model',
+        providerModel: 'Executed Model',
+        provider: 'Provider',
+        strategy: 'Routing Strategy',
+        capabilities: 'Capabilities',
+        modelType: 'Model Type',
+        stream: 'Request Mode',
+        app: 'Source App',
+        ip: 'Client IP',
+        httpPath: 'Endpoint',
+        userAgent: 'User-Agent',
+        // Tags tab — error section
+        errorSection: 'Error Details',
+        errorType: 'Error Type',
+        errorCode: 'Error Code',
+        errorMessage: 'Error Message',
+        providerStatus: 'Provider Status Code',
+        providerCode: 'Provider Error Code',
+        providerRawBody: 'Provider Raw Response',
         systemPrompt: 'System Prompt',
         systemPromptDesc: 'Core instructions injected when the model request is initiated.',
         reasoning: 'Reasoning',
@@ -663,6 +691,11 @@ export default {
         pricingTier: 'Tier Start Threshold',
         baseTier: 'Base Pricing Tier',
         pricingType: 'Model Execution Type',
+        // Metadata Tab
+        metadataDesc:
+          'Full protocol snapshot and low-level metadata for the request lifecycle, useful for framework debugging and auditing.',
+        gatewayContextSnapshot: 'Gateway Context Snapshot',
+        gatewayContextSnapshotDesc: 'All internal state context produced by Linguist during request processing',
       },
     },
   },
