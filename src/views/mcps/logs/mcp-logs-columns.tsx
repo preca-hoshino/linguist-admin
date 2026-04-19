@@ -50,12 +50,12 @@ export function getMcpLogsColumns(
     {
       accessorKey: 'id',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.id', 'ID')} />,
-      meta: { className: 'ps-4' },
+      meta: { className: 'w-[70px]' },
       cell: ({ row }) => (
         <Link
           to={`/mcps/logs/$id`}
           params={{ id: row.original.id }}
-          className="w-[70px] truncate font-mono text-xs text-primary hover:underline"
+          className="truncate font-mono text-xs text-primary hover:underline"
           title={row.original.id}
         >
           {row.original.id.slice(0, 8)}
@@ -69,7 +69,7 @@ export function getMcpLogsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.logs.virtualMcp', 'Virtual MCP')} />
       ),
-      meta: { className: 'ps-4 w-40' },
+      meta: { className: 'w-40' },
       cell: ({ row }): React.JSX.Element => {
         const val = row.original.virtual_mcp_id;
         const name = virtualMcpOptions.find((o) => o.value === val)?.label;
@@ -88,7 +88,7 @@ export function getMcpLogsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.logs.providerMcp', 'Provider MCP')} />
       ),
-      meta: { className: 'ps-4 w-40' },
+      meta: { className: 'w-40' },
       cell: ({ row }): React.JSX.Element => {
         const val = row.original.mcp_provider_id;
         const name = providerOptions.find((o) => o.value === val)?.label;
@@ -105,7 +105,7 @@ export function getMcpLogsColumns(
     {
       accessorKey: 'method',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('mcpsPage.logs.method', 'Method')} />,
-      meta: { className: 'ps-4 w-[160px]' },
+      meta: { className: 'w-[160px]' },
       cell: ({ row }): React.JSX.Element => {
         const method = String(row.getValue('method'));
         return (
@@ -120,7 +120,7 @@ export function getMcpLogsColumns(
       id: 'error',
       accessorFn: (row) => row.error,
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.status', 'Status')} />,
-      meta: { className: 'ps-4 w-20' },
+      meta: { className: 'w-20' },
       cell: ({ row }): React.JSX.Element => {
         const err = row.original.error;
         let variant: 'outline' | 'destructive' = 'outline';
@@ -151,7 +151,7 @@ export function getMcpLogsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.latency', 'Duration')} />
       ),
-      meta: { className: 'ps-4 w-20' },
+      meta: { className: 'w-20' },
       cell: ({ row }): React.JSX.Element => (
         <div className="flex items-baseline gap-1.5">
           <span className="text-[11px] text-muted-foreground/80 tracking-tight">E2E</span>
@@ -163,7 +163,7 @@ export function getMcpLogsColumns(
     {
       accessorKey: 'created_at',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.createdAt', 'Time')} />,
-      meta: { className: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => formatDateTime(String(row.getValue('created_at') ?? '')),
       enableSorting: true,
     },

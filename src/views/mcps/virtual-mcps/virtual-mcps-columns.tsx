@@ -14,6 +14,7 @@ export function getVirtualMcpsColumns(
     {
       accessorKey: 'id',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('common.id', 'ID')} />,
+      meta: { className: 'w-[100px]' },
       cell: ({ row }): React.JSX.Element => (
         <span className="text-[11px] font-mono text-muted-foreground">{row.original.id}</span>
       ),
@@ -22,6 +23,7 @@ export function getVirtualMcpsColumns(
     {
       accessorKey: 'name',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('mcpsPage.virtualMcps.name', 'Name')} />,
+      meta: {},
       cell: ({ row }): React.JSX.Element => <div className="font-medium">{row.getValue('name')}</div>,
       enableSorting: true,
     },
@@ -30,6 +32,7 @@ export function getVirtualMcpsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.virtualMcps.description', 'Description')} />
       ),
+      meta: {},
       cell: ({ row }): React.JSX.Element => (
         <div className="whitespace-normal break-all sm:break-words text-muted-foreground text-sm leading-snug">
           {row.getValue('description')}
@@ -42,6 +45,7 @@ export function getVirtualMcpsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.virtualMcps.backendProvider', 'Provider')} />
       ),
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const id = String(row.getValue('mcp_provider_id'));
         return (
@@ -58,6 +62,7 @@ export function getVirtualMcpsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.virtualMcps.tools', 'Tools Count')} />
       ),
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const count = row.getValue<number>('tools');
         if (count === 0) {
@@ -70,6 +75,7 @@ export function getVirtualMcpsColumns(
     {
       accessorKey: 'is_active',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('common.status', 'Status')} />,
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const isActive = row.original.is_active;
         if (isActive) {

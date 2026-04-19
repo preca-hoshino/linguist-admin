@@ -17,20 +17,21 @@ export function useProvidersColumns(): ColumnDef<Provider>[] {
     {
       accessorKey: 'id',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.providers.id', 'ID')} />,
-      cell: ({ row }) => <div className="w-[100px] font-mono text-xs text-muted-foreground">{row.getValue('id')}</div>,
+      meta: { className: 'w-[100px]' },
+      cell: ({ row }) => <div className="font-mono text-xs text-muted-foreground">{row.getValue('id')}</div>,
       enableSorting: false,
       enableHiding: false,
     },
     {
       accessorKey: 'name',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.providers.name', 'Name')} />,
-      meta: { className: 'ps-1 max-w-0 w-1/4', tdClassName: 'ps-4' },
+      meta: { className: 'max-w-0 w-1/4' },
       cell: ({ row }) => <span className="truncate font-medium">{row.getValue('name')}</span>,
     },
     {
       accessorKey: 'kind',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.providers.kind', 'Kind')} />,
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const kindValue = row.getValue<string>('kind');
         return <ProviderBadge provider={kindValue} />;
@@ -44,7 +45,7 @@ export function useProvidersColumns(): ColumnDef<Provider>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.providers.baseUrl', 'Base URL')} />
       ),
-      meta: { className: 'ps-1 max-w-0 w-1/4', tdClassName: 'ps-4' },
+      meta: { className: 'max-w-0 w-1/4' },
       cell: ({ row }) => (
         <span className="truncate font-mono text-xs text-muted-foreground">{row.getValue('base_url')}</span>
       ),
@@ -54,7 +55,7 @@ export function useProvidersColumns(): ColumnDef<Provider>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.providers.credentialType', 'Auth')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const credType = row.getValue<string>('credential_type');
         return (
@@ -69,7 +70,7 @@ export function useProvidersColumns(): ColumnDef<Provider>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.providers.createdAt', 'Created')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }) => <span className="text-muted-foreground">{formatDate(row.getValue('created_at'))}</span>,
     },
     {
