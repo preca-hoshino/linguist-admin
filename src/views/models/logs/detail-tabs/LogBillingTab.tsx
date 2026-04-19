@@ -6,7 +6,7 @@ import { listProviderModels } from '@/api/provider-models';
 import { ProviderLogo } from '@/components/ProviderLogo';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import type { GatewayContextSnapshot, PricingTier, RequestLog } from '@/types';
+import type { CostBreakdown, GatewayContextSnapshot, PricingTier, RequestLog } from '@/types';
 
 function InvoiceRow({
   label,
@@ -198,12 +198,11 @@ function PricingContextCard({
 export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.Element {
   const { t } = useTranslation();
   const ctx = log.gateway_context;
-  const breakdown = log.cost_breakdown;
+  /** 计费数据统一从 gateway_context.billing 读取，迁移脚本已对存量数据回填 */
+  const billing = ctx?.billing;
   const isEmbedding = ctx?.route?.modelType === 'embedding';
 
-  const hasBreakdown = breakdown != null && typeof breakdown === 'object' && 'inputCost' in breakdown;
-
-  if (!ctx || !hasBreakdown) {
+  if (!ctx || billing == null) {
     return (
       <div className="flex h-40 flex-col items-center justify-center gap-2 text-sm text-muted-foreground">
         <Wallet className="h-8 w-8 text-muted-foreground/30 mb-2" />
@@ -217,7 +216,8 @@ export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.
     );
   }
 
-  const { calculated_cost } = log;
+  const { calculatedCost, costBreakdown } = billing;
+  const breakdown: CostBreakdown = costBreakdown;
   const inputCost = breakdown.inputCost;
   const outputCost = breakdown.outputCost;
   const cacheCost = breakdown.cacheCost;
@@ -242,9 +242,7 @@ export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.
 
             <div className="flex items-baseline gap-1 text-foreground">
               <span className="text-lg font-semibold opacity-70">¥</span>
-              <span className="text-3xl font-bold font-mono tracking-tighter">
-                {calculated_cost == null ? '0.000000' : Number(calculated_cost).toFixed(6)}
-              </span>
+              <span className="text-3xl font-bold font-mono tracking-tighter">{calculatedCost.toFixed(6)}</span>
             </div>
           </div>
         </CardContent>
