@@ -63,7 +63,7 @@ function StatusCodeCard({ code }: { readonly code: number | undefined }): React.
             bgColor,
           )}
         >
-          {code === undefined ? 'N/A' : `HTTP ${String(code)}`}
+          {code === undefined ? t('common.na', 'N/A') : `HTTP ${String(code)}`}
         </div>
       </div>
     </div>
@@ -220,7 +220,7 @@ export function LogMetadataTab({ log }: LogMetadataTabProps): React.JSX.Element 
               {t('modelsPage.logs.detail.userResponse', '用户响应')}
             </TabsTrigger>
             <TabsTrigger value="context" className="text-xs py-1.5">
-              Context
+              {t('modelsPage.logs.detail.context', '内部上下文')}
             </TabsTrigger>
           </TabsList>
         </div>
