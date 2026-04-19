@@ -204,13 +204,6 @@ export function LogMetadataTab({ log }: LogMetadataTabProps): React.JSX.Element 
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-xs text-muted-foreground">
-        {t(
-          'modelsPage.logs.detail.metadataDesc',
-          '以下为请求生命周期的完整协议快照与底层元数据，可用于底层框架调试和审计。',
-        )}
-      </p>
-
       <Tabs defaultValue="userRequest" className="w-full">
         <div className="overflow-x-auto pb-1 mb-2">
           <TabsList className="grid w-[600px] sm:w-full grid-cols-5 h-auto py-1">
