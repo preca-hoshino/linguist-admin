@@ -1,4 +1,7 @@
-import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine } from '@lobehub/icons';
+import { ProviderCell } from '@/components/ProviderCell';
+import { DataTableColumnHeader } from '@/components/data-table';
+import { Badge } from '@/components/ui/Badge';
+import { Progress } from '@/components/ui/Progress';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
   Box,
@@ -13,9 +16,6 @@ import {
   Wrench,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { DataTableColumnHeader } from '@/components/data-table';
-import { Badge } from '@/components/ui/Badge';
-import { Progress } from '@/components/ui/Progress';
 import type { ProviderModel } from '@/types';
 import { cn } from '@/utils/utils';
 import { ProviderModelsRowActions } from './provider-models-row-actions';
@@ -118,44 +118,8 @@ export function useProviderModelsColumns(): ColumnDef<ProviderModel>[] {
         <DataTableColumnHeader column={column} title={t('modelsPage.providerModels.provider', 'Provider')} />
       ),
       cell: ({ row }): React.JSX.Element => {
-        const providerId = row.getValue<string>('provider_id');
         const model = row.original;
-        const kindValue = model.provider_kind != null && model.provider_kind !== '' ? model.provider_kind : providerId; // fallback to id if kind is empty
-
-        let iconNode: React.ReactNode;
-        switch (kindValue) {
-          case 'gemini': {
-            iconNode = <Gemini size={14} className="fill-current" />;
-            break;
-          }
-          case 'deepseek': {
-            iconNode = <DeepSeek size={14} className="fill-current" />;
-            break;
-          }
-          case 'volcengine': {
-            iconNode = <Volcengine size={14} className="fill-current" />;
-            break;
-          }
-          case 'copilot': {
-            iconNode = <Github size={14} className="fill-current" />;
-            break;
-          }
-          default: {
-            iconNode = <ProviderIcon provider={kindValue} size={14} type="mono" className="fill-current" />;
-            break;
-          }
-        }
-
-        return (
-          <div className="flex items-center gap-2">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border text-muted-foreground shadow-sm">
-              {iconNode}
-            </span>
-            <span className="text-sm text-foreground">
-              {model.provider_name != null && model.provider_name !== '' ? model.provider_name : providerId}
-            </span>
-          </div>
-        );
+        return <ProviderCell kind={model.provider_kind} id={model.provider_id} name={model.provider_name} />;
       },
       enableSorting: true,
       enableHiding: true,
