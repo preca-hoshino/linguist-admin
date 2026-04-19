@@ -8,7 +8,7 @@ export function LangSwitch(): React.JSX.Element {
   const { locale, setLocale } = useLocale();
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="scale-95 rounded-full">
           <Languages className="scale-125" />
