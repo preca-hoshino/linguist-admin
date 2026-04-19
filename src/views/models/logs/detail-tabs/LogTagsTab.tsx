@@ -1,6 +1,6 @@
 import { AlertTriangle, Globe, Network, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { ProviderBadge } from '@/components/ProviderBadge';
+import { ProviderCell } from '@/components/ProviderCell';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import type { RequestLog } from '@/types';
@@ -207,7 +207,7 @@ function GatewayCard({ log }: { readonly log: RequestLog }): React.JSX.Element {
 
             {/* 提供商 */}
             <InfoRow label={t('modelsPage.logs.detail.provider', '提供商')}>
-              <ProviderBadge provider={providerIcon} label={providerName} />
+              <ProviderCell kind={providerIcon} id={route.providerId} name={providerName} />
             </InfoRow>
 
             {/* 路由策略 */}
