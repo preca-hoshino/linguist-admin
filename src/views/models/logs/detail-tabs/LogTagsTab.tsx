@@ -1,5 +1,6 @@
 import { AlertTriangle, Globe, Network, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { ProviderBadge } from '@/components/ProviderBadge';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import type { RequestLog } from '@/types';
@@ -167,6 +168,15 @@ function GatewayCard({ log }: { readonly log: RequestLog }): React.JSX.Element {
 
   const protocolLabel = (PROTOCOL_LABEL[ctx.userFormat] ?? ctx.userFormat) || '';
 
+  // route 相关的提供商展现（在 {route && ...} 块内使用）
+  let providerName = '';
+  let providerIcon = '';
+  if (route != null) {
+    const rName = route.providerName ?? '';
+    providerName = rName === '' ? route.providerId : rName;
+    providerIcon = route.providerKind === '' ? providerName : route.providerKind;
+  }
+
   return (
     <Card className="shadow-sm border-border/60 h-full gap-0 py-0">
       <CardHeader className="flex flex-row items-center gap-2 space-y-0 px-6 py-4 border-b border-border/40">
@@ -197,14 +207,7 @@ function GatewayCard({ log }: { readonly log: RequestLog }): React.JSX.Element {
 
             {/* 提供商 */}
             <InfoRow label={t('modelsPage.logs.detail.provider', '提供商')}>
-              <span className="text-sm font-medium">
-                {route.providerName === '' ? route.providerId : route.providerName}
-                {route.providerKind !== '' && (
-                  <span className="ml-1.5 text-[11px] text-muted-foreground font-mono font-normal">
-                    {route.providerKind}
-                  </span>
-                )}
-              </span>
+              <ProviderBadge provider={providerIcon} label={providerName} />
             </InfoRow>
 
             {/* 路由策略 */}
