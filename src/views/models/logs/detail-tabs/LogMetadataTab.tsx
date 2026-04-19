@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import JsonView from 'react18-json-view';
 import 'react18-json-view/src/style.css';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { useTheme } from '@/providers/ThemeProvider';
 import type { RequestLog } from '@/types';
@@ -48,11 +47,9 @@ function StatusCodeCard({ code }: { readonly code: number | undefined }): React.
   const bgColor = getStatusBgColor(code);
 
   return (
-    <Card className="shadow-none border-border/60">
-      <CardHeader className="py-4">
-        <CardTitle className="text-sm">HTTP Status Code</CardTitle>
-      </CardHeader>
-      <CardContent className="pb-4">
+    <div className="flex flex-col gap-2">
+      <div className="text-sm font-semibold text-foreground/90 px-0.5">HTTP Status Code</div>
+      <div className="rounded-lg border border-border/60 bg-card p-3 shadow-sm">
         <div
           className={cn(
             'inline-flex items-center rounded-md px-3 py-1 font-mono font-bold text-lg',
@@ -62,8 +59,8 @@ function StatusCodeCard({ code }: { readonly code: number | undefined }): React.
         >
           {code === undefined ? 'N/A' : `HTTP ${String(code)}`}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -74,34 +71,32 @@ function HeadersCard({ headers }: { readonly headers: AuditHeaderMap | undefined
   const isEmpty = entries.length === 0;
 
   return (
-    <Card className="shadow-none border-border/60">
-      <CardHeader className="py-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-sm">Headers</CardTitle>
-          {!isEmpty && (
-            <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-              {entries.length} items
-            </span>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="pb-4">
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between px-0.5">
+        <div className="text-sm font-semibold text-foreground/90">Headers</div>
+        {!isEmpty && (
+          <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+            {entries.length} items
+          </span>
+        )}
+      </div>
+      <div className="rounded-lg border border-border/60 bg-card p-4 shadow-sm overflow-x-auto">
         {isEmpty ? (
           <span className="text-sm text-muted-foreground italic">{t('common.empty', '空')}</span>
         ) : (
-          <div className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 overflow-x-auto">
+          <div className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-1.5">
             {entries.map(([key, value]) => (
               <div key={key} className="contents">
-                <span className="font-mono text-[13px] text-muted-foreground break-all">{key}</span>
-                <span className="font-mono text-[13px] text-foreground break-all">
+                <span className="font-mono text-[13px] text-muted-foreground break-all py-0.5">{key}</span>
+                <span className="font-mono text-[13px] text-foreground break-all py-0.5">
                   {Array.isArray(value) ? value.join(', ') : value}
                 </span>
               </div>
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -119,32 +114,28 @@ function BodyCard({
     data == null || (typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length === 0);
 
   return (
-    <Card className="shadow-none border-border/60">
-      <CardHeader className="py-4">
-        <CardTitle className="text-sm">{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="pb-4">
-        <div className="w-full min-w-0 overflow-x-auto rounded-md border border-border/40 bg-card p-4">
-          {isEmpty ? (
-            <span className="text-sm text-muted-foreground italic">{t('common.empty', '空')}</span>
-          ) : (
-            <JsonView
-              src={data as object}
-              collapsed={2}
-              enableClipboard
-              displaySize
-              theme={resolvedTheme === 'dark' ? 'a11y' : 'default'}
-              style={{
-                fontSize: '13px',
-                lineHeight: '1.6',
-                fontFamily: 'var(--font-mono, ui-monospace, monospace)',
-                backgroundColor: 'transparent',
-              }}
-            />
-          )}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="flex flex-col gap-2">
+      <div className="text-sm font-semibold text-foreground/90 px-0.5">{title}</div>
+      <div className="w-full min-w-0 overflow-x-auto rounded-lg border border-border/60 bg-zinc-50/50 p-4 shadow-sm dark:bg-zinc-900/50">
+        {isEmpty ? (
+          <span className="text-sm text-muted-foreground italic">{t('common.empty', '空')}</span>
+        ) : (
+          <JsonView
+            src={data as object}
+            collapsed={2}
+            enableClipboard
+            displaySize
+            theme={resolvedTheme === 'dark' ? 'a11y' : 'default'}
+            style={{
+              fontSize: '13px',
+              lineHeight: '1.6',
+              fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+              backgroundColor: 'transparent',
+            }}
+          />
+        )}
+      </div>
+    </div>
   );
 }
 
