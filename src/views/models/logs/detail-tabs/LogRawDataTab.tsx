@@ -97,7 +97,7 @@ export function LogRawDataTab({ log }: LogRawDataTabProps): React.JSX.Element {
   const audit = ctx?.audit;
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-6 pt-4 pb-6 w-full">
       <p className="text-xs text-muted-foreground">
         {t('modelsPage.logs.detail.rawDataDesc', '以下为请求生命周期中四次 HTTP 交换的完整快照，可用于调试和审计。')}
       </p>
