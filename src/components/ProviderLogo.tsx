@@ -2,7 +2,7 @@ import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine } from '@lobehub/ico
 import { forwardRef } from 'react';
 
 export interface ProviderLogoProps {
-  /** The provider identifier (e.g., 'openai', 'deepseek', 'volcengine') */
+  /** The provider identifier (e.g., 'openai', 'deepseek', 'volcengine', 'openaicompat') */
   provider?: string | null | undefined;
   /** Icon size in pixels */
   size?: number;
@@ -12,37 +12,41 @@ export interface ProviderLogoProps {
   className?: string;
 }
 
+// ── 组件 ──────────────────────────────────────────────────────────────────
 export const ProviderLogo = forwardRef<SVGSVGElement, ProviderLogoProps>(
   ({ provider, size = 16, type = 'mono', className }, ref) => {
     if (provider == null || provider === '') {
       return null;
     }
 
-    // 规范化：将 API 格式标识符 / 内部别名映射到对应的 icon key
+    // ── API 格式 / 内部别名 → icon key 规范化 ──────────────────────────────
     const ALIAS: Record<string, string> = {
-      openaicompat: 'openai', // OpenAI-compatible API format → OpenAI icon
+      openaicompat: 'openai', // OpenAI-compatible API format
       google: 'gemini', // Google API format → Gemini icon
-      anthropic: 'anthropic', // Anthropic API format（explicit, ProviderIcon fallback supports it）
+      anthropic: 'anthropic', // explicit（ProviderIcon fallback 支持，明确声明意图）
     };
 
+    // ── 品牌图标映射 ────────────────────────────────────────────────────────
+    // @lobehub/icons 对以下 provider 不支持或风格不一致，需精确映射。
+    // 放在函数体内部，避免 mock 环境下顶层求值时报"未导出"错误。
+    const BRANDED: Record<string, React.ElementType> = {
+      gemini: Gemini,
+      deepseek: DeepSeek,
+      volcengine: Volcengine,
+      copilot: Github,
+    };
+
+    // 1. 规范化：别名映射
     const rawKind = provider.toLowerCase();
     const kindValue = ALIAS[rawKind] ?? rawKind;
 
-    // @lobehub/icons exports these specific branded icons natively.
-    if (kindValue === 'gemini') {
-      return <Gemini ref={ref as never} size={size} className={className} />;
-    }
-    if (kindValue === 'deepseek') {
-      return <DeepSeek ref={ref as never} size={size} className={className} />;
-    }
-    if (kindValue === 'volcengine') {
-      return <Volcengine ref={ref as never} size={size} className={className} />;
-    }
-    if (kindValue === 'copilot') {
-      return <Github ref={ref as never} size={size} className={className} />;
+    // 2. 品牌图标：优先使用表中的精确映射
+    const BrandIcon = BRANDED[kindValue];
+    if (BrandIcon != null) {
+      return <BrandIcon ref={ref as never} size={size} className={className} />;
     }
 
-    // Fallback to the generic ProviderIcon which handles mainstream ones like openai, anthropic, azure, etc.
+    // 3. Fallback：通用 ProviderIcon（支持 openai / anthropic / azure 等主流提供商）
     return <ProviderIcon provider={kindValue} type={type} size={size} className={className ?? ''} />;
   },
 );
