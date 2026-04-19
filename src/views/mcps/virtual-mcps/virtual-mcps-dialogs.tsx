@@ -31,7 +31,13 @@ import type {
 import { listMcpProviders, listMcpProviderTools } from '@/api/mcp-providers';
 
 const virtualMcpSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
+  name: z
+    .string()
+    .min(1, 'Name is required')
+    .regex(
+      /^[a-zA-Z0-9._-]+$/,
+      'Name must not contain spaces. Only letters, numbers, hyphens (-), underscores (_), and dots (.) are allowed.',
+    ),
   description: z.string().optional(),
   mcp_provider_id: z.string().min(1, 'Provider is required'),
 });
@@ -308,7 +314,7 @@ export function MutateVirtualMcpDialog({
                       <div className="space-y-1.5">
                         <FormControl>
                           <Input
-                            placeholder={t('mcpsPage.virtualMcps.namePlaceholder', 'e.g. Frontend Tools')}
+                            placeholder={t('mcpsPage.virtualMcps.namePlaceholder', 'e.g. frontend-tools')}
                             {...field}
                           />
                         </FormControl>
