@@ -48,8 +48,9 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
     {
       accessorKey: 'id',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.id', 'ID')} />,
+      meta: { className: 'w-[70px]' },
       cell: ({ row }) => (
-        <div className="w-[70px] truncate font-mono text-xs text-muted-foreground" title={row.original.id}>
+        <div className="truncate font-mono text-xs text-muted-foreground" title={row.original.id}>
           {row.original.id.slice(0, 8)}
         </div>
       ),
