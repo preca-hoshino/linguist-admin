@@ -17,7 +17,8 @@ export function useProvidersColumns(): ColumnDef<Provider>[] {
     {
       accessorKey: 'id',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.providers.id', 'ID')} />,
-      cell: ({ row }) => <div className="w-[100px] font-mono text-xs text-muted-foreground">{row.getValue('id')}</div>,
+      meta: { className: 'w-[100px]' },
+      cell: ({ row }) => <div className="font-mono text-xs text-muted-foreground">{row.getValue('id')}</div>,
       enableSorting: false,
       enableHiding: false,
     },
