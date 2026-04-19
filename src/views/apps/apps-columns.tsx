@@ -24,7 +24,7 @@ export function useAppsColumns(): ColumnDef<App>[] {
     {
       accessorKey: 'name',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('apps.name', 'Name')} />,
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => <span className="font-medium">{row.getValue<string>('name')}</span>,
       enableSorting: true,
       enableHiding: true,
@@ -34,7 +34,7 @@ export function useAppsColumns(): ColumnDef<App>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('apps.virtualModels', 'Virtual Models')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const models = row.getValue<string[] | null>('allowed_model_ids');
         return <span className="font-medium text-muted-foreground">{models?.length ?? 0}</span>;
@@ -50,7 +50,7 @@ export function useAppsColumns(): ColumnDef<App>[] {
     {
       accessorKey: 'allowed_mcp_ids',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('apps.virtualMcps', 'Virtual MCPs')} />,
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const mcps = row.getValue<string[] | null>('allowed_mcp_ids');
         return <span className="font-medium text-muted-foreground">{mcps?.length ?? 0}</span>;
@@ -66,7 +66,7 @@ export function useAppsColumns(): ColumnDef<App>[] {
     {
       accessorKey: 'api_key',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('apps.apiKey', 'API Key')} />,
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const apiKey = row.getValue<string>('api_key');
         return <CopyableId id={apiKey} />;
@@ -77,7 +77,7 @@ export function useAppsColumns(): ColumnDef<App>[] {
     {
       accessorKey: 'is_active',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('apps.status', 'Status')} />,
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const isActive = row.getValue<boolean>('is_active');
         return (
@@ -95,7 +95,7 @@ export function useAppsColumns(): ColumnDef<App>[] {
     {
       accessorKey: 'created_at',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('apps.createdAt', 'Created At')} />,
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const dateStr = row.getValue<string>('created_at');
         return (
