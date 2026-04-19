@@ -49,3 +49,20 @@ export function formatPercent(ratio?: number | null): string {
   }
   return `${(ratio * 100).toFixed(1)}%`;
 }
+
+/**
+ * 将字节数格式化为人类可读格式。
+ * @example formatBytes(1024) → "1 KB"
+ */
+export function formatBytes(bytes?: number | null): string {
+  if (bytes == null) {
+    return '0 B';
+  }
+  if (bytes === 0) {
+    return '0 B';
+  }
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1);
+  return `${Number.parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i] ?? ''}`;
+}

@@ -95,6 +95,8 @@ export interface AuditUserChatResponse {
 
 /** Audit 四次交换的请求/响应包装 */
 export interface AuditEnvelope {
+  /** HTTP 响应状态码（仅响应方具备，即 providerResponse 和 userResponse） */
+  statusCode?: number;
   headers?: Record<string, string | string[]>;
   body?: unknown;
 }
