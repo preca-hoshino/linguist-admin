@@ -41,6 +41,10 @@ export default {
     // 确认
     cannotBeUndone: '此操作无法撤销。',
     deletedSuccess: '删除成功',
+    // 剩余通用
+    empty: '空',
+    copy: '复制',
+    copied: '已复制',
   },
   nav: {
     general: '通用',
@@ -680,6 +684,10 @@ export default {
         pricingTier: '费用启调阶梯 (Tier Start)',
         baseTier: '基准定价层 (Base Tier)',
         pricingType: '模型计费类型',
+        // Metadata Tab
+        metadataDesc: '以下为请求生命周期的完整协议快照与底层元数据，可用于底层框架调试和审计。',
+        gatewayContextSnapshot: 'Gateway Context Snapshot',
+        gatewayContextSnapshotDesc: 'Linguist 内部流转所产生的所有状态上下文',
       },
     },
   },
