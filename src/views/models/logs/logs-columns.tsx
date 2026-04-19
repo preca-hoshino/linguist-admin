@@ -66,7 +66,7 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.requestModel', 'Virtual Model')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const val = row.original.gateway_context?.requestModel;
         return <span className="truncate font-mono font-bold text-xs">{val != null && val !== '' ? val : '-'}</span>;
@@ -78,7 +78,7 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       id: 'mode',
       accessorFn: (row) => (row.gateway_context?.stream === true ? 'stream' : 'non-stream'),
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.mode', 'Mode')} />,
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const isStream = row.original.gateway_context?.stream === true;
         return (
@@ -127,7 +127,7 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       accessorFn: (row) =>
         row.gateway_context?.ip != null && row.gateway_context.ip !== '' ? row.gateway_context.ip : '-',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.ip', 'IP')} />,
-      meta: { className: 'ps-1 w-24', tdClassName: 'ps-4' },
+      meta: { className: 'w-24' },
       cell: ({ row }): React.JSX.Element => {
         const ip = row.original.gateway_context?.ip;
         return (
@@ -145,7 +145,7 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.providerKind', 'Provider')} />
       ),
-      meta: { className: 'ps-1 w-32', tdClassName: 'ps-4' },
+      meta: { className: 'w-32' },
       cell: ({ row }): React.JSX.Element => {
         const route = row.original.gateway_context?.route;
         if (route?.providerKind == null || route.providerKind === '') {
@@ -170,7 +170,7 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
         return '-';
       },
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.app', 'App')} />,
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const ctx = row.original.gateway_context as NonNullable<RequestLog['gateway_context']> & { appName?: string };
         const name = ctx.appName ?? ctx.apiKeyName;
@@ -182,7 +182,7 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       id: 'status',
       accessorFn: (row) => row.status,
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.status', 'Status')} />,
-      meta: { className: 'ps-1 w-20', tdClassName: 'ps-4' },
+      meta: { className: 'w-20' },
       cell: ({ row }): React.JSX.Element => {
         const status = row.original.status;
         let variant: 'outline' | 'destructive' | 'secondary' = 'secondary';
@@ -217,7 +217,7 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       id: 'tokens',
       accessorFn: (row) => row.gateway_context?.response?.usage?.total_tokens ?? 0,
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.tokens', 'Token')} />,
-      meta: { className: 'ps-1 w-24', tdClassName: 'ps-4' },
+      meta: { className: 'w-24' },
       cell: ({ row }): React.JSX.Element => {
         const usage = row.original.gateway_context?.response?.usage;
         if (usage == null || usage.total_tokens === 0) {
@@ -247,7 +247,7 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
         return (usage.cached_tokens ?? 0) / usage.prompt_tokens;
       },
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.cacheRate', 'Cache')} />,
-      meta: { className: 'ps-1 w-16', tdClassName: 'ps-4' },
+      meta: { className: 'w-16' },
       cell: ({ row }): React.JSX.Element => {
         const usage = row.original.gateway_context?.response?.usage;
         const p = usage?.prompt_tokens ?? 0;
@@ -266,7 +266,7 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.latency', 'Duration')} />
       ),
-      meta: { className: 'ps-1 w-20', tdClassName: 'ps-4' },
+      meta: { className: 'w-20' },
       cell: ({ row }): React.JSX.Element => {
         const isStream = row.original.gateway_context?.stream === true;
         const ttft = row.original.gateway_context?.timing.ttft;
@@ -296,7 +296,7 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
     {
       accessorKey: 'created_at',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.createdAt', 'Time')} />,
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => formatDateTime(String(row.getValue('created_at') ?? '')),
       enableSorting: false,
     },
