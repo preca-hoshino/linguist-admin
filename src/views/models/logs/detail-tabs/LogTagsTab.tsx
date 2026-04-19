@@ -146,7 +146,7 @@ export function LogTagsTab({ log }: LogTagsTabProps): React.JSX.Element {
         <div className="rounded-lg border bg-card p-5 h-full">
           <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
             <Network className="h-4 w-4 text-muted-foreground" />
-            网关与路由特征
+            {t('modelsPage.logs.detail.tagsGatewaySection', '网关与路由特征')}
           </h3>
           <div>
             <InfoRow label={t('modelsPage.logs.detail.status', '状态')} icon={StatusIcon}>
@@ -241,7 +241,7 @@ export function LogTagsTab({ log }: LogTagsTabProps): React.JSX.Element {
         <div className="rounded-lg border bg-card p-5 h-full">
           <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
             <Globe className="h-4 w-4 text-muted-foreground" />
-            下发来源追踪追踪
+            {t('modelsPage.logs.detail.tagsSourceSection', '下发来源追踪')}
           </h3>
           <div>
             <InfoRow label={t('modelsPage.logs.detail.app', '归属应用 (App)')} icon={Key}>
@@ -256,7 +256,9 @@ export function LogTagsTab({ log }: LogTagsTabProps): React.JSX.Element {
                   )}
                 {(ctxExtended.appName == null || ctxExtended.appName === '') &&
                   (ctx.apiKeyName == null || ctx.apiKeyName === '') && (
-                    <span className="text-muted-foreground opacity-50">未追踪到明确的 App / 或匿名请求</span>
+                    <span className="text-muted-foreground opacity-50">
+                      {t('modelsPage.logs.detail.tagsAnonymousApp', '未追踪到明确的 App / 或匿名请求')}
+                    </span>
                   )}
               </span>
             </InfoRow>
