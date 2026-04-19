@@ -36,6 +36,7 @@ function JsonCard({
   readonly accentClass?: string | undefined;
 }): React.JSX.Element {
   const [open, setOpen] = useState(defaultOpen);
+  const { t } = useTranslation();
   const { copied, copy } = useCopy();
   const isEmpty = data == null || (typeof data === 'object' && Object.keys(data).length === 0);
   const jsonStr = isEmpty ? '{}' : JSON.stringify(data, null, 2);
@@ -58,7 +59,7 @@ function JsonCard({
             <div className="text-[11px] text-muted-foreground mt-0.5">{subtitle}</div>
           )}
         </div>
-        {isEmpty && <span className="text-[11px] text-muted-foreground mr-2">空</span>}
+        {isEmpty && <span className="text-[11px] text-muted-foreground mr-2">{t('common.empty', '空')}</span>}
         <ChevronDown
           className={cn('h-4 w-4 text-muted-foreground shrink-0 transition-transform', open && 'rotate-180')}
         />
@@ -74,7 +75,7 @@ function JsonCard({
               className="flex items-center gap-1 rounded px-2 py-0.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
               {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-              {copied ? '已复制' : '复制'}
+              {copied ? t('common.copied', '已复制') : t('common.copy', '复制')}
             </button>
           </div>
           <pre className="px-4 py-4 font-mono text-xs leading-relaxed text-foreground overflow-auto max-h-96">
@@ -99,7 +100,10 @@ export function LogMetadataTab({ log }: LogMetadataTabProps): React.JSX.Element 
   return (
     <div className="flex flex-col gap-3">
       <p className="text-xs text-muted-foreground">
-        以下为请求生命周期的完整协议快照与底层元数据，可用于底层框架调试和审计。
+        {t(
+          'modelsPage.logs.detail.metadataDesc',
+          '以下为请求生命周期的完整协议快照与底层元数据，可用于底层框架调试和审计。',
+        )}
       </p>
 
       <JsonCard
@@ -148,8 +152,8 @@ export function LogMetadataTab({ log }: LogMetadataTabProps): React.JSX.Element 
       )}
 
       <JsonCard
-        title="Gateway Context Snapshot"
-        subtitle="Linguist 内部流转所产生的所有状态上下文"
+        title={t('modelsPage.logs.detail.gatewayContextSnapshot', 'Gateway Context Snapshot')}
+        subtitle={t('modelsPage.logs.detail.gatewayContextSnapshotDesc', 'Linguist 内部流转所产生的所有状态上下文')}
         data={ctx}
         accentClass="bg-zinc-400 dark:bg-zinc-600"
       />
