@@ -21,6 +21,8 @@ export const ProviderLogo = forwardRef<SVGSVGElement, ProviderLogoProps>(
     // 规范化：将 API 格式标识符 / 内部别名映射到对应的 icon key
     const ALIAS: Record<string, string> = {
       openaicompat: 'openai', // OpenAI-compatible API format → OpenAI icon
+      google: 'gemini', // Google API format → Gemini icon
+      anthropic: 'anthropic', // Anthropic API format（explicit, ProviderIcon fallback supports it）
     };
 
     const rawKind = provider.toLowerCase();
