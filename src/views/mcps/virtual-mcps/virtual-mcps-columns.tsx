@@ -23,7 +23,7 @@ export function getVirtualMcpsColumns(
     {
       accessorKey: 'name',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('mcpsPage.virtualMcps.name', 'Name')} />,
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => <div className="font-medium">{row.getValue('name')}</div>,
       enableSorting: true,
     },
@@ -32,7 +32,7 @@ export function getVirtualMcpsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.virtualMcps.description', 'Description')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => (
         <div className="whitespace-normal break-all sm:break-words text-muted-foreground text-sm leading-snug">
           {row.getValue('description')}
@@ -45,7 +45,7 @@ export function getVirtualMcpsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.virtualMcps.backendProvider', 'Provider')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const id = String(row.getValue('mcp_provider_id'));
         return (
@@ -62,7 +62,7 @@ export function getVirtualMcpsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.virtualMcps.tools', 'Tools Count')} />
       ),
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const count = row.getValue<number>('tools');
         if (count === 0) {
@@ -75,7 +75,7 @@ export function getVirtualMcpsColumns(
     {
       accessorKey: 'is_active',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('common.status', 'Status')} />,
-      meta: { className: 'ps-1', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const isActive = row.original.is_active;
         if (isActive) {
