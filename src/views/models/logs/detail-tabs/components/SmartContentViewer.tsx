@@ -2,7 +2,7 @@ import { Code, Download, Eye } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import JsonView from 'react18-json-view';
-import { MarkdownViewer } from '@/components/MarkdownViewer';
+import { MarkdownViewer } from '@/components/markdown-viewer';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useTheme } from '@/providers/ThemeProvider';

@@ -2,7 +2,7 @@ import { DialogTrigger } from '@radix-ui/react-dialog';
 import { Blocks, ChevronDown, FileText, Image as ImageIcon, Settings2, Wrench, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MarkdownViewer } from '@/components/MarkdownViewer';
+import { MarkdownViewer } from '@/components/markdown-viewer';
 import { Button } from '@/components/ui/Button';
 import {
   Dialog,
