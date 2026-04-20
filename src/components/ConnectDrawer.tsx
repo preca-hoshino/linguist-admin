@@ -23,6 +23,7 @@ import type { VirtualModel } from '@/types/virtual-model';
 
 type ApiFormat = 'openaicompat' | 'anthropic' | 'gemini';
 type ClientType = 'curl' | 'python' | 'nodejs';
+type McpClientType = 'claude-desktop' | 'cursor' | 'trae' | 'antigravity' | 'cherry-studio' | 'claude-code';
 
 // ────────────────────────────────────────────────────────────────────────────
 // 代码高亮与可复制 Token 逻辑
@@ -257,22 +258,24 @@ console.log(response.text);`;
 }
 
 /**
- * 生成 MCP 客户端 JSON 配置。
- * 使用 SSE 传输模式（url + headers），兼容 Claude Desktop / Cursor 等支持 HTTP SSE 的客户端。
+ * 生成 MCP 客户端配置。
  */
-function buildMcpJsonSnippet(
+function buildMcpSnippet(
+  clientType: McpClientType,
   apiKey: string,
   mcpName: string,
   gatewayOrigin: string,
-): { rawCode: string; renderCode: React.ReactNode } {
+): { rawCode: string; renderCode: React.ReactNode; language: string } {
   const tokens: Record<string, string> = {
     URL: `${gatewayOrigin}/mcp/sse`,
     MCP_NAME: mcpName,
     APIKEY: apiKey,
   };
 
-  const template = `{
-  "mcpServers": {
+  let template = '';
+  let language = 'json';
+
+  const mcpServerJson = `"mcpServers": {
     "{{MCP_NAME}}": {
       "url": "{{URL}}",
       "headers": {
@@ -280,9 +283,25 @@ function buildMcpJsonSnippet(
         "Authorization": "Bearer {{APIKEY}}"
       }
     }
+  }`;
+
+  if (clientType === 'cherry-studio') {
+    language = 'text';
+    template = `Type: SSE
+URL: {{URL}}
+Headers: 
+  X-Mcp-Name: {{MCP_NAME}}
+  Authorization: Bearer {{APIKEY}}`;
+  } else if (clientType === 'claude-code') {
+    language = 'bash';
+    template = `claude mcp add --transport sse "{{MCP_NAME}}" "{{URL}}"\n# 注意: claude code 暂时不支持为 sse 连接添加自定义 Header 鉴权凭证。\n# 请在此配置外围通过代理服务器处理认证，或等待官方后续支持。`;
+  } else {
+    // Other JSON based clients (claude-desktop, cursor, trae, antigravity)
+    template = `{\n  ${mcpServerJson}\n}`;
   }
-}`;
-  return parseSnippetTemplate(template, tokens);
+
+  const { rawCode, renderCode } = parseSnippetTemplate(template, tokens);
+  return { rawCode, renderCode, language };
 }
 
 // ===== 子组件 =====
@@ -338,6 +357,7 @@ function ConnectDrawerContent({ gatewayOrigin }: ConnectDrawerContentProps): Rea
   const [selectedResourceId, setSelectedResourceId] = useState<string>('');
   const [apiFormat, setApiFormat] = useState<ApiFormat>('openaicompat');
   const [clientType, setClientType] = useState<ClientType>('curl');
+  const [mcpClientType, setMcpClientType] = useState<McpClientType>('claude-desktop');
 
   const apps = appsData?.data ?? [];
   const allModels = modelsData?.data ?? [];
@@ -380,8 +400,7 @@ function ConnectDrawerContent({ gatewayOrigin }: ConnectDrawerContentProps): Rea
       gatewayOrigin,
     );
   } else if (selectedApp && selectedVirtualMcp) {
-    const mcpResult = buildMcpJsonSnippet(selectedApp.api_key, selectedVirtualMcp.name, gatewayOrigin);
-    generatedConfig = { ...mcpResult, language: 'json' };
+    generatedConfig = buildMcpSnippet(mcpClientType, selectedApp.api_key, selectedVirtualMcp.name, gatewayOrigin);
   }
 
   // ========== 步骤跳转处理 ==========
@@ -563,21 +582,95 @@ function ConnectDrawerContent({ gatewayOrigin }: ConnectDrawerContentProps): Rea
                 </div>
               )}
 
-              {generatedConfig !== null && (
-                <div className="flex flex-col gap-1.5">
-                  <p className="text-sm font-medium text-foreground">
-                    {resourceType === 'model' ? t('connectDrawer.curlConfig') : t('connectDrawer.mcpConfig')}
-                  </p>
-                  {resourceType === 'mcp' && (
-                    <p className="text-xs text-muted-foreground">{t('connectDrawer.mcpConfigNote')}</p>
-                  )}
-                  <CodeViewer
-                    code={generatedConfig.rawCode}
-                    renderCode={generatedConfig.renderCode}
-                    language={generatedConfig.language}
-                  />
+              {resourceType === 'mcp' && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1.5 col-span-1">
+                    <label
+                      htmlFor="connect-drawer-mcp-client-select"
+                      className="text-xs font-medium text-muted-foreground"
+                    >
+                      {t('connectDrawer.clientType', { defaultValue: 'Client / IDE' })}
+                    </label>
+                    <Select
+                      value={mcpClientType}
+                      onValueChange={(v) => {
+                        setMcpClientType(v as McpClientType);
+                      }}
+                    >
+                      <SelectTrigger id="connect-drawer-mcp-client-select" className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="claude-desktop">
+                          <div className="flex items-center gap-2">
+                            <ProviderLogo provider="claude-desktop" className="h-4 w-4" />
+                            <span>Claude Desktop</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="cursor">
+                          <div className="flex items-center gap-2">
+                            <ProviderLogo provider="cursor" className="h-4 w-4" />
+                            <span>Cursor</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="trae">
+                          <div className="flex items-center gap-2">
+                            <ProviderLogo provider="trae" className="h-4 w-4" />
+                            <span>Trae</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="antigravity">
+                          <div className="flex items-center gap-2">
+                            <ProviderLogo provider="antigravity" className="h-4 w-4" />
+                            <span>Antigravity</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="cherry-studio">
+                          <div className="flex items-center gap-2">
+                            <ProviderLogo provider="cherry-studio" className="h-4 w-4" />
+                            <span>Cherry Studio</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="claude-code">
+                          <div className="flex items-center gap-2">
+                            <ProviderLogo provider="claude-code" className="h-4 w-4" />
+                            <span>Claude Code</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               )}
+
+              {generatedConfig !== null &&
+                ((): React.ReactNode => {
+                  const mcpNotes: Record<McpClientType, string> = {
+                    'claude-desktop':
+                      '配置保存至: %APPDATA%/Claude/claude_desktop_config.json 或 ~/Library/Application Support/Claude/claude_desktop_config.json',
+                    cursor: '配置保存至当前项目根目录: .cursor/mcp.json',
+                    trae: '配置保存至当前项目根目录: .trae/mcp.json',
+                    antigravity: '配置保存为系统支持的标准 MCP 结构',
+                    'cherry-studio': '在 Cherry Studio 中添加 MCP Server 时填入以下参数',
+                    'claude-code': '在终端执行以下命令直接添加',
+                  };
+
+                  return (
+                    <div className="flex flex-col gap-1.5">
+                      <p className="text-sm font-medium text-foreground">
+                        {resourceType === 'model' ? t('connectDrawer.curlConfig') : t('connectDrawer.mcpConfig')}
+                      </p>
+                      {resourceType === 'mcp' && (
+                        <p className="text-xs text-muted-foreground">{mcpNotes[mcpClientType]}</p>
+                      )}
+                      <CodeViewer
+                        code={generatedConfig.rawCode}
+                        renderCode={generatedConfig.renderCode}
+                        language={generatedConfig.language}
+                      />
+                    </div>
+                  );
+                })()}
             </div>
           </AccordionContent>
         </AccordionItem>
