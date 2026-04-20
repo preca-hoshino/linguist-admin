@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/Sidebar';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar';
 import { useLayout } from '@/providers/LayoutProvider';
 import { getSidebarData } from './data/sidebar-data';
 import { NavGroup } from './NavGroup';

@@ -10,7 +10,7 @@ import { IconSidebarFloating } from '@/assets/custom/layout/icon-sidebar-floatin
 import { IconSidebarInset } from '@/assets/custom/layout/icon-sidebar-inset';
 import { IconSidebarSidebar } from '@/assets/custom/layout/icon-sidebar-sidebar';
 import { Button } from '@/components/ui/Button';
-import { useSidebar } from '@/components/ui/Sidebar';
+import { useSidebar } from '@/components/ui/sidebar';
 import { useDirection } from '@/providers/DirectionProvider';
 import { type Collapsible, useLayout } from '@/providers/LayoutProvider';
 import { cn } from '@/utils/utils';

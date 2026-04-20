@@ -1,6 +1,6 @@
 import { Outlet } from '@tanstack/react-router';
 import { SkipToMain } from '@/components/SkipToMain';
-import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/layouts/AppSidebar';
 import { Header } from '@/layouts/Header';
 import { LayoutProvider } from '@/providers/LayoutProvider';

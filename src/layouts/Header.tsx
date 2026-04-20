@@ -5,7 +5,7 @@ import { Search } from '@/components/Search';
 import { ThemeSwitch } from '@/components/ThemeSwitch';
 import { ConnectDrawer } from '@/components/ConnectDrawer';
 import { Separator } from '@/components/ui/Separator';
-import { SidebarTrigger } from '@/components/ui/Sidebar';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { cn } from '@/utils/utils';
 
 type HeaderProps = React.HTMLAttributes<HTMLElement> & {

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { SidebarProvider } from '@/components/ui/Sidebar';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import { NavUser } from '../NavUser';
 
 vi.mock('react-i18next', () => ({
