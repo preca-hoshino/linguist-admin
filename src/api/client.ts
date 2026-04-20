@@ -1,5 +1,5 @@
 import { API_PREFIX, UI_BASE } from '@/config/runtime';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 import type { ApiErrorBody, ApiResult } from '../types';
 
 const DEFAULT_TIMEOUT_MS = 10_000;

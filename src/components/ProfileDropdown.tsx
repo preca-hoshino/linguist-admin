@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
 import { useDialogState } from '@/composables/use-dialog-state';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 
 function getInitials(name: string): string {
   return name.charAt(0).toUpperCase();

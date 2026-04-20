@@ -1,9 +1,9 @@
 import type { StatsOverview, StatsToday } from '@/types';
 import type { GlobalTimeRange } from '@/types/dashboard';
-import { LatencyCard } from '../components/latency-card';
-import { RequestCard } from '../components/request-card';
-import { SuccessRateCard } from '../components/success-rate-card';
-import { TokenCard } from '../components/token-card';
+import { LatencyCard } from '../components/LatencyCard';
+import { RequestCard } from '../components/RequestCard';
+import { SuccessRateCard } from '../components/SuccessRateCard';
+import { TokenCard } from '../components/TokenCard';
 import { UsageSection } from '../components/UsageSection';
 
 interface OverviewTabProps {

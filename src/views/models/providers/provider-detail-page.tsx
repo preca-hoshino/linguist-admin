@@ -14,7 +14,7 @@ import type { Provider } from '@/types';
 import type { GlobalTimeRange } from '@/types/dashboard';
 import { cn } from '@/utils/utils';
 import { TimeRangePicker } from '@/views/dashboard/components/TimeRangePicker';
-import { BillingTabContent } from '@/views/models/shared/billing-tab-content';
+import { BillingTabContent } from '@/views/models/shared/BillingTabContent';
 import { ProviderUsageTab } from './detail-tabs/ProviderDistributionTab';
 import { ProviderErrorsTab } from './detail-tabs/ProviderErrorsTab';
 import { ProviderOverviewTab } from './detail-tabs/ProviderOverviewTab';

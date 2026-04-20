@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as meApi from '@/api/me';
 import * as cookies from '@/utils/cookies';
 import * as jwt from '@/utils/jwt';
-import { useAuthStore } from '../authStore';
+import { useAuthStore } from '../auth-store';
 
 vi.mock('@/utils/cookies');
 vi.mock('@/utils/jwt');

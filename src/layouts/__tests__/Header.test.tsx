@@ -21,7 +21,7 @@ vi.mock('react-i18next', () => ({
   initReactI18next: { type: '3rdParty', init: vi.fn() },
 }));
 
-vi.mock('@/stores/authStore', () => ({
+vi.mock('@/stores/auth-store', () => ({
   useAuthStore: (): { auth: { user: { username: string; email: string }; reset: ReturnType<typeof vi.fn> } } => ({
     auth: { user: { username: 'testuser', email: 'test@example.com' }, reset: vi.fn() },
   }),

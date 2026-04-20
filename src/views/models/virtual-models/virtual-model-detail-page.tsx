@@ -12,7 +12,7 @@ import { Main } from '@/layouts/Main';
 import type { GlobalTimeRange, StatsFilterOptions } from '@/types/dashboard';
 import { cn } from '@/utils/utils';
 import { TimeRangePicker } from '@/views/dashboard/components/TimeRangePicker';
-import { BillingTabContent } from '@/views/models/shared/billing-tab-content';
+import { BillingTabContent } from '@/views/models/shared/BillingTabContent';
 import { VirtualModelDistributionTab } from './detail-tabs/VirtualModelDistributionTab';
 import { VirtualModelErrorsTab } from './detail-tabs/VirtualModelErrorsTab';
 // Tab 组件
