@@ -1,7 +1,12 @@
 import { render } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SidebarProvider } from '@/components/ui/Sidebar';
 import { Header } from '../Header';
+
+vi.mock('@/components/ConnectDrawer', () => ({
+  ConnectDrawer: (): React.ReactNode => <div data-testid="mock-connect-drawer" />,
+}));
 
 vi.mock('@/providers/ThemeProvider', () => ({
   useTheme: (): { theme: string; setTheme: ReturnType<typeof vi.fn> } => ({ theme: 'dark', setTheme: vi.fn() }),
@@ -60,21 +65,26 @@ describe('Header Component', () => {
     vi.clearAllMocks();
   });
 
-  it('should render without crashing', () => {
-    const { container } = render(
-      <SidebarProvider>
-        <Header />
-      </SidebarProvider>,
+  function renderWithProviders(): ReturnType<typeof render> {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    return render(
+      <QueryClientProvider client={queryClient}>
+        <SidebarProvider>
+          <Header />
+        </SidebarProvider>
+      </QueryClientProvider>,
     );
+  }
+
+  it('should render without crashing', () => {
+    const { container } = renderWithProviders();
     expect(container).toBeInTheDocument();
   });
 
   it('should match snapshot', () => {
-    const { container } = render(
-      <SidebarProvider>
-        <Header />
-      </SidebarProvider>,
-    );
+    const { container } = renderWithProviders();
     expect(container).toMatchSnapshot();
   });
 });

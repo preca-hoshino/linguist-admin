@@ -99,6 +99,9 @@ exports[`Header Component > should match snapshot 1`] = `
               K
             </kbd>
           </button>
+          <div
+            data-testid="mock-connect-drawer"
+          />
           <button
             aria-expanded="false"
             aria-haspopup="menu"

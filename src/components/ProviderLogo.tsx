@@ -1,4 +1,16 @@
-import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine } from '@lobehub/icons';
+import {
+  Antigravity,
+  CherryStudio,
+  Claude,
+  ClaudeCode,
+  Cursor,
+  DeepSeek,
+  Gemini,
+  Github,
+  ProviderIcon,
+  Trae,
+  Volcengine,
+} from '@lobehub/icons';
 import { forwardRef } from 'react';
 
 export interface ProviderLogoProps {
@@ -34,6 +46,12 @@ export const ProviderLogo = forwardRef<SVGSVGElement, ProviderLogoProps>(
       deepseek: DeepSeek,
       volcengine: Volcengine,
       copilot: Github,
+      'cherry-studio': CherryStudio,
+      antigravity: Antigravity,
+      cursor: Cursor,
+      trae: Trae,
+      'claude-code': ClaudeCode,
+      'claude-desktop': Claude,
     };
 
     // 1. 规范化：别名映射
