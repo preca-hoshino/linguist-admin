@@ -4,22 +4,20 @@
 // 基础 URL 当前从 window.location.origin 提取，
 // 后续可通过"设置"页面提供 Gateway 公网地址覆盖此默认值。
 
+import { useQuery } from '@tanstack/react-query';
 import { AppWindow, Box, Plug, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
 import { listApps } from '@/api/apps';
-import { listVirtualModels } from '@/api/virtual-models';
 import { listVirtualMcps } from '@/api/mcp-virtual-servers';
-import { Button } from '@/components/ui/Button';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/Sheet';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { listVirtualModels } from '@/api/virtual-models';
 import { CodeViewer } from '@/components/CodeViewer';
-
-import type { App } from '@/types/app';
-import type { VirtualModel } from '@/types/virtual-model';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
+import { Button } from '@/components/ui/Button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/Sheet';
 import type { VirtualMcp } from '@/types/mcp';
+import type { VirtualModel } from '@/types/virtual-model';
 
 type ApiFormat = 'openaicompat' | 'anthropic' | 'gemini';
 
@@ -105,161 +103,13 @@ function buildMcpJsonSnippet(apiKey: string, mcpName: string, gatewayOrigin: str
 
 // ===== 子组件 =====
 
-interface ModelConfigPanelProps {
-  readonly app: App;
-  readonly allModels: VirtualModel[];
-  readonly gatewayOrigin: string;
-}
-
-function ModelConfigPanel({ app, allModels, gatewayOrigin }: ModelConfigPanelProps): React.JSX.Element {
-  const { t } = useTranslation();
-
-  // 根据 App 的 allowed_model_ids 过滤可用虚拟模型
-  // 若 allowed_model_ids 为空数组，则无权访问任何模型
-  const availableModels = useMemo<VirtualModel[]>(() => {
-    if (app.allowed_model_ids.length === 0) {
-      return [];
-    }
-    return allModels.filter((m) => app.allowed_model_ids.includes(m.id));
-  }, [app.allowed_model_ids, allModels]);
-
-  const [selectedModelId, setSelectedModelId] = useState<string>('');
-  const [apiFormat, setApiFormat] = useState<ApiFormat>('openaicompat');
-
-  const selectedModel = availableModels.find((m) => m.id === selectedModelId);
-  const snippet = selectedModel ? buildCurlSnippet(apiFormat, app.api_key, selectedModel.name, gatewayOrigin) : null;
-
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-[auto_1fr] items-center gap-4">
-        <label htmlFor="connect-drawer-model-select" className="text-sm font-medium text-foreground whitespace-nowrap">
-          {t('connectDrawer.selectModel')}
-        </label>
-        {availableModels.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{t('connectDrawer.noModels')}</p>
-        ) : (
-          <Select value={selectedModelId} onValueChange={setSelectedModelId}>
-            <SelectTrigger id="connect-drawer-model-select" className="w-full">
-              <SelectValue placeholder={t('connectDrawer.modelPlaceholder')} />
-            </SelectTrigger>
-            <SelectContent>
-              {availableModels.map((m) => (
-                <SelectItem key={m.id} value={m.id}>
-                  <div className="flex items-center gap-2">
-                    <Box className="h-4 w-4 text-muted-foreground" />
-                    <span>{m.name}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-      </div>
-
-      <div className="grid grid-cols-[auto_1fr] items-center gap-4">
-        <label htmlFor="connect-drawer-format-select" className="text-sm font-medium text-foreground whitespace-nowrap">
-          {t('connectDrawer.apiFormat')}
-        </label>
-        <Select
-          value={apiFormat}
-          onValueChange={(v) => {
-            setApiFormat(v as ApiFormat);
-          }}
-        >
-          <SelectTrigger id="connect-drawer-format-select" className="w-full">
-            <SelectValue placeholder={t('connectDrawer.apiFormatPlaceholder')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="openaicompat">OpenAI Compatible</SelectItem>
-            <SelectItem value="anthropic">Anthropic Messages</SelectItem>
-            <SelectItem value="gemini">Google Gemini</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {snippet !== null && (
-        <div className="flex flex-col gap-1.5">
-          <p className="text-sm font-medium text-foreground">{t('connectDrawer.curlConfig')}</p>
-          <CodeViewer code={snippet} language="bash" />
-        </div>
-      )}
-    </div>
-  );
-}
-
-interface McpConfigPanelProps {
-  readonly app: App;
-  readonly allMcps: VirtualMcp[];
-  readonly gatewayOrigin: string;
-}
-
-function McpConfigPanel({ app, allMcps, gatewayOrigin }: McpConfigPanelProps): React.JSX.Element {
-  const { t } = useTranslation();
-
-  // 根据 App 的 allowed_mcp_ids 过滤可用虚拟 MCP
-  // allowed_mcp_ids 为 undefined 或空数组均表示无权限
-  const availableMcps = useMemo<VirtualMcp[]>(() => {
-    const allowedIds = app.allowed_mcp_ids;
-    if (!allowedIds || allowedIds.length === 0) {
-      return [];
-    }
-    return allMcps.filter((m) => allowedIds.includes(m.id));
-  }, [app.allowed_mcp_ids, allMcps]);
-
-  const [selectedMcpId, setSelectedMcpId] = useState<string>('');
-
-  const selectedMcp = availableMcps.find((m) => m.id === selectedMcpId);
-  const snippet = selectedMcp ? buildMcpJsonSnippet(app.api_key, selectedMcp.name, gatewayOrigin) : null;
-
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-[auto_1fr] items-center gap-4">
-        <label htmlFor="connect-drawer-mcp-select" className="text-sm font-medium text-foreground whitespace-nowrap">
-          {t('connectDrawer.selectMcp')}
-        </label>
-        {availableMcps.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{t('connectDrawer.noMcps')}</p>
-        ) : (
-          <Select value={selectedMcpId} onValueChange={setSelectedMcpId}>
-            <SelectTrigger id="connect-drawer-mcp-select" className="w-full">
-              <SelectValue placeholder={t('connectDrawer.mcpPlaceholder')} />
-            </SelectTrigger>
-            <SelectContent>
-              {availableMcps.map((m) => (
-                <SelectItem key={m.id} value={m.id}>
-                  <div className="flex items-center gap-2">
-                    <Box className="h-4 w-4 text-muted-foreground" />
-                    <span>{m.name}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-      </div>
-
-      {snippet !== null && (
-        <div className="flex flex-col gap-1.5">
-          <p className="text-sm font-medium text-foreground">{t('connectDrawer.mcpConfig')}</p>
-          <p className="text-xs text-muted-foreground">{t('connectDrawer.mcpConfigNote')}</p>
-          <CodeViewer code={snippet} language="json" />
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ===== 内部核心视图（分离以支持动画延迟加载） =====
-
 interface ConnectDrawerContentProps {
   readonly gatewayOrigin: string;
 }
 
 function ConnectDrawerContent({ gatewayOrigin }: ConnectDrawerContentProps): React.JSX.Element {
   const { t } = useTranslation();
-  const [selectedAppId, setSelectedAppId] = useState<string>('');
 
-  // 内部加载数据（因为是从外部延迟挂载，挂载后立即开始加载）
   const { data: appsData, isLoading: appsLoading } = useQuery({
     queryKey: ['apps', 'connect-drawer'],
     queryFn: async () => {
@@ -296,67 +146,209 @@ function ConnectDrawerContent({ gatewayOrigin }: ConnectDrawerContentProps): Rea
     staleTime: 30_000,
   });
 
+  // ========== 状态控制 ==========
+  const [step, setStep] = useState<string>('step-1');
+  const [selectedAppId, setSelectedAppId] = useState<string>('');
+
+  const [resourceType, setResourceType] = useState<'model' | 'mcp'>('model');
+  const [selectedResourceId, setSelectedResourceId] = useState<string>('');
+  const [apiFormat, setApiFormat] = useState<ApiFormat>('openaicompat');
+
   const apps = appsData?.data ?? [];
   const allModels = modelsData?.data ?? [];
   const allMcps = mcpsData?.data ?? [];
 
-  const isLoadingAny = appsLoading || modelsLoading || mcpsLoading;
+  // 获取当前选中的 App
   const selectedApp = apps.find((a) => a.id === selectedAppId);
 
-  // 重置下游选择（换 App 时清空）
+  // 根据选中的 App 过滤可选资源
+  const availableModels = useMemo<VirtualModel[]>(() => {
+    const allowed = selectedApp?.allowed_model_ids;
+    if (!allowed) {
+      return [];
+    }
+    return allModels.filter((m) => allowed.includes(m.id));
+  }, [selectedApp, allModels]);
+
+  const availableMcps = useMemo<VirtualMcp[]>(() => {
+    const allowed = selectedApp?.allowed_mcp_ids;
+    if (!allowed) {
+      return [];
+    }
+    return allMcps.filter((m) => allowed.includes(m.id));
+  }, [selectedApp, allMcps]);
+
+  const currentAvailableResources = resourceType === 'model' ? availableModels : availableMcps;
+
+  const selectedVirtualModel =
+    resourceType === 'model' ? availableModels.find((x) => x.id === selectedResourceId) : undefined;
+  const selectedVirtualMcp =
+    resourceType === 'mcp' ? availableMcps.find((x) => x.id === selectedResourceId) : undefined;
+
+  let snippet: string | null = null;
+  if (selectedApp && selectedVirtualModel) {
+    snippet = buildCurlSnippet(apiFormat, selectedApp.api_key, selectedVirtualModel.name, gatewayOrigin);
+  } else if (selectedApp && selectedVirtualMcp) {
+    snippet = buildMcpJsonSnippet(selectedApp.api_key, selectedVirtualMcp.name, gatewayOrigin);
+  }
+
+  // ========== 步骤跳转处理 ==========
   const handleAppChange = (appId: string): void => {
     setSelectedAppId(appId);
+    setSelectedResourceId(''); // 清空下级缓存
+    setStep('step-2');
   };
 
+  const handleResourceTypeChange = (type: 'model' | 'mcp'): void => {
+    setResourceType(type);
+    setSelectedResourceId('');
+  };
+
+  const handleResourceChange = (resId: string): void => {
+    setSelectedResourceId(resId);
+    setStep('step-3');
+  };
+
+  const isLoading = appsLoading || modelsLoading || mcpsLoading;
+
+  let placeholderText = t('connectDrawer.modelPlaceholder');
+  if (currentAvailableResources.length === 0) {
+    placeholderText = resourceType === 'model' ? t('connectDrawer.noModels') : t('connectDrawer.noMcps');
+  }
+
   return (
-    <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-6 py-5">
-      {/* Step 1: 选择应用 */}
-      <div className="grid grid-cols-[auto_1fr] items-center gap-4">
-        <label htmlFor="connect-drawer-app-select" className="text-sm font-medium text-foreground whitespace-nowrap">
-          {t('connectDrawer.selectApp')}
-        </label>
-        {isLoadingAny ? (
-          <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
-        ) : (
-          <Select value={selectedAppId} onValueChange={handleAppChange}>
-            <SelectTrigger id="connect-drawer-app-select" className="w-full">
-              <SelectValue placeholder={t('connectDrawer.appPlaceholder')} />
-            </SelectTrigger>
-            <SelectContent>
-              {apps.map((app) => (
-                <SelectItem key={app.id} value={app.id}>
-                  <div className="flex items-center gap-2">
-                    <AppWindow className="h-4 w-4 text-muted-foreground" />
-                    <span>{app.name}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-      </div>
+    <div className="flex flex-1 flex-col overflow-y-auto px-6 py-2">
+      <Accordion
+        type="single"
+        value={step}
+        onValueChange={(val) => {
+          if (val) {
+            setStep(val);
+          }
+        }}
+        className="w-full"
+      >
+        {/* ================= STEP 1 ================= */}
+        <AccordionItem value="step-1" className="border-b">
+          <AccordionTrigger className="hover:no-underline">
+            <span className="font-semibold text-foreground">{t('connectDrawer.step1')}</span>
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="pt-2">
+              <Select value={selectedAppId} onValueChange={handleAppChange} disabled={isLoading}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t('connectDrawer.appPlaceholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {apps.map((app) => (
+                    <SelectItem key={app.id} value={app.id}>
+                      <div className="flex items-center gap-2">
+                        <AppWindow className="h-4 w-4 text-muted-foreground" />
+                        <span>{app.name}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
 
-      {/* Step 2 & 3: 选择类型 + 生成配置 */}
-      {selectedApp !== undefined && (
-        <Tabs defaultValue="model" className="flex flex-col gap-4">
-          <TabsList className="w-full">
-            <TabsTrigger value="model" className="flex-1">
-              {t('connectDrawer.tabModel')}
-            </TabsTrigger>
-            <TabsTrigger value="mcp" className="flex-1">
-              {t('connectDrawer.tabMcp')}
-            </TabsTrigger>
-          </TabsList>
+        {/* ================= STEP 2 ================= */}
+        <AccordionItem value="step-2" disabled={!selectedAppId} className="border-b">
+          <AccordionTrigger className="hover:no-underline">
+            <span className="font-semibold text-foreground">{t('connectDrawer.step2')}</span>
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="pt-2">
+              <div className="grid grid-cols-[140px_1fr] items-center gap-4">
+                <Select
+                  value={resourceType}
+                  onValueChange={(v) => {
+                    handleResourceTypeChange(v as 'model' | 'mcp');
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="model">{t('connectDrawer.tabModel')}</SelectItem>
+                    <SelectItem value="mcp">{t('connectDrawer.tabMcp')}</SelectItem>
+                  </SelectContent>
+                </Select>
 
-          <TabsContent value="model">
-            <ModelConfigPanel app={selectedApp} allModels={allModels} gatewayOrigin={gatewayOrigin} />
-          </TabsContent>
+                <Select
+                  value={selectedResourceId}
+                  onValueChange={handleResourceChange}
+                  disabled={currentAvailableResources.length === 0}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={placeholderText} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {currentAvailableResources.map((res) => (
+                      <SelectItem key={res.id} value={res.id}>
+                        <div className="flex items-center gap-2">
+                          <Box className="h-4 w-4 text-muted-foreground" />
+                          <span>{res.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
 
-          <TabsContent value="mcp">
-            <McpConfigPanel app={selectedApp} allMcps={allMcps} gatewayOrigin={gatewayOrigin} />
-          </TabsContent>
-        </Tabs>
-      )}
+        {/* ================= STEP 3 ================= */}
+        <AccordionItem value="step-3" disabled={!selectedResourceId} className="border-0">
+          <AccordionTrigger className="hover:no-underline">
+            <span className="font-semibold text-foreground">{t('connectDrawer.step3')}</span>
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="flex flex-col gap-5 pt-2">
+              {resourceType === 'model' && (
+                <div className="grid grid-cols-[auto_1fr] items-center gap-4">
+                  <label
+                    htmlFor="connect-drawer-format-select"
+                    className="text-sm font-medium text-foreground whitespace-nowrap"
+                  >
+                    {t('connectDrawer.apiFormat')}
+                  </label>
+                  <Select
+                    value={apiFormat}
+                    onValueChange={(v) => {
+                      setApiFormat(v as ApiFormat);
+                    }}
+                  >
+                    <SelectTrigger id="connect-drawer-format-select" className="w-full">
+                      <SelectValue placeholder={t('connectDrawer.apiFormatPlaceholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="openaicompat">OpenAI Compatible</SelectItem>
+                      <SelectItem value="anthropic">Anthropic Messages</SelectItem>
+                      <SelectItem value="gemini">Google Gemini</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {snippet !== null && (
+                <div className="flex flex-col gap-1.5">
+                  <p className="text-sm font-medium text-foreground">
+                    {resourceType === 'model' ? t('connectDrawer.curlConfig') : t('connectDrawer.mcpConfig')}
+                  </p>
+                  {resourceType === 'mcp' && (
+                    <p className="text-xs text-muted-foreground">{t('connectDrawer.mcpConfigNote')}</p>
+                  )}
+                  <CodeViewer code={snippet} language={resourceType === 'model' ? 'bash' : 'json'} />
+                </div>
+              )}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 }

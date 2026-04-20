@@ -862,6 +862,9 @@ export default {
   connectDrawer: {
     title: 'Quick Connect',
     desc: 'Generate ready-to-use connection configuration for your apps.',
+    step1: '1. Select Application',
+    step2: '2. Select Target Resource',
+    step3: '3. Extract Configuration',
     selectApp: 'Select Application',
     appPlaceholder: 'Select an app...',
     tabModel: 'Virtual Model',

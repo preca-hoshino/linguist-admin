@@ -854,6 +854,9 @@ export default {
   connectDrawer: {
     title: '快速接入',
     desc: '为您的应用生成即插即用的接入配置。',
+    step1: '1. 选择应用',
+    step2: '2. 选择目标资源',
+    step3: '3. 提取配置',
     selectApp: '选择应用',
     appPlaceholder: '选择一个应用…',
     tabModel: '虚拟模型',
