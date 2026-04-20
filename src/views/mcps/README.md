@@ -20,6 +20,7 @@ mcps/
 │   ├── providers-columns.tsx     # 表格列定义
 │   ├── providers-context.tsx     # 操作状态上下文
 │   ├── providers-dialogs.tsx     # 增/改/删对话框挂载
+│   ├── providers-mutate-dialog.tsx# 独立分离的新增/编辑弹窗态表单组件
 │   ├── providers-table.tsx       # 完整表格组件
 │   └── detail-tabs/         # 详情页的 Tab 内容
 │       ├── McpProviderSettingsTab.tsx
@@ -31,6 +32,7 @@ mcps/
 │   ├── virtual-mcps-columns.tsx      # 表格列定义
 │   ├── virtual-mcps-context.tsx      # 操作状态上下文
 │   ├── virtual-mcps-dialogs.tsx      # 增/改/删对话框挂载
+│   ├── virtual-mcps-mutate-dialog.tsx# 独立分离的新增/编辑弹窗表单组件
 │   ├── virtual-mcps-table.tsx        # 完整表格组件
 │   └── detail-tabs/         # 详情 Tab 内容
 │       ├── VirtualMcpSettingsTab.tsx

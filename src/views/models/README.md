@@ -16,8 +16,13 @@
 models/
 ├── provider-models/    # 实际由第三方供应商提供的模型管理 (如 GPT-4, Claude-3)
 ├── providers/          # 接入的供应商渠道配置 (含认证, 代理配置等)
+│   ├── components/     # 大页面剥离出纯受控 UI 组件 (如 CredentialSection)
+│   └── ...
 ├── virtual-models/     # 系统内部基于渠道模型再次分装、负载分配的虚拟模型配置
 ├── logs/               # 对各类模型产生的审计与请求踪迹面板 (明细追溯)
+│   ├── detail-tabs/
+│   │   ├── components/ # 剥离出日志详情页（如 LogToolsTab）中巨型的工具区视窗 (ToolWorkspace, ToolCallsResult)
+│   └── ...
 └── shared/             # 供上述各模型子模块复用的泛用块 (如计费图表等)
 ```
 
