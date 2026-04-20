@@ -13,7 +13,7 @@ import { listApps } from '@/api/apps';
 import { listVirtualMcps } from '@/api/mcp-virtual-servers';
 import { listVirtualModels } from '@/api/virtual-models';
 import { CodeViewer } from '@/components/CodeViewer';
-import { ProviderLogo } from '@/components/ProviderLogo';
+import { ProviderLogo } from '@/components/provider/ProviderLogo';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';

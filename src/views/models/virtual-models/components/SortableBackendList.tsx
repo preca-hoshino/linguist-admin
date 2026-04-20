@@ -24,7 +24,7 @@ import { Button } from '@/components/ui/Button';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
-import { ProviderLogo } from '@/components/ProviderLogo';
+import { ProviderLogo } from '@/components/provider/ProviderLogo';
 import type { ProviderModel } from '@/types';
 import type { VirtualModelForm } from '../virtual-models-mutate-dialog';
 

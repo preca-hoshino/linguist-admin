@@ -22,7 +22,7 @@ import { Label } from '@/components/ui/Label';
 import { Separator } from '@/components/ui/Separator';
 import type { ProviderModel } from '@/types';
 import { cn } from '@/utils/utils';
-import { ProviderLogo } from '@/components/ProviderLogo';
+import { ProviderLogo } from '@/components/provider/ProviderLogo';
 import { ProviderModelsMutateDialog } from '../provider-models-mutate-dialog';
 
 /* 能力 Badge 体系 */

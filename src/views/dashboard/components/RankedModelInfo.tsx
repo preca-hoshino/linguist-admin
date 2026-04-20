@@ -1,4 +1,4 @@
-import { ProviderLogo } from '@/components/ProviderLogo';
+import { ProviderLogo } from '@/components/provider/ProviderLogo';
 
 export interface RankedModelInfoProps {
   readonly rank: number;

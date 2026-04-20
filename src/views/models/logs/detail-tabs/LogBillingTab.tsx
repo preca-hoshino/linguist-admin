@@ -3,7 +3,7 @@ import { ArrowDownToLine, ArrowUpFromLine, CornerDownRight, ExternalLink, Wallet
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { listProviderModels } from '@/api/provider-models';
-import { ProviderLogo } from '@/components/ProviderLogo';
+import { ProviderLogo } from '@/components/provider/ProviderLogo';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import type { CostBreakdown, GatewayContextSnapshot, PricingTier, RequestLog } from '@/types';
