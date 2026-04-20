@@ -1,4 +1,4 @@
-import { Eye, EyeOff, Key } from 'lucide-react';
+﻿import { Eye, EyeOff, Key } from 'lucide-react';
 import { Github } from '@lobehub/icons';
 
 import type { UseFormReturn } from 'react-hook-form';
@@ -13,7 +13,7 @@ interface CredentialSectionProps {
   readonly form: UseFormReturn<ProviderForm>;
   readonly selectedKind: string;
   readonly isUpdate: boolean;
-  readonly currentRow?: Provider;
+  readonly currentRow?: Provider | undefined;
   readonly showApiKey: boolean;
   readonly setShowApiKey: (val: boolean) => void;
   readonly setCopilotAuthData: (

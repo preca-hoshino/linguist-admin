@@ -401,7 +401,6 @@ export function ProvidersMutateDialog({
                   isUpdate={isUpdate}
                   currentRow={currentRow}
                   setCopilotAuthData={setCopilotAuthData}
-                  open={open}
                 />
                 {/* Proxy */}
                 <div className="grid grid-cols-[140px_1fr] items-start gap-5">
