@@ -657,9 +657,9 @@ function ConnectDrawerContent({ gatewayOrigin }: ConnectDrawerContentProps): Rea
 
                   return (
                     <div className="flex flex-col gap-1.5">
-                      <p className="text-sm font-medium text-foreground">
-                        {resourceType === 'model' ? t('connectDrawer.curlConfig') : t('connectDrawer.mcpConfig')}
-                      </p>
+                      {resourceType !== 'model' && (
+                        <p className="text-sm font-medium text-foreground">{t('connectDrawer.mcpConfig')}</p>
+                      )}
                       {resourceType === 'mcp' && (
                         <p className="text-xs text-muted-foreground">{mcpNotes[mcpClientType]}</p>
                       )}
