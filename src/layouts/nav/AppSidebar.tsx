@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar';
 import { useLayout } from '@/providers/LayoutProvider';
-import { getSidebarData } from './data/sidebar-data';
+import { getSidebarData } from '../data/sidebar-data';
 import { NavGroup } from './NavGroup';
 import { NavUser } from './NavUser';
 import { TeamSwitcher } from './TeamSwitcher';

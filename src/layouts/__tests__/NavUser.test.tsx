@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { NavUser } from '../NavUser';
+import { NavUser } from '../nav/NavUser';
 
 vi.mock('react-i18next', () => ({
   useTranslation: (): { t: (k: string) => string } => ({ t: (k: string): string => k }),

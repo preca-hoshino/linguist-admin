@@ -23,7 +23,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { UI_BASE } from '@/config/runtime';
-import type { NavCollapsible, NavGroup as NavGroupProps, NavItem, NavLink } from './types';
+import type { NavCollapsible, NavGroup as NavGroupProps, NavItem, NavLink } from '../types';
 
 export function NavGroup({ title, items }: Readonly<NavGroupProps>): React.JSX.Element {
   const { state, isMobile } = useSidebar();
