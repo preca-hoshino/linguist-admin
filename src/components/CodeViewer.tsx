@@ -61,7 +61,7 @@ export function CodeViewer({ code, renderCode, language, className }: CodeViewer
       </div>
 
       {/* 代码内容 */}
-      <pre className="overflow-x-auto p-3 font-mono text-xs leading-relaxed text-foreground whitespace-pre">
+      <pre className="overflow-x-auto p-3 font-mono font-light text-xs leading-relaxed text-foreground whitespace-pre">
         {renderCode ?? code}
       </pre>
     </div>
