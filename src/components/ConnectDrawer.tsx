@@ -4,7 +4,7 @@
 // 基础 URL 当前从 window.location.origin 提取，
 // 后续可通过"设置"页面提供 Gateway 公网地址覆盖此默认值。
 
-import { Plug } from 'lucide-react';
+import { AppWindow, Box, Plug, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
@@ -94,21 +94,24 @@ function ModelConfigPanel({ app, allModels, gatewayOrigin }: ModelConfigPanelPro
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="connect-drawer-model-select" className="text-sm font-medium text-foreground">
+      <div className="grid grid-cols-[auto_1fr] items-center gap-4">
+        <label htmlFor="connect-drawer-model-select" className="text-sm font-medium text-foreground whitespace-nowrap">
           {t('connectDrawer.selectModel')}
         </label>
         {availableModels.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t('connectDrawer.noModels')}</p>
         ) : (
           <Select value={selectedModelId} onValueChange={setSelectedModelId}>
-            <SelectTrigger id="connect-drawer-model-select">
+            <SelectTrigger id="connect-drawer-model-select" className="w-full">
               <SelectValue placeholder={t('connectDrawer.modelPlaceholder')} />
             </SelectTrigger>
             <SelectContent>
               {availableModels.map((m) => (
                 <SelectItem key={m.id} value={m.id}>
-                  {m.name}
+                  <div className="flex items-center gap-2">
+                    <Box className="h-4 w-4 text-muted-foreground" />
+                    <span>{m.name}</span>
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -152,21 +155,24 @@ function McpConfigPanel({ app, allMcps, gatewayOrigin }: McpConfigPanelProps): R
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="connect-drawer-mcp-select" className="text-sm font-medium text-foreground">
+      <div className="grid grid-cols-[auto_1fr] items-center gap-4">
+        <label htmlFor="connect-drawer-mcp-select" className="text-sm font-medium text-foreground whitespace-nowrap">
           {t('connectDrawer.selectMcp')}
         </label>
         {availableMcps.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t('connectDrawer.noMcps')}</p>
         ) : (
           <Select value={selectedMcpId} onValueChange={setSelectedMcpId}>
-            <SelectTrigger id="connect-drawer-mcp-select">
+            <SelectTrigger id="connect-drawer-mcp-select" className="w-full">
               <SelectValue placeholder={t('connectDrawer.mcpPlaceholder')} />
             </SelectTrigger>
             <SelectContent>
               {availableMcps.map((m) => (
                 <SelectItem key={m.id} value={m.id}>
-                  {m.name}
+                  <div className="flex items-center gap-2">
+                    <Box className="h-4 w-4 text-muted-foreground" />
+                    <span>{m.name}</span>
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -247,21 +253,24 @@ function ConnectDrawerContent({ gatewayOrigin }: ConnectDrawerContentProps): Rea
   return (
     <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-6 py-5">
       {/* Step 1: 选择应用 */}
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="connect-drawer-app-select" className="text-sm font-medium text-foreground">
+      <div className="grid grid-cols-[auto_1fr] items-center gap-4">
+        <label htmlFor="connect-drawer-app-select" className="text-sm font-medium text-foreground whitespace-nowrap">
           {t('connectDrawer.selectApp')}
         </label>
         {isLoadingAny ? (
           <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
         ) : (
           <Select value={selectedAppId} onValueChange={handleAppChange}>
-            <SelectTrigger id="connect-drawer-app-select">
+            <SelectTrigger id="connect-drawer-app-select" className="w-full">
               <SelectValue placeholder={t('connectDrawer.appPlaceholder')} />
             </SelectTrigger>
             <SelectContent>
               {apps.map((app) => (
                 <SelectItem key={app.id} value={app.id}>
-                  {app.name}
+                  <div className="flex items-center gap-2">
+                    <AppWindow className="h-4 w-4 text-muted-foreground" />
+                    <span>{app.name}</span>
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -340,13 +349,31 @@ export function ConnectDrawer(): React.JSX.Element {
         </Button>
       </SheetTrigger>
 
-      <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-[550px] lg:max-w-[680px]">
-        <SheetHeader className="border-b px-6 py-4">
-          <SheetTitle className="flex items-center gap-2">
-            <Plug className="h-4 w-4" />
-            {t('connectDrawer.title')}
-          </SheetTitle>
-          <SheetDescription>{t('connectDrawer.desc')}</SheetDescription>
+      <SheetContent
+        side="right"
+        className="flex w-full flex-col gap-0 p-0 sm:max-w-[550px] lg:max-w-[680px]"
+        showCloseButton={false}
+      >
+        <SheetHeader className="flex shrink-0 flex-row items-start justify-between border-b px-6 py-4">
+          <div className="flex flex-col gap-1.5 text-left">
+            <SheetTitle className="flex items-center gap-2">
+              <Plug className="h-4 w-4" />
+              {t('connectDrawer.title')}
+            </SheetTitle>
+            <SheetDescription>{t('connectDrawer.desc')}</SheetDescription>
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="mt-0.5 -mr-2 h-8 w-8 text-muted-foreground"
+            onClick={() => {
+              setOpen(false);
+            }}
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </Button>
         </SheetHeader>
 
         {renderContent ? (
