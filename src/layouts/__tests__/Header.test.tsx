@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Header } from '../Header';
 
-vi.mock('@/components/ConnectDrawer', () => ({
+vi.mock('@/components/connect-drawer', () => ({
   ConnectDrawer: (): React.ReactNode => <div data-testid="mock-connect-drawer" />,
 }));
 
