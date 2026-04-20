@@ -57,9 +57,6 @@ exports[`Header Component > should match snapshot 1`] = `
         <div
           class="ml-auto flex items-center space-x-2"
         >
-          <div
-            data-testid="mock-connect-drawer"
-          />
           <button
             class="inline-flex items-center gap-2 whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 px-4 py-2 has-[>svg]:px-3 group relative h-8 w-full flex-1 justify-start rounded-md bg-muted/25 text-sm font-normal text-muted-foreground shadow-none hover:bg-accent sm:w-40 sm:pe-12 md:flex-none lg:w-52 xl:w-64"
             data-slot="button"
@@ -102,6 +99,9 @@ exports[`Header Component > should match snapshot 1`] = `
               K
             </kbd>
           </button>
+          <div
+            data-testid="mock-connect-drawer"
+          />
           <button
             aria-expanded="false"
             aria-haspopup="menu"

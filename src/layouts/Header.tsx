@@ -51,8 +51,8 @@ export function Header({ className, fixed, children, ...props }: HeaderProps): R
 
         {/* 右侧工具栏组件集成 */}
         <div className="ml-auto flex items-center space-x-2">
-          <ConnectDrawer />
           <Search />
+          <ConnectDrawer />
           <LangSwitch />
           <ThemeSwitch />
           <ProfileDropdown />
