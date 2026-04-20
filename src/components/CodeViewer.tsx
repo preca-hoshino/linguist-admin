@@ -9,13 +9,15 @@ import { Button } from '@/components/ui/Button';
 interface CodeViewerProps {
   /** 代码内容 */
   readonly code: string;
+  /** 可选：如果不传则 fallback 到渲染 code 字符串；传了则渲染自定义的 ReactNode */
+  readonly renderCode?: React.ReactNode;
   /** 语言标签（仅展示用，如 "bash" / "json"） */
   readonly language?: string;
   /** 额外 className */
   readonly className?: string;
 }
 
-export function CodeViewer({ code, language, className }: CodeViewerProps): React.JSX.Element {
+export function CodeViewer({ code, renderCode, language, className }: CodeViewerProps): React.JSX.Element {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(async () => {
@@ -59,7 +61,9 @@ export function CodeViewer({ code, language, className }: CodeViewerProps): Reac
       </div>
 
       {/* 代码内容 */}
-      <pre className="overflow-x-auto p-3 font-mono text-xs leading-relaxed text-foreground whitespace-pre">{code}</pre>
+      <pre className="overflow-x-auto p-3 font-mono text-xs leading-relaxed text-foreground whitespace-pre">
+        {renderCode ?? code}
+      </pre>
     </div>
   );
 }

@@ -6,7 +6,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { AppWindow, Box, Plug, X } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { listApps } from '@/api/apps';
 import { listVirtualMcps } from '@/api/mcp-virtual-servers';
@@ -22,20 +23,81 @@ import type { VirtualModel } from '@/types/virtual-model';
 
 type ApiFormat = 'openaicompat' | 'anthropic' | 'gemini';
 
+// ────────────────────────────────────────────────────────────────────────────
+// 代码高亮与可复制 Token 逻辑
+// ────────────────────────────────────────────────────────────────────────────
+
+function InteractiveToken({ value }: { readonly value: string }): React.JSX.Element {
+  const { t } = useTranslation();
+  return (
+    <button
+      type="button"
+      className="inline cursor-pointer appearance-none border-none bg-transparent p-0 font-bold text-green-600 hover:text-green-700 hover:underline focus:outline-none dark:text-green-400 dark:hover:text-green-300"
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        void navigator.clipboard.writeText(value);
+        toast.success(t('connectDrawer.copied', { defaultValue: 'Copied to clipboard' }));
+      }}
+      title={t('connectDrawer.clickToCopy', { defaultValue: 'Click to copy' })}
+    >
+      {value}
+    </button>
+  );
+}
+
+function parseSnippetTemplate(
+  template: string,
+  tokens: Record<string, string>,
+): { rawCode: string; renderCode: React.ReactNode } {
+  // eslint-disable-next-line sonarjs/slow-regex
+  const tokenRegex = /\{\{([^}]+)\}\}/g;
+  const rawCode = template.replaceAll(tokenRegex, (_, key) => tokens[key as string] ?? '');
+
+  const parts = template.split(tokenRegex);
+  const renderCode = (
+    <>
+      {parts.map((part, index) => {
+        const uniqueKey = `${part}-${index}`;
+        if (index % 2 === 1) {
+          const value = tokens[part] ?? '';
+          return <InteractiveToken key={uniqueKey} value={value} />;
+        }
+        return <Fragment key={uniqueKey}>{part}</Fragment>;
+      })}
+    </>
+  );
+
+  return { rawCode, renderCode };
+}
+
 /**
  * 生成 cURL 形式的接入配置。
  *
  * 基础地址使用 window.location.origin。
  * 如需使用自定义域名，可在未来的设置页面中通过配置项覆盖。
  */
-function buildCurlSnippet(apiFormat: ApiFormat, apiKey: string, modelName: string, gatewayOrigin: string): string {
+function buildCurlSnippet(
+  apiFormat: ApiFormat,
+  apiKey: string,
+  modelName: string,
+  gatewayOrigin: string,
+): { rawCode: string; renderCode: React.ReactNode } {
+  const tokens: Record<string, string> = {
+    APIKEY: apiKey,
+    MODEL: modelName,
+  };
+
+  let template = '';
+
   if (apiFormat === 'anthropic') {
-    return String.raw`curl "${gatewayOrigin}/model/anthropic/v1/messages" \
-  -H "x-api-key: ${apiKey}" \
+    tokens.URL = `${gatewayOrigin}/model/anthropic/v1/messages`;
+    template = String.raw`curl "{{URL}}" \
+  -H "x-api-key: {{APIKEY}}" \
   -H "anthropic-version: 2023-06-01" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "${modelName}",
+    "model": "{{MODEL}}",
     "max_tokens": 1024,
     "messages": [
       {
@@ -45,11 +107,10 @@ function buildCurlSnippet(apiFormat: ApiFormat, apiKey: string, modelName: strin
     ],
     "stream": false
   }'`;
-  }
-
-  if (apiFormat === 'gemini') {
-    return String.raw`curl "${gatewayOrigin}/model/gemini/v1beta/models/${modelName}:generateContent" \
-  -H "x-goog-api-key: ${apiKey}" \
+  } else if (apiFormat === 'gemini') {
+    tokens.URL = `${gatewayOrigin}/model/gemini/v1beta/models/${modelName}:generateContent`;
+    template = String.raw`curl "{{URL}}" \
+  -H "x-goog-api-key: {{APIKEY}}" \
   -H "Content-Type: application/json" \
   -d '{
     "contents": [
@@ -62,14 +123,14 @@ function buildCurlSnippet(apiFormat: ApiFormat, apiKey: string, modelName: strin
       }
     ]
   }'`;
-  }
-
-  // 默认为 openai-compat
-  return String.raw`curl "${gatewayOrigin}/model/openai-compat/v1/chat/completions" \
-  -H "Authorization: Bearer ${apiKey}" \
+  } else {
+    // openaicompat
+    tokens.URL = `${gatewayOrigin}/model/openai-compat/v1/chat/completions`;
+    template = String.raw`curl "{{URL}}" \
+  -H "Authorization: Bearer {{APIKEY}}" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "${modelName}",
+    "model": "{{MODEL}}",
     "messages": [
       {
         "role": "user",
@@ -78,6 +139,9 @@ function buildCurlSnippet(apiFormat: ApiFormat, apiKey: string, modelName: strin
     ],
     "stream": false
   }'`;
+  }
+
+  return parseSnippetTemplate(template, tokens);
 }
 
 /**
@@ -87,19 +151,29 @@ function buildCurlSnippet(apiFormat: ApiFormat, apiKey: string, modelName: strin
  * 基础地址使用 window.location.origin。
  * 如需使用自定义域名，可在未来的设置页面中通过配置项覆盖。
  */
-function buildMcpJsonSnippet(apiKey: string, mcpName: string, gatewayOrigin: string): string {
-  const config = {
-    mcpServers: {
-      [mcpName]: {
-        url: `${gatewayOrigin}/mcp/sse`,
-        headers: {
-          'X-Mcp-Name': mcpName,
-          Authorization: `Bearer ${apiKey}`,
-        },
-      },
-    },
+function buildMcpJsonSnippet(
+  apiKey: string,
+  mcpName: string,
+  gatewayOrigin: string,
+): { rawCode: string; renderCode: React.ReactNode } {
+  const tokens: Record<string, string> = {
+    URL: `${gatewayOrigin}/mcp/sse`,
+    MCP_NAME: mcpName,
+    APIKEY: apiKey,
   };
-  return JSON.stringify(config, null, 2);
+
+  const template = `{
+  "mcpServers": {
+    "{{MCP_NAME}}": {
+      "url": "{{URL}}",
+      "headers": {
+        "X-Mcp-Name": "{{MCP_NAME}}",
+        "Authorization": "Bearer {{APIKEY}}"
+      }
+    }
+  }
+}`;
+  return parseSnippetTemplate(template, tokens);
 }
 
 // ===== 子组件 =====
@@ -186,11 +260,11 @@ function ConnectDrawerContent({ gatewayOrigin }: ConnectDrawerContentProps): Rea
   const selectedVirtualMcp =
     resourceType === 'mcp' ? availableMcps.find((x) => x.id === selectedResourceId) : undefined;
 
-  let snippet: string | null = null;
+  let generatedConfig: { rawCode: string; renderCode: React.ReactNode } | null = null;
   if (selectedApp && selectedVirtualModel) {
-    snippet = buildCurlSnippet(apiFormat, selectedApp.api_key, selectedVirtualModel.name, gatewayOrigin);
+    generatedConfig = buildCurlSnippet(apiFormat, selectedApp.api_key, selectedVirtualModel.name, gatewayOrigin);
   } else if (selectedApp && selectedVirtualMcp) {
-    snippet = buildMcpJsonSnippet(selectedApp.api_key, selectedVirtualMcp.name, gatewayOrigin);
+    generatedConfig = buildMcpJsonSnippet(selectedApp.api_key, selectedVirtualMcp.name, gatewayOrigin);
   }
 
   // ========== 步骤跳转处理 ==========
@@ -350,7 +424,7 @@ function ConnectDrawerContent({ gatewayOrigin }: ConnectDrawerContentProps): Rea
                 </div>
               )}
 
-              {snippet !== null && (
+              {generatedConfig !== null && (
                 <div className="flex flex-col gap-1.5">
                   <p className="text-sm font-medium text-foreground">
                     {resourceType === 'model' ? t('connectDrawer.curlConfig') : t('connectDrawer.mcpConfig')}
@@ -358,7 +432,11 @@ function ConnectDrawerContent({ gatewayOrigin }: ConnectDrawerContentProps): Rea
                   {resourceType === 'mcp' && (
                     <p className="text-xs text-muted-foreground">{t('connectDrawer.mcpConfigNote')}</p>
                   )}
-                  <CodeViewer code={snippet} language={resourceType === 'model' ? 'bash' : 'json'} />
+                  <CodeViewer
+                    code={generatedConfig.rawCode}
+                    renderCode={generatedConfig.renderCode}
+                    language={resourceType === 'model' ? 'bash' : 'json'}
+                  />
                 </div>
               )}
             </div>
