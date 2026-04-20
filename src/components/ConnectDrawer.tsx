@@ -5,7 +5,7 @@
 // 后续可通过"设置"页面提供 Gateway 公网地址覆盖此默认值。
 
 import { Plug } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { listApps } from '@/api/apps';
@@ -185,18 +185,17 @@ function McpConfigPanel({ app, allMcps, gatewayOrigin }: McpConfigPanelProps): R
   );
 }
 
-// ===== 主组件 =====
+// ===== 内部核心视图（分离以支持动画延迟加载） =====
 
-export function ConnectDrawer(): React.JSX.Element {
+interface ConnectDrawerContentProps {
+  readonly gatewayOrigin: string;
+}
+
+function ConnectDrawerContent({ gatewayOrigin }: ConnectDrawerContentProps): React.JSX.Element {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
   const [selectedAppId, setSelectedAppId] = useState<string>('');
 
-  // Gateway 基础地址：当前使用运行时 origin。
-  // 后续可通过"设置"页面提供公网地址覆盖，此处留注释做标记。
-  const gatewayOrigin = globalThis.location.origin;
-
-  // 只在抽屉打开时加载数据
+  // 内部加载数据（因为是从外部延迟挂载，挂载后立即开始加载）
   const { data: appsData, isLoading: appsLoading } = useQuery({
     queryKey: ['apps', 'connect-drawer'],
     queryFn: async () => {
@@ -206,7 +205,6 @@ export function ConnectDrawer(): React.JSX.Element {
       }
       return res.data;
     },
-    enabled: open,
     staleTime: 30_000,
   });
 
@@ -219,7 +217,6 @@ export function ConnectDrawer(): React.JSX.Element {
       }
       return res.data;
     },
-    enabled: open,
     staleTime: 30_000,
   });
 
@@ -232,7 +229,6 @@ export function ConnectDrawer(): React.JSX.Element {
       }
       return res.data;
     },
-    enabled: open,
     staleTime: 30_000,
   });
 
@@ -247,6 +243,87 @@ export function ConnectDrawer(): React.JSX.Element {
   const handleAppChange = (appId: string): void => {
     setSelectedAppId(appId);
   };
+
+  return (
+    <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-6 py-5">
+      {/* Step 1: 选择应用 */}
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="connect-drawer-app-select" className="text-sm font-medium text-foreground">
+          {t('connectDrawer.selectApp')}
+        </label>
+        {isLoadingAny ? (
+          <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
+        ) : (
+          <Select value={selectedAppId} onValueChange={handleAppChange}>
+            <SelectTrigger id="connect-drawer-app-select">
+              <SelectValue placeholder={t('connectDrawer.appPlaceholder')} />
+            </SelectTrigger>
+            <SelectContent>
+              {apps.map((app) => (
+                <SelectItem key={app.id} value={app.id}>
+                  {app.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </div>
+
+      {/* Step 2 & 3: 选择类型 + 生成配置 */}
+      {selectedApp !== undefined && (
+        <Tabs defaultValue="model" className="flex flex-col gap-4">
+          <TabsList className="w-full">
+            <TabsTrigger value="model" className="flex-1">
+              {t('connectDrawer.tabModel')}
+            </TabsTrigger>
+            <TabsTrigger value="mcp" className="flex-1">
+              {t('connectDrawer.tabMcp')}
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="model">
+            <ModelConfigPanel app={selectedApp} allModels={allModels} gatewayOrigin={gatewayOrigin} />
+          </TabsContent>
+
+          <TabsContent value="mcp">
+            <McpConfigPanel app={selectedApp} allMcps={allMcps} gatewayOrigin={gatewayOrigin} />
+          </TabsContent>
+        </Tabs>
+      )}
+    </div>
+  );
+}
+
+// ===== 主组件 =====
+
+export function ConnectDrawer(): React.JSX.Element {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  // 延迟挂载内部内容，避免重渲染打断抽屉推入动画
+  const [renderContent, setRenderContent] = useState(false);
+
+  // Gateway 基础地址：当前使用运行时 origin。
+  // 后续可通过"设置"页面提供公网地址覆盖，此处留注释做标记。
+  const gatewayOrigin = globalThis.location.origin;
+
+  useEffect(() => {
+    if (open) {
+      // 延迟 150ms 挂载，错开动画渲染期
+      const timer = setTimeout(() => {
+        setRenderContent(true);
+      }, 150);
+      return (): void => {
+        clearTimeout(timer);
+      };
+    }
+    // 等待面板关闭动画结束（约 300ms）后卸载内层组件和重置状态
+    const timer = setTimeout(() => {
+      setRenderContent(false);
+    }, 300);
+    return (): void => {
+      clearTimeout(timer);
+    };
+  }, [open]);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -272,52 +349,11 @@ export function ConnectDrawer(): React.JSX.Element {
           <SheetDescription>{t('connectDrawer.desc')}</SheetDescription>
         </SheetHeader>
 
-        <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-6 py-5">
-          {/* Step 1: 选择应用 */}
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="connect-drawer-app-select" className="text-sm font-medium text-foreground">
-              {t('connectDrawer.selectApp')}
-            </label>
-            {isLoadingAny ? (
-              <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
-            ) : (
-              <Select value={selectedAppId} onValueChange={handleAppChange}>
-                <SelectTrigger id="connect-drawer-app-select">
-                  <SelectValue placeholder={t('connectDrawer.appPlaceholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  {apps.map((app) => (
-                    <SelectItem key={app.id} value={app.id}>
-                      {app.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          </div>
-
-          {/* Step 2 & 3: 选择类型 + 生成配置 */}
-          {selectedApp !== undefined && (
-            <Tabs defaultValue="model" className="flex flex-col gap-4">
-              <TabsList className="w-full">
-                <TabsTrigger value="model" className="flex-1">
-                  {t('connectDrawer.tabModel')}
-                </TabsTrigger>
-                <TabsTrigger value="mcp" className="flex-1">
-                  {t('connectDrawer.tabMcp')}
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="model">
-                <ModelConfigPanel app={selectedApp} allModels={allModels} gatewayOrigin={gatewayOrigin} />
-              </TabsContent>
-
-              <TabsContent value="mcp">
-                <McpConfigPanel app={selectedApp} allMcps={allMcps} gatewayOrigin={gatewayOrigin} />
-              </TabsContent>
-            </Tabs>
-          )}
-        </div>
+        {renderContent ? (
+          <ConnectDrawerContent gatewayOrigin={gatewayOrigin} />
+        ) : (
+          <div className="flex flex-1 items-center justify-center">{/* 动画期间的占位，保持视觉平滑过渡 */}</div>
+        )}
       </SheetContent>
     </Sheet>
   );
