@@ -3,6 +3,7 @@ import { LangSwitch } from '@/components/LangSwitch';
 import { ProfileDropdown } from '@/components/ProfileDropdown';
 import { Search } from '@/components/Search';
 import { ThemeSwitch } from '@/components/ThemeSwitch';
+import { ConnectDrawer } from '@/components/ConnectDrawer';
 import { Separator } from '@/components/ui/Separator';
 import { SidebarTrigger } from '@/components/ui/Sidebar';
 import { cn } from '@/utils/utils';
@@ -50,6 +51,7 @@ export function Header({ className, fixed, children, ...props }: HeaderProps): R
 
         {/* 右侧工具栏组件集成 */}
         <div className="ml-auto flex items-center space-x-2">
+          <ConnectDrawer />
           <Search />
           <LangSwitch />
           <ThemeSwitch />
