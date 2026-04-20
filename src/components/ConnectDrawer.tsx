@@ -715,9 +715,9 @@ export function ConnectDrawer(): React.JSX.Element {
       <SheetTrigger asChild>
         <Button
           id="connect-drawer-trigger"
-          variant="outline"
+          variant="ghost"
           size="icon"
-          className="relative h-8 w-8"
+          className="scale-95 rounded-full"
           title={t('connectDrawer.title')}
         >
           <Plug className="h-4 w-4" />
