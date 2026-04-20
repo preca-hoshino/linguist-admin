@@ -1,7 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { DataTableColumnHeader } from '@/components/data-table';
-import { ProviderBadge } from '@/components/ProviderBadge';
+import { ProviderBadge } from '@/components/provider/ProviderBadge';
 import { Badge } from '@/components/ui/Badge';
 import type { Provider } from '@/types';
 import { ProvidersRowActions } from './providers-row-actions';

@@ -3,9 +3,9 @@ import { LangSwitch } from '@/components/LangSwitch';
 import { ProfileDropdown } from '@/components/ProfileDropdown';
 import { Search } from '@/components/Search';
 import { ThemeSwitch } from '@/components/ThemeSwitch';
-import { ConnectDrawer } from '@/components/ConnectDrawer';
+import { ConnectDrawer } from '@/components/connect-drawer';
 import { Separator } from '@/components/ui/Separator';
-import { SidebarTrigger } from '@/components/ui/Sidebar';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { cn } from '@/utils/utils';
 
 type HeaderProps = React.HTMLAttributes<HTMLElement> & {

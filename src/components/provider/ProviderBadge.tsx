@@ -1,4 +1,4 @@
-import { ProviderLogo } from '@/components/ProviderLogo';
+import { ProviderLogo } from './ProviderLogo';
 import { Badge } from '@/components/ui/Badge';
 import { cn } from '@/utils/utils';
 

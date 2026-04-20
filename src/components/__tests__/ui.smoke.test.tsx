@@ -20,7 +20,7 @@ vi.mock('@tanstack/react-router', () => ({
   useNavigate: (): ReturnType<typeof vi.fn> => vi.fn(),
 }));
 
-vi.mock('@/stores/authStore', () => ({
+vi.mock('@/stores/auth-store', () => ({
   useAuthStore: (): { auth: { reset: ReturnType<typeof vi.fn> } } => ({ auth: { reset: vi.fn() } }),
 }));
 

@@ -1,4 +1,4 @@
-import { ProviderCell } from '@/components/ProviderCell';
+import { ProviderCell } from '@/components/provider/ProviderCell';
 import { DataTableColumnHeader } from '@/components/data-table';
 import { Badge } from '@/components/ui/Badge';
 import { Progress } from '@/components/ui/Progress';

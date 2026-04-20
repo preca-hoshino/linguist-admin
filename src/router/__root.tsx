@@ -1,6 +1,6 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 
 function RootComponent(): React.JSX.Element {
   const isInitialized = useAuthStore((s) => s.auth.isInitialized);

@@ -1,9 +1,9 @@
 import type { ProviderModel, StatsOverview, StatsToday } from '@/types';
 import type { GlobalTimeRange, StatsFilterOptions } from '@/types/dashboard';
-import { LatencyCard } from '@/views/dashboard/components/latency-card';
-import { RequestCard } from '@/views/dashboard/components/request-card';
-import { SuccessRateCard } from '@/views/dashboard/components/success-rate-card';
-import { TokenCard } from '@/views/dashboard/components/token-card';
+import { LatencyCard } from '@/views/dashboard/components/LatencyCard';
+import { RequestCard } from '@/views/dashboard/components/RequestCard';
+import { SuccessRateCard } from '@/views/dashboard/components/SuccessRateCard';
+import { TokenCard } from '@/views/dashboard/components/TokenCard';
 import { UsageSection } from '@/views/dashboard/components/UsageSection';
 
 interface ProviderModelOverviewTabProps {

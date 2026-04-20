@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 import { getAdminKey, request } from '../client';
 
-vi.mock('@/stores/authStore');
+vi.mock('@/stores/auth-store');
 
 describe('client API', () => {
   const mockFetch = vi.fn();

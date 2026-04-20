@@ -1,4 +1,4 @@
-import { ProviderCell } from '@/components/ProviderCell';
+import { ProviderCell } from '@/components/provider/ProviderCell';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { DataTableColumnHeader } from '@/components/data-table';

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { SidebarProvider } from '@/components/ui/Sidebar';
-import { NavUser } from '../NavUser';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { NavUser } from '../nav/NavUser';
 
 vi.mock('react-i18next', () => ({
   useTranslation: (): { t: (k: string) => string } => ({ t: (k: string): string => k }),
@@ -22,7 +22,7 @@ vi.mock('@tanstack/react-router', () => ({
   useNavigate: (): ReturnType<typeof vi.fn> => vi.fn(),
 }));
 
-vi.mock('@/stores/authStore', () => ({
+vi.mock('@/stores/auth-store', () => ({
   useAuthStore: (): { auth: { user: { username: string; email: string }; reset: ReturnType<typeof vi.fn> } } => ({
     auth: { user: { username: 'testuser', email: 'test@example.com' }, reset: vi.fn() },
   }),

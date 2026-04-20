@@ -6,7 +6,7 @@ import { login } from '@/api/auth';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 
 export function LoginPage(): React.JSX.Element {
   const navigate = useNavigate();

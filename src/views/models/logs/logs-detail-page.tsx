@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { deleteRequestLog } from '@/api/request-logs';
 import { CopyableId } from '@/components/CopyableId';
-import { ProviderBadge } from '@/components/ProviderBadge';
+import { ProviderBadge } from '@/components/provider/ProviderBadge';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';

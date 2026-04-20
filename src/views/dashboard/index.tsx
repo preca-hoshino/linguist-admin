@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { useTodayStats } from '@/composables/use-today-stats';
 import { Main } from '@/layouts/Main';
 import { DASHBOARD_TABS, type DashboardTab, type GlobalTimeRange } from '@/types/dashboard';
-import { BillingTabContent } from '@/views/models/shared/billing-tab-content';
+import { BillingTabContent } from '@/views/models/shared/BillingTabContent';
 import { TimeRangePicker } from './components/TimeRangePicker';
 import { DistributionTab } from './tabs/DistributionTab';
 import { ErrorTab } from './tabs/ErrorTab';

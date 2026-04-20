@@ -11,13 +11,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { usePageTitle } from '@/composables/use-page-title';
 import { Main } from '@/layouts/Main';
 import type { GlobalTimeRange } from '@/types/dashboard';
-import type { McpProviderUpdateInput } from '@/types/mcp';
+import type { McpProviderCreateInput, McpProviderUpdateInput } from '@/types/mcp';
 import { cn } from '@/utils/utils';
 import { TimeRangePicker } from '@/views/dashboard/components/TimeRangePicker';
 import { McpPerformanceTab } from '../shared/McpPerformanceTab';
 import { McpProviderSettingsTab } from './detail-tabs/McpProviderSettingsTab';
 import { McpProviderToolsTab } from './detail-tabs/McpProviderToolsTab';
-import { MutateProviderDialog } from './providers-dialogs';
+import { MutateProviderDialog } from './providers-mutate-dialog';
 
 const PROVIDER_TABS = ['overview', 'tools', 'settings'] as const;
 type ProviderTab = (typeof PROVIDER_TABS)[number];
@@ -140,7 +140,7 @@ export function McpProviderDetailPage(): React.JSX.Element {
         onOpenChange={setEditOpen}
         mode="edit"
         initialData={provider}
-        onSubmit={async (data) => {
+        onSubmit={async (data: McpProviderCreateInput | McpProviderUpdateInput) => {
           const res = await updateMcpProvider(provider.id, data as McpProviderUpdateInput);
           if (res.ok) {
             toast.success(t('mcpsPage.providers.updatedSuccess', 'Provider updated successfully'));

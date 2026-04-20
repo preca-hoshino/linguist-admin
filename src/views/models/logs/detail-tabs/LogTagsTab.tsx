@@ -1,6 +1,6 @@
 import { AlertTriangle, Globe, Network, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { ProviderCell } from '@/components/ProviderCell';
+import { ProviderCell } from '@/components/provider/ProviderCell';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import type { RequestLog } from '@/types';
