@@ -12,6 +12,7 @@ import { listApps } from '@/api/apps';
 import { listVirtualMcps } from '@/api/mcp-virtual-servers';
 import { listVirtualModels } from '@/api/virtual-models';
 import { CodeViewer } from '@/components/CodeViewer';
+import { ProviderLogo } from '@/components/ProviderLogo';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
@@ -326,9 +327,24 @@ function ConnectDrawerContent({ gatewayOrigin }: ConnectDrawerContentProps): Rea
                       <SelectValue placeholder={t('connectDrawer.apiFormatPlaceholder')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="openaicompat">OpenAI Compatible</SelectItem>
-                      <SelectItem value="anthropic">Anthropic Messages</SelectItem>
-                      <SelectItem value="gemini">Google Gemini</SelectItem>
+                      <SelectItem value="openaicompat">
+                        <div className="flex items-center gap-2">
+                          <ProviderLogo provider="openaicompat" className="h-4 w-4" />
+                          <span>OpenAI Compat</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="anthropic">
+                        <div className="flex items-center gap-2">
+                          <ProviderLogo provider="anthropic" className="h-4 w-4" />
+                          <span>Anthropic</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="gemini">
+                        <div className="flex items-center gap-2">
+                          <ProviderLogo provider="gemini" className="h-4 w-4" />
+                          <span>Google</span>
+                        </div>
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

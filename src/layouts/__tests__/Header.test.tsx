@@ -4,6 +4,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SidebarProvider } from '@/components/ui/Sidebar';
 import { Header } from '../Header';
 
+vi.mock('@/components/ConnectDrawer', () => ({
+  ConnectDrawer: (): React.ReactNode => <div data-testid="mock-connect-drawer" />,
+}));
+
 vi.mock('@/providers/ThemeProvider', () => ({
   useTheme: (): { theme: string; setTheme: ReturnType<typeof vi.fn> } => ({ theme: 'dark', setTheme: vi.fn() }),
 }));

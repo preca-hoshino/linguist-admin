@@ -25,7 +25,9 @@ export function CodeViewer({ code, language, className }: CodeViewerProps): Reac
     try {
       await navigator.clipboard.writeText(code);
       setCopied(true);
-      setTimeout(() => { setCopied(false); }, 2000);
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
     } catch {
       // clipboard API 偶发异常，静默忽略
     }
