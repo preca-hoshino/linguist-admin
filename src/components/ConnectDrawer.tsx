@@ -340,7 +340,7 @@ export function ConnectDrawer(): React.JSX.Element {
         </Button>
       </SheetTrigger>
 
-      <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-md">
+      <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-[550px] lg:max-w-[680px]">
         <SheetHeader className="border-b px-6 py-4">
           <SheetTitle className="flex items-center gap-2">
             <Plug className="h-4 w-4" />
