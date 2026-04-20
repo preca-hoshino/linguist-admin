@@ -22,6 +22,7 @@ import type { VirtualMcp } from '@/types/mcp';
 import type { VirtualModel } from '@/types/virtual-model';
 
 type ApiFormat = 'openaicompat' | 'anthropic' | 'gemini';
+type ClientType = 'curl' | 'python' | 'nodejs';
 
 // ────────────────────────────────────────────────────────────────────────────
 // 代码高亮与可复制 Token 逻辑
@@ -71,28 +72,117 @@ function parseSnippetTemplate(
   return { rawCode, renderCode };
 }
 
+// ────────────────────────────────────────────────────────────────────────────
+// 代码片段模板：按 apiFormat × clientType 分发
+// ────────────────────────────────────────────────────────────────────────────
+
 /**
- * 生成 cURL 形式的接入配置。
- *
- * 基础地址使用 window.location.origin。
- * 如需使用自定义域名，可在未来的设置页面中通过配置项覆盖。
+ * 生成 Model 调用配置。
+ * 支持 cURL / Python SDK / Node.js SDK × openaicompat / anthropic / gemini 三种 API 格式。
  */
-function buildCurlSnippet(
+function buildModelSnippet(
   apiFormat: ApiFormat,
+  clientType: ClientType,
   apiKey: string,
   modelName: string,
   gatewayOrigin: string,
-): { rawCode: string; renderCode: React.ReactNode } {
+): { rawCode: string; renderCode: React.ReactNode; language: string } {
   const tokens: Record<string, string> = {
     APIKEY: apiKey,
     MODEL: modelName,
   };
 
   let template = '';
+  let language = 'bash';
 
-  if (apiFormat === 'anthropic') {
-    tokens.URL = `${gatewayOrigin}/model/anthropic/v1/messages`;
-    template = String.raw`curl "{{URL}}" \
+  // ── openaicompat ──────────────────────────────────────────────────────────
+  if (apiFormat === 'openaicompat') {
+    tokens.URL = `${gatewayOrigin}/model/openai-compat/v1`;
+
+    if (clientType === 'python') {
+      language = 'python';
+      template = `from openai import OpenAI
+
+client = OpenAI(
+    api_key="{{APIKEY}}",
+    base_url="{{URL}}",
+)
+
+response = client.chat.completions.create(
+    model="{{MODEL}}",
+    messages=[{"role": "user", "content": "Hello!"}],
+)
+print(response.choices[0].message.content)`;
+    } else if (clientType === 'nodejs') {
+      language = 'javascript';
+      template = `import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "{{APIKEY}}",
+  baseURL: "{{URL}}",
+});
+
+const response = await client.chat.completions.create({
+  model: "{{MODEL}}",
+  messages: [{ role: "user", content: "Hello!" }],
+});
+console.log(response.choices[0].message.content);`;
+    } else {
+      // curl (default)
+      tokens.ENDPOINT = `${gatewayOrigin}/model/openai-compat/v1/chat/completions`;
+      template = String.raw`curl "{{ENDPOINT}}" \
+  -H "Authorization: Bearer {{APIKEY}}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "{{MODEL}}",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hello!"
+      }
+    ],
+    "stream": false
+  }'`;
+    }
+  }
+
+  // ── anthropic ─────────────────────────────────────────────────────────────
+  else if (apiFormat === 'anthropic') {
+    tokens.URL = `${gatewayOrigin}/model/anthropic/v1`;
+
+    if (clientType === 'python') {
+      language = 'python';
+      template = `import anthropic
+
+client = anthropic.Anthropic(
+    api_key="{{APIKEY}}",
+    base_url="{{URL}}",
+)
+
+message = client.messages.create(
+    model="{{MODEL}}",
+    max_tokens=1024,
+    messages=[{"role": "user", "content": "Hello!"}],
+)
+print(message.content[0].text)`;
+    } else if (clientType === 'nodejs') {
+      language = 'javascript';
+      template = `import Anthropic from "@anthropic-ai/sdk";
+
+const client = new Anthropic({
+  apiKey: "{{APIKEY}}",
+  baseURL: "{{URL}}",
+});
+
+const message = await client.messages.create({
+  model: "{{MODEL}}",
+  max_tokens: 1024,
+  messages: [{ role: "user", content: "Hello!" }],
+});
+console.log(message.content[0].text);`;
+    } else {
+      tokens.ENDPOINT = `${gatewayOrigin}/model/anthropic/v1/messages`;
+      template = String.raw`curl "{{ENDPOINT}}" \
   -H "x-api-key: {{APIKEY}}" \
   -H "anthropic-version: 2023-06-01" \
   -H "Content-Type: application/json" \
@@ -107,9 +197,45 @@ function buildCurlSnippet(
     ],
     "stream": false
   }'`;
-  } else if (apiFormat === 'gemini') {
-    tokens.URL = `${gatewayOrigin}/model/gemini/v1beta/models/${modelName}:generateContent`;
-    template = String.raw`curl "{{URL}}" \
+    }
+  }
+
+  // ── gemini ────────────────────────────────────────────────────────────────
+  else {
+    tokens.URL = `${gatewayOrigin}/model/gemini/v1beta`;
+
+    if (clientType === 'python') {
+      language = 'python';
+      template = `from google import genai
+from google.genai import types
+
+client = genai.Client(
+    api_key="{{APIKEY}}",
+    http_options=types.HttpOptions(base_url="{{URL}}"),
+)
+
+response = client.models.generate_content(
+    model="{{MODEL}}",
+    contents="Hello!",
+)
+print(response.text)`;
+    } else if (clientType === 'nodejs') {
+      language = 'javascript';
+      template = `import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({
+  apiKey: "{{APIKEY}}",
+  httpOptions: { baseUrl: "{{URL}}" },
+});
+
+const response = await ai.models.generateContent({
+  model: "{{MODEL}}",
+  contents: "Hello!",
+});
+console.log(response.text);`;
+    } else {
+      tokens.ENDPOINT = `${gatewayOrigin}/model/gemini/v1beta/models/${modelName}:generateContent`;
+      template = String.raw`curl "{{ENDPOINT}}" \
   -H "x-goog-api-key: {{APIKEY}}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -123,33 +249,16 @@ function buildCurlSnippet(
       }
     ]
   }'`;
-  } else {
-    // openaicompat
-    tokens.URL = `${gatewayOrigin}/model/openai-compat/v1/chat/completions`;
-    template = String.raw`curl "{{URL}}" \
-  -H "Authorization: Bearer {{APIKEY}}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "{{MODEL}}",
-    "messages": [
-      {
-        "role": "user",
-        "content": "Hello!"
-      }
-    ],
-    "stream": false
-  }'`;
+    }
   }
 
-  return parseSnippetTemplate(template, tokens);
+  const { rawCode, renderCode } = parseSnippetTemplate(template, tokens);
+  return { rawCode, renderCode, language };
 }
 
 /**
  * 生成 MCP 客户端 JSON 配置。
  * 使用 SSE 传输模式（url + headers），兼容 Claude Desktop / Cursor 等支持 HTTP SSE 的客户端。
- *
- * 基础地址使用 window.location.origin。
- * 如需使用自定义域名，可在未来的设置页面中通过配置项覆盖。
  */
 function buildMcpJsonSnippet(
   apiKey: string,
@@ -228,6 +337,7 @@ function ConnectDrawerContent({ gatewayOrigin }: ConnectDrawerContentProps): Rea
   const [resourceType, setResourceType] = useState<'model' | 'mcp'>('model');
   const [selectedResourceId, setSelectedResourceId] = useState<string>('');
   const [apiFormat, setApiFormat] = useState<ApiFormat>('openaicompat');
+  const [clientType, setClientType] = useState<ClientType>('curl');
 
   const apps = appsData?.data ?? [];
   const allModels = modelsData?.data ?? [];
@@ -260,11 +370,18 @@ function ConnectDrawerContent({ gatewayOrigin }: ConnectDrawerContentProps): Rea
   const selectedVirtualMcp =
     resourceType === 'mcp' ? availableMcps.find((x) => x.id === selectedResourceId) : undefined;
 
-  let generatedConfig: { rawCode: string; renderCode: React.ReactNode } | null = null;
+  let generatedConfig: { rawCode: string; renderCode: React.ReactNode; language: string } | null = null;
   if (selectedApp && selectedVirtualModel) {
-    generatedConfig = buildCurlSnippet(apiFormat, selectedApp.api_key, selectedVirtualModel.name, gatewayOrigin);
+    generatedConfig = buildModelSnippet(
+      apiFormat,
+      clientType,
+      selectedApp.api_key,
+      selectedVirtualModel.name,
+      gatewayOrigin,
+    );
   } else if (selectedApp && selectedVirtualMcp) {
-    generatedConfig = buildMcpJsonSnippet(selectedApp.api_key, selectedVirtualMcp.name, gatewayOrigin);
+    const mcpResult = buildMcpJsonSnippet(selectedApp.api_key, selectedVirtualMcp.name, gatewayOrigin);
+    generatedConfig = { ...mcpResult, language: 'json' };
   }
 
   // ========== 步骤跳转处理 ==========
@@ -384,43 +501,65 @@ function ConnectDrawerContent({ gatewayOrigin }: ConnectDrawerContentProps): Rea
           <AccordionContent>
             <div className="flex flex-col gap-5 pt-2">
               {resourceType === 'model' && (
-                <div className="grid grid-cols-[auto_1fr] items-center gap-4">
-                  <label
-                    htmlFor="connect-drawer-format-select"
-                    className="text-sm font-medium text-foreground whitespace-nowrap"
-                  >
-                    {t('connectDrawer.apiFormat')}
-                  </label>
-                  <Select
-                    value={apiFormat}
-                    onValueChange={(v) => {
-                      setApiFormat(v as ApiFormat);
-                    }}
-                  >
-                    <SelectTrigger id="connect-drawer-format-select" className="w-full">
-                      <SelectValue placeholder={t('connectDrawer.apiFormatPlaceholder')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="openaicompat">
-                        <div className="flex items-center gap-2">
-                          <ProviderLogo provider="openaicompat" className="h-4 w-4" />
-                          <span>OpenAI Compat</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="anthropic">
-                        <div className="flex items-center gap-2">
-                          <ProviderLogo provider="anthropic" className="h-4 w-4" />
-                          <span>Anthropic</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="gemini">
-                        <div className="flex items-center gap-2">
-                          <ProviderLogo provider="gemini" className="h-4 w-4" />
-                          <span>Google</span>
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-2 gap-3">
+                  {/* 第一列：API 格式 */}
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="connect-drawer-format-select" className="text-xs font-medium text-muted-foreground">
+                      {t('connectDrawer.apiFormat')}
+                    </label>
+                    <Select
+                      value={apiFormat}
+                      onValueChange={(v) => {
+                        setApiFormat(v as ApiFormat);
+                      }}
+                    >
+                      <SelectTrigger id="connect-drawer-format-select" className="w-full">
+                        <SelectValue placeholder={t('connectDrawer.apiFormatPlaceholder')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="openaicompat">
+                          <div className="flex items-center gap-2">
+                            <ProviderLogo provider="openaicompat" className="h-4 w-4" />
+                            <span>OpenAI Compat</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="anthropic">
+                          <div className="flex items-center gap-2">
+                            <ProviderLogo provider="anthropic" className="h-4 w-4" />
+                            <span>Anthropic</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="gemini">
+                          <div className="flex items-center gap-2">
+                            <ProviderLogo provider="gemini" className="h-4 w-4" />
+                            <span>Google</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* 第二列：调用路径（SDK / cURL） */}
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="connect-drawer-client-select" className="text-xs font-medium text-muted-foreground">
+                      {t('connectDrawer.clientType', { defaultValue: 'Client / SDK' })}
+                    </label>
+                    <Select
+                      value={clientType}
+                      onValueChange={(v) => {
+                        setClientType(v as ClientType);
+                      }}
+                    >
+                      <SelectTrigger id="connect-drawer-client-select" className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="curl">cURL</SelectItem>
+                        <SelectItem value="python">Python SDK</SelectItem>
+                        <SelectItem value="nodejs">Node.js SDK</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               )}
 
@@ -435,7 +574,7 @@ function ConnectDrawerContent({ gatewayOrigin }: ConnectDrawerContentProps): Rea
                   <CodeViewer
                     code={generatedConfig.rawCode}
                     renderCode={generatedConfig.renderCode}
-                    language={resourceType === 'model' ? 'bash' : 'json'}
+                    language={generatedConfig.language}
                   />
                 </div>
               )}
