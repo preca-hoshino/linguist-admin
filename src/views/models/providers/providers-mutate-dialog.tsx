@@ -1,7 +1,7 @@
-/* eslint-disable sonarjs/cognitive-complexity */
+﻿/* eslint-disable sonarjs/cognitive-complexity */
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine } from '@lobehub/icons';
-import { Eye, EyeOff, Globe, Key, Network, Type, X } from 'lucide-react';
+import { Globe, Network, Type, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +20,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/Input';
 import type { Provider } from '@/types';
 import { cn } from '@/utils/utils';
-import { CopilotOAuthPanel } from './components/CopilotOAuthPanel';
+import { CredentialSection } from './components/CredentialSection';
 import { CustomHeadersInput } from './components/CustomHeadersInput';
 import { type KindOption, ProviderKindSelector } from './components/ProviderKindSelector';
 import { KIND_OPTIONS } from './constants';
@@ -50,7 +50,7 @@ const formSchema = z.object({
     .optional(),
 });
 
-type ProviderForm = z.infer<typeof formSchema>;
+export type ProviderForm = z.infer<typeof formSchema>;
 
 export function ProvidersMutateDialog({
   open,
@@ -68,10 +68,10 @@ export function ProvidersMutateDialog({
       opt.value.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
+  const [showApiKey, setShowApiKey] = useState(false);
   const [proxyMode, setProxyMode] = useState<'off' | 'custom'>(
     (currentRow?.config.http_proxy ?? '') === '' ? 'off' : 'custom',
   );
-  const [showApiKey, setShowApiKey] = useState(false);
   // Copilot OAuth 凭证与附加信息暂存
   const [copilotAuthData, setCopilotAuthData] = useState<{
     accessToken: string;
@@ -393,65 +393,16 @@ export function ProvidersMutateDialog({
                   }}
                 />
 
-                {selectedKind === 'copilot' ? (
-                  <div className="grid grid-cols-[140px_1fr] items-center gap-5">
-                    <div className="flex items-center justify-start gap-2 text-sm text-muted-foreground">
-                      <Github className="h-3.5 w-3.5" />
-                      <span className="font-medium text-foreground">
-                        {t('modelsPage.copilot.authorization', 'Authorization')}
-                      </span>
-                    </div>
-                    <CopilotOAuthPanel
-                      providerId={currentRow?.id}
-                      currentCredential={currentRow?.credential}
-                      githubInfo={
-                        currentRow?.config.github_info as
-                          | undefined
-                          | { login: string; avatarUrl: string; htmlUrl: string }
-                      }
-                      isUpdate={isUpdate}
-                      onCredentialChange={setCopilotAuthData}
-                    />
-                  </div>
-                ) : (
-                  <FormField
-                    control={form.control}
-                    name="api_key"
-                    render={({ field }) => (
-                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                          <Key className="h-3.5 w-3.5" />
-                          <span className="font-medium text-foreground">
-                            {t('modelsPage.providers.apiKey', 'API Key')}
-                          </span>
-                        </FormLabel>
-                        <div className="space-y-1.5">
-                          <FormControl>
-                            <div className="relative">
-                              <Input
-                                {...field}
-                                type={showApiKey ? 'text' : 'password'}
-                                placeholder={isUpdate ? '••••••••  (leave blank to keep current)' : 'sk-...'}
-                                className="pr-10 font-mono"
-                              />
-                              <button
-                                type="button"
-                                className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                                onClick={() => {
-                                  setShowApiKey(!showApiKey);
-                                }}
-                              >
-                                {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                              </button>
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                )}
-
+                <CredentialSection
+                  showApiKey={showApiKey}
+                  setShowApiKey={setShowApiKey}
+                  form={form}
+                  selectedKind={selectedKind}
+                  isUpdate={isUpdate}
+                  currentRow={currentRow}
+                  setCopilotAuthData={setCopilotAuthData}
+                  open={open}
+                />
                 {/* Proxy */}
                 <div className="grid grid-cols-[140px_1fr] items-start gap-5">
                   <div className="flex items-center justify-start gap-2 text-sm leading-9 text-muted-foreground">
