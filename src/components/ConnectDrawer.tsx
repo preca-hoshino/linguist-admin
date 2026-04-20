@@ -16,7 +16,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { CodeViewer } from '@/components/CodeViewer';
-import { API_PREFIX } from '@/config/runtime';
+
 import type { App } from '@/types/app';
 import type { VirtualModel } from '@/types/virtual-model';
 import type { VirtualMcp } from '@/types/mcp';
@@ -30,7 +30,7 @@ import type { VirtualMcp } from '@/types/mcp';
  * 如需使用自定义域名，可在未来的设置页面中通过配置项覆盖。
  */
 function buildCurlSnippet(apiKey: string, modelName: string, gatewayOrigin: string): string {
-  return String.raw`curl "${gatewayOrigin}${API_PREFIX}/v1/chat/completions" \
+  return String.raw`curl "${gatewayOrigin}/model/openai-compat/v1/chat/completions" \
   -H "Authorization: Bearer ${apiKey}" \
   -H "Content-Type: application/json" \
   -d '{
