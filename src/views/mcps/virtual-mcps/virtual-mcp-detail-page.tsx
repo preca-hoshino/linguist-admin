@@ -1,4 +1,4 @@
-import { Link, useLoaderData, useRouter } from '@tanstack/react-router';
+﻿import { Link, useLoaderData, useRouter } from '@tanstack/react-router';
 import { ChevronLeft, Database, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,13 +11,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { usePageTitle } from '@/composables/use-page-title';
 import { Main } from '@/layouts/Main';
 import type { GlobalTimeRange } from '@/types/dashboard';
-import type { VirtualMcpUpdateInput } from '@/types/mcp';
+import type { VirtualMcpCreateInput, VirtualMcpUpdateInput } from '@/types/mcp';
 import { cn } from '@/utils/utils';
 import { TimeRangePicker } from '@/views/dashboard/components/TimeRangePicker';
 import { McpPerformanceTab } from '../shared/McpPerformanceTab';
 import { VirtualMcpSettingsTab } from './detail-tabs/VirtualMcpSettingsTab';
 import { VirtualMcpToolsTab } from './detail-tabs/VirtualMcpToolsTab';
-import { MutateVirtualMcpDialog } from './virtual-mcps-dialogs';
+import { MutateVirtualMcpDialog } from './virtual-mcps-mutate-dialog';
 
 const VMCP_TABS = ['overview', 'tools', 'settings'] as const;
 type VmcpTab = (typeof VMCP_TABS)[number];
@@ -138,7 +138,7 @@ export function VirtualMcpDetailPage(): React.JSX.Element {
         onOpenChange={setEditOpen}
         mode="edit"
         initialData={virtualMcp}
-        onSubmit={async (data) => {
+        onSubmit={async (data: VirtualMcpCreateInput | VirtualMcpUpdateInput) => {
           const res = await updateVirtualMcp(virtualMcp.id, data as VirtualMcpUpdateInput);
           if (res.ok) {
             toast.success(t('mcpsPage.virtualMcps.updatedSuccess', 'Virtual MCP updated'));
