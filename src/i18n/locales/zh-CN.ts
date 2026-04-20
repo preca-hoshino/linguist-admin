@@ -858,6 +858,8 @@ export default {
     appPlaceholder: '选择一个应用…',
     tabModel: '虚拟模型',
     tabMcp: '虚拟 MCP',
+    apiFormat: 'API 格式',
+    apiFormatPlaceholder: '选择符合您客户端的格式…',
     selectModel: '选择虚拟模型',
     modelPlaceholder: '选择一个模型…',
     noModels: '此应用未配置任何允许访问的虚拟模型。',

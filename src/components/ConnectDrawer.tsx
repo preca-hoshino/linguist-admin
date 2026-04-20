@@ -21,15 +21,51 @@ import type { App } from '@/types/app';
 import type { VirtualModel } from '@/types/virtual-model';
 import type { VirtualMcp } from '@/types/mcp';
 
-// ===== 配置片段生成 =====
+type ApiFormat = 'openaicompat' | 'anthropic' | 'gemini';
 
 /**
- * 生成 cURL 形式的 Chat Completions 接入配置。
+ * 生成 cURL 形式的接入配置。
  *
- * 基础地址使用 window.location.origin + API_PREFIX。
+ * 基础地址使用 window.location.origin。
  * 如需使用自定义域名，可在未来的设置页面中通过配置项覆盖。
  */
-function buildCurlSnippet(apiKey: string, modelName: string, gatewayOrigin: string): string {
+function buildCurlSnippet(apiFormat: ApiFormat, apiKey: string, modelName: string, gatewayOrigin: string): string {
+  if (apiFormat === 'anthropic') {
+    return String.raw`curl "${gatewayOrigin}/model/anthropic/v1/messages" \
+  -H "x-api-key: ${apiKey}" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "${modelName}",
+    "max_tokens": 1024,
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hello!"
+      }
+    ],
+    "stream": false
+  }'`;
+  }
+
+  if (apiFormat === 'gemini') {
+    return String.raw`curl "${gatewayOrigin}/model/gemini/v1beta/models/${modelName}:generateContent" \
+  -H "x-goog-api-key: ${apiKey}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "contents": [
+      {
+        "parts": [
+          {
+            "text": "Hello!"
+          }
+        ]
+      }
+    ]
+  }'`;
+  }
+
+  // 默认为 openai-compat
   return String.raw`curl "${gatewayOrigin}/model/openai-compat/v1/chat/completions" \
   -H "Authorization: Bearer ${apiKey}" \
   -H "Content-Type: application/json" \
@@ -88,9 +124,10 @@ function ModelConfigPanel({ app, allModels, gatewayOrigin }: ModelConfigPanelPro
   }, [app.allowed_model_ids, allModels]);
 
   const [selectedModelId, setSelectedModelId] = useState<string>('');
+  const [apiFormat, setApiFormat] = useState<ApiFormat>('openaicompat');
 
   const selectedModel = availableModels.find((m) => m.id === selectedModelId);
-  const snippet = selectedModel ? buildCurlSnippet(app.api_key, selectedModel.name, gatewayOrigin) : null;
+  const snippet = selectedModel ? buildCurlSnippet(apiFormat, app.api_key, selectedModel.name, gatewayOrigin) : null;
 
   return (
     <div className="flex flex-col gap-4">
@@ -117,6 +154,27 @@ function ModelConfigPanel({ app, allModels, gatewayOrigin }: ModelConfigPanelPro
             </SelectContent>
           </Select>
         )}
+      </div>
+
+      <div className="grid grid-cols-[auto_1fr] items-center gap-4">
+        <label htmlFor="connect-drawer-format-select" className="text-sm font-medium text-foreground whitespace-nowrap">
+          {t('connectDrawer.apiFormat')}
+        </label>
+        <Select
+          value={apiFormat}
+          onValueChange={(v) => {
+            setApiFormat(v as ApiFormat);
+          }}
+        >
+          <SelectTrigger id="connect-drawer-format-select" className="w-full">
+            <SelectValue placeholder={t('connectDrawer.apiFormatPlaceholder')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="openaicompat">OpenAI Compatible</SelectItem>
+            <SelectItem value="anthropic">Anthropic Messages</SelectItem>
+            <SelectItem value="gemini">Google Gemini</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {snippet !== null && (

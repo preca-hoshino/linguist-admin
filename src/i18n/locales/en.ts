@@ -866,6 +866,8 @@ export default {
     appPlaceholder: 'Select an app...',
     tabModel: 'Virtual Model',
     tabMcp: 'Virtual MCP',
+    apiFormat: 'API Format',
+    apiFormatPlaceholder: 'Select client format...',
     selectModel: 'Select Virtual Model',
     modelPlaceholder: 'Select a model...',
     noModels: 'This app has no allowed virtual models configured.',
