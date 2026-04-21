@@ -23,6 +23,7 @@ import type { ProviderModel } from '@/types';
 import { CapabilitiesSelector } from './components/CapabilitiesSelector';
 import { PricingTiersSection, usePricingTiersLogic } from './components/PricingTiersSection';
 import { ProviderSelector } from './components/ProviderSelector';
+import { SupportedParametersSelector } from './components/SupportedParametersSelector';
 import { MODEL_TYPE_OPTIONS } from './constants';
 
 // --- Definitions & Schemas ---
@@ -41,6 +42,7 @@ const formSchema = z.object({
   max_tokens: z.number().min(1),
   provider_id: z.string().min(1, 'Provider required'),
   capabilities: z.array(z.string()),
+  supported_parameters: z.array(z.string()),
   pricing_tiers: z.array(PricingTierSchema),
   rpm_limit: z.number().nullable().optional(),
   tpm_limit: z.number().nullable().optional(),
@@ -90,6 +92,7 @@ export function ProviderModelsMutateDialog({
       max_tokens: 128,
       provider_id: fixedProviderId ?? '',
       capabilities: [],
+      supported_parameters: [],
       pricing_tiers: [{ start_tokens: 0, max_tokens: 128, input_price: 0, output_price: 0, cache_price: 0 }],
       rpm_limit: null,
       tpm_limit: null,
@@ -113,6 +116,7 @@ export function ProviderModelsMutateDialog({
           max_tokens: Math.round(currentRow.max_tokens / 1000),
           provider_id: currentRow.provider_id,
           capabilities: currentRow.capabilities,
+          supported_parameters: (currentRow as { supported_parameters?: string[] }).supported_parameters ?? [],
           pricing_tiers:
             (currentRow.pricing_tiers?.length ?? 0) > 0
               ? (currentRow.pricing_tiers?.map((p) => ({
@@ -142,6 +146,7 @@ export function ProviderModelsMutateDialog({
           max_tokens: 128,
           provider_id: fixedProviderId ?? '',
           capabilities: [],
+          supported_parameters: [],
           pricing_tiers: [{ start_tokens: 0, max_tokens: 128, input_price: 0, output_price: 0, cache_price: 0 }],
           rpm_limit: null,
           tpm_limit: null,
@@ -166,6 +171,7 @@ export function ProviderModelsMutateDialog({
         model_type: values.type,
         max_tokens: values.max_tokens * 1000,
         capabilities: values.capabilities,
+        supported_parameters: values.supported_parameters,
         pricing_tiers: values.pricing_tiers.map((t, index) => ({
           ...t,
           start_tokens: t.start_tokens * 1000,
@@ -461,6 +467,8 @@ export function ProviderModelsMutateDialog({
                 />
 
                 <CapabilitiesSelector control={form.control} name="capabilities" modelType={modelType} />
+
+                <SupportedParametersSelector control={form.control} name="supported_parameters" modelType={modelType} />
 
                 <div className="text-foreground">
                   <PricingTiersSection
