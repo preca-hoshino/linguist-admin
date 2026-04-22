@@ -23,10 +23,18 @@ import type { ProviderModel } from '@/types';
 import { CapabilitiesSelector } from './components/CapabilitiesSelector';
 import { PricingTiersSection, usePricingTiersLogic } from './components/PricingTiersSection';
 import { ProviderSelector } from './components/ProviderSelector';
+import { RequestOverridesEditor } from './components/RequestOverridesEditor';
 import { SupportedParametersSelector } from './components/SupportedParametersSelector';
 import { MODEL_TYPE_OPTIONS } from './constants';
 
 // --- Definitions & Schemas ---
+const RequestOverrideUIRowSchema = z.object({
+  type: z.enum(['header', 'body']),
+  key: z.string().min(1),
+  action: z.enum(['override', 'delete']),
+  value: z.string().optional(),
+});
+
 const PricingTierSchema = z.object({
   start_tokens: z.number().min(0),
   max_tokens: z.number().min(0),
@@ -46,6 +54,7 @@ const formSchema = z.object({
   pricing_tiers: z.array(PricingTierSchema),
   rpm_limit: z.number().nullable().optional(),
   tpm_limit: z.number().nullable().optional(),
+  request_overrides_ui: z.array(RequestOverrideUIRowSchema).optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -58,6 +67,38 @@ interface ProviderModelsMutateDialogProps {
   readonly title?: string;
   readonly description?: string;
   readonly fixedProviderId?: string;
+}
+
+function buildRequestOverridesPayload(
+  uiOverrides:
+    | Array<{ type: 'header' | 'body'; key: string; action: 'override' | 'delete'; value?: string | undefined }>
+    | undefined,
+): { headers?: Record<string, string | null>; body?: Record<string, string | null> } | null {
+  if (!uiOverrides || uiOverrides.length === 0) {
+    return null;
+  }
+  const overrides: { headers: Record<string, string | null>; body: Record<string, string | null> } = {
+    headers: {},
+    body: {},
+  };
+  for (const item of uiOverrides) {
+    const dict = item.type === 'header' ? overrides.headers : overrides.body;
+    dict[item.key] = item.action === 'delete' ? null : (item.value ?? '');
+  }
+  let hasOverrides = false;
+  if (Object.keys(overrides.headers).length > 0) {
+    hasOverrides = true;
+  } else {
+    delete (overrides as unknown as Record<string, unknown>).headers;
+  }
+
+  if (Object.keys(overrides.body).length > 0) {
+    hasOverrides = true;
+  } else {
+    delete (overrides as unknown as Record<string, unknown>).body;
+  }
+
+  return hasOverrides ? overrides : null;
 }
 
 export function ProviderModelsMutateDialog({
@@ -96,6 +137,7 @@ export function ProviderModelsMutateDialog({
       pricing_tiers: [{ start_tokens: 0, max_tokens: 128, input_price: 0, output_price: 0, cache_price: 0 }],
       rpm_limit: null,
       tpm_limit: null,
+      request_overrides_ui: [],
     },
   });
 
@@ -116,53 +158,87 @@ export function ProviderModelsMutateDialog({
 
   // Initialize form
   useEffect(() => {
-    if (open) {
-      if (currentRow) {
-        form.reset({
-          id: currentRow.id,
-          name: currentRow.name,
-          type: (currentRow as { type?: string }).type ?? currentRow.model_type,
-          max_tokens: Math.round(currentRow.max_tokens / 1000),
-          provider_id: currentRow.provider_id,
-          capabilities: currentRow.capabilities,
-          supported_parameters: (currentRow as { supported_parameters?: string[] }).supported_parameters ?? [],
-          pricing_tiers:
-            (currentRow.pricing_tiers?.length ?? 0) > 0
-              ? (currentRow.pricing_tiers?.map((p) => ({
-                  start_tokens: Math.round(p.start_tokens / 1000),
-                  max_tokens: Math.round((p.max_tokens ?? currentRow.max_tokens) / 1000),
-                  input_price: p.input_price,
-                  output_price: p.output_price,
-                  cache_price: p.cache_price,
-                })) ?? [])
-              : [
-                  {
-                    start_tokens: 0,
-                    max_tokens: Math.round(currentRow.max_tokens / 1000),
-                    input_price: 0,
-                    output_price: 0,
-                    cache_price: 0,
-                  },
-                ],
-          rpm_limit: currentRow.rpm_limit,
-          tpm_limit: currentRow.tpm_limit,
+    if (!open) {
+      return;
+    }
+
+    if (!currentRow) {
+      form.reset({
+        id: '',
+        name: '',
+        type: 'chat',
+        max_tokens: 128,
+        provider_id: fixedProviderId ?? '',
+        capabilities: [],
+        supported_parameters: [],
+        pricing_tiers: [{ start_tokens: 0, max_tokens: 128, input_price: 0, output_price: 0, cache_price: 0 }],
+        rpm_limit: null,
+        tpm_limit: null,
+        request_overrides_ui: [],
+      });
+      setSearchQuery('');
+      return;
+    }
+
+    form.reset({
+      id: currentRow.id,
+      name: currentRow.name,
+      type: (currentRow as { type?: string }).type ?? currentRow.model_type,
+      max_tokens: Math.round(currentRow.max_tokens / 1000),
+      provider_id: currentRow.provider_id,
+      capabilities: currentRow.capabilities,
+      supported_parameters: (currentRow as { supported_parameters?: string[] }).supported_parameters ?? [],
+      pricing_tiers:
+        (currentRow.pricing_tiers?.length ?? 0) > 0
+          ? (currentRow.pricing_tiers?.map((p) => ({
+              start_tokens: Math.round(p.start_tokens / 1000),
+              max_tokens: Math.round((p.max_tokens ?? currentRow.max_tokens) / 1000),
+              input_price: p.input_price,
+              output_price: p.output_price,
+              cache_price: p.cache_price,
+            })) ?? [])
+          : [
+              {
+                start_tokens: 0,
+                max_tokens: Math.round(currentRow.max_tokens / 1000),
+                input_price: 0,
+                output_price: 0,
+                cache_price: 0,
+              },
+            ],
+      rpm_limit: currentRow.rpm_limit,
+      tpm_limit: currentRow.tpm_limit,
+    });
+
+    // Initialize request overrides UI array
+    const overridesUi: Array<{
+      type: 'header' | 'body';
+      key: string;
+      action: 'override' | 'delete';
+      value: string;
+    }> = [];
+    const overrides = currentRow.request_overrides;
+    if (overrides) {
+      const headers = overrides.headers ?? {};
+      const body = overrides.body ?? {};
+      for (const [k, v] of Object.entries(headers)) {
+        overridesUi.push({
+          type: 'header',
+          key: k,
+          action: v === null ? 'delete' : 'override',
+          value: v ?? '',
         });
-      } else {
-        form.reset({
-          id: '',
-          name: '',
-          type: 'chat',
-          max_tokens: 128,
-          provider_id: fixedProviderId ?? '',
-          capabilities: [],
-          supported_parameters: [],
-          pricing_tiers: [{ start_tokens: 0, max_tokens: 128, input_price: 0, output_price: 0, cache_price: 0 }],
-          rpm_limit: null,
-          tpm_limit: null,
+      }
+      for (const [k, v] of Object.entries(body)) {
+        overridesUi.push({
+          type: 'body',
+          key: k,
+          action: v === null ? 'delete' : 'override',
+          value: v ?? '',
         });
-        setSearchQuery('');
       }
     }
+    form.setValue('request_overrides_ui', overridesUi);
   }, [open, currentRow, form, fixedProviderId]);
 
   // 当选定提供商变更且当前模型类型不再被支持时，自动重置为首个合法类型
@@ -191,20 +267,27 @@ export function ProviderModelsMutateDialog({
   const handleSubmit = async (values: FormValues): Promise<void> => {
     setIsSubmitting(true);
     try {
-      const payload = {
+      type CreationPayload = Omit<
+        ProviderModel,
+        'id' | 'provider_id' | 'object' | 'created_at' | 'updated_at' | 'is_active'
+      >;
+      const payload: CreationPayload = {
         name: values.name,
-        model_type: values.type,
+        model_type: values.type as 'chat' | 'embedding',
         max_tokens: values.max_tokens * 1000,
         capabilities: values.capabilities,
-        supported_parameters: values.supported_parameters,
+        parameters: values.supported_parameters as unknown as Record<string, unknown>,
         pricing_tiers: values.pricing_tiers.map((t, index) => ({
           ...t,
           start_tokens: t.start_tokens * 1000,
           max_tokens: index === values.pricing_tiers.length - 1 ? null : t.max_tokens * 1000,
         })),
-        rpm_limit: values.rpm_limit,
-        tpm_limit: values.tpm_limit,
+        rpm_limit: values.rpm_limit ?? null,
+        tpm_limit: values.tpm_limit ?? null,
       };
+
+      const parsedOverrides = buildRequestOverridesPayload(values.request_overrides_ui);
+      payload.request_overrides = parsedOverrides;
 
       await (mode === 'edit' && currentRow
         ? updateProviderModel(currentRow.id, payload)
@@ -505,6 +588,8 @@ export function ProviderModelsMutateDialog({
                       name="supported_parameters"
                       modelType={modelType}
                     />
+
+                    <RequestOverridesEditor name="request_overrides_ui" />
 
                     <div className="text-foreground">
                       <PricingTiersSection
