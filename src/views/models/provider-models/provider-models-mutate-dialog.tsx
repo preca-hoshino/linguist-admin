@@ -297,246 +297,259 @@ export function ProviderModelsMutateDialog({
             </Button>
           </DialogHeader>
 
-          <Form {...form}>
-            <form
-              id="provider-models-form"
-              onSubmit={(e) => {
-                void form.handleSubmit(handleSubmit)(e);
-              }}
-              className="flex-1 overflow-y-auto px-8 py-6"
-            >
-              <div className="w-full space-y-6">
-                {form.formState.errors.root && (
-                  <div className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-                    {form.formState.errors.root.message}
-                  </div>
-                )}
-
-                <FormField
-                  control={form.control}
-                  name="provider_id"
-                  render={() => (
-                    <FormItem className="hidden">
-                      <FormControl>
-                        <Input type="hidden" />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="id"
-                  render={({ field }) => (
-                    <FormItem className="hidden">
-                      <FormControl>
-                        <Input type="hidden" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                      <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                        <Type className="h-3.5 w-3.5" />
-                        <span className="font-medium text-foreground">
-                          {t('modelsPage.providerModels.name', '展示名称')}
-                        </span>
-                        <span className="text-destructive">*</span>
-                      </FormLabel>
-                      <div className="space-y-1.5">
-                        <FormControl>
-                          <Input {...field} placeholder="e.g., GPT-4o" className="bg-muted/10" />
-                        </FormControl>
-                        <FormMessage />
+          {currentProviderId ? (
+            <>
+              <Form {...form}>
+                <form
+                  id="provider-models-form"
+                  onSubmit={(e) => {
+                    void form.handleSubmit(handleSubmit)(e);
+                  }}
+                  className="flex-1 overflow-y-auto px-8 py-6"
+                >
+                  <div className="w-full space-y-6">
+                    {form.formState.errors.root && (
+                      <div className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                        {form.formState.errors.root.message}
                       </div>
-                    </FormItem>
-                  )}
-                />
+                    )}
 
-                <FormField
-                  control={form.control}
-                  name="type"
-                  render={({ field }) => (
-                    <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                      <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                        <Box className="h-3.5 w-3.5" />
-                        <span className="font-medium text-foreground">
-                          {t('modelsPage.providerModels.modelType', '模型类型')}
-                        </span>
-                      </FormLabel>
-                      <div className="space-y-1.5">
-                        <Tabs
-                          onValueChange={(val) => {
-                            field.onChange(val);
-                            form.setValue('capabilities', []);
-                            form.setValue('supported_parameters', []);
-                          }}
-                          value={field.value}
-                          className="w-full sm:max-w-[420px]"
-                        >
-                          <TabsList className="flex h-9 w-full">
-                            {visibleTypeOptions.map((opt) => (
-                              <TabsTrigger
-                                key={opt.id}
-                                value={opt.id}
-                                className="flex-1 px-3 text-sm"
-                                disabled={mode === 'edit'}
-                              >
-                                <opt.icon className="mr-1.5 h-4 w-4" />
-                                {t(opt.i18nLabel, opt.label)}
-                              </TabsTrigger>
-                            ))}
-                          </TabsList>
-                        </Tabs>
-                        <FormMessage />
-                      </div>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="max_tokens"
-                  render={({ field }) => (
-                    <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                      <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                        <BrainCircuit className="h-3.5 w-3.5" />
-                        <span className="font-medium text-foreground">
-                          {t('modelsPage.providerModels.maxTokens', '最大上下文 (K)')}
-                        </span>
-                      </FormLabel>
-                      <div className="space-y-1.5">
-                        <div className="relative w-full sm:max-w-[280px]">
+                    <FormField
+                      control={form.control}
+                      name="provider_id"
+                      render={() => (
+                        <FormItem className="hidden">
                           <FormControl>
-                            <Input
-                              type="number"
-                              step="1"
-                              min={1}
-                              {...field}
-                              onChange={(e) => {
-                                field.onChange(Number.parseInt(e.target.value, 10));
-                              }}
-                              className="pr-10 font-mono"
-                            />
+                            <Input type="hidden" />
                           </FormControl>
-                          <div className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm font-medium text-muted-foreground/60">
-                            K
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="id"
+                      render={({ field }) => (
+                        <FormItem className="hidden">
+                          <FormControl>
+                            <Input type="hidden" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                          <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                            <Type className="h-3.5 w-3.5" />
+                            <span className="font-medium text-foreground">
+                              {t('modelsPage.providerModels.name', '展示名称')}
+                            </span>
+                            <span className="text-destructive">*</span>
+                          </FormLabel>
+                          <div className="space-y-1.5">
+                            <FormControl>
+                              <Input {...field} placeholder="e.g., GPT-4o" className="bg-muted/10" />
+                            </FormControl>
+                            <FormMessage />
                           </div>
-                        </div>
-                        <FormMessage />
-                      </div>
-                    </FormItem>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="type"
+                      render={({ field }) => (
+                        <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                          <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                            <Box className="h-3.5 w-3.5" />
+                            <span className="font-medium text-foreground">
+                              {t('modelsPage.providerModels.modelType', '模型类型')}
+                            </span>
+                          </FormLabel>
+                          <div className="space-y-1.5">
+                            <Tabs
+                              onValueChange={(val) => {
+                                field.onChange(val);
+                                form.setValue('capabilities', []);
+                                form.setValue('supported_parameters', []);
+                              }}
+                              value={field.value}
+                              className="w-full sm:max-w-[420px]"
+                            >
+                              <TabsList className="flex h-9 w-full">
+                                {visibleTypeOptions.map((opt) => (
+                                  <TabsTrigger
+                                    key={opt.id}
+                                    value={opt.id}
+                                    className="flex-1 px-3 text-sm"
+                                    disabled={mode === 'edit'}
+                                  >
+                                    <opt.icon className="mr-1.5 h-4 w-4" />
+                                    {t(opt.i18nLabel, opt.label)}
+                                  </TabsTrigger>
+                                ))}
+                              </TabsList>
+                            </Tabs>
+                            <FormMessage />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="max_tokens"
+                      render={({ field }) => (
+                        <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                          <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                            <BrainCircuit className="h-3.5 w-3.5" />
+                            <span className="font-medium text-foreground">
+                              {t('modelsPage.providerModels.maxTokens', '最大上下文 (K)')}
+                            </span>
+                          </FormLabel>
+                          <div className="space-y-1.5">
+                            <div className="relative w-full sm:max-w-[280px]">
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  step="1"
+                                  min={1}
+                                  {...field}
+                                  onChange={(e) => {
+                                    field.onChange(Number.parseInt(e.target.value, 10));
+                                  }}
+                                  className="pr-10 font-mono"
+                                />
+                              </FormControl>
+                              <div className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm font-medium text-muted-foreground/60">
+                                K
+                              </div>
+                            </div>
+                            <FormMessage />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="rpm_limit"
+                      render={({ field }) => (
+                        <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                          <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                            <Activity className="h-3.5 w-3.5" />
+                            <span className="font-medium text-foreground">
+                              {t('modelsPage.providerModels.rpmLimit', 'RPM 限制')}
+                            </span>
+                          </FormLabel>
+                          <div className="space-y-1.5">
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min={0}
+                                placeholder={t('modelsPage.providerModels.unlimited', '留空或 0 代表无限制')}
+                                value={field.value === null ? '' : field.value}
+                                onChange={(e) => {
+                                  const val = e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
+                                  field.onChange(val);
+                                }}
+                                className="bg-muted/10 font-mono"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="tpm_limit"
+                      render={({ field }) => (
+                        <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                          <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                            <Activity className="h-3.5 w-3.5" />
+                            <span className="font-medium text-foreground">
+                              {t('modelsPage.providerModels.tpmLimit', 'TPM 限制')}
+                            </span>
+                          </FormLabel>
+                          <div className="space-y-1.5">
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min={0}
+                                placeholder={t('modelsPage.providerModels.unlimited', '留空或 0 代表无限制')}
+                                value={field.value === null ? '' : field.value}
+                                onChange={(e) => {
+                                  const val = e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
+                                  field.onChange(val);
+                                }}
+                                className="bg-muted/10 font-mono"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <CapabilitiesSelector control={form.control} name="capabilities" modelType={modelType} />
+
+                    <SupportedParametersSelector
+                      control={form.control}
+                      name="supported_parameters"
+                      modelType={modelType}
+                    />
+
+                    <div className="text-foreground">
+                      <PricingTiersSection
+                        form={form}
+                        currentMaxTokens={currentMaxTokens}
+                        currentPricingTiers={currentPricingTiers}
+                        splitPoints={splitPoints}
+                        onSliderChange={handleSliderChange}
+                        onAddSplit={addSplit}
+                        onRemoveSplit={removeSplit}
+                      />
+                    </div>
+                  </div>
+                </form>
+              </Form>
+
+              <DialogFooter className="shrink-0 border-t bg-muted/30 px-6 py-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    onOpenChange(false);
+                  }}
+                  disabled={isSubmitting}
+                >
+                  {t('common.cancel', '取消')}
+                </Button>
+                <Button form="provider-models-form" type="submit" disabled={isSubmitting || !currentProviderId}>
+                  {isSubmitting && (
+                    <span className="flex items-center gap-2">
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      {t('common.saving', '保存中...')}
+                    </span>
                   )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="rpm_limit"
-                  render={({ field }) => (
-                    <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                      <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                        <Activity className="h-3.5 w-3.5" />
-                        <span className="font-medium text-foreground">
-                          {t('modelsPage.providerModels.rpmLimit', 'RPM 限制')}
-                        </span>
-                      </FormLabel>
-                      <div className="space-y-1.5">
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min={0}
-                            placeholder={t('modelsPage.providerModels.unlimited', '留空或 0 代表无限制')}
-                            value={field.value === null ? '' : field.value}
-                            onChange={(e) => {
-                              const val = e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
-                              field.onChange(val);
-                            }}
-                            className="bg-muted/10 font-mono"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </div>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="tpm_limit"
-                  render={({ field }) => (
-                    <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                      <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                        <Activity className="h-3.5 w-3.5" />
-                        <span className="font-medium text-foreground">
-                          {t('modelsPage.providerModels.tpmLimit', 'TPM 限制')}
-                        </span>
-                      </FormLabel>
-                      <div className="space-y-1.5">
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min={0}
-                            placeholder={t('modelsPage.providerModels.unlimited', '留空或 0 代表无限制')}
-                            value={field.value === null ? '' : field.value}
-                            onChange={(e) => {
-                              const val = e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
-                              field.onChange(val);
-                            }}
-                            className="bg-muted/10 font-mono"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </div>
-                    </FormItem>
-                  )}
-                />
-
-                <CapabilitiesSelector control={form.control} name="capabilities" modelType={modelType} />
-
-                <SupportedParametersSelector control={form.control} name="supported_parameters" modelType={modelType} />
-
-                <div className="text-foreground">
-                  <PricingTiersSection
-                    form={form}
-                    currentMaxTokens={currentMaxTokens}
-                    currentPricingTiers={currentPricingTiers}
-                    splitPoints={splitPoints}
-                    onSliderChange={handleSliderChange}
-                    onAddSplit={addSplit}
-                    onRemoveSplit={removeSplit}
-                  />
-                </div>
-              </div>
-            </form>
-          </Form>
-
-          <DialogFooter className="shrink-0 border-t bg-muted/30 px-6 py-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                onOpenChange(false);
-              }}
-              disabled={isSubmitting}
-            >
-              {t('common.cancel', '取消')}
-            </Button>
-            <Button form="provider-models-form" type="submit" disabled={isSubmitting || !currentProviderId}>
-              {isSubmitting && (
-                <span className="flex items-center gap-2">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                  {t('common.saving', '保存中...')}
-                </span>
-              )}
-              {!isSubmitting && mode === 'edit' && t('common.save', '保存更改')}
-              {!isSubmitting && mode !== 'edit' && t('common.create', '确认添加')}
-            </Button>
-          </DialogFooter>
+                  {!isSubmitting && mode === 'edit' && t('common.save', '保存更改')}
+                  {!isSubmitting && mode !== 'edit' && t('common.create', '确认添加')}
+                </Button>
+              </DialogFooter>
+            </>
+          ) : (
+            <div className="flex flex-1 flex-col items-center justify-center text-muted-foreground">
+              <Box className="mb-4 h-12 w-12 opacity-20" />
+              <p>{t('modelsPage.providerModels.pleaseSelectProvider', '请先在左侧选择对应提供商')}</p>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
