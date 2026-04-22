@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as providerModelsApi from '@/api/provider-models';
 import * as providersApi from '@/api/providers';
 import { ProviderModelsMutateDialog } from '../provider-models-mutate-dialog';
@@ -49,7 +49,16 @@ vi.mock('../components/ProviderSelector', () => ({
 vi.spyOn(providersApi, 'listProviders').mockResolvedValue({
   ok: true,
   data: {
-    data: [{ id: 'provider-1', name: 'OpenAI', kind: 'openai', base_url: '', is_active: true }],
+    data: [
+      {
+        id: 'provider-1',
+        name: 'OpenAI',
+        kind: 'openai',
+        base_url: '',
+        supported_model_types: ['chat', 'embedding'],
+        is_active: true,
+      },
+    ],
     total: 1,
   },
   // biome-ignore lint/suspicious/noExplicitAny: mock override
@@ -120,12 +129,16 @@ describe('ProviderModelsMutateDialog Integration', () => {
     });
 
     // Verify it sent capabilities and supported_parameters
-    const payload = mockCreateProviderModel.mock.calls[0][0];
+    // biome-ignore lint/style/noNonNullAssertion: mock calls always present after verified call count
+    const payload = mockCreateProviderModel.mock.calls[0]![0];
     expect(payload.name).toBe('my-chat-model');
     expect(payload.provider_id).toBe('provider-1');
     expect(payload.model_type).toBe('chat');
-    expect(payload.capabilities).toContain('stream');
-    expect(payload.supported_parameters).toContain('temperature');
-    expect(payload.supported_parameters).toContain('top_p');
+    // biome-ignore lint/suspicious/noExplicitAny: cast needed since API payload type is wide
+    expect((payload as any).capabilities).toContain('stream');
+    // biome-ignore lint/suspicious/noExplicitAny: cast needed since API payload type is wide
+    expect((payload as any).supported_parameters).toContain('temperature');
+    // biome-ignore lint/suspicious/noExplicitAny: cast needed since API payload type is wide
+    expect((payload as any).supported_parameters).toContain('top_p');
   });
 });

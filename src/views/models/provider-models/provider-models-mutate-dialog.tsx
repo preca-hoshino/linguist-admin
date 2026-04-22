@@ -105,6 +105,15 @@ export function ProviderModelsMutateDialog({
   const currentPricingTiers = useWatch({ control: form.control, name: 'pricing_tiers' });
   const modelType = useWatch({ control: form.control, name: 'type' });
 
+  // 提前计算提供商列表（须在 useWatch 之后、useEffect 之前）
+  const providers = providerRes?.ok === true ? providerRes.data.data : [];
+
+  // 根据当前选中提供商动态过滤可用模型类型
+  const selectedProvider = providers.find((p) => p.id === currentProviderId);
+  const rawAllowed = selectedProvider?.supported_model_types ?? [];
+  const allowedTypes: string[] = rawAllowed.length > 0 ? rawAllowed : MODEL_TYPE_OPTIONS.map((o) => o.id);
+  const visibleTypeOptions = MODEL_TYPE_OPTIONS.filter((o) => allowedTypes.includes(o.id));
+
   // Initialize form
   useEffect(() => {
     if (open) {
@@ -156,6 +165,22 @@ export function ProviderModelsMutateDialog({
     }
   }, [open, currentRow, form, fixedProviderId]);
 
+  // 当选定提供商变更且当前模型类型不再被支持时，自动重置为首个合法类型
+  useEffect(() => {
+    if (!currentProviderId) {
+      return;
+    }
+    if (allowedTypes.includes(modelType)) {
+      return;
+    }
+    const firstAllowed = visibleTypeOptions[0]?.id;
+    if (firstAllowed !== undefined) {
+      form.setValue('type', firstAllowed, { shouldValidate: true });
+      form.setValue('capabilities', []);
+      form.setValue('supported_parameters', []);
+    }
+  }, [currentProviderId, allowedTypes, modelType, visibleTypeOptions, form]);
+
   // Pricing Hook logic
   const { splitPoints, handleSliderChange, addSplit, removeSplit } = usePricingTiersLogic({
     currentMaxTokens,
@@ -202,7 +227,6 @@ export function ProviderModelsMutateDialog({
     }
   };
 
-  const providers = providerRes?.ok === true ? providerRes.data.data : [];
   const filteredOpts = providers.filter(
     (p) =>
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -356,7 +380,7 @@ export function ProviderModelsMutateDialog({
                           className="w-full sm:max-w-[420px]"
                         >
                           <TabsList className="flex h-9 w-full">
-                            {MODEL_TYPE_OPTIONS.map((opt) => (
+                            {visibleTypeOptions.map((opt) => (
                               <TabsTrigger
                                 key={opt.id}
                                 value={opt.id}

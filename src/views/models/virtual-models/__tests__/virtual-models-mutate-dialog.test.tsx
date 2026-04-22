@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-unsafe-argument */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as providerModelsApi from '@/api/provider-models';
 import * as virtualModelsApi from '@/api/virtual-models';
 import { VirtualModelsMutateDialog } from '../virtual-models-mutate-dialog';
@@ -66,7 +66,7 @@ vi.spyOn(providerModelsApi, 'listProviderModels').mockResolvedValue({
   // biome-ignore lint/suspicious/noExplicitAny: mock override
 } as any);
 
-const mockCreateVirtualModel = vi.spyOn(virtualModelsApi, 'createVirtualModel').mockResolvedValue({
+vi.spyOn(virtualModelsApi, 'createVirtualModel').mockResolvedValue({
   ok: true,
   data: { id: 'vm-1' },
   // biome-ignore lint/suspicious/noExplicitAny: mock override
