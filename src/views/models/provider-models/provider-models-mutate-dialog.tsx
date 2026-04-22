@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
-import { Activity, Box, BrainCircuit, Type, X } from 'lucide-react';
+import { Activity, Box, BrainCircuit, Timer, Type, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -53,6 +53,8 @@ const formSchema = z.object({
   pricing_tiers: z.array(PricingTierSchema),
   rpm_limit: z.number().nullable().optional(),
   tpm_limit: z.number().nullable().optional(),
+  /** API 调用超时时间（毫秒），null = 使用系统默认 */
+  timeout_ms: z.number().int().positive().nullable().optional(),
   request_overrides_ui: z.array(RequestOverrideUIRowSchema).optional(),
 });
 
@@ -143,6 +145,7 @@ export function ProviderModelsMutateDialog({
       pricing_tiers: [{ start_tokens: 0, max_tokens: 128, input_price: 0, output_price: 0, cache_price: 0 }],
       rpm_limit: null,
       tpm_limit: null,
+      timeout_ms: null,
       request_overrides_ui: [],
     },
   });
@@ -180,6 +183,7 @@ export function ProviderModelsMutateDialog({
         pricing_tiers: [{ start_tokens: 0, max_tokens: 128, input_price: 0, output_price: 0, cache_price: 0 }],
         rpm_limit: null,
         tpm_limit: null,
+        timeout_ms: null,
         request_overrides_ui: [],
       });
       setSearchQuery('');
@@ -214,6 +218,7 @@ export function ProviderModelsMutateDialog({
             ],
       rpm_limit: currentRow.rpm_limit,
       tpm_limit: currentRow.tpm_limit,
+      timeout_ms: currentRow.timeout_ms ?? null,
     });
 
     // Initialize request overrides UI array
@@ -290,6 +295,7 @@ export function ProviderModelsMutateDialog({
         })),
         rpm_limit: values.rpm_limit ?? null,
         tpm_limit: values.tpm_limit ?? null,
+        timeout_ms: values.timeout_ms ?? null,
       };
 
       const parsedOverrides = buildRequestOverridesPayload(values.request_overrides_ui);
@@ -574,6 +580,37 @@ export function ProviderModelsMutateDialog({
                                 min={0}
                                 placeholder={t('modelsPage.providerModels.unlimited', '留空或 0 代表无限制')}
                                 value={field.value === null ? '' : field.value}
+                                onChange={(e) => {
+                                  const val = e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
+                                  field.onChange(val);
+                                }}
+                                className="bg-muted/10 font-mono"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="timeout_ms"
+                      render={({ field }) => (
+                        <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                          <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                            <Timer className="h-3.5 w-3.5" />
+                            <span className="font-medium text-foreground">
+                              {t('modelsPage.providerModels.timeoutMs', '超时时间 (ms)')}
+                            </span>
+                          </FormLabel>
+                          <div className="space-y-1.5">
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min={1}
+                                placeholder={t('modelsPage.providerModels.defaultTimeout', '留空则使用系统默认')}
+                                value={field.value ?? ''}
                                 onChange={(e) => {
                                   const val = e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
                                   field.onChange(val);
