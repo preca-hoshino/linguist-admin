@@ -399,7 +399,8 @@ export default {
       typePlaceholder: '选择类型...',
       capabilities: '模型能力',
       supportedParameters: '支持参数',
-      supportedParametersDesc: '声明此后端原生支持的特定调优参数（这通常受限于后端底层，如某些大模型本身就不支持设置 top_k，这里将其取消勾选可确保网关在向该模型发出请求时候静默移除该前端传来的参数，从而避免由于传参导致的错误报错）。配置该参数同时也会在多模型负载均衡路由发生时被优先调度。',
+      supportedParametersDesc:
+        '声明此后端原生支持的特定调优参数（这通常受限于后端底层，如某些大模型本身就不支持设置 top_k，这里将其取消勾选可确保网关在向该模型发出请求时候静默移除该前端传来的参数，从而避免由于传参导致的错误报错）。配置该参数同时也会在多模型负载均衡路由发生时被优先调度。',
       typeChat: '对话',
       typeEmbedding: '嵌入',
       typeRerank: '重排',

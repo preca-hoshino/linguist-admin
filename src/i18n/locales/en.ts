@@ -402,7 +402,8 @@ export default {
       typePlaceholder: 'Select type',
       capabilities: 'Capabilities',
       supportedParameters: 'Supported Parameters',
-      supportedParametersDesc: 'Declare the specific tuning parameters natively supported by the backend model. If unchecked, the gateway will silently strip the parameter from the request to prevent backend errors. Checked parameters also act as a soft priority factor for load balancing.',
+      supportedParametersDesc:
+        'Declare the specific tuning parameters natively supported by the backend model. If unchecked, the gateway will silently strip the parameter from the request to prevent backend errors. Checked parameters also act as a soft priority factor for load balancing.',
       typeChat: 'Chat',
       typeEmbedding: 'Embedding',
       typeRerank: 'Rerank',
