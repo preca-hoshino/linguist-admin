@@ -42,7 +42,7 @@ export function RequestOverridesEditor({
         <p className="mr-2 text-xs leading-normal text-muted-foreground">
           {t(
             'modelsPage.providerModels.requestOverridesDesc',
-            '发起模型请求时强制覆写 Header 或 JSON Body。将值留空将在发出前彻底移除该字段。',
+            '发起模型请求时强制覆写 Header 或 JSON Body。将值留空将在发出前彻底移除该字段。对于 Body，其键和值均支持原生的 JSON 语法的反序列化。',
           )}
         </p>
       </div>

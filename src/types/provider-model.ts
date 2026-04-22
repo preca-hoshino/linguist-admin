@@ -11,7 +11,7 @@ export interface ProviderModel {
   /** 请求规则重写 */
   request_overrides?: {
     headers?: Record<string, string | null>;
-    body?: Record<string, string | null>;
+    body?: Record<string, unknown>;
   } | null;
   is_active: boolean;
   created_at: string;

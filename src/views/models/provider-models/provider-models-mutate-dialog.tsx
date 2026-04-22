@@ -68,34 +68,43 @@ interface ProviderModelsMutateDialogProps {
   readonly fixedProviderId?: string;
 }
 
+function tryParseJson(value: string): unknown {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
+
 function buildRequestOverridesPayload(
   uiOverrides: Array<{ type: 'header' | 'body'; key: string; value?: string | undefined }> | undefined,
-): { headers?: Record<string, string | null>; body?: Record<string, string | null> } | null {
+): { headers?: Record<string, string | null>; body?: Record<string, unknown> } | null {
   if (!uiOverrides || uiOverrides.length === 0) {
     return null;
   }
-  const overrides: { headers: Record<string, string | null>; body: Record<string, string | null> } = {
-    headers: {},
-    body: {},
-  };
+  const headers: Record<string, string | null> = {};
+  const body: Record<string, unknown> = {};
+
   for (const item of uiOverrides) {
-    const dict = item.type === 'header' ? overrides.headers : overrides.body;
-    dict[item.key] = item.value === undefined || item.value.trim() === '' ? null : item.value;
-  }
-  let hasOverrides = false;
-  if (Object.keys(overrides.headers).length > 0) {
-    hasOverrides = true;
-  } else {
-    delete (overrides as unknown as Record<string, unknown>).headers;
+    if (item.type === 'header') {
+      headers[item.key] = item.value === undefined || item.value.trim() === '' ? null : item.value;
+      continue;
+    }
+
+    const valIsNull = item.value === undefined || item.value.trim() === '';
+    const tempKey = tryParseJson(item.key);
+    body[typeof tempKey === 'string' ? tempKey : item.key] = valIsNull ? null : tryParseJson(item.value ?? '');
   }
 
-  if (Object.keys(overrides.body).length > 0) {
-    hasOverrides = true;
-  } else {
-    delete (overrides as unknown as Record<string, unknown>).body;
+  const overrides: { headers?: Record<string, string | null>; body?: Record<string, unknown> } = {};
+  if (Object.keys(headers).length > 0) {
+    overrides.headers = headers;
+  }
+  if (Object.keys(body).length > 0) {
+    overrides.body = body;
   }
 
-  return hasOverrides ? overrides : null;
+  return Object.keys(overrides).length > 0 ? overrides : null;
 }
 
 export function ProviderModelsMutateDialog({
@@ -214,24 +223,27 @@ export function ProviderModelsMutateDialog({
       value: string;
     }> = [];
     const overrides = currentRow.request_overrides;
-    if (overrides) {
-      const headers = overrides.headers ?? {};
-      const body = overrides.body ?? {};
-      for (const [k, v] of Object.entries(headers)) {
-        overridesUi.push({
-          type: 'header',
-          key: k,
-          value: v ?? '',
-        });
-      }
-      for (const [k, v] of Object.entries(body)) {
-        overridesUi.push({
-          type: 'body',
-          key: k,
-          value: v ?? '',
-        });
-      }
+
+    for (const [k, v] of Object.entries(overrides?.headers ?? {})) {
+      overridesUi.push({
+        type: 'header',
+        key: k,
+        value: v ?? '',
+      });
     }
+
+    for (const [k, v] of Object.entries(overrides?.body ?? {})) {
+      let textValue = '';
+      if (v !== null && v !== undefined) {
+        textValue = typeof v === 'string' ? v : JSON.stringify(v);
+      }
+      overridesUi.push({
+        type: 'body',
+        key: k,
+        value: textValue,
+      });
+    }
+
     form.setValue('request_overrides_ui', overridesUi);
   }, [open, currentRow, form, fixedProviderId]);
 

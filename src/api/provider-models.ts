@@ -48,7 +48,7 @@ export const createProviderModel = async (data: {
   model_config?: Record<string, unknown>;
   request_overrides?: {
     headers?: Record<string, string | null>;
-    body?: Record<string, string | null>;
+    body?: Record<string, unknown>;
   } | null;
   rpm_limit?: number | null | undefined;
   tpm_limit?: number | null | undefined;
@@ -69,7 +69,7 @@ export const updateProviderModel = async (
     model_config: Record<string, unknown>;
     request_overrides: {
       headers?: Record<string, string | null>;
-      body?: Record<string, string | null>;
+      body?: Record<string, unknown>;
     } | null;
     is_active: boolean;
     rpm_limit?: number | null | undefined;
