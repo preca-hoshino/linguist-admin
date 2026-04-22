@@ -32,12 +32,20 @@ export function RequestOverridesEditor({
 
   return (
     <FormItem className="grid grid-cols-[140px_1fr] items-start gap-5 space-y-0">
-      <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground mt-2">
-        <Settings2 className="h-3.5 w-3.5" />
-        <span className="font-medium text-foreground">
-          {t('modelsPage.providerModels.requestOverrides', '请求覆写')}
-        </span>
-      </FormLabel>
+      <div className="mt-2 space-y-2">
+        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+          <Settings2 className="h-3.5 w-3.5" />
+          <span className="font-medium text-foreground">
+            {t('modelsPage.providerModels.requestOverrides', '请求覆写')}
+          </span>
+        </FormLabel>
+        <p className="mr-2 text-xs leading-normal text-muted-foreground">
+          {t(
+            'modelsPage.providerModels.requestOverridesDesc',
+            '发起模型请求时强制覆写 Header 或 JSON Body。将值留空将在发出前彻底移除该字段。',
+          )}
+        </p>
+      </div>
       <div className="space-y-3">
         <Tabs
           value={activeTab}
