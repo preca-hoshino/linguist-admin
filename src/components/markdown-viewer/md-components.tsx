@@ -1,8 +1,8 @@
-﻿// src/components/markdown-viewer/md-components.tsx
+// src/components/markdown-viewer/md-components.tsx
 // Shared ReactMarkdown component map generator
 
-import { type CSSProperties } from 'react';
-import ReactMarkdown from 'react-markdown';
+import type { CSSProperties } from 'react';
+import type ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { cn } from '@/utils/utils';

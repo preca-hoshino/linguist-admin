@@ -41,6 +41,9 @@ globalThis.IntersectionObserver = class IntersectionObserver {
   public unobserve = vi.fn();
 } as unknown as typeof IntersectionObserver;
 
+// Mock emoji-mart native json imports which break vitest ESM parser
+vi.mock('@emoji-mart/data', () => ({ default: {} }));
+
 // Mock scrollIntoView
 globalThis.HTMLElement.prototype.scrollIntoView = vi.fn();
 globalThis.HTMLElement.prototype.hasPointerCapture = vi.fn();
