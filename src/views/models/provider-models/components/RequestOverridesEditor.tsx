@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 
 interface RequestOverridesEditorProps {
   readonly name?: string;
@@ -42,18 +43,19 @@ export function RequestOverridesEditor({
               control={control}
               name={`${name}.${index}.type`}
               render={({ field: vField }) => (
-                <FormItem className="w-24 shrink-0 space-y-0">
-                  <Select onValueChange={vField.onChange} value={vField.value as string}>
-                    <FormControl>
-                      <SelectTrigger className="h-9">
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="header">Header</SelectItem>
-                      <SelectItem value="body">Body</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <FormItem className="w-32 shrink-0 space-y-0">
+                  <FormControl>
+                    <Tabs value={vField.value as string} onValueChange={vField.onChange} className="w-full">
+                      <TabsList className="grid w-full grid-cols-2 h-9 p-1">
+                        <TabsTrigger value="header" className="text-xs">
+                          Header
+                        </TabsTrigger>
+                        <TabsTrigger value="body" className="text-xs">
+                          Body
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+                  </FormControl>
                 </FormItem>
               )}
             />
