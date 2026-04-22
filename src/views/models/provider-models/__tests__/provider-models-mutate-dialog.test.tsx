@@ -87,6 +87,32 @@ describe('ProviderModelsMutateDialog Integration', () => {
     vi.clearAllMocks();
   });
 
+  it('requires a provider to be selected before showing the form', async () => {
+    renderComponent({
+      open: true,
+      onOpenChange: vi.fn(),
+    });
+
+    // 等待 provider 数据加载并渲染左侧列表
+    await waitFor(() => {
+      expect(screen.getByText('OpenAI')).toBeInTheDocument();
+    });
+
+    // 此时还没有选择提供商，应该显示提示而不是表单
+    expect(screen.getByText('modelsPage.providerModels.pleaseSelectProvider')).toBeInTheDocument();
+    // 确保表单项（如名称输入框）不在文档中
+    expect(screen.queryByPlaceholderText('e.g., GPT-4o')).not.toBeInTheDocument();
+
+    // 选择提供商
+    fireEvent.click(screen.getByText('OpenAI'));
+
+    // 提示应当消失，表单应当展示
+    await waitFor(() => {
+      expect(screen.queryByText('modelsPage.providerModels.pleaseSelectProvider')).not.toBeInTheDocument();
+      expect(screen.getByPlaceholderText('e.g., GPT-4o')).toBeInTheDocument();
+    });
+  });
+
   it('forms payload correctly when creating a chat model with supported parameters', async () => {
     const handleOpenChange = vi.fn();
     const handleSuccess = vi.fn();
