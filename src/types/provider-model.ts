@@ -22,6 +22,8 @@ export interface ProviderModel {
   pricing_tiers?: PricingTier[];
   rpm_limit?: number | null;
   tpm_limit?: number | null;
+  /** API 调用超时时间（毫秒）。null = 使用系统默认超时 */
+  timeout_ms?: number | null;
   throughput?: {
     rpm: number;
     tpm: number;
