@@ -49,7 +49,16 @@ vi.mock('../components/ProviderSelector', () => ({
 vi.spyOn(providersApi, 'listProviders').mockResolvedValue({
   ok: true,
   data: {
-    data: [{ id: 'provider-1', name: 'OpenAI', kind: 'openai', base_url: '', is_active: true }],
+    data: [
+      {
+        id: 'provider-1',
+        name: 'OpenAI',
+        kind: 'openai',
+        base_url: '',
+        supported_model_types: ['chat', 'embedding'],
+        is_active: true,
+      },
+    ],
     total: 1,
   },
   // biome-ignore lint/suspicious/noExplicitAny: mock override
