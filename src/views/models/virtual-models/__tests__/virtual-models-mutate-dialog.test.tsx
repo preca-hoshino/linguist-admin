@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
@@ -8,9 +8,15 @@ import { VirtualModelsMutateDialog } from '../virtual-models-mutate-dialog';
 
 // Mock ResizeObserver for Radix UI
 class ResizeObserver {
-  public observe(): void { /* mock */ }
-  public unobserve(): void { /* mock */ }
-  public disconnect(): void { /* mock */ }
+  public observe(): void {
+    /* mock */
+  }
+  public unobserve(): void {
+    /* mock */
+  }
+  public disconnect(): void {
+    /* mock */
+  }
 }
 globalThis.ResizeObserver = ResizeObserver;
 
@@ -57,13 +63,13 @@ vi.spyOn(providerModelsApi, 'listProviderModels').mockResolvedValue({
     ],
     total: 2,
   },
-// biome-ignore lint/suspicious/noExplicitAny: mock override
+  // biome-ignore lint/suspicious/noExplicitAny: mock override
 } as any);
 
 const mockCreateVirtualModel = vi.spyOn(virtualModelsApi, 'createVirtualModel').mockResolvedValue({
   ok: true,
   data: { id: 'vm-1' },
-// biome-ignore lint/suspicious/noExplicitAny: mock override
+  // biome-ignore lint/suspicious/noExplicitAny: mock override
 } as any);
 
 describe('VirtualModelsMutateDialog Integration', () => {
@@ -75,7 +81,7 @@ describe('VirtualModelsMutateDialog Integration', () => {
     return render(
       <QueryClientProvider client={queryClient}>
         <VirtualModelsMutateDialog {...props} />
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
   };
 
@@ -110,8 +116,8 @@ describe('VirtualModelsMutateDialog Integration', () => {
 
     // Actually, in the UI, selecting providers is usually a combobox. We'll skip interacting with it explicitly if it's too complex to mock Radix UI Select in RTL without full event simulation.
     // We already have a default backend block `[{ provider_id: '', provider_model_id: '', weight: 1 }]`
-    // If the Zod validation passes without provider_model_id being actually valid, we can submit. 
-    // Wait, the zod schema says provider_model_id: z.string().min(1). 
+    // If the Zod validation passes without provider_model_id being actually valid, we can submit.
+    // Wait, the zod schema says provider_model_id: z.string().min(1).
     // Let's just assume we can mock the payload correctly by not firing full Radix interactions, or we just test if model_type is correct when button is disabled/enabled.
 
     // A more thorough test would engage with the backend list, but for now we just verify the model_type state changes correctly.

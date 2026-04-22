@@ -347,17 +347,23 @@ export function ProviderModelsMutateDialog({
                       </FormLabel>
                       <div className="space-y-1.5">
                         <Tabs
-                          value={field.value}
                           onValueChange={(val) => {
                             field.onChange(val);
                             form.setValue('capabilities', []);
+                            form.setValue('supported_parameters', []);
                           }}
-                          className="w-full sm:max-w-[280px]"
+                          value={field.value}
+                          className="w-full sm:max-w-[420px]"
                         >
-                          <TabsList className="grid w-full grid-cols-2">
+                          <TabsList className="flex h-9 w-full">
                             {MODEL_TYPE_OPTIONS.map((opt) => (
-                              <TabsTrigger key={opt.id} value={opt.id} disabled={mode === 'edit'}>
-                                <opt.icon className="mr-2 h-4 w-4" />
+                              <TabsTrigger
+                                key={opt.id}
+                                value={opt.id}
+                                className="flex-1 px-3 text-sm"
+                                disabled={mode === 'edit'}
+                              >
+                                <opt.icon className="mr-1.5 h-4 w-4" />
                                 {t(opt.i18nLabel, opt.label)}
                               </TabsTrigger>
                             ))}

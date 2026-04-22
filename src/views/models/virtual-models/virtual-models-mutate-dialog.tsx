@@ -235,7 +235,7 @@ export function VirtualModelsMutateDialog({
                 </div>
               )}
 
-              <div className="grid min-h-0 flex-1 grid-cols-1 gap-10 lg:grid-cols-[360px_1fr]">
+              <div className="grid min-h-0 flex-1 grid-cols-1 gap-10 lg:grid-cols-[520px_1fr]">
                 {/* 基础配置区 */}
                 <div className="-mr-4 flex flex-col gap-6 overflow-y-auto pt-1 pr-4 pb-4">
                   <FormField
@@ -274,7 +274,7 @@ export function VirtualModelsMutateDialog({
                           </span>
                         </FormLabel>
                         <div className="space-y-1.5">
-                          <div className="inline-flex h-9 w-full items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
+                          <div className="flex h-9 w-full flex-nowrap items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
                             {MODEL_TYPE_OPTIONS.map((opt) => {
                               const isSelected = field.value === opt.id;
                               return (
@@ -288,14 +288,14 @@ export function VirtualModelsMutateDialog({
                                     }
                                   }}
                                   className={cn(
-                                    'inline-flex flex-1 items-center justify-center rounded-md px-4 py-1 text-sm font-medium whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
+                                    'inline-flex flex-1 items-center justify-center rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
                                     isSelected ? 'bg-background text-foreground shadow-sm' : 'hover:text-foreground',
                                     isUpdate && 'cursor-not-allowed opacity-50',
                                   )}
                                 >
                                   <opt.icon
                                     className={cn(
-                                      'mr-2 h-4 w-4',
+                                      'mr-1.5 h-4 w-4',
                                       isSelected ? 'text-foreground' : 'text-muted-foreground',
                                     )}
                                   />

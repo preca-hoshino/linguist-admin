@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
@@ -8,9 +8,15 @@ import { ProviderModelsMutateDialog } from '../provider-models-mutate-dialog';
 
 // Mock ResizeObserver for Radix UI
 class ResizeObserver {
-  public observe(): void { /* mock */ }
-  public unobserve(): void { /* mock */ }
-  public disconnect(): void { /* mock */ }
+  public observe(): void {
+    /* mock */
+  }
+  public unobserve(): void {
+    /* mock */
+  }
+  public disconnect(): void {
+    /* mock */
+  }
 }
 globalThis.ResizeObserver = ResizeObserver;
 
@@ -25,7 +31,15 @@ vi.mock('../components/ProviderSelector', () => ({
     <div data-testid="provider-selector">
       {/* biome-ignore lint/suspicious/noExplicitAny: mock override */}
       {props.providers.map((p: any) => (
-        <button key={p.id} type="button" onClick={() => { props.onSelect(p.id); }}>{p.name}</button>
+        <button
+          key={p.id}
+          type="button"
+          onClick={() => {
+            props.onSelect(p.id);
+          }}
+        >
+          {p.name}
+        </button>
       ))}
     </div>
   ),
@@ -35,18 +49,16 @@ vi.mock('../components/ProviderSelector', () => ({
 vi.spyOn(providersApi, 'listProviders').mockResolvedValue({
   ok: true,
   data: {
-    data: [
-      { id: 'provider-1', name: 'OpenAI', kind: 'openai', base_url: '', is_active: true },
-    ],
+    data: [{ id: 'provider-1', name: 'OpenAI', kind: 'openai', base_url: '', is_active: true }],
     total: 1,
   },
-// biome-ignore lint/suspicious/noExplicitAny: mock override
+  // biome-ignore lint/suspicious/noExplicitAny: mock override
 } as any);
 
 const mockCreateProviderModel = vi.spyOn(providerModelsApi, 'createProviderModel').mockResolvedValue({
   ok: true,
   data: { id: 'model-1' },
-// biome-ignore lint/suspicious/noExplicitAny: mock override
+  // biome-ignore lint/suspicious/noExplicitAny: mock override
 } as any);
 
 describe('ProviderModelsMutateDialog Integration', () => {
@@ -58,7 +70,7 @@ describe('ProviderModelsMutateDialog Integration', () => {
     return render(
       <QueryClientProvider client={queryClient}>
         <ProviderModelsMutateDialog {...props} />
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
   };
 
@@ -116,5 +128,4 @@ describe('ProviderModelsMutateDialog Integration', () => {
     expect(payload.supported_parameters).toContain('temperature');
     expect(payload.supported_parameters).toContain('top_p');
   });
-
 });
