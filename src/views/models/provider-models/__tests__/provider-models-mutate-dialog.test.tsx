@@ -163,8 +163,8 @@ describe('ProviderModelsMutateDialog Integration', () => {
     // biome-ignore lint/suspicious/noExplicitAny: cast needed since API payload type is wide
     expect((payload as any).capabilities).toContain('stream');
     // biome-ignore lint/suspicious/noExplicitAny: cast needed since API payload type is wide
-    expect((payload as any).supported_parameters).toContain('temperature');
+    expect((payload as any).parameters).toContain('temperature');
     // biome-ignore lint/suspicious/noExplicitAny: cast needed since API payload type is wide
-    expect((payload as any).supported_parameters).toContain('top_p');
+    expect((payload as any).parameters).toContain('top_p');
   });
 });

@@ -12,9 +12,9 @@
     "check:lint": "biome lint src && eslint . --fix --cache --max-warnings 0",
     "check:types": "tsc -b",
     "check:deps": "knip",
-    "check:test": "vitest run --passWithNoTests",
+    "check:test": "vitest run --passWithNoTests --reporter=dot",
     "check": "run-s check:format check:lint check:types check:deps check:test",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage --reporter=dot"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

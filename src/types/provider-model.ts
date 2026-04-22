@@ -8,6 +8,11 @@ export interface ProviderModel {
   parameters: Record<string, unknown>;
   /** 提供商模型级专属配置（如 Copilot 端点覆盖、特殊 Header 等） */
   model_config?: Record<string, unknown>;
+  /** 请求规则重写 */
+  request_overrides?: {
+    headers?: Record<string, string | null>;
+    body?: Record<string, unknown>;
+  } | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
