@@ -21,7 +21,6 @@ import { Input } from '@/components/ui/Input';
 import type { Provider } from '@/types';
 import { cn } from '@/utils/utils';
 import { CredentialSection } from './components/CredentialSection';
-import { CustomHeadersInput } from './components/CustomHeadersInput';
 import { type KindOption, ProviderKindSelector } from './components/ProviderKindSelector';
 import { KIND_OPTIONS } from './constants';
 
@@ -40,14 +39,6 @@ const formSchema = z.object({
   api_key: z.string().optional(),
   // 高级配置
   http_proxy: z.string().optional(),
-  custom_headers: z
-    .array(
-      z.object({
-        key: z.string(),
-        value: z.string(),
-      }),
-    )
-    .optional(),
   // 并发限制（字符串存储，提交时转换为数字或 null）
   rpm_limit: z.string().optional(),
   tpm_limit: z.string().optional(),
@@ -89,7 +80,6 @@ export function ProvidersMutateDialog({
       base_url: KIND_OPTIONS[0]?.defaultBaseUrl ?? '',
       api_key: '',
       http_proxy: '',
-      custom_headers: [],
       rpm_limit: '',
       tpm_limit: '',
     },
@@ -107,10 +97,6 @@ export function ProvidersMutateDialog({
           base_url: currentRow.base_url,
           api_key: currentRow.credential_type === 'api_key' ? (currentRow.credential.key as string) || '' : '',
           http_proxy: currentRow.config.http_proxy,
-          custom_headers:
-            Object.keys(currentRow.config.custom_headers).length > 0
-              ? Object.entries(currentRow.config.custom_headers).map(([k, v]) => ({ key: k, value: v }))
-              : [],
           rpm_limit: currentRow.rpm_limit === null ? '' : String(currentRow.rpm_limit),
           tpm_limit: currentRow.tpm_limit === null ? '' : String(currentRow.tpm_limit),
         });
@@ -124,7 +110,6 @@ export function ProvidersMutateDialog({
           base_url: KIND_OPTIONS[0]?.defaultBaseUrl ?? '',
           api_key: '',
           http_proxy: '',
-          custom_headers: [],
           rpm_limit: '',
           tpm_limit: '',
         });
@@ -142,15 +127,9 @@ export function ProvidersMutateDialog({
 
   const onSubmit = async (data: ProviderForm): Promise<void> => {
     try {
-      // 解析 custom_headers 数组到 Record
-      const customHeaders = Object.fromEntries(
-        (data.custom_headers ?? []).filter((h) => h.key.trim() !== '').map((h) => [h.key.trim(), h.value]),
-      );
-
       const config: Record<string, unknown> = {
         ...currentRow?.config,
         http_proxy: proxyMode === 'custom' ? (data.http_proxy ?? '') : '',
-        custom_headers: customHeaders,
       };
 
       // 判断当前 kind 是否为 copilot
@@ -481,9 +460,6 @@ export function ProvidersMutateDialog({
                     )}
                   </div>
                 </div>
-
-                {/* Custom Headers 抽离后的组件 */}
-                <CustomHeadersInput form={form} name="custom_headers" />
 
                 {/* 并发限制 */}
                 <div className="grid grid-cols-[140px_1fr] items-center gap-5">

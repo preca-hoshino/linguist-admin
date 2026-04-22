@@ -10,7 +10,6 @@ export interface Provider {
   credential: Record<string, unknown>;
   /** 高级配置 */
   config: {
-    custom_headers: Record<string, string>;
     http_proxy: string;
     [key: string]: unknown;
   };
