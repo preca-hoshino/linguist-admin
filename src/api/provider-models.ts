@@ -46,6 +46,10 @@ export const createProviderModel = async (data: {
   parameters?: Record<string, unknown>;
   /** 提供商模型级专属配置（如 Copilot 端点覆盖、特殊 Header 等） */
   model_config?: Record<string, unknown>;
+  request_overrides?: {
+    headers?: Record<string, string | null>;
+    body?: Record<string, string | null>;
+  } | null;
   rpm_limit?: number | null | undefined;
   tpm_limit?: number | null | undefined;
   max_tokens?: number;
@@ -63,6 +67,10 @@ export const updateProviderModel = async (
     parameters: Record<string, unknown>;
     /** 提供商模型级专属配置（如 Copilot 端点覆盖、特殊 Header 等） */
     model_config: Record<string, unknown>;
+    request_overrides: {
+      headers?: Record<string, string | null>;
+      body?: Record<string, string | null>;
+    } | null;
     is_active: boolean;
     rpm_limit?: number | null | undefined;
     tpm_limit?: number | null | undefined;
