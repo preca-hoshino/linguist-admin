@@ -1,6 +1,6 @@
 import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine } from '@lobehub/icons';
 import { useRouter } from '@tanstack/react-router';
-import { FileCode, Globe, Key, Network, Pencil, Plus } from 'lucide-react';
+import { Globe, Key, Network, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/Badge';
@@ -156,20 +156,6 @@ export function ProviderSettingsTab({ provider }: ProviderSettingsTabProps): Rea
                   <code className="rounded bg-muted px-2 py-1 font-mono text-xs">{provider.config.http_proxy}</code>
                 ) : (
                   <span className="text-sm text-muted-foreground">{t('common.disabled', 'Disabled')}</span>
-                )}
-              </DetailRow>
-              <DetailRow label={t('modelsPage.providers.customHeaders', 'Custom Headers')} icon={FileCode}>
-                {Object.keys(provider.config.custom_headers).length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {Object.entries(provider.config.custom_headers).map(([k, v]) => (
-                      <code key={k} className="inline-flex gap-1.5 rounded bg-muted px-2 py-1 font-mono text-xs">
-                        <span className="text-muted-foreground opacity-70">{k}:</span>
-                        <span>{v}</span>
-                      </code>
-                    ))}
-                  </div>
-                ) : (
-                  <span className="text-sm text-muted-foreground">—</span>
                 )}
               </DetailRow>
             </div>

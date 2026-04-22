@@ -37,6 +37,10 @@ export interface CreateProviderPayload {
   credential_type?: 'api_key' | 'oauth2' | 'copilot' | 'none';
   credential?: Record<string, unknown>;
   config?: Partial<Provider['config']>;
+  /** 提供商级 RPM 限制（null = 清除限制） */
+  rpm_limit?: number | null;
+  /** 提供商级 TPM 限制（null = 清除限制） */
+  tpm_limit?: number | null;
 }
 
 /** 更新提供商的请求体 */

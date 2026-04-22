@@ -1,7 +1,7 @@
-﻿/* eslint-disable sonarjs/cognitive-complexity */
+/* eslint-disable sonarjs/cognitive-complexity */
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine } from '@lobehub/icons';
-import { Globe, Network, Type, X } from 'lucide-react';
+import { Activity, Globe, Network, Timer, Type, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +21,6 @@ import { Input } from '@/components/ui/Input';
 import type { Provider } from '@/types';
 import { cn } from '@/utils/utils';
 import { CredentialSection } from './components/CredentialSection';
-import { CustomHeadersInput } from './components/CustomHeadersInput';
 import { type KindOption, ProviderKindSelector } from './components/ProviderKindSelector';
 import { KIND_OPTIONS } from './constants';
 
@@ -40,14 +39,9 @@ const formSchema = z.object({
   api_key: z.string().optional(),
   // 高级配置
   http_proxy: z.string().optional(),
-  custom_headers: z
-    .array(
-      z.object({
-        key: z.string(),
-        value: z.string(),
-      }),
-    )
-    .optional(),
+  // 并发限制（字符串存储，提交时转换为数字或 null）
+  rpm_limit: z.string().optional(),
+  tpm_limit: z.string().optional(),
 });
 
 export type ProviderForm = z.infer<typeof formSchema>;
@@ -86,7 +80,8 @@ export function ProvidersMutateDialog({
       base_url: KIND_OPTIONS[0]?.defaultBaseUrl ?? '',
       api_key: '',
       http_proxy: '',
-      custom_headers: [],
+      rpm_limit: '',
+      tpm_limit: '',
     },
   });
 
@@ -102,10 +97,8 @@ export function ProvidersMutateDialog({
           base_url: currentRow.base_url,
           api_key: currentRow.credential_type === 'api_key' ? (currentRow.credential.key as string) || '' : '',
           http_proxy: currentRow.config.http_proxy,
-          custom_headers:
-            Object.keys(currentRow.config.custom_headers).length > 0
-              ? Object.entries(currentRow.config.custom_headers).map(([k, v]) => ({ key: k, value: v }))
-              : [],
+          rpm_limit: currentRow.rpm_limit === null ? '' : String(currentRow.rpm_limit),
+          tpm_limit: currentRow.tpm_limit === null ? '' : String(currentRow.tpm_limit),
         });
         setTimeout(() => {
           setProxyMode(currentRow.config.http_proxy ? 'custom' : 'off');
@@ -117,7 +110,8 @@ export function ProvidersMutateDialog({
           base_url: KIND_OPTIONS[0]?.defaultBaseUrl ?? '',
           api_key: '',
           http_proxy: '',
-          custom_headers: [],
+          rpm_limit: '',
+          tpm_limit: '',
         });
         setTimeout(() => {
           setProxyMode('off');
@@ -133,15 +127,9 @@ export function ProvidersMutateDialog({
 
   const onSubmit = async (data: ProviderForm): Promise<void> => {
     try {
-      // 解析 custom_headers 数组到 Record
-      const customHeaders = Object.fromEntries(
-        (data.custom_headers ?? []).filter((h) => h.key.trim() !== '').map((h) => [h.key.trim(), h.value]),
-      );
-
       const config: Record<string, unknown> = {
         ...currentRow?.config,
         http_proxy: proxyMode === 'custom' ? (data.http_proxy ?? '') : '',
-        custom_headers: customHeaders,
       };
 
       // 判断当前 kind 是否为 copilot
@@ -151,11 +139,20 @@ export function ProvidersMutateDialog({
         config.github_info = copilotAuthData.user;
       }
 
+      const rpmParsed =
+        data.rpm_limit !== '' && data.rpm_limit !== undefined ? Number.parseInt(data.rpm_limit, 10) : null;
+      const tpmParsed =
+        data.tpm_limit !== '' && data.tpm_limit !== undefined ? Number.parseInt(data.tpm_limit, 10) : null;
+      const rpmLimitVal = rpmParsed !== null && !Number.isNaN(rpmParsed) && rpmParsed > 0 ? rpmParsed : null;
+      const tpmLimitVal = tpmParsed !== null && !Number.isNaN(tpmParsed) && tpmParsed > 0 ? tpmParsed : null;
+
       if (currentRow) {
         const payload: Record<string, unknown> = {
           name: data.name,
           kind: data.kind,
           config,
+          rpm_limit: rpmLimitVal,
+          tpm_limit: tpmLimitVal,
         };
 
         if (isCopilotKind) {
@@ -191,6 +188,8 @@ export function ProvidersMutateDialog({
             credential_type: 'copilot',
             credential: { accessToken: copilotAuthData.accessToken },
             config,
+            rpm_limit: rpmLimitVal,
+            tpm_limit: tpmLimitVal,
           });
         } else {
           // API Key 创建模式：必须有 base_url
@@ -205,6 +204,8 @@ export function ProvidersMutateDialog({
             credential_type: 'api_key',
             credential: { key: data.api_key ?? '' },
             config,
+            rpm_limit: rpmLimitVal,
+            tpm_limit: tpmLimitVal,
           });
         }
       }
@@ -224,7 +225,9 @@ export function ProvidersMutateDialog({
 
   const handleSelectOption = (opt: KindOption): void => {
     form.setValue('kind', opt.value, { shouldValidate: true });
-    if (!isUpdate) {
+    // 创建模式和编辑模式（base_url 为空时）均自动填充默认 base_url
+    const currentBaseUrl = form.getValues('base_url') ?? '';
+    if (!isUpdate || currentBaseUrl === '') {
       form.setValue('base_url', opt.defaultBaseUrl ?? '', { shouldValidate: true });
     }
   };
@@ -458,8 +461,60 @@ export function ProvidersMutateDialog({
                   </div>
                 </div>
 
-                {/* Custom Headers 抽离后的组件 */}
-                <CustomHeadersInput form={form} name="custom_headers" />
+                {/* 并发限制 */}
+                <div className="grid grid-cols-[140px_1fr] items-center gap-5">
+                  <div className="flex items-center justify-start gap-2 text-sm text-muted-foreground">
+                    <Activity className="h-3.5 w-3.5" />
+                    <span className="font-medium text-foreground">RPM Limit</span>
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="rpm_limit"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="number"
+                            min="1"
+                            step="1"
+                            placeholder="No limit"
+                            className="h-9 w-40"
+                            value={field.value ?? ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-[140px_1fr] items-center gap-5">
+                  <div className="flex items-center justify-start gap-2 text-sm text-muted-foreground">
+                    <Timer className="h-3.5 w-3.5" />
+                    <span className="font-medium text-foreground">TPM Limit</span>
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="tpm_limit"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="number"
+                            min="1"
+                            step="1"
+                            placeholder="No limit"
+                            className="h-9 w-40"
+                            value={field.value ?? ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
             </form>
           </Form>

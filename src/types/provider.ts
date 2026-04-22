@@ -10,7 +10,6 @@ export interface Provider {
   credential: Record<string, unknown>;
   /** 高级配置 */
   config: {
-    custom_headers: Record<string, string>;
     http_proxy: string;
     [key: string]: unknown;
   };
@@ -19,6 +18,10 @@ export interface Provider {
    * 前端可据此过滤模型类别选型。
    */
   supported_model_types: string[];
+  /** 提供商级 RPM 并发限制（null = 无限制） */
+  rpm_limit: number | null;
+  /** 提供商级 TPM 并发限制（null = 无限制） */
+  tpm_limit: number | null;
   created_at: string;
   updated_at: string;
 }
