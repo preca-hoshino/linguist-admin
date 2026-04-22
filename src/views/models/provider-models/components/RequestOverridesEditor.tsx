@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
+
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 
 interface RequestOverridesEditorProps {
@@ -23,7 +23,7 @@ export function RequestOverridesEditor({
   });
 
   const [activeTab, setActiveTab] = useState<'header' | 'body'>('header');
-  const watchData = (useWatch({ control, name }) as Array<{ type?: string; action?: string }> | undefined) ?? [];
+  const watchData = (useWatch({ control, name }) as Array<{ type?: string }> | undefined) ?? [];
 
   const visibleCount = fields.filter((f, index) => {
     const t = watchData[index]?.type ?? (f as { type?: string }).type;
@@ -86,38 +86,15 @@ export function RequestOverridesEditor({
               />
               <FormField
                 control={control}
-                name={`${name}.${index}.action`}
-                render={({ field: vField }) => (
-                  <FormItem className="w-24 shrink-0 space-y-0">
-                    <Select onValueChange={vField.onChange} value={vField.value as string}>
-                      <FormControl>
-                        <SelectTrigger className="h-9">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="override">{t('common.override', '覆盖')}</SelectItem>
-                        <SelectItem value="delete">{t('common.delete', '删除')}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
                 name={`${name}.${index}.value`}
                 render={({ field: vField }) => {
-                  const action = watchData[index]?.action ?? 'override';
-                  if (action === 'delete') {
-                    return <div className="flex-1" />;
-                  }
                   return (
                     <FormItem className="flex-1 space-y-0">
                       <FormControl>
                         <Input
                           {...vField}
                           value={vField.value !== undefined && vField.value !== null ? String(vField.value) : ''}
-                          placeholder={t('common.value', '值')}
+                          placeholder={t('common.value', '留空代表删除该字段')}
                           className="h-9"
                         />
                       </FormControl>
@@ -142,10 +119,9 @@ export function RequestOverridesEditor({
         <Button
           type="button"
           variant="outline"
-          size="sm"
-          className="mt-2"
+          className="mt-2 w-full border-dashed"
           onClick={() => {
-            append({ type: activeTab, key: '', action: 'override', value: '' });
+            append({ type: activeTab, key: '', value: '' });
           }}
         >
           <Plus className="mr-2 h-4 w-4" />

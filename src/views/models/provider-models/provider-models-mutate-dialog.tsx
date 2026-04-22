@@ -31,7 +31,6 @@ import { MODEL_TYPE_OPTIONS } from './constants';
 const RequestOverrideUIRowSchema = z.object({
   type: z.enum(['header', 'body']),
   key: z.string().min(1),
-  action: z.enum(['override', 'delete']),
   value: z.string().optional(),
 });
 
@@ -70,9 +69,7 @@ interface ProviderModelsMutateDialogProps {
 }
 
 function buildRequestOverridesPayload(
-  uiOverrides:
-    | Array<{ type: 'header' | 'body'; key: string; action: 'override' | 'delete'; value?: string | undefined }>
-    | undefined,
+  uiOverrides: Array<{ type: 'header' | 'body'; key: string; value?: string | undefined }> | undefined,
 ): { headers?: Record<string, string | null>; body?: Record<string, string | null> } | null {
   if (!uiOverrides || uiOverrides.length === 0) {
     return null;
@@ -83,7 +80,7 @@ function buildRequestOverridesPayload(
   };
   for (const item of uiOverrides) {
     const dict = item.type === 'header' ? overrides.headers : overrides.body;
-    dict[item.key] = item.action === 'delete' ? null : (item.value ?? '');
+    dict[item.key] = item.value === undefined || item.value.trim() === '' ? null : item.value;
   }
   let hasOverrides = false;
   if (Object.keys(overrides.headers).length > 0) {
@@ -214,7 +211,6 @@ export function ProviderModelsMutateDialog({
     const overridesUi: Array<{
       type: 'header' | 'body';
       key: string;
-      action: 'override' | 'delete';
       value: string;
     }> = [];
     const overrides = currentRow.request_overrides;
@@ -225,7 +221,6 @@ export function ProviderModelsMutateDialog({
         overridesUi.push({
           type: 'header',
           key: k,
-          action: v === null ? 'delete' : 'override',
           value: v ?? '',
         });
       }
@@ -233,7 +228,6 @@ export function ProviderModelsMutateDialog({
         overridesUi.push({
           type: 'body',
           key: k,
-          action: v === null ? 'delete' : 'override',
           value: v ?? '',
         });
       }
