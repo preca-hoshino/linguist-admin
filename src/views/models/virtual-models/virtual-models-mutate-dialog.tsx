@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import type { ProviderModel, VirtualModel } from '@/types';
 import { cn } from '@/utils/utils';
 import { SortableBackendList } from './components/SortableBackendList';
-import { MODEL_TYPE_OPTIONS } from './constants';
+import { MODEL_TYPE_OPTIONS } from '@/views/models/provider-models/constants';
 
 interface VirtualModelsMutateDialogProps {
   readonly open: boolean;
