@@ -264,6 +264,29 @@ export function VirtualModelsMutateDialog({
 
                   <FormField
                     control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                          <Type className="h-3.5 w-3.5" />
+                          <span className="font-medium text-foreground">{t('common.description', 'Description')}</span>
+                        </FormLabel>
+                        <div className="space-y-1.5">
+                          <FormControl>
+                            <Input
+                              {...field}
+                              value={field.value ?? ''}
+                              placeholder={t('common.descriptionPlaceholder', 'Optional details about this model...')}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
                     name="model_type"
                     render={({ field }) => (
                       <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">

@@ -131,7 +131,7 @@ export function LogRawDataTab({ log }: LogRawDataTabProps): React.JSX.Element {
         accentClass="bg-emerald-400"
       />
 
-      {log.cost_breakdown && (
+      {ctx?.billing?.costBreakdown && (
         <JsonCard
           title={t('modelsPage.logs.detail.costBreakdown', '计费明细')}
           subtitle={
@@ -142,7 +142,7 @@ export function LogRawDataTab({ log }: LogRawDataTabProps): React.JSX.Element {
                   defaultValue: `总费用: ¥${Number(log.calculated_cost).toFixed(6)}`,
                 })
           }
-          data={log.cost_breakdown}
+          data={ctx.billing.costBreakdown}
           accentClass="bg-rose-400"
         />
       )}

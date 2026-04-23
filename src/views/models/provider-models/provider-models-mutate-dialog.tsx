@@ -287,7 +287,6 @@ export function ProviderModelsMutateDialog({
         model_type: values.type as 'chat' | 'embedding',
         max_tokens: values.max_tokens * 1000,
         capabilities: values.capabilities,
-        parameters: values.supported_parameters as unknown as Record<string, unknown>,
         pricing_tiers: values.pricing_tiers.map((t, index) => ({
           ...t,
           start_tokens: t.start_tokens * 1000,
