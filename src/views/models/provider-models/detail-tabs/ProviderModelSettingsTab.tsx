@@ -181,17 +181,6 @@ export function ProviderModelSettingsTab({ model }: ProviderModelSettingsTabProp
                   <span className="text-sm text-muted-foreground">—</span>
                 )}
               </DetailRow>
-              <DetailRow label={t('modelsPage.providerModels.detailPage.parameters', 'Parameters')}>
-                {Object.keys(model.parameters).length > 0 ? (
-                  <pre className="max-h-48 overflow-auto rounded bg-muted px-3 py-2 font-mono text-xs">
-                    {JSON.stringify(model.parameters, null, 2)}
-                  </pre>
-                ) : (
-                  <span className="text-sm text-muted-foreground">
-                    {t('modelsPage.providerModels.detailPage.noParameters', 'No custom parameters')}
-                  </span>
-                )}
-              </DetailRow>
             </div>
           </div>
         </div>

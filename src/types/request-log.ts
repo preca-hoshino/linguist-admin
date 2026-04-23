@@ -188,8 +188,6 @@ export interface RequestLog {
   gateway_context: GatewayContextSnapshot | null;
   /** 后置计费总额（PostgreSQL numeric 类型，可能以字符串返回） */
   calculated_cost: number | string | null;
-  /** 计费明细快照 */
-  cost_breakdown: CostBreakdown | null;
 }
 
 export interface CostBreakdown {

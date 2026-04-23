@@ -43,7 +43,6 @@ export const createProviderModel = async (data: {
   name: string;
   model_type: string;
   capabilities?: string[];
-  parameters?: Record<string, unknown>;
   /** 提供商模型级专属配置（如 Copilot 端点覆盖、特殊 Header 等） */
   model_config?: Record<string, unknown>;
   request_overrides?: {
@@ -64,7 +63,6 @@ export const updateProviderModel = async (
     name: string;
     model_type: string;
     capabilities: string[];
-    parameters: Record<string, unknown>;
     /** 提供商模型级专属配置（如 Copilot 端点覆盖、特殊 Header 等） */
     model_config: Record<string, unknown>;
     request_overrides: {
