@@ -31,13 +31,13 @@ export const listMcpLogs = async (params?: {
   }
 
   const queryStr = qs.toString() ? `?${qs.toString()}` : '';
-  return await request<ListResponse<McpLog>>('GET', `/mcp-logs${queryStr}`);
+  return await request<ListResponse<McpLog>>('GET', `/mcp/logs${queryStr}`);
 };
 
 export const getMcpLog = async (id: string): Promise<ApiResult<McpLog>> => {
-  return await request<McpLog>('GET', `/mcp-logs/${id}`);
+  return await request<McpLog>('GET', `/mcp/logs/${id}`);
 };
 
 export const deleteMcpLog = async (id: string): Promise<ApiResult<{ id: string; deleted: boolean }>> => {
-  return await request<{ id: string; deleted: boolean }>('DELETE', `/mcp-logs/${id}`);
+  return await request<{ id: string; deleted: boolean }>('DELETE', `/mcp/logs/${id}`);
 };

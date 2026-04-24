@@ -35,22 +35,22 @@ function buildStatsQuery(params?: StatsParams): string {
 }
 
 export const getStatsOverview = async (params?: StatsParams): Promise<ApiResult<StatsOverview>> =>
-  await request<StatsOverview>('GET', `/stats/overview${buildStatsQuery(params)}`);
+  await request<StatsOverview>('GET', `/model/stats/overview${buildStatsQuery(params)}`);
 
 export const getStatsTimeSeries = async (params?: StatsParams): Promise<ApiResult<TimeSeriesResult>> =>
-  await request<TimeSeriesResult>('GET', `/stats/time-series${buildStatsQuery(params)}`);
+  await request<TimeSeriesResult>('GET', `/model/stats/time-series${buildStatsQuery(params)}`);
 
 export const getStatsErrors = async (params?: StatsParams): Promise<ApiResult<StatsErrors>> =>
-  await request<StatsErrors>('GET', `/stats/errors${buildStatsQuery(params)}`);
+  await request<StatsErrors>('GET', `/model/stats/errors${buildStatsQuery(params)}`);
 
 export const getStatsTokens = async (params?: StatsParams): Promise<ApiResult<StatsTokens>> =>
-  await request<StatsTokens>('GET', `/stats/tokens${buildStatsQuery(params)}`);
+  await request<StatsTokens>('GET', `/model/stats/tokens${buildStatsQuery(params)}`);
 
 export const getStatsToday = async (params?: {
   dimension?: StatsDimension;
   id?: string;
 }): Promise<ApiResult<StatsToday>> =>
-  await request<StatsToday>('GET', `/stats/today${buildStatsQuery(params as StatsParams)}`);
+  await request<StatsToday>('GET', `/model/stats/today${buildStatsQuery(params as StatsParams)}`);
 
 export const getStatsBreakdown = async (
   params: StatsParams & { group_by: StatsBreakdownGroupBy },
@@ -61,7 +61,7 @@ export const getStatsBreakdown = async (
   const sep = qs ? '&' : '?';
   return await request<StatsBreakdown>(
     'GET',
-    `/stats/breakdown${qs}${sep}group_by=${group_by}`,
+    `/model/stats/breakdown${qs}${sep}group_by=${group_by}`,
     undefined,
     signal ? { signal } : undefined,
   );

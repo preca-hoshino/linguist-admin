@@ -2,7 +2,7 @@ import type { ApiResult, DeletedResponse, ListResponse, PricingTier, ProviderMod
 import { request } from '../client';
 
 export const getProviderModel = async (id: string): Promise<ApiResult<ProviderModel>> => {
-  return await request<ProviderModel>('GET', `/provider-models/${id}`);
+  return await request<ProviderModel>('GET', `/model/provider-models/${id}`);
 };
 
 export const listProviderModels = async (params?: {
@@ -34,7 +34,7 @@ export const listProviderModels = async (params?: {
   }
   const query = qs.toString();
   const queryStr = query ? `?${query}` : '';
-  return await request<ListResponse<ProviderModel>>('GET', `/provider-models${queryStr}`);
+  return await request<ListResponse<ProviderModel>>('GET', `/model/provider-models${queryStr}`);
 };
 
 export const createProviderModel = async (data: {
@@ -54,7 +54,7 @@ export const createProviderModel = async (data: {
   max_tokens?: number;
   pricing_tiers?: PricingTier[];
 }): Promise<ApiResult<ProviderModel>> => {
-  return await request<ProviderModel>('POST', '/provider-models', data);
+  return await request<ProviderModel>('POST', '/model/provider-models', data);
 };
 
 export const updateProviderModel = async (
@@ -76,9 +76,9 @@ export const updateProviderModel = async (
     pricing_tiers?: PricingTier[];
   }>,
 ): Promise<ApiResult<ProviderModel>> => {
-  return await request<ProviderModel>('PATCH', `/provider-models/${id}`, data);
+  return await request<ProviderModel>('PATCH', `/model/provider-models/${id}`, data);
 };
 
 export const deleteProviderModel = async (id: string): Promise<ApiResult<DeletedResponse>> => {
-  return await request<DeletedResponse>('DELETE', `/provider-models/${id}`);
+  return await request<DeletedResponse>('DELETE', `/model/provider-models/${id}`);
 };

@@ -22,11 +22,11 @@ export const listProviders = async (params?: {
   }
   const query = qs.toString();
   const queryStr = query ? `?${query}` : '';
-  return await request<ListResponse<Provider>>('GET', `/providers${queryStr}`);
+  return await request<ListResponse<Provider>>('GET', `/model/providers${queryStr}`);
 };
 
 export const getProvider = async (id: string): Promise<ApiResult<Provider>> => {
-  return await request<Provider>('GET', `/providers/${id}`);
+  return await request<Provider>('GET', `/model/providers/${id}`);
 };
 
 /** 创建提供商的请求体 */
@@ -47,15 +47,15 @@ export interface CreateProviderPayload {
 export type UpdateProviderPayload = Partial<CreateProviderPayload>;
 
 export const createProvider = async (data: CreateProviderPayload): Promise<ApiResult<Provider>> => {
-  return await request<Provider>('POST', '/providers', data);
+  return await request<Provider>('POST', '/model/providers', data);
 };
 
 export const updateProvider = async (id: string, data: UpdateProviderPayload): Promise<ApiResult<Provider>> => {
-  return await request<Provider>('PATCH', `/providers/${id}`, data);
+  return await request<Provider>('PATCH', `/model/providers/${id}`, data);
 };
 
 export const deleteProvider = async (id: string): Promise<ApiResult<DeletedResponse>> => {
-  return await request<DeletedResponse>('DELETE', `/providers/${id}`);
+  return await request<DeletedResponse>('DELETE', `/model/providers/${id}`);
 };
 
 // ===== Copilot OAuth Device Flow API =====
@@ -88,7 +88,7 @@ export interface CopilotVerifyResponse {
 
 /** 发起 Copilot OAuth Device Flow */
 export const copilotCreateDeviceCode = async (): Promise<ApiResult<CopilotDeviceCodeResponse>> =>
-  await request<CopilotDeviceCodeResponse>('POST', '/oauth/copilot/device-codes');
+  await request<CopilotDeviceCodeResponse>('POST', '/model/oauth/copilot/device-codes');
 
 /**
  * 轮询 OAuth 授权状态，尝试换取 access_token
@@ -99,10 +99,10 @@ export const copilotPollToken = async (
   deviceCode: string,
   providerId?: string,
 ): Promise<ApiResult<CopilotPollTokenResponse>> =>
-  await request<CopilotPollTokenResponse>('POST', `/oauth/copilot/device-codes/${deviceCode}/poll`, {
+  await request<CopilotPollTokenResponse>('POST', `/model/oauth/copilot/device-codes/${deviceCode}/poll`, {
     ...(providerId !== undefined && providerId !== '' ? { provider_id: providerId } : {}),
   });
 
 /** 验证 provider 凭证是否仍然有效 */
 export const copilotVerifyToken = async (providerId: string): Promise<ApiResult<CopilotVerifyResponse>> =>
-  await request<CopilotVerifyResponse>('POST', '/oauth/copilot/verify', { provider_id: providerId });
+  await request<CopilotVerifyResponse>('POST', '/model/oauth/copilot/verify', { provider_id: providerId });

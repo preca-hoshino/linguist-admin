@@ -70,10 +70,10 @@ function buildMcpStatsQuery(params?: McpStatsParams): string {
 // ── API 调用  ──────────────────────────────────────────────────────────────
 
 export const getMcpStatsOverview = async (params?: McpStatsParams): Promise<ApiResult<McpStatsOverview>> =>
-  await request<McpStatsOverview>('GET', `/mcp-stats/overview${buildMcpStatsQuery(params)}`);
+  await request<McpStatsOverview>('GET', `/mcp/stats/overview${buildMcpStatsQuery(params)}`);
 
 export const getMcpStatsTimeSeries = async (params?: McpStatsParams): Promise<ApiResult<McpTimeSeriesResult>> =>
-  await request<McpTimeSeriesResult>('GET', `/mcp-stats/time-series${buildMcpStatsQuery(params)}`);
+  await request<McpTimeSeriesResult>('GET', `/mcp/stats/time-series${buildMcpStatsQuery(params)}`);
 
 export const getMcpMethodBreakdown = async (params?: McpStatsParams): Promise<ApiResult<McpMethodBreakdownResult>> =>
-  await request<McpMethodBreakdownResult>('GET', `/mcp-stats/methods${buildMcpStatsQuery(params)}`);
+  await request<McpMethodBreakdownResult>('GET', `/mcp/stats/methods${buildMcpStatsQuery(params)}`);

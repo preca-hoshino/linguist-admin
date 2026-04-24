@@ -24,13 +24,13 @@ export const listRequestLogs = async (params?: {
   }
   const query = qs.toString();
   const queryStr = query ? `?${query}` : '';
-  return await request<RequestLogList>('GET', `/request-logs${queryStr}`);
+  return await request<RequestLogList>('GET', `/model/logs${queryStr}`);
 };
 
 export const getRequestLog = async (id: string): Promise<ApiResult<RequestLog>> => {
-  return await request<RequestLog>('GET', `/request-logs/${id}`);
+  return await request<RequestLog>('GET', `/model/logs/${id}`);
 };
 
 export const deleteRequestLog = async (id: string): Promise<ApiResult<DeletedResponse>> => {
-  return await request<DeletedResponse>('DELETE', `/request-logs/${id}`);
+  return await request<DeletedResponse>('DELETE', `/model/logs/${id}`);
 };
