@@ -4,7 +4,7 @@ import type { Row } from '@tanstack/react-table';
 import { FileText, Pencil, Power, PowerOff, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { updateVirtualModel } from '@/api/virtual-models';
+import { updateVirtualModel } from '@/api/model/virtual-models';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,

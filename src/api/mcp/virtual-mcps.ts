@@ -1,6 +1,6 @@
-import type { ApiResult, DeletedResponse, ListResponse } from '../types';
-import type { VirtualMcp, VirtualMcpCreateInput, VirtualMcpUpdateInput } from '../types/mcp';
-import { request } from './client';
+import type { ApiResult, DeletedResponse, ListResponse } from '../../types';
+import type { VirtualMcp, VirtualMcpCreateInput, VirtualMcpUpdateInput } from '../../types/mcp';
+import { request } from '../client';
 
 export const listVirtualMcps = async (params?: {
   limit?: number;

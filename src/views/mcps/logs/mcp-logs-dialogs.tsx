@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { deleteMcpLog } from '@/api/mcp-logs';
+import { deleteMcpLog } from '@/api/mcp/logs';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { useMcpLogs } from './mcp-logs-context';
 

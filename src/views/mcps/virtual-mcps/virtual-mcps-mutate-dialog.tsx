@@ -26,7 +26,7 @@ import type {
   McpToolInfo,
   VirtualMcpConfig,
 } from '@/types/mcp';
-import { listMcpProviders, listMcpProviderTools } from '@/api/mcp-providers';
+import { listMcpProviders, listMcpProviderTools } from '@/api/mcp/provider-mcps';
 
 const virtualMcpSchema = z.object({
   name: z

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { deleteVirtualModel } from '@/api/virtual-models';
+import { deleteVirtualModel } from '@/api/model/virtual-models';
 import {
   AlertDialog,
   AlertDialogAction,

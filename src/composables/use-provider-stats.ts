@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getStatsOverview, getStatsToday } from '@/api/stats';
+import { getStatsOverview, getStatsToday } from '@/api/model/stats';
 import type { StatsDimension, StatsOverview, StatsRange, StatsToday } from '@/types';
 
 const POLL_INTERVAL_MS = 60_000;

@@ -1,5 +1,5 @@
-import type { ApiResult, DeletedResponse, RequestLog, RequestLogList } from '../types';
-import { request } from './client';
+import type { ApiResult, DeletedResponse, RequestLog, RequestLogList } from '../../types';
+import { request } from '../client';
 
 export const listRequestLogs = async (params?: {
   status?: string;

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import JsonView from 'react18-json-view';
 import 'react18-json-view/src/style.css';
 
-import { listMcpProviderTools } from '@/api/mcp-providers';
+import { listMcpProviderTools } from '@/api/mcp/provider-mcps';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';

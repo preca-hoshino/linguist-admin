@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { listMcpProviders } from '@/api/mcp-providers';
+import { listMcpProviders } from '@/api/mcp/provider-mcps';
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { getVirtualMcpsColumns } from './virtual-mcps-columns';

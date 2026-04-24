@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { deleteRequestLog } from '@/api/request-logs';
+import { deleteRequestLog } from '@/api/model/logs';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { useLogs } from './logs-context';
 

@@ -2,7 +2,7 @@ import type { ColumnFiltersState, PaginationState } from '@tanstack/react-table'
 import type React from 'react';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { McpProvider, McpProviderCreateInput, McpProviderUpdateInput } from '@/types/mcp';
-import { listMcpProviders, createMcpProvider, updateMcpProvider, deleteMcpProvider } from '@/api/mcp-providers';
+import { listMcpProviders, createMcpProvider, updateMcpProvider, deleteMcpProvider } from '@/api/mcp/provider-mcps';
 
 interface ProvidersContextType {
   providers: McpProvider[];

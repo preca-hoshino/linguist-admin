@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { getStatsOverview, getStatsToday } from '@/api/stats';
+import { getStatsOverview, getStatsToday } from '@/api/model/stats';
 import { useProviderStats } from '../use-provider-stats';
 
-vi.mock('@/api/stats');
+vi.mock('@/api/model/stats');
 
 describe('useProviderStats', () => {
   beforeEach(() => {

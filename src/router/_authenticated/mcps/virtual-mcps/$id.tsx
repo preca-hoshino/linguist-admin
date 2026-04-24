@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getVirtualMcp } from '@/api/mcp-virtual-servers';
+import { getVirtualMcp } from '@/api/mcp/virtual-mcps';
 import { VirtualMcpDetailPage } from '@/views/mcps/virtual-mcps/virtual-mcp-detail-page';
 
 export const Route = createFileRoute('/_authenticated/mcps/virtual-mcps/$id')({

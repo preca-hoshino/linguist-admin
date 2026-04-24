@@ -9,8 +9,8 @@ import type {
   StatsToday,
   StatsTokens,
   TimeSeriesResult,
-} from '../types';
-import { request } from './client';
+} from '../../types';
+import { request } from '../client';
 
 export interface StatsParams {
   range?: StatsRange;

@@ -1,7 +1,7 @@
 import type { ColumnFiltersState, PaginationState } from '@tanstack/react-table';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { listProviderModels } from '@/api/provider-models';
+import { listProviderModels } from '@/api/model/provider-models';
 import { useDialogState } from '@/composables/use-dialog-state';
 import type { ProviderModel } from '@/types';
 

@@ -1,7 +1,7 @@
 import type { ColumnFiltersState, PaginationState } from '@tanstack/react-table';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { listVirtualModels } from '@/api/virtual-models';
+import { listVirtualModels } from '@/api/model/virtual-models';
 import { useDialogState } from '@/composables/use-dialog-state';
 import type { VirtualModel } from '@/types';
 

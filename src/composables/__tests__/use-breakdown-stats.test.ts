@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/consistent-type-assertions */
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { getStatsBreakdown } from '@/api/stats';
+import { getStatsBreakdown } from '@/api/model/stats';
 import { type TimeRange, useBreakdownStats } from '../use-breakdown-stats';
 
-vi.mock('@/api/stats');
+vi.mock('@/api/model/stats');
 
 const noop = (): void => {
   /* init */

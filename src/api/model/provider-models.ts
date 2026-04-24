@@ -1,5 +1,5 @@
-import type { ApiResult, DeletedResponse, ListResponse, PricingTier, ProviderModel } from '../types';
-import { request } from './client';
+import type { ApiResult, DeletedResponse, ListResponse, PricingTier, ProviderModel } from '../../types';
+import { request } from '../client';
 
 export const getProviderModel = async (id: string): Promise<ApiResult<ProviderModel>> => {
   return await request<ProviderModel>('GET', `/provider-models/${id}`);

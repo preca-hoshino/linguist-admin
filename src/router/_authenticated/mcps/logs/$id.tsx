@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getMcpLog } from '@/api/mcp-logs';
+import { getMcpLog } from '@/api/mcp/logs';
 import { McpLogDetailPage } from '@/views/mcps/logs/log-detail-page';
 
 export const Route = createFileRoute('/_authenticated/mcps/logs/$id')({

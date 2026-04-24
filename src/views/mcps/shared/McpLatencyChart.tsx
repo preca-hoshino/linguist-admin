@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import type { McpStatsTimeSeriesPoint } from '@/api/mcp-stats';
+import type { McpStatsTimeSeriesPoint } from '@/api/mcp/stats';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { getTickInterval, type TimeRange } from '@/composables/use-usage-chart';
 

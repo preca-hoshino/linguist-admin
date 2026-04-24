@@ -1,6 +1,6 @@
-import type { ApiResult, ListResponse } from '../types';
-import type { McpLog } from '../types/mcp';
-import { request } from './client';
+import type { ApiResult, ListResponse } from '../../types';
+import type { McpLog } from '../../types/mcp';
+import { request } from '../client';
 
 export const listMcpLogs = async (params?: {
   limit?: number;

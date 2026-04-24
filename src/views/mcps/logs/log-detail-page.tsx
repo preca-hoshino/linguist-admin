@@ -3,7 +3,7 @@ import { ArrowRight, ChevronLeft, Clock, Cloud, Code2, Database, FileText, Trash
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { deleteMcpLog } from '@/api/mcp-logs';
+import { deleteMcpLog } from '@/api/mcp/logs';
 import { CopyableId } from '@/components/CopyableId';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';

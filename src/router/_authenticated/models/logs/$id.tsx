@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestLog } from '@/api/request-logs';
+import { getRequestLog } from '@/api/model/logs';
 import { ModelLogDetailPage } from '@/views/models/logs/logs-detail-page';
 
 export const Route = createFileRoute('/_authenticated/models/logs/$id')({

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getMcpProvider } from '@/api/mcp-providers';
+import { getMcpProvider } from '@/api/mcp/provider-mcps';
 import { McpProviderDetailPage } from '@/views/mcps/providers/provider-detail-page';
 
 export const Route = createFileRoute('/_authenticated/mcps/providers/$id')({

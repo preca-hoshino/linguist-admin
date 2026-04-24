@@ -4,8 +4,8 @@
 import { AlertCircle, CheckCircle, ExternalLink, Github, Loader2, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { CopilotDeviceCodeResponse } from '@/api/providers';
-import { copilotCreateDeviceCode, copilotPollToken, copilotVerifyToken } from '@/api/providers';
+import type { CopilotDeviceCodeResponse } from '@/api/model/providers';
+import { copilotCreateDeviceCode, copilotPollToken, copilotVerifyToken } from '@/api/model/providers';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 

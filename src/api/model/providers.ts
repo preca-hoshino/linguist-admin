@@ -1,5 +1,5 @@
-import type { ApiResult, DeletedResponse, ListResponse, Provider } from '../types';
-import { request } from './client';
+import type { ApiResult, DeletedResponse, ListResponse, Provider } from '../../types';
+import { request } from '../client';
 
 export const listProviders = async (params?: {
   limit?: number;

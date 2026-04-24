@@ -2,8 +2,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import * as providerModelsApi from '@/api/provider-models';
-import * as virtualModelsApi from '@/api/virtual-models';
+import * as providerModelsApi from '@/api/model/provider-models';
+import * as virtualModelsApi from '@/api/model/virtual-models';
 import { VirtualModelsMutateDialog } from '../virtual-models-mutate-dialog';
 
 // Mock ResizeObserver for Radix UI

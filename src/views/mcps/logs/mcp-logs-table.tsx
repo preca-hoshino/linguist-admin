@@ -8,8 +8,8 @@ import {
 } from '@tanstack/react-table';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { listMcpProviders } from '@/api/mcp-providers';
-import { listVirtualMcps } from '@/api/mcp-virtual-servers';
+import { listMcpProviders } from '@/api/mcp/provider-mcps';
+import { listVirtualMcps } from '@/api/mcp/virtual-mcps';
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
 import { DataTableBulkActions } from '@/components/data-table/BulkActions';
 import { Button } from '@/components/ui/Button';

@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { ArrowDownToLine, ArrowUpFromLine, CornerDownRight, ExternalLink, Wallet } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { listProviderModels } from '@/api/provider-models';
+import { listProviderModels } from '@/api/model/provider-models';
 import { ProviderLogo } from '@/components/provider/ProviderLogo';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';

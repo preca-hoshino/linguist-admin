@@ -1,6 +1,6 @@
-import type { ApiResult, DeletedResponse, ListResponse } from '../types';
-import type { McpProvider, McpProviderCreateInput, McpProviderUpdateInput, McpToolInfo } from '../types/mcp';
-import { request } from './client';
+import type { ApiResult, DeletedResponse, ListResponse } from '../../types';
+import type { McpProvider, McpProviderCreateInput, McpProviderUpdateInput, McpToolInfo } from '../../types/mcp';
+import { request } from '../client';
 
 export const listMcpProviders = async (params?: {
   limit?: number;

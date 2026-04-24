@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { deleteProvider } from '@/api/providers';
+import { deleteProvider } from '@/api/model/providers';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { useProviders } from './providers-context';
 import { ProvidersMutateDialog } from './providers-mutate-dialog';

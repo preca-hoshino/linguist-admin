@@ -11,7 +11,7 @@ import { Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { listApps } from '@/api/apps';
-import { listProviders } from '@/api/providers';
+import { listProviders } from '@/api/model/providers';
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
 import { DataTableBulkActions } from '@/components/data-table/BulkActions';
 import { Button } from '@/components/ui/Button';

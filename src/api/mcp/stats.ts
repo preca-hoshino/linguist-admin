@@ -1,7 +1,7 @@
 // src/api/mcp-stats.ts — MCP 统计 API 客户端
 
-import type { ApiResult } from '../types';
-import { request } from './client';
+import type { ApiResult } from '../../types';
+import { request } from '../client';
 
 // ── 类型定义  ──────────────────────────────────────────────────────────────
 

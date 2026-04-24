@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getProvider } from '@/api/providers';
+import { getProvider } from '@/api/model/providers';
 import { ProviderDetailPage } from '@/views/models/providers/provider-detail-page';
 
 export const Route = createFileRoute('/_authenticated/models/providers/$id')({

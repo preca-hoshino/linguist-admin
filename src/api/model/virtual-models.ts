@@ -1,5 +1,5 @@
-import type { ApiResult, DeletedResponse, ListResponse, VirtualModel } from '../types';
-import { request } from './client';
+import type { ApiResult, DeletedResponse, ListResponse, VirtualModel } from '../../types';
+import { request } from '../client';
 
 export const listVirtualModels = async (params?: {
   limit?: number;

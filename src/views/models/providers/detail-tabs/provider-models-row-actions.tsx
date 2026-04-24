@@ -4,7 +4,7 @@ import type { Row } from '@tanstack/react-table';
 import { Eye, Pencil, Power, PowerOff, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { updateProviderModel } from '@/api/provider-models';
+import { updateProviderModel } from '@/api/model/provider-models';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,

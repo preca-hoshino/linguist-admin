@@ -1,6 +1,6 @@
 import { Activity, AlertTriangle, Clock, type LucideIcon, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { McpStatsOverview } from '@/api/mcp-stats';
+import type { McpStatsOverview } from '@/api/mcp/stats';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { formatDuration, formatDurationUnit } from '@/utils/utils';

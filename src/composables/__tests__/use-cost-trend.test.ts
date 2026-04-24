@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { getStatsTimeSeries } from '@/api/stats';
+import { getStatsTimeSeries } from '@/api/model/stats';
 import { useCostTrend } from '../use-cost-trend';
 
-vi.mock('@/api/stats');
+vi.mock('@/api/model/stats');
 
 describe('useCostTrend', () => {
   beforeEach(() => {

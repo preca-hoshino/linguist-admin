@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { createProviderModel, updateProviderModel } from '@/api/provider-models';
-import { listProviders } from '@/api/providers';
+import { createProviderModel, updateProviderModel } from '@/api/model/provider-models';
+import { listProviders } from '@/api/model/providers';
 import { Button } from '@/components/ui/Button';
 import {
   Dialog,

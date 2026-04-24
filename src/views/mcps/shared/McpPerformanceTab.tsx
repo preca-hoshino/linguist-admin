@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import type { McpMethodBreakdownItem, McpStatsDimension } from '@/api/mcp-stats';
-import { getMcpMethodBreakdown, getMcpStatsOverview, getMcpStatsTimeSeries } from '@/api/mcp-stats';
+import type { McpMethodBreakdownItem, McpStatsDimension } from '@/api/mcp/stats';
+import { getMcpMethodBreakdown, getMcpStatsOverview, getMcpStatsTimeSeries } from '@/api/mcp/stats';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/Skeleton';

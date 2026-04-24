@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getStatsOverview, getStatsToday } from '@/api/stats';
+import { getStatsOverview, getStatsToday } from '@/api/model/stats';
 import type { StatsOverview, StatsToday } from '@/types';
 
 /** today 端点 + 当日 overview 端点的并行数据 */
