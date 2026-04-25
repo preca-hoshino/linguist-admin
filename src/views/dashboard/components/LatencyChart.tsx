@@ -85,14 +85,35 @@ function CustomTooltip({ payload, timeRange }: CustomTooltipProps): React.JSX.El
 
 const SHARED_LINE_PROPS = {
   type: 'monotone' as const,
-  dot: false,
   activeDot: { r: 4, strokeWidth: 0 },
   connectNulls: false,
-  animationDuration: 600,
+  isAnimationActive: false,
 };
+
+/**
+ * 为指定 dataKey 生成稳定的 dot 渲染函数。
+ * 在 useMemo 中调用，确保 data 不变时函数引用不变，避免 recharts 全量重绘。
+ */
+function makeDotRenderer(
+  dataRef: Record<string, unknown>[],
+  dataKey: string,
+): (props: Record<string, unknown>) => React.JSX.Element | null {
+  return (props: Record<string, unknown>): React.JSX.Element | null => renderIsolatedDot(props, dataRef, dataKey);
+}
 
 export function LatencyChart({ data, metric, loading, timeRange }: LatencyChartProps): React.JSX.Element {
   const tickInterval = useMemo(() => getTickInterval(timeRange, data.length), [timeRange, data.length]);
+
+  // 稳定 dot 渲染函数引用，data 或 metric 变化时才重建
+  const dotRenderers = useMemo(() => {
+    const dataRef = data as unknown as Record<string, unknown>[];
+    const renderers: Record<string, (props: Record<string, unknown>) => React.JSX.Element | null> = {};
+    for (const line of PERCENTILE_LINES) {
+      const key = resolveDataKey(metric, line.suffix) as string;
+      renderers[line.suffix] = makeDotRenderer(dataRef, key);
+    }
+    return renderers;
+  }, [data, metric]);
 
   if (loading) {
     return <Skeleton className="h-[280px] w-full rounded-lg" />;
@@ -100,7 +121,8 @@ export function LatencyChart({ data, metric, loading, timeRange }: LatencyChartP
 
   return (
     <ResponsiveContainer width="100%" height={280}>
-      <LineChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+      {/* margin.right 扩大到 24 以确保最右侧数据点在 recharts 热区内 */}
+      <LineChart data={data} margin={{ top: 8, right: 24, left: 0, bottom: 0 }}>
         <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-muted/30" />
         <XAxis
           dataKey="tickLabel"
@@ -131,9 +153,7 @@ export function LatencyChart({ data, metric, loading, timeRange }: LatencyChartP
             <Line
               key={line.suffix}
               {...SHARED_LINE_PROPS}
-              dot={(props: Record<string, unknown>) =>
-                renderIsolatedDot(props, data as unknown as Record<string, unknown>[], resolvedKey)
-              }
+              dot={dotRenderers[line.suffix] ?? false}
               dataKey={resolvedKey}
               name={line.label}
               stroke={line.color}
