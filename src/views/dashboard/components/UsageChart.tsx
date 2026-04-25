@@ -141,8 +141,8 @@ export function UsageChart({ data, metric, loading, timeRange }: UsageChartProps
 
   return (
     <ResponsiveContainer width="100%" height={280}>
-      {/* margin.right 扩大到 24 以确保最右侧数据点在 recharts 热区内 */}
-      <AreaChart data={data} margin={{ top: 8, right: 24, left: 0, bottom: 0 }}>
+      {/* XAxis padding.right=30 确保最后数据点与热区右边缘保持缓冲距离，修复最后列 hover 失效 */}
+      <AreaChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
         <defs>
           {TOKEN_LINES.map((line) => (
             <linearGradient key={line.key} id={`color${line.key}`} x1="0" y1="0" x2="0" y2="1">
@@ -164,6 +164,7 @@ export function UsageChart({ data, metric, loading, timeRange }: UsageChartProps
           interval={tickInterval}
           minTickGap={40}
           className="fill-muted-foreground"
+          padding={{ right: 30 }}
         />
         <YAxis
           tick={{ fontSize: 11 }}
