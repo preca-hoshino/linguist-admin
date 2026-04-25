@@ -92,7 +92,8 @@ export function CostChart({ data, loading, timeRange }: CostChartProps): React.J
 
   return (
     <ResponsiveContainer width="100%" height={280}>
-      <ComposedChart data={enhancedData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+      {/* margin.right 扩大到 60（右 YAxis width=52 + 8px 余量），确保最后列数据点在 recharts 热区内 */}
+      <ComposedChart data={enhancedData} margin={{ top: 8, right: 60, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="colorCostBar" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor={BAR_COLOR} stopOpacity={0.8} />
@@ -138,7 +139,7 @@ export function CostChart({ data, loading, timeRange }: CostChartProps): React.J
           wrapperStyle={{ fontSize: 12, paddingTop: 12 }}
           formatter={(value) => (value === 'cost' ? '当期花费' : '累计金额')}
         />
-        <Bar dataKey="cost" name="cost" yAxisId="left" fill="url(#colorCostBar)" animationDuration={600} />
+        <Bar dataKey="cost" name="cost" yAxisId="left" fill="url(#colorCostBar)" isAnimationActive={false} />
         <Line
           type="monotone"
           dataKey="cumulative"
@@ -148,7 +149,8 @@ export function CostChart({ data, loading, timeRange }: CostChartProps): React.J
           dot={false}
           activeDot={{ r: 4, strokeWidth: 0 }}
           connectNulls={false}
-          animationDuration={600}
+          animationDuration={0}
+          isAnimationActive={false}
           yAxisId="right"
         />
       </ComposedChart>
