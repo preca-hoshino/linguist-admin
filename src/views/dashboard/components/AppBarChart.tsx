@@ -144,7 +144,7 @@ export function AppBarChart({ timeRange, providerId, filterOptions, refreshKey }
 
           return (
             <ResponsiveContainer width="100%" height="100%">
-              {/* margin.right 扩大到 24 以确保最右侧数据点在 recharts 热区内 */}
+              {/* BarChart 通过 cursor 区域触发 hover，margin.right=24 留出足够边距 */}
               <BarChart data={chartData} layout="horizontal" margin={{ top: 16, right: 24, left: 0, bottom: 4 }}>
                 <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-muted/30" />
                 <XAxis

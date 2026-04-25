@@ -92,8 +92,8 @@ export function CostChart({ data, loading, timeRange }: CostChartProps): React.J
 
   return (
     <ResponsiveContainer width="100%" height={280}>
-      {/* margin.right 扩大到 60（右 YAxis width=52 + 8px 余量），确保最后列数据点在 recharts 热区内 */}
-      <ComposedChart data={enhancedData} margin={{ top: 8, right: 60, left: 0, bottom: 0 }}>
+      {/* XAxis padding.right=30 确保最后数据点与热区右边缘保持缓冲距离，修复最后列 hover 失效 */}
+      <ComposedChart data={enhancedData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="colorCostBar" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor={BAR_COLOR} stopOpacity={0.8} />
@@ -109,6 +109,7 @@ export function CostChart({ data, loading, timeRange }: CostChartProps): React.J
           interval={tickInterval}
           minTickGap={40}
           className="fill-muted-foreground"
+          padding={{ right: 30 }}
         />
         <YAxis
           yAxisId="left"
