@@ -72,6 +72,7 @@ export const updateProviderModel = async (
     is_active: boolean;
     rpm_limit?: number | null | undefined;
     tpm_limit?: number | null | undefined;
+    timeout_ms?: number | null | undefined;
     max_tokens?: number;
     pricing_tiers?: PricingTier[];
   }>,
