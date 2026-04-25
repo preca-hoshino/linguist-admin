@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { ArrowDownToLine, ArrowUpFromLine, CornerDownRight, ExternalLink, Wallet } from 'lucide-react';
+import { ArrowDownToLine, ArrowUpFromLine, Database, ExternalLink, Wallet } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { listProviderModels } from '@/api/model/provider-models';
@@ -288,7 +288,7 @@ export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.
                     )
               }
               amount={cacheCost}
-              icon={CornerDownRight}
+              icon={Database}
             />
           </CardContent>
         </Card>
