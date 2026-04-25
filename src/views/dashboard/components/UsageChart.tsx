@@ -99,19 +99,41 @@ function CustomTooltip({ active, payload, metric, timeRange }: CustomTooltipProp
   );
 }
 
-/** 公共 Area props */
+/** 公共 Area props（无 dot、无动画） */
 const SHARED_AREA_PROPS = {
   type: 'monotone' as const,
   strokeWidth: 2,
-  dot: false,
   activeDot: { r: 4, strokeWidth: 0 },
   connectNulls: false,
-  animationDuration: 600,
+  isAnimationActive: false,
   fillOpacity: 0.2,
 };
 
+/**
+ * 为指定 dataKey 生成稳定的 dot 渲染函数。
+ * 调用方通过 useMemo 缓存，确保每次 render 不产生新函数引用，
+ * 避免 recharts 误判 props 变化而触发全量重绘。
+ */
+function makeDotRenderer(
+  dataRef: Record<string, unknown>[],
+  dataKey: string,
+): (props: Record<string, unknown>) => React.JSX.Element | null {
+  return (props: Record<string, unknown>): React.JSX.Element | null => renderIsolatedDot(props, dataRef, dataKey);
+}
+
 export function UsageChart({ data, metric, loading, timeRange }: UsageChartProps): React.JSX.Element {
   const tickInterval = useMemo(() => getTickInterval(timeRange, data.length), [timeRange, data.length]);
+
+  // 稳定 dot 渲染函数引用：data 或 metric 变化时才重建，避免每帧新建箭头函数
+  const dotRenderers = useMemo(() => {
+    const dataRef = data as unknown as Record<string, unknown>[];
+    return {
+      prompt_tokens: makeDotRenderer(dataRef, 'prompt_tokens'),
+      completion_tokens: makeDotRenderer(dataRef, 'completion_tokens'),
+      cached_tokens: makeDotRenderer(dataRef, 'cached_tokens'),
+      single: makeDotRenderer(dataRef, SINGLE_DATAKEY[metric as Exclude<MetricKey, 'tokens'>] as string),
+    };
+  }, [data, metric]);
 
   if (loading) {
     return <Skeleton className="h-[280px] w-full rounded-lg" />;
@@ -119,6 +141,7 @@ export function UsageChart({ data, metric, loading, timeRange }: UsageChartProps
 
   return (
     <ResponsiveContainer width="100%" height={280}>
+      {/* XAxis padding.right=30 确保最后数据点与热区右边缘保持缓冲距离，修复最后列 hover 失效 */}
       <AreaChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
         <defs>
           {TOKEN_LINES.map((line) => (
@@ -141,6 +164,7 @@ export function UsageChart({ data, metric, loading, timeRange }: UsageChartProps
           interval={tickInterval}
           minTickGap={40}
           className="fill-muted-foreground"
+          padding={{ right: 30 }}
         />
         <YAxis
           tick={{ fontSize: 11 }}
@@ -160,9 +184,7 @@ export function UsageChart({ data, metric, loading, timeRange }: UsageChartProps
             <Area
               key={line.key}
               {...SHARED_AREA_PROPS}
-              dot={(props: Record<string, unknown>) =>
-                renderIsolatedDot(props, data as unknown as Record<string, unknown>[], line.key)
-              }
+              dot={dotRenderers[line.key]}
               dataKey={line.key}
               stroke={line.color}
               fill={`url(#color${line.key})`}
@@ -172,9 +194,7 @@ export function UsageChart({ data, metric, loading, timeRange }: UsageChartProps
         ) : (
           <Area
             {...SHARED_AREA_PROPS}
-            dot={(props: Record<string, unknown>) =>
-              renderIsolatedDot(props, data as unknown as Record<string, unknown>[], SINGLE_DATAKEY[metric])
-            }
+            dot={dotRenderers.single}
             dataKey={SINGLE_DATAKEY[metric]}
             stroke={SINGLE_COLORS[metric]}
             fill="url(#colorsingle)"
