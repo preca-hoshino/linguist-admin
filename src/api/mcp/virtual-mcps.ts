@@ -1,6 +1,6 @@
-import type { ApiResult, DeletedResponse, ListResponse } from '../types';
-import type { VirtualMcp, VirtualMcpCreateInput, VirtualMcpUpdateInput } from '../types/mcp';
-import { request } from './client';
+import type { ApiResult, DeletedResponse, ListResponse } from '../../types';
+import type { VirtualMcp, VirtualMcpCreateInput, VirtualMcpUpdateInput } from '../../types/mcp';
+import { request } from '../client';
 
 export const listVirtualMcps = async (params?: {
   limit?: number;
@@ -27,21 +27,21 @@ export const listVirtualMcps = async (params?: {
   }
 
   const queryStr = qs.toString() ? `?${qs.toString()}` : '';
-  return await request<ListResponse<VirtualMcp>>('GET', `/virtual-mcps${queryStr}`);
+  return await request<ListResponse<VirtualMcp>>('GET', `/mcp/virtual-mcps${queryStr}`);
 };
 
 export const getVirtualMcp = async (id: string): Promise<ApiResult<VirtualMcp>> => {
-  return await request<VirtualMcp>('GET', `/virtual-mcps/${id}`);
+  return await request<VirtualMcp>('GET', `/mcp/virtual-mcps/${id}`);
 };
 
 export const createVirtualMcp = async (data: VirtualMcpCreateInput): Promise<ApiResult<VirtualMcp>> => {
-  return await request<VirtualMcp>('POST', '/virtual-mcps', data);
+  return await request<VirtualMcp>('POST', '/mcp/virtual-mcps', data);
 };
 
 export const updateVirtualMcp = async (id: string, data: VirtualMcpUpdateInput): Promise<ApiResult<VirtualMcp>> => {
-  return await request<VirtualMcp>('PATCH', `/virtual-mcps/${id}`, data);
+  return await request<VirtualMcp>('PATCH', `/mcp/virtual-mcps/${id}`, data);
 };
 
 export const deleteVirtualMcp = async (id: string): Promise<ApiResult<DeletedResponse>> => {
-  return await request<DeletedResponse>('DELETE', `/virtual-mcps/${id}`);
+  return await request<DeletedResponse>('DELETE', `/mcp/virtual-mcps/${id}`);
 };

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getStatsTimeSeries } from '@/api/stats';
+import { getStatsTimeSeries } from '@/api/model/stats';
 import type { StatsDimension, StatsRange, TimeSeriesPoint } from '@/types';
 
 /** 时间范围选项 */

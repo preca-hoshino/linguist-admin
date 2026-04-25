@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { listProviderModels } from '@/api/provider-models';
+import { listProviderModels } from '@/api/model/provider-models';
 import { useDialogState } from '@/composables/use-dialog-state';
 import type { ProviderModel } from '@/types';
 

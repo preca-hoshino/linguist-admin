@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import type { McpStatsTimeSeriesPoint } from '@/api/mcp-stats';
+import type { McpStatsTimeSeriesPoint } from '@/api/mcp/stats';
 import { Card, CardContent } from '@/components/ui/Card';
 import type { TimeRange } from '@/composables/use-usage-chart';
 import { McpLatencyChart } from './McpLatencyChart';

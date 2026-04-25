@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getStatsTimeSeries } from '@/api/stats';
+import { getStatsTimeSeries } from '@/api/model/stats';
 import type { StatsDimension, TimeSeriesPoint } from '@/types';
 
 export type TimeRange = 'today' | '7d' | '30d';

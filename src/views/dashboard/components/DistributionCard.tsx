@@ -2,7 +2,7 @@ import { Anthropic, Gemini, Github, OpenAI, ProviderIcon, Volcengine } from '@lo
 import { Box, Braces, Loader2, MessageSquare } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { listVirtualModels } from '@/api/virtual-models';
+import { listVirtualModels } from '@/api/model/virtual-models';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { type TimeRange, useBreakdownStats } from '@/composables/use-breakdown-stats';
 import type { StatsBreakdownGroupBy } from '@/types';

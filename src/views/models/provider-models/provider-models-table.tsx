@@ -10,8 +10,8 @@ import {
 } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { listProviderModels } from '@/api/provider-models';
-import { listProviders } from '@/api/providers';
+import { listProviderModels } from '@/api/model/provider-models';
+import { listProviders } from '@/api/model/providers';
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { cn } from '@/utils/utils';

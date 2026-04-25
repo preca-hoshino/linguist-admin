@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getStatsBreakdown } from '@/api/stats';
+import { getStatsBreakdown } from '@/api/model/stats';
 import type { StatsBreakdownGroupBy, StatsBreakdownItem, StatsDimension, StatsRange } from '@/types';
 
 export type TimeRange = '24h' | '7d' | '30d';

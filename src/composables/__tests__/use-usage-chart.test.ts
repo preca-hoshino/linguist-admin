@@ -1,9 +1,9 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { getStatsTimeSeries } from '@/api/stats';
+import { getStatsTimeSeries } from '@/api/model/stats';
 import { formatTooltipTime, getTickInterval, useUsageChart } from '../use-usage-chart';
 
-vi.mock('@/api/stats');
+vi.mock('@/api/model/stats');
 
 describe('useUsageChart properties', () => {
   describe('formatTooltipTime', () => {

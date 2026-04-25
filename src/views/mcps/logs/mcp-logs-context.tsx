@@ -2,7 +2,7 @@ import type { ColumnFiltersState, PaginationState } from '@tanstack/react-table'
 import type React from 'react';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { McpLog } from '@/types/mcp';
-import { listMcpLogs } from '@/api/mcp-logs';
+import { listMcpLogs } from '@/api/mcp/logs';
 import { extractFilterValue } from '@/utils/table';
 import { useTranslation } from 'react-i18next';
 import { useDialogState } from '@/composables/use-dialog-state';

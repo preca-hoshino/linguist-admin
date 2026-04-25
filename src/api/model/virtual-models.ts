@@ -1,5 +1,5 @@
-import type { ApiResult, DeletedResponse, ListResponse, VirtualModel } from '../types';
-import { request } from './client';
+import type { ApiResult, DeletedResponse, ListResponse, VirtualModel } from '../../types';
+import { request } from '../client';
 
 export const listVirtualModels = async (params?: {
   limit?: number;
@@ -32,11 +32,11 @@ export const listVirtualModels = async (params?: {
 
   const query = qs.toString();
   const queryStr = query ? `?${query}` : '';
-  return await request<ListResponse<VirtualModel>>('GET', `/virtual-models${queryStr}`);
+  return await request<ListResponse<VirtualModel>>('GET', `/model/virtual-models${queryStr}`);
 };
 
 export const getVirtualModel = async (id: string): Promise<ApiResult<VirtualModel>> => {
-  return await request<VirtualModel>('GET', `/virtual-models/${id}`);
+  return await request<VirtualModel>('GET', `/model/virtual-models/${id}`);
 };
 
 export const createVirtualModel = async (data: {
@@ -48,7 +48,7 @@ export const createVirtualModel = async (data: {
   rpm_limit?: number | null | undefined;
   tpm_limit?: number | null | undefined;
 }): Promise<ApiResult<VirtualModel>> => {
-  return await request<VirtualModel>('POST', '/virtual-models', data);
+  return await request<VirtualModel>('POST', '/model/virtual-models', data);
 };
 
 export const updateVirtualModel = async (
@@ -63,9 +63,9 @@ export const updateVirtualModel = async (
     tpm_limit?: number | null | undefined;
   }>,
 ): Promise<ApiResult<VirtualModel>> => {
-  return await request<VirtualModel>('PATCH', `/virtual-models/${id}`, data);
+  return await request<VirtualModel>('PATCH', `/model/virtual-models/${id}`, data);
 };
 
 export const deleteVirtualModel = async (id: string): Promise<ApiResult<DeletedResponse>> => {
-  return await request<DeletedResponse>('DELETE', `/virtual-models/${id}`);
+  return await request<DeletedResponse>('DELETE', `/model/virtual-models/${id}`);
 };

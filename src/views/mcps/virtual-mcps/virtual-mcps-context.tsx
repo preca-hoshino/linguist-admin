@@ -2,7 +2,7 @@ import type { ColumnFiltersState, PaginationState } from '@tanstack/react-table'
 import type React from 'react';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { VirtualMcp, VirtualMcpCreateInput, VirtualMcpUpdateInput } from '@/types/mcp';
-import { listVirtualMcps, createVirtualMcp, updateVirtualMcp, deleteVirtualMcp } from '@/api/mcp-virtual-servers';
+import { listVirtualMcps, createVirtualMcp, updateVirtualMcp, deleteVirtualMcp } from '@/api/mcp/virtual-mcps';
 
 interface VirtualMcpsContextType {
   servers: VirtualMcp[];

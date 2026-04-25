@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getVirtualModel } from '@/api/virtual-models';
+import { getVirtualModel } from '@/api/model/virtual-models';
 import { VirtualModelDetailPage } from '@/views/models/virtual-models/virtual-model-detail-page';
 
 export const Route = createFileRoute('/_authenticated/models/virtual-models/$id')({
