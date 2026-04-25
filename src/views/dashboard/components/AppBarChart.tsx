@@ -144,7 +144,8 @@ export function AppBarChart({ timeRange, providerId, filterOptions, refreshKey }
 
           return (
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} layout="horizontal" margin={{ top: 16, right: 16, left: 0, bottom: 4 }}>
+              {/* margin.right 扩大到 24 以确保最右侧数据点在 recharts 热区内 */}
+              <BarChart data={chartData} layout="horizontal" margin={{ top: 16, right: 24, left: 0, bottom: 4 }}>
                 <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-muted/30" />
                 <XAxis
                   dataKey="name"
@@ -167,7 +168,7 @@ export function AppBarChart({ timeRange, providerId, filterOptions, refreshKey }
                   dataKey={metric}
                   fill="hsl(var(--primary))"
                   radius={[4, 4, 0, 0]}
-                  animationDuration={600}
+                  isAnimationActive={false}
                   maxBarSize={48}
                 />
               </BarChart>
