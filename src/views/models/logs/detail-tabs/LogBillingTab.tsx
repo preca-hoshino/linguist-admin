@@ -278,15 +278,17 @@ export function LogBillingTab({ log }: { readonly log: RequestLog }): React.JSX.
             )}
 
             <InvoiceRow
-              label={t('modelsPage.logs.detail.billCache', 'Cache 缓存节省')}
+              label={t('modelsPage.logs.detail.billCache', 'Cache 命中计费')}
               desc={
                 isEmbedding
-                  ? t('modelsPage.logs.detail.billCacheDescEmbed', '若提供商支持且启用嵌入缓存时的低价结算')
-                  : t('modelsPage.logs.detail.billCacheDescChat', '通过上下文缓存匹配的特殊结算费')
+                  ? t('modelsPage.logs.detail.billCacheDescEmbed', '缓存命中的输入 Token 以缓存单价结算')
+                  : t(
+                      'modelsPage.logs.detail.billCacheDescChat',
+                      '缓存命中的上下文 Token 以缓存单价（低于输入单价）结算',
+                    )
               }
               amount={cacheCost}
               icon={CornerDownRight}
-              isDiscount
             />
           </CardContent>
         </Card>
