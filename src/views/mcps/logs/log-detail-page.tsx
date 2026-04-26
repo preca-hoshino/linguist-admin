@@ -6,9 +6,9 @@ import {
   Clock,
   Cloud,
   Code2,
-  Database,
   FileText,
   MessageSquare,
+  RouterIcon,
   Trash2,
   User,
 } from 'lucide-react';
@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { deleteMcpLog } from '@/api/mcp/logs';
 import { CopyableId } from '@/components/CopyableId';
+import { ProviderBadge } from '@/components/provider/ProviderBadge';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
@@ -95,32 +96,30 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
   const renderEdge = (label: string, isError?: boolean): React.JSX.Element => (
     <div
       className="flex flex-col items-center justify-center relative shrink-0 mx-6 -mt-8"
-      style={{ minWidth: '160px' }}
+      style={{ minWidth: '240px' }}
     >
+      {/* 水平连线 */}
       <div
         className={cn(
           'absolute w-full h-[1px] left-0 top-1/2 -translate-y-1/2',
           isError ? 'bg-destructive/40 border-dashed border-t border-destructive/40 bg-transparent' : 'bg-border',
         )}
       />
+      {/* 小箭头 */}
       <div className="absolute right-[-4px] top-1/2 -translate-y-1/2 text-border">
         <ArrowRight className={cn('h-4 w-4', isError && 'text-destructive/50')} />
       </div>
-      <Badge
-        variant="outline"
-        className={cn(
-          'z-10 bg-background shadow-sm truncate max-w-full text-[10px] font-mono',
-          isError && 'border-destructive/50 text-destructive',
-        )}
-      >
-        {label}
-      </Badge>
+      {/* 线中标签 (统一采用 Provider 小胶囊样式) */}
+      <ProviderBadge provider={null} label={label} isError={isError} className="z-10 bg-background shadow-sm" />
     </div>
   );
 
-  // 详情页以 status 字段判断成功/失败（冷热分离后 error JSONB 字段已移除）
-  const isError = log.status === 'error';
   const isCompleted = log.status === 'completed';
+  const isError = log.status === 'error';
+  const ctx = log.mcp_context as Record<string, unknown> | undefined;
+  const appNameFromCtx = ctx ? (ctx as { appName?: string }).appName : undefined;
+  const virtualMcpName = ctx ? (ctx as { virtualMcpName?: string }).virtualMcpName : undefined;
+  const providerMcpName = ctx ? (ctx as { mcpProviderName?: string }).mcpProviderName : undefined;
 
   return (
     <div className="flex flex-col gap-6 mb-2">
@@ -192,25 +191,34 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
       </div>
 
       <div className="flex items-center justify-center px-4 py-8 relative max-w-full overflow-x-auto">
+        {/* Client */}
         {renderNode(
           <User className="h-5 w-5" />,
-          t('mcpsPage.logs.clientNode', 'Client'),
+          appNameFromCtx ?? t('mcpsPage.logs.clientNode', 'Client'),
           null,
-          log.app_id ?? 'Unknown',
+          log.app_id,
         )}
-        {renderEdge(log.method, isError)}
+
+        {/* Client -> Virtual MCP */}
+        {renderEdge(log.method, false)}
+
+        {/* Virtual MCP (Router) */}
         {renderNode(
-          <Database className="h-5 w-5" />,
-          t('mcpsPage.logs.virtualMcpNode', 'Virtual MCP'),
+          <RouterIcon className="h-5 w-5" />,
+          virtualMcpName ?? t('mcpsPage.logs.virtualMcpNode', 'Virtual MCP'),
           null,
-          log.virtual_mcp_id ?? 'Unknown',
+          log.virtual_mcp_id,
         )}
+
+        {/* Virtual MCP -> Provider */}
         {renderEdge(log.method, isError)}
+
+        {/* Provider */}
         {renderNode(
           <Cloud className="h-5 w-5" />,
-          t('mcpsPage.logs.mcpServerNode', 'MCP Server'),
+          providerMcpName ?? t('mcpsPage.logs.mcpServerNode', 'MCP Server'),
           null,
-          log.mcp_provider_id ?? 'Unknown',
+          log.mcp_provider_id,
         )}
       </div>
     </div>
