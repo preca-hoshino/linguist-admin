@@ -92,8 +92,9 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
     </div>
   );
 
-  const isError = log.error != null;
-  const isCompleted = !isError;
+  // 详情页以 status 字段判断成功/失败（冷热分离后 error JSONB 字段已移除）
+  const isError = log.status === 'error';
+  const isCompleted = log.status === 'completed';
 
   return (
     <div className="flex flex-col gap-6 mb-2">
@@ -135,9 +136,12 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
               </Badge>
               <Badge
                 variant="outline"
-                className={cn('text-[11px] font-mono', log.duration_ms > 2000 && 'border-amber-400 text-amber-600')}
+                className={cn(
+                  'text-[11px] font-mono',
+                  (log.duration_ms ?? 0) > 2000 && 'border-amber-400 text-amber-600',
+                )}
               >
-                {log.duration_ms}ms
+                {log.duration_ms == null ? '-' : `${log.duration_ms}ms`}
               </Badge>
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground ml-1">
                 <Clock className="h-3.5 w-3.5" />
