@@ -1,4 +1,5 @@
 import { ProviderCell } from '@/components/provider/ProviderCell';
+import { AppCell } from '@/components/app/AppCell';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { DataTableColumnHeader } from '@/components/data-table';
@@ -177,7 +178,7 @@ export function useLogsColumns(
           return <span className="text-muted-foreground">-</span>;
         }
 
-        return <ProviderCell kind={appId ?? ''} id={appId ?? ''} name={name} size="sm" />;
+        return <AppCell name={name} size="sm" />;
       },
       enableSorting: false,
     },
