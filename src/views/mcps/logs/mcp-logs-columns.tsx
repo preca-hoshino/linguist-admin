@@ -1,11 +1,14 @@
 import { Link } from '@tanstack/react-router';
+import { AppCell } from '@/components/app/AppCell';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/Badge';
 import { Checkbox } from '@/components/ui/Checkbox';
+import { Box, Database } from 'lucide-react';
 import type { McpLog } from '@/types/mcp';
 import { McpLogsRowActions } from './mcp-logs-row-actions';
 import { DataTableColumnHeader } from '@/components/data-table';
 import type { TFunction } from 'i18next';
+import { formatLatency } from '@/utils/format-number';
 
 function formatDateTime(dateStr: string): React.JSX.Element {
   const d = new Date(dateStr);
@@ -50,7 +53,7 @@ export function getMcpLogsColumns(
     {
       accessorKey: 'id',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.id', 'ID')} />,
-      meta: { className: 'w-[70px]' },
+      meta: {},
       cell: ({ row }) => (
         <Link
           to={`/mcps/logs/$id`}
@@ -61,7 +64,7 @@ export function getMcpLogsColumns(
           {row.original.id.slice(0, 8)}
         </Link>
       ),
-      enableSorting: true,
+      enableSorting: false,
       enableColumnFilter: false,
     },
     {
@@ -69,16 +72,15 @@ export function getMcpLogsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.logs.virtualMcp', 'Virtual MCP')} />
       ),
-      meta: { className: 'w-40' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const val = row.original.virtual_mcp_id;
         const name = virtualMcpOptions.find((o) => o.value === val)?.label;
         const displayVal = name ?? (val != null && val !== '' ? val.slice(0, 8) : '-');
-        return (
-          <div className="w-[140px] truncate text-xs text-muted-foreground" title={name ?? val ?? ''}>
-            {displayVal}
-          </div>
-        );
+        if (displayVal === '-') {
+          return <span className="text-muted-foreground">-</span>;
+        }
+        return <AppCell name={displayVal} size="sm" icon={Box} />;
       },
       enableSorting: false,
       enableColumnFilter: true,
@@ -88,16 +90,15 @@ export function getMcpLogsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.logs.providerMcp', 'Provider MCP')} />
       ),
-      meta: { className: 'w-40' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const val = row.original.mcp_provider_id;
         const name = providerOptions.find((o) => o.value === val)?.label;
         const displayVal = name ?? (val != null && val !== '' ? val.slice(0, 8) : '-');
-        return (
-          <div className="w-[140px] truncate text-xs text-muted-foreground" title={name ?? val ?? ''}>
-            {displayVal}
-          </div>
-        );
+        if (displayVal === '-') {
+          return <span className="text-muted-foreground">-</span>;
+        }
+        return <AppCell name={displayVal} size="sm" icon={Database} />;
       },
       enableSorting: false,
       enableColumnFilter: true,
@@ -105,11 +106,11 @@ export function getMcpLogsColumns(
     {
       accessorKey: 'method',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('mcpsPage.logs.method', 'Method')} />,
-      meta: { className: 'w-[160px]' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const method = String(row.getValue('method'));
         return (
-          <div className="w-[140px] truncate font-mono font-bold text-xs" title={method}>
+          <div className="font-mono font-bold text-xs max-w-[200px] truncate" title={method}>
             {method}
           </div>
         );
@@ -121,7 +122,7 @@ export function getMcpLogsColumns(
       // 冷热分离后改读热表 status 字段（替代旧的 error JSONB 判断逻辑）
       accessorFn: (row) => row.status,
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.status', 'Status')} />,
-      meta: { className: 'w-20' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const status = row.original.status;
         const isError = status === 'error';
@@ -154,14 +155,14 @@ export function getMcpLogsColumns(
     {
       accessorKey: 'tool_name',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('mcpsPage.logs.toolName', 'Tool')} />,
-      meta: { className: 'w-[160px]' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const toolName = row.original.tool_name;
         if (toolName == null || toolName === '') {
           return <span className="text-muted-foreground text-xs">-</span>;
         }
         return (
-          <div className="w-[140px] truncate font-mono text-xs" title={toolName}>
+          <div className="font-mono text-xs max-w-[250px] truncate" title={toolName}>
             {toolName}
           </div>
         );
@@ -173,7 +174,7 @@ export function getMcpLogsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.latency', 'Duration')} />
       ),
-      meta: { className: 'w-20' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const d = row.original.duration_ms;
         if (d == null) {
@@ -182,7 +183,7 @@ export function getMcpLogsColumns(
         return (
           <div className="flex items-baseline gap-1.5">
             <span className="text-[11px] text-muted-foreground/80 tracking-tight">E2E</span>
-            <span className="font-mono text-[11px]">{d}ms</span>
+            <span className="font-mono text-[11px]">{formatLatency(d)}</span>
           </div>
         );
       },

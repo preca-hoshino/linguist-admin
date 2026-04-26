@@ -1,4 +1,5 @@
 import { ProviderCell } from '@/components/provider/ProviderCell';
+import { AppCell } from '@/components/app/AppCell';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { DataTableColumnHeader } from '@/components/data-table';
@@ -6,6 +7,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Checkbox } from '@/components/ui/Checkbox';
 import type { RequestLog } from '@/types';
 import { LogsRowActions } from './logs-row-actions';
+import { formatLatency } from '@/utils/format-number';
 
 function formatDateTime(dateStr: string): React.JSX.Element {
   const d = new Date(dateStr);
@@ -17,7 +19,10 @@ function formatDateTime(dateStr: string): React.JSX.Element {
   );
 }
 
-export function useLogsColumns(): ColumnDef<RequestLog>[] {
+export function useLogsColumns(
+  providerOptions: { label: string; value: string }[],
+  appOptions: { label: string; value: string }[],
+): ColumnDef<RequestLog>[] {
   const { t } = useTranslation();
 
   const columns: ColumnDef<RequestLog>[] = [
@@ -48,13 +53,13 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
     {
       accessorKey: 'id',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.id', 'ID')} />,
-      meta: { className: 'w-[70px]' },
+      meta: {},
       cell: ({ row }) => (
         <div className="truncate font-mono text-xs text-muted-foreground" title={row.original.id}>
           {row.original.id.slice(0, 8)}
         </div>
       ),
-      enableSorting: true,
+      enableSorting: false,
       enableColumnFilter: false,
     },
     {
@@ -96,13 +101,27 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       enableSorting: true,
     },
     {
+      id: 'ip',
+      // 直接读热表列 ip
+      accessorFn: (row) => (row.ip != null && row.ip !== '' ? row.ip : '-'),
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.ip', 'IP')} />,
+      meta: {},
+      cell: ({ row }): React.JSX.Element => {
+        const ip = row.original.ip;
+        return (
+          <span className="font-mono text-[11px] text-muted-foreground">{ip != null && ip !== '' ? ip : '-'}</span>
+        );
+      },
+      enableSorting: false,
+    },
+    {
       id: 'source',
       // 直接读热表列 user_format
       accessorFn: (row) => (row.user_format != null && row.user_format !== '' ? row.user_format : '-'),
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('modelsPage.logs.userFormat', 'Client Format')} />
+        <DataTableColumnHeader column={column} title={t('modelsPage.logs.userFormat', 'API Format')} />
       ),
-      meta: { className: 'ps-1 w-32', tdClassName: 'ps-4' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const fmt = row.original.user_format;
         if (fmt == null || fmt === '') {
@@ -119,34 +138,21 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       enableSorting: true,
     },
     {
-      id: 'ip',
-      // 直接读热表列 ip
-      accessorFn: (row) => (row.ip != null && row.ip !== '' ? row.ip : '-'),
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.ip', 'IP')} />,
-      meta: { className: 'w-24' },
-      cell: ({ row }): React.JSX.Element => {
-        const ip = row.original.ip;
-        return (
-          <span className="font-mono text-[11px] text-muted-foreground">{ip != null && ip !== '' ? ip : '-'}</span>
-        );
-      },
-      enableSorting: false,
-    },
-    {
       id: 'provider_id',
       // 直接读热表列 provider_id / provider_kind
       accessorFn: (row) => (row.provider_id != null && row.provider_id !== '' ? row.provider_id : '-'),
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.providerKind', 'Provider')} />
       ),
-      meta: { className: 'w-32' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const kind = row.original.provider_kind;
         const pid = row.original.provider_id;
         if (kind == null || kind === '') {
           return <span className="text-muted-foreground">-</span>;
         }
-        return <ProviderCell kind={kind} id={pid ?? ''} name={''} size="sm" />;
+        const providerName = providerOptions.find((o) => o.value === pid)?.label ?? '';
+        return <ProviderCell kind={kind} id={pid ?? ''} name={providerName} size="sm" />;
       },
       enableSorting: true,
     },
@@ -165,16 +171,22 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.app', 'App')} />,
       meta: {},
       cell: ({ row }): React.JSX.Element => {
-        const name = row.original.app_name ?? row.original.app_id;
-        return <span className="text-[11px] font-medium">{name != null && name !== '' ? name : '-'}</span>;
+        const appId = row.original.app_id;
+        const name = row.original.app_name ?? appOptions.find((o) => o.value === appId)?.label ?? appId;
+
+        if (name == null || name === '') {
+          return <span className="text-muted-foreground">-</span>;
+        }
+
+        return <AppCell name={name} size="sm" />;
       },
-      enableSorting: false,
+      enableSorting: true,
     },
     {
       id: 'status',
       accessorFn: (row) => row.status,
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.status', 'Status')} />,
-      meta: { className: 'w-20' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const status = row.original.status;
         let variant: 'outline' | 'destructive' | 'secondary' = 'secondary';
@@ -210,7 +222,7 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       // 直接读热表列 total_tokens / prompt_tokens / completion_tokens
       accessorFn: (row) => row.total_tokens ?? 0,
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.tokens', 'Token')} />,
-      meta: { className: 'w-24' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const total = row.original.total_tokens;
         const p = row.original.prompt_tokens;
@@ -241,7 +253,7 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
         return cached / p;
       },
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.cacheRate', 'Cache')} />,
-      meta: { className: 'w-16' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const p = row.original.prompt_tokens ?? 0;
         const cached = row.original.cached_tokens ?? 0;
@@ -249,48 +261,50 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
           return <span className="text-muted-foreground">-</span>;
         }
         const rate = Math.round((cached / p) * 100);
-        return <span className="font-mono text-[11px]">{rate}%</span>;
+        return <span className="font-mono text-sm font-bold text-foreground">{rate}%</span>;
       },
       enableSorting: true,
     },
     {
-      id: 'latency',
-      // 直接读热表列 duration_ms / ttft_ms（is_stream 判断流式）
-      accessorFn: (row) => row.duration_ms ?? 0,
+      accessorKey: 'duration_ms',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.latency', 'Duration')} />
       ),
-      meta: { className: 'w-20' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const isStream = row.original.is_stream === true;
         const ttftMs = row.original.ttft_ms;
         const duration = row.original.duration_ms;
-        if (isStream && ttftMs != null) {
-          return (
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-[11px] text-muted-foreground/80 tracking-tight">TTFT</span>
-              <span className="font-mono text-[11px]">{ttftMs}ms</span>
-            </div>
-          );
+
+        if (duration == null && ttftMs == null) {
+          return <span className="text-muted-foreground">-</span>;
         }
-        if (duration != null) {
-          return (
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-[11px] text-muted-foreground/80 tracking-tight">E2E</span>
-              <span className="font-mono text-[11px]">{duration}ms</span>
-            </div>
-          );
-        }
-        return <span className="text-muted-foreground">-</span>;
+
+        return (
+          <div className="flex flex-col gap-0.5">
+            {isStream && ttftMs != null && (
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-[10px] text-muted-foreground/80 tracking-tight w-6">TTFT</span>
+                <span className="font-mono text-[11px]">{formatLatency(ttftMs)}</span>
+              </div>
+            )}
+            {duration != null && (
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-[10px] text-muted-foreground/80 tracking-tight w-6">E2E</span>
+                <span className="font-mono text-[11px]">{formatLatency(duration)}</span>
+              </div>
+            )}
+          </div>
+        );
       },
-      enableSorting: false,
+      enableSorting: true,
     },
     {
       accessorKey: 'created_at',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.createdAt', 'Time')} />,
       meta: {},
       cell: ({ row }): React.JSX.Element => formatDateTime(String(row.getValue('created_at') ?? '')),
-      enableSorting: false,
+      enableSorting: true,
     },
     {
       id: 'actions',

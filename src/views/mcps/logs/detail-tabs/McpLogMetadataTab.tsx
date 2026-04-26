@@ -1,172 +1,140 @@
-import { Terminal, Clock, Copy, Check, Server, RouterIcon, Box } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import JsonView from 'react18-json-view';
+import 'react18-json-view/src/style.css';
+import { Button } from '@/components/ui/Button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { useTheme } from '@/providers/ThemeProvider';
+import type { GatewayContextSnapshot } from '@/types';
 import type { McpLog } from '@/types/mcp';
-import { Card, CardContent } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { Link } from '@tanstack/react-router';
-
-// Helper hook for copying text
-function useCopy(): { copied: boolean; copy: (text: string) => Promise<void> } {
-  const [copied, setCopied] = useState(false);
-  const copy = useCallback(async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => {
-        setCopied(false);
-      }, 2000);
-    } catch {
-      /* ignore */
-    }
-  }, []);
-  return { copied, copy };
-}
-
-function MetadataItem({
-  label,
-  value,
-  icon,
-  copyable = false,
-  linkTo,
-}: {
-  readonly label: string;
-  readonly value: string | undefined | null;
-  readonly icon?: React.ReactNode;
-  readonly copyable?: boolean | undefined;
-  readonly linkTo?: string | undefined;
-}): React.JSX.Element {
+import { formatBytes } from '@/utils/format-number';
+// ── Body Card -> Message Card (For JSON-RPC)
+function MessageCard({ data, title }: { readonly data: unknown; readonly title: string }): React.JSX.Element {
   const { t } = useTranslation();
-  const { copied, copy } = useCopy();
+  const { resolvedTheme } = useTheme();
+  const isEmpty = data == null || (typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length === 0);
 
-  const valueDisplay =
-    value == null || value === '' ? (
-      <span className="text-muted-foreground opacity-50 italic">{t('common.notProvided', '未提供 / Unknown')}</span>
-    ) : (
-      value
-    );
-
-  const contentBase = (
-    <div className="flex items-center gap-2 max-w-full">
-      {icon != null && <div className="text-muted-foreground shrink-0">{icon}</div>}
-      <span className="truncate font-mono grow text-sm font-medium">{valueDisplay}</span>
-      {copyable && value != null && value !== '' && (
-        <button
-          type="button"
-          onClick={() => void copy(value)}
-          className="ml-2 flex items-center justify-center h-6 w-6 rounded hover:bg-muted/50 text-muted-foreground hover:text-foreground shrink-0 transition-colors"
-          title="Copy"
-        >
-          {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
-        </button>
-      )}
-    </div>
-  );
+  const sizeAnnotation = isEmpty ? null : formatBytes(new Blob([JSON.stringify(data)]).size);
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center py-3 border-b last:border-0 border-border/40 gap-1.5 sm:gap-4">
-      <div className="text-sm font-medium text-muted-foreground sm:w-1/4 shrink-0 px-2 pl-4">{label}</div>
-      <div className="flex-1 min-w-0 px-2 sm:px-0">
-        {linkTo != null && value != null && value !== '' ? (
-          <Link to={linkTo} className="text-primary hover:underline underline-offset-4 decoration-primary/30">
-            {contentBase}
-          </Link>
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center px-0.5">
+        <div className="flex items-center gap-2">
+          <div className="text-sm font-semibold text-foreground/90">{title}</div>
+          {sizeAnnotation != null && (
+            <span className="text-[11px] font-semibold text-muted-foreground">· {sizeAnnotation}</span>
+          )}
+        </div>
+        {!isEmpty && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 ml-1 text-muted-foreground hover:text-foreground shrink-0"
+            title={t('common.download', '下载')}
+            onClick={() => {
+              const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'payload.json';
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+      <div className="w-full min-w-0 overflow-x-auto rounded-lg border border-border/60 bg-zinc-50/50 p-4 shadow-sm dark:bg-zinc-900/50">
+        {isEmpty ? (
+          <span className="text-sm text-muted-foreground italic">{t('common.empty', '空')}</span>
         ) : (
-          contentBase
+          <JsonView
+            src={data as object}
+            collapsed={2}
+            enableClipboard
+            displaySize
+            theme={resolvedTheme === 'dark' ? 'a11y' : 'default'}
+            style={{
+              fontSize: '13px',
+              lineHeight: '1.6',
+              fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+              backgroundColor: 'transparent',
+            }}
+          />
         )}
       </div>
     </div>
   );
 }
 
+// ── 主组件
 interface McpLogMetadataTabProps {
   readonly log: McpLog;
 }
 
 export function McpLogMetadataTab({ log }: McpLogMetadataTabProps): React.JSX.Element {
   const { t } = useTranslation();
+  const ctx = log.mcp_context as unknown as GatewayContextSnapshot | undefined | null;
+  const audit = ctx?.audit;
 
   return (
-    <div className="flex flex-col gap-6 w-full pb-6">
-      <Card className="rounded-xl overflow-hidden shadow-sm">
-        <div className="bg-muted/30 px-5 py-3 border-b">
-          <h3 className="font-semibold text-sm tracking-tight flex items-center gap-2">
-            <Terminal className="h-4 w-4" />
-            {t('modelsPage.logs.detail.mcpBasicInfo', '基础请求信息 (Basic Info)')}
-          </h3>
+    <div className="flex flex-col gap-6 pt-4 pb-6 w-full">
+      <Tabs defaultValue="userRequest" className="w-full">
+        <div className="overflow-x-auto pb-1 mb-2">
+          <TabsList className="grid w-[600px] sm:w-full grid-cols-5 h-auto py-1">
+            <TabsTrigger value="userRequest" className="text-xs py-1.5">
+              {t('modelsPage.logs.detail.userRequest', '用户请求')}
+            </TabsTrigger>
+            <TabsTrigger value="providerRequest" className="text-xs py-1.5">
+              {t('modelsPage.logs.detail.providerRequest', '提供商请求')}
+            </TabsTrigger>
+            <TabsTrigger value="providerResponse" className="text-xs py-1.5">
+              {t('modelsPage.logs.detail.providerResponse', '提供商响应')}
+            </TabsTrigger>
+            <TabsTrigger value="userResponse" className="text-xs py-1.5">
+              {t('modelsPage.logs.detail.userResponse', '用户响应')}
+            </TabsTrigger>
+            <TabsTrigger value="context" className="text-xs py-1.5">
+              {t('modelsPage.logs.detail.context', '内部上下文')}
+            </TabsTrigger>
+          </TabsList>
         </div>
-        <CardContent className="p-0">
-          <MetadataItem label={t('mcpsPage.logs.logId', 'Log ID')} value={log.id} copyable />
-          <MetadataItem label={t('mcpsPage.logs.sessionId', 'Session ID')} value={log.session_id} copyable />
-          <MetadataItem label={t('mcpsPage.logs.protocolMethod', 'Protocol Method')} value={log.method} copyable />
-        </CardContent>
-      </Card>
 
-      <Card className="rounded-xl overflow-hidden shadow-sm">
-        <div className="bg-muted/30 px-5 py-3 border-b">
-          <h3 className="font-semibold text-sm tracking-tight flex items-center gap-2">
-            <RouterIcon className="h-4 w-4" />
-            {t('modelsPage.logs.detail.mcpRoutingInfo', '路由资源信息 (Routing)')}
-          </h3>
-        </div>
-        <CardContent className="p-0">
-          <MetadataItem
-            label={t('mcpsPage.logs.appId', 'App ID (Client)')}
-            value={log.app_id}
-            copyable
-            icon={<Box className="h-4 w-4" />}
-          />
-          <MetadataItem
-            label={t('mcpsPage.logs.virtualMcpLabel', 'Virtual MCP')}
-            value={log.virtual_mcp_id}
-            copyable
-            linkTo={
-              log.virtual_mcp_id != null && log.virtual_mcp_id !== ''
-                ? `/mcps/virtual-mcps/${log.virtual_mcp_id}`
-                : undefined
-            }
-            icon={<RouterIcon className="h-4 w-4" />}
-          />
-          <MetadataItem
-            label={t('mcpsPage.logs.mcpProviderLabel', 'MCP Provider')}
-            value={log.mcp_provider_id}
-            copyable
-            linkTo={
-              log.mcp_provider_id != null && log.mcp_provider_id !== ''
-                ? `/mcps/providers/${log.mcp_provider_id}`
-                : undefined
-            }
-            icon={<Server className="h-4 w-4" />}
-          />
-        </CardContent>
-      </Card>
+        {/* 1. 用户请求 */}
+        <TabsContent value="userRequest" className="flex flex-col gap-4 focus-visible:outline-none">
+          <MessageCard data={audit?.userRequest?.body} title={t('mcpsPage.logs.jsonRpcMessage', 'JSON-RPC Message')} />
+        </TabsContent>
 
-      <Card className="rounded-xl overflow-hidden shadow-sm">
-        <div className="bg-muted/30 px-5 py-3 border-b">
-          <h3 className="font-semibold text-sm tracking-tight flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            {t('modelsPage.logs.detail.mcpTimingInfo', '时延跟踪 (Timing)')}
-          </h3>
-        </div>
-        <CardContent className="p-0">
-          <MetadataItem
-            label={t('mcpsPage.logs.createdAt', 'Created At')}
-            value={new Date(log.created_at).toLocaleString()}
+        {/* 2. 提供商请求 */}
+        <TabsContent value="providerRequest" className="flex flex-col gap-4 focus-visible:outline-none">
+          <MessageCard
+            data={audit?.providerRequest?.body}
+            title={t('mcpsPage.logs.jsonRpcMessage', 'JSON-RPC Message')}
           />
-          <MetadataItem
-            label={t('mcpsPage.logs.duration', 'Duration')}
-            value={log.duration_ms == null ? undefined : `${log.duration_ms} ms`}
-            icon={
-              <Badge
-                variant="outline"
-                className={(log.duration_ms ?? 0) > 2000 ? 'border-amber-400 text-amber-600' : 'border-muted'}
-              >
-                {(log.duration_ms ?? 0) > 2000 ? t('mcpsPage.logs.slow', 'Slow') : t('mcpsPage.logs.fast', 'Fast')}
-              </Badge>
-            }
+        </TabsContent>
+
+        {/* 3. 提供商响应 */}
+        <TabsContent value="providerResponse" className="flex flex-col gap-4 focus-visible:outline-none">
+          <MessageCard
+            data={audit?.providerResponse?.body}
+            title={t('mcpsPage.logs.jsonRpcMessage', 'JSON-RPC Message')}
           />
-        </CardContent>
-      </Card>
+        </TabsContent>
+
+        {/* 4. 用户响应 */}
+        <TabsContent value="userResponse" className="flex flex-col gap-4 focus-visible:outline-none">
+          <MessageCard data={audit?.userResponse?.body} title={t('mcpsPage.logs.jsonRpcMessage', 'JSON-RPC Message')} />
+        </TabsContent>
+
+        {/* 5. Context */}
+        <TabsContent value="context" className="focus-visible:outline-none">
+          <MessageCard
+            data={ctx}
+            title={t('modelsPage.logs.detail.gatewayContextSnapshot', 'Gateway Context Snapshot')}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

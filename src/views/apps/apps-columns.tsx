@@ -5,6 +5,7 @@ import { CopyableId } from '@/components/CopyableId';
 import { Badge } from '@/components/ui/Badge';
 import type { App } from '@/types/app';
 import { cn } from '@/utils/utils';
+import { AppCell } from '@/components/app/AppCell';
 import { AppsRowActions } from './apps-row-actions';
 
 export function useAppsColumns(): ColumnDef<App>[] {
@@ -25,7 +26,7 @@ export function useAppsColumns(): ColumnDef<App>[] {
       accessorKey: 'name',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('apps.name', 'Name')} />,
       meta: {},
-      cell: ({ row }): React.JSX.Element => <span className="font-medium">{row.getValue<string>('name')}</span>,
+      cell: ({ row }): React.JSX.Element => <AppCell name={row.getValue<string>('name')} size="md" />,
       enableSorting: true,
       enableHiding: true,
     },

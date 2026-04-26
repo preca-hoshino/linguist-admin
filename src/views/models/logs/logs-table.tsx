@@ -46,10 +46,10 @@ export function LogsTable(): React.JSX.Element {
     setOpen,
     setSelectedIds,
   } = useLogs();
-  const columns = useLogsColumns();
-
   const [providerOptions, setProviderOptions] = useState<{ label: string; value: string }[]>([]);
   const [appOptions, setAppOptions] = useState<{ label: string; value: string }[]>([]);
+
+  const columns = useLogsColumns(providerOptions, appOptions);
 
   useEffect(() => {
     // 异步拉取全部已有 providers 以作为过滤选项（直接以具体实例的 id 作为筛选值）
@@ -89,7 +89,6 @@ export function LogsTable(): React.JSX.Element {
     is_stream: false,
     total_tokens: false,
     calculated_cost: false,
-    cacheMode: false,
     ip: false,
   });
 
@@ -158,7 +157,7 @@ export function LogsTable(): React.JSX.Element {
           },
           {
             columnId: 'source',
-            title: t('modelsPage.logs.userFormat', 'Client Format'),
+            title: t('modelsPage.logs.userFormat', 'API Format'),
             options: [
               { label: 'Anthropic', value: 'anthropic', icon: AnthropicIcon },
               { label: 'OpenAI Compat', value: 'openaicompat', icon: OpenAIIcon },
