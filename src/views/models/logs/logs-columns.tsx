@@ -160,11 +160,11 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
     {
       id: 'app_id',
       accessorFn: (row): string => {
-        const ctx = row.gateway_context as NonNullable<RequestLog['gateway_context']> & { appName?: string };
-        if (ctx.appName != null && ctx.appName !== '') {
+        const ctx = row.gateway_context as (RequestLog['gateway_context'] & { appName?: string }) | null | undefined;
+        if (ctx?.appName != null && ctx.appName !== '') {
           return ctx.appName;
         }
-        if (ctx.apiKeyName != null && ctx.apiKeyName !== '') {
+        if (ctx?.apiKeyName != null && ctx.apiKeyName !== '') {
           return ctx.apiKeyName;
         }
         return '-';
@@ -172,8 +172,11 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.app', 'App')} />,
       meta: {},
       cell: ({ row }): React.JSX.Element => {
-        const ctx = row.original.gateway_context as NonNullable<RequestLog['gateway_context']> & { appName?: string };
-        const name = ctx.appName ?? ctx.apiKeyName;
+        const ctx = row.original.gateway_context as
+          | (RequestLog['gateway_context'] & { appName?: string })
+          | null
+          | undefined;
+        const name = ctx?.appName ?? ctx?.apiKeyName;
         return <span className="text-[11px] font-medium">{name != null && name !== '' ? name : '-'}</span>;
       },
       enableSorting: false,
