@@ -1,5 +1,5 @@
 import type { PaginationState } from '@tanstack/react-table';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { listApps } from '@/api/apps';
 import { useDialogState } from '@/composables/use-dialog-state';
@@ -23,6 +23,7 @@ interface AppsContextType {
   error: string;
   loadApps: () => Promise<void>;
   hasMore: boolean;
+  total: number;
 }
 
 const AppsContext = React.createContext<AppsContextType | null>(null);
@@ -33,9 +34,7 @@ export function AppsProvider({ children }: { readonly children: React.ReactNode 
   const [currentRow, setCurrentRow] = useState<App | null>(null);
   const [apps, setApps] = useState<App[]>([]);
   const [hasMore, setHasMore] = useState(false);
-
-  // For cursor-based pagination with pageIndex map
-  const cursorsRef = useRef<(string | undefined)[]>([undefined]);
+  const [total, setTotal] = useState(0);
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -52,11 +51,11 @@ export function AppsProvider({ children }: { readonly children: React.ReactNode 
       setLoading(true);
       setError('');
 
-      const startingAfter = cursorsRef.current[pagination.pageIndex];
+      const offset = pagination.pageIndex * pagination.pageSize;
 
       const payload: Parameters<typeof listApps>[0] = { limit: pagination.pageSize, search };
-      if (startingAfter !== undefined) {
-        payload.starting_after = startingAfter;
+      if (offset > 0) {
+        payload.offset = offset;
       }
       if (statusFilter !== 'all') {
         payload.is_active = statusFilter === 'true';
@@ -70,14 +69,7 @@ export function AppsProvider({ children }: { readonly children: React.ReactNode 
 
       setApps(res.data.data);
       setHasMore(res.data.has_more);
-
-      // Record next cursor if available
-      if (res.data.has_more && res.data.data.length > 0) {
-        const lastItem = res.data.data.at(-1);
-        if (lastItem) {
-          cursorsRef.current[pagination.pageIndex + 1] = lastItem.id;
-        }
-      }
+      setTotal(res.data.total);
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : t('common.loadFailed', 'Failed to load data'));
     } finally {
@@ -90,10 +82,9 @@ export function AppsProvider({ children }: { readonly children: React.ReactNode 
     void load();
   }, [load]);
 
-  // Reset pagination and cursors when search changes
+  // Reset pagination when search/filter changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: react to search change
   useEffect(() => {
-    cursorsRef.current = [undefined];
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   }, [search, statusFilter]);
 
@@ -115,6 +106,7 @@ export function AppsProvider({ children }: { readonly children: React.ReactNode 
         error,
         loadApps: load,
         hasMore,
+        total,
       }}
     >
       {children}
