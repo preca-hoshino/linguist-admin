@@ -59,7 +59,7 @@ export function useLogsColumns(
           {row.original.id.slice(0, 8)}
         </div>
       ),
-      enableSorting: true,
+      enableSorting: false,
       enableColumnFilter: false,
     },
     {
@@ -261,7 +261,7 @@ export function useLogsColumns(
           return <span className="text-muted-foreground">-</span>;
         }
         const rate = Math.round((cached / p) * 100);
-        return <span className="font-mono text-[11px]">{rate}%</span>;
+        return <span className="font-mono text-sm font-bold text-foreground">{rate}%</span>;
       },
       enableSorting: true,
     },
@@ -304,7 +304,7 @@ export function useLogsColumns(
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.createdAt', 'Time')} />,
       meta: {},
       cell: ({ row }): React.JSX.Element => formatDateTime(String(row.getValue('created_at') ?? '')),
-      enableSorting: false,
+      enableSorting: true,
     },
     {
       id: 'actions',

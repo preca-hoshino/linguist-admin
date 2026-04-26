@@ -89,7 +89,6 @@ export function LogsTable(): React.JSX.Element {
     is_stream: false,
     total_tokens: false,
     calculated_cost: false,
-    cacheMode: false,
     ip: false,
   });
 
