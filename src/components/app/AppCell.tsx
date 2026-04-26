@@ -3,11 +3,13 @@ import { AppWindow } from 'lucide-react';
 export interface AppCellProps {
   /** 对人类友好的显示名称 */
   readonly name?: string | null | undefined;
+  /** 自定义图标组件，若不传则默认使用 AppWindow */
+  readonly icon?: React.ElementType;
   /** 容器尺寸规格。默认 "md" */
   readonly size?: 'sm' | 'md';
 }
 
-export function AppCell({ name, size = 'md' }: AppCellProps): React.JSX.Element {
+export function AppCell({ name, icon: Icon = AppWindow, size = 'md' }: AppCellProps): React.JSX.Element {
   const label = name != null && name !== '' ? name : '-';
 
   const isSm = size === 'sm';
@@ -20,7 +22,7 @@ export function AppCell({ name, size = 'md' }: AppCellProps): React.JSX.Element 
   return (
     <div className="flex items-center gap-2">
       <span className={containerClass}>
-        <AppWindow size={iconSize} className="opacity-80" strokeWidth={2.5} />
+        <Icon size={iconSize} className="opacity-80" strokeWidth={2.5} />
       </span>
       <span className={textClass} title={label === '-' ? undefined : label}>
         {label}

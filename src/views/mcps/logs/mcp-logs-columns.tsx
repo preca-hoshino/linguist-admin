@@ -3,6 +3,7 @@ import { AppCell } from '@/components/app/AppCell';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/Badge';
 import { Checkbox } from '@/components/ui/Checkbox';
+import { Box, Database } from 'lucide-react';
 import type { McpLog } from '@/types/mcp';
 import { McpLogsRowActions } from './mcp-logs-row-actions';
 import { DataTableColumnHeader } from '@/components/data-table';
@@ -79,7 +80,7 @@ export function getMcpLogsColumns(
         if (displayVal === '-') {
           return <span className="text-muted-foreground">-</span>;
         }
-        return <AppCell name={displayVal} size="sm" />;
+        return <AppCell name={displayVal} size="sm" icon={Box} />;
       },
       enableSorting: false,
       enableColumnFilter: true,
@@ -97,7 +98,7 @@ export function getMcpLogsColumns(
         if (displayVal === '-') {
           return <span className="text-muted-foreground">-</span>;
         }
-        return <AppCell name={displayVal} size="sm" />;
+        return <AppCell name={displayVal} size="sm" icon={Database} />;
       },
       enableSorting: false,
       enableColumnFilter: true,
