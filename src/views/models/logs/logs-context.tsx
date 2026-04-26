@@ -18,6 +18,7 @@ interface LogsContextType {
   loading: boolean;
   error: string;
   hasMore: boolean;
+  total: number;
   pagination: PaginationState;
   setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
   columnFilters: ColumnFiltersState;
@@ -48,7 +49,7 @@ export function LogsProvider({ children }: { readonly children: React.ReactNode 
   const [currentRow, setCurrentRow] = useState<RequestLog | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [logs, setLogs] = useState<RequestLog[]>([]);
-  const cursorsRef = React.useRef<(string | undefined)[]>([undefined]);
+  const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -77,9 +78,11 @@ export function LogsProvider({ children }: { readonly children: React.ReactNode 
       setLoading(true);
       setError('');
 
+      const offset = pagination.pageIndex * pagination.pageSize;
+
       const rawPayload = {
         limit: pagination.pageSize,
-        starting_after: cursorsRef.current[pagination.pageIndex],
+        offset: offset > 0 ? offset : undefined,
         request_model: globalFilter === '' ? undefined : globalFilter,
         status: statusFilter,
         provider_kind: providerKindFilter,
@@ -101,13 +104,7 @@ export function LogsProvider({ children }: { readonly children: React.ReactNode 
       }
       setLogs(res.data.data);
       setHasMore(res.data.has_more);
-
-      if (res.data.has_more && res.data.data.length > 0) {
-        const lastItem = res.data.data.at(-1);
-        if (lastItem) {
-          cursorsRef.current[pagination.pageIndex + 1] = lastItem.id;
-        }
-      }
+      setTotal(res.data.total ?? 0);
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : t('common.loadFailed', 'Failed to load logs'));
     } finally {
@@ -130,7 +127,6 @@ export function LogsProvider({ children }: { readonly children: React.ReactNode 
   // Reset to first page on search/filter change
   // biome-ignore lint/correctness/useExhaustiveDependencies: react to search/filter change
   useEffect(() => {
-    cursorsRef.current = [undefined];
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   }, [
     globalFilter,
@@ -168,6 +164,7 @@ export function LogsProvider({ children }: { readonly children: React.ReactNode 
         error,
         pagination,
         hasMore,
+        total,
         setPagination,
         columnFilters,
         setColumnFilters,
