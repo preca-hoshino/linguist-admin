@@ -12,11 +12,26 @@ export function McpLogRawDataTab({ log }: McpLogRawDataTabProps): React.JSX.Elem
   const { t } = useTranslation();
   const { resolvedTheme } = useTheme();
 
-  // 冷热分离后，params/result/error 从 mcp_context JSONB（冷宽表，详情页 JOIN 后返回）读取
+  // 冷热分离后，数据从 mcp_context JSONB 读取
+  // 采用 4-envelope (userRequest / userResponse) 结构，兼容旧日志
   const ctx = log.mcp_context;
-  const auditParams = (ctx?.params ?? {}) as Record<string, unknown>;
-  const auditResult = (ctx?.result ?? {}) as Record<string, unknown>;
-  const auditError = ctx?.error as Record<string, unknown> | null | undefined;
+  const audit = ctx?.audit as Record<string, unknown> | undefined | null;
+
+  const userReqBody = (audit?.userRequest as Record<string, unknown> | undefined)?.body as
+    | Record<string, unknown>
+    | undefined;
+  const userResBody = (audit?.userResponse as Record<string, unknown> | undefined)?.body as
+    | Record<string, unknown>
+    | undefined;
+
+  const auditParams = (userReqBody?.params ?? audit?.params ?? {}) as Record<string, unknown>;
+  const auditError = (userResBody?.error ?? audit?.error) as Record<string, unknown> | null | undefined;
+
+  // 若包含 error 字段，则不将其视作成功的 result
+  const auditResult = (userResBody != null && auditError == null ? userResBody : (audit?.result ?? {})) as Record<
+    string,
+    unknown
+  >;
 
   return (
     <div className="flex flex-col gap-6">
