@@ -117,16 +117,21 @@ export function getMcpLogsColumns(
       enableSorting: true,
     },
     {
-      id: 'error',
-      accessorFn: (row) => row.error,
+      id: 'status',
+      // 冷热分离后改读热表 status 字段（替代旧的 error JSONB 判断逻辑）
+      accessorFn: (row) => row.status,
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.status', 'Status')} />,
       meta: { className: 'w-20' },
       cell: ({ row }): React.JSX.Element => {
-        const err = row.original.error;
-        let variant: 'outline' | 'destructive' = 'outline';
-        let label = t('modelsPage.logs.statusCompleted', '成功');
+        const status = row.original.status;
+        const isError = status === 'error';
+        let variant: 'outline' | 'destructive' | 'secondary' = 'secondary';
+        let label = t('modelsPage.logs.statusProcessing', '处理');
 
-        if (err != null) {
+        if (status === 'completed') {
+          variant = 'outline';
+          label = t('modelsPage.logs.statusCompleted', '成功');
+        } else if (isError) {
           variant = 'destructive';
           label = t('modelsPage.logs.statusError', '失败');
         }
@@ -135,13 +140,30 @@ export function getMcpLogsColumns(
           <Badge
             variant={variant}
             className={
-              err == null
+              status === 'completed'
                 ? 'border-green-300 text-green-700 bg-green-50/50 dark:border-green-900 dark:text-green-400 dark:bg-green-900/20'
                 : ''
             }
           >
             {label}
           </Badge>
+        );
+      },
+      enableSorting: true,
+    },
+    {
+      accessorKey: 'tool_name',
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('mcpsPage.logs.toolName', 'Tool')} />,
+      meta: { className: 'w-[160px]' },
+      cell: ({ row }): React.JSX.Element => {
+        const toolName = row.original.tool_name;
+        if (toolName == null || toolName === '') {
+          return <span className="text-muted-foreground text-xs">-</span>;
+        }
+        return (
+          <div className="w-[140px] truncate font-mono text-xs" title={toolName}>
+            {toolName}
+          </div>
         );
       },
       enableSorting: false,
@@ -152,12 +174,18 @@ export function getMcpLogsColumns(
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.latency', 'Duration')} />
       ),
       meta: { className: 'w-20' },
-      cell: ({ row }): React.JSX.Element => (
-        <div className="flex items-baseline gap-1.5">
-          <span className="text-[11px] text-muted-foreground/80 tracking-tight">E2E</span>
-          <span className="font-mono text-[11px]">{row.getValue('duration_ms')}ms</span>
-        </div>
-      ),
+      cell: ({ row }): React.JSX.Element => {
+        const d = row.original.duration_ms;
+        if (d == null) {
+          return <span className="text-muted-foreground">-</span>;
+        }
+        return (
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-[11px] text-muted-foreground/80 tracking-tight">E2E</span>
+            <span className="font-mono text-[11px]">{d}ms</span>
+          </div>
+        );
+      },
       enableSorting: true,
     },
     {

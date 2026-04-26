@@ -155,13 +155,13 @@ export function McpLogMetadataTab({ log }: McpLogMetadataTabProps): React.JSX.El
           />
           <MetadataItem
             label={t('mcpsPage.logs.duration', 'Duration')}
-            value={`${log.duration_ms} ms`}
+            value={log.duration_ms == null ? undefined : `${log.duration_ms} ms`}
             icon={
               <Badge
                 variant="outline"
-                className={log.duration_ms > 2000 ? 'border-amber-400 text-amber-600' : 'border-muted'}
+                className={(log.duration_ms ?? 0) > 2000 ? 'border-amber-400 text-amber-600' : 'border-muted'}
               >
-                {log.duration_ms > 2000 ? t('mcpsPage.logs.slow', 'Slow') : t('mcpsPage.logs.fast', 'Fast')}
+                {(log.duration_ms ?? 0) > 2000 ? t('mcpsPage.logs.slow', 'Slow') : t('mcpsPage.logs.fast', 'Fast')}
               </Badge>
             }
           />

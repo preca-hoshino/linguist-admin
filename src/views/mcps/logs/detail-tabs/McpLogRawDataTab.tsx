@@ -12,14 +12,20 @@ export function McpLogRawDataTab({ log }: McpLogRawDataTabProps): React.JSX.Elem
   const { t } = useTranslation();
   const { resolvedTheme } = useTheme();
 
+  // 冷热分离后，params/result/error 从 mcp_context JSONB（冷宽表，详情页 JOIN 后返回）读取
+  const ctx = log.mcp_context;
+  const auditParams = (ctx?.params ?? {}) as Record<string, unknown>;
+  const auditResult = (ctx?.result ?? {}) as Record<string, unknown>;
+  const auditError = ctx?.error as Record<string, unknown> | null | undefined;
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
         <h3 className="text-sm font-semibold">{t('modelsPage.logs.detail.mcpRequestParams', '请求参数 (Params)')}</h3>
         <div className="border border-border/40 rounded-md bg-card w-full min-w-0 p-4 overflow-x-auto">
-          {Object.keys(log.params).length > 0 ? (
+          {Object.keys(auditParams).length > 0 ? (
             <JsonView
-              src={log.params}
+              src={auditParams}
               collapsed={2}
               enableClipboard
               displaySize
@@ -39,9 +45,9 @@ export function McpLogRawDataTab({ log }: McpLogRawDataTabProps): React.JSX.Elem
       <div className="flex flex-col gap-3">
         <h3 className="text-sm font-semibold">{t('modelsPage.logs.detail.mcpResponseResult', '返回结果 (Result)')}</h3>
         <div className="border border-border/40 rounded-md bg-card w-full min-w-0 p-4 overflow-x-auto">
-          {Object.keys(log.result).length > 0 ? (
+          {Object.keys(auditResult).length > 0 ? (
             <JsonView
-              src={log.result}
+              src={auditResult}
               collapsed={2}
               enableClipboard
               displaySize
@@ -58,14 +64,14 @@ export function McpLogRawDataTab({ log }: McpLogRawDataTabProps): React.JSX.Elem
         </div>
       </div>
 
-      {log.error == null ? null : (
+      {auditError == null ? null : (
         <div className="flex flex-col gap-3">
           <h3 className="text-sm font-semibold text-destructive">
             {t('modelsPage.logs.detail.mcpError', '错误详情 (Error)')}
           </h3>
           <div className="border border-destructive/40 bg-destructive/5 rounded-md w-full min-w-0 p-4 overflow-x-auto">
             <JsonView
-              src={log.error}
+              src={auditError}
               collapsed={2}
               enableClipboard
               displaySize

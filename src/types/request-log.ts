@@ -171,23 +171,52 @@ export interface GatewayContextSnapshot {
 /**
  * 请求日志条目（列表和详情共用类型）
  *
- * 仅包含 DB 元数据字段 + gateway_context 完整快照。
- * 用户/路由/Token 等业务数据全部从 gateway_context 读取，不再重复。
+ * 列表接口（GET /model/logs）返回热表独立列，可直接在表格中渲染。
+ * 详情接口（GET /model/logs/:id）额外返回 gateway_context 完整快照用于审计展示。
  */
 export interface RequestLog {
   id: string;
   readonly object: 'request_log';
   status: 'processing' | 'completed' | 'error';
+  // ─── 热表列（列表页直接可用，无需 JOIN 冷表） ───
+  /** 请求的虚拟模型名称 */
+  request_model: string | null;
+  /** 实际路由到的后端模型名称 */
+  routed_model: string | null;
+  /** 提供商协议类型 */
+  provider_kind: string | null;
+  /** 提供商 ID */
+  provider_id: string | null;
+  /** 关联应用 ID */
+  app_id: string | null;
+  /** 关联应用名称（migration 12 新增） */
+  app_name: string | null;
+  /** 请求来源 IP（migration 12 新增） */
+  ip: string | null;
+  /** 是否流式 */
+  is_stream: boolean | null;
+  /** 客户端协议格式（openaicompat / anthropic / gemini 等） */
+  user_format: string | null;
   error_type: string | null;
   error_code: string | null;
   error_message: string | null;
-  duration_ms: number | null;
-  created_at: string;
-  updated_at: string;
-  /** GatewayContext 完整快照 */
-  gateway_context: GatewayContextSnapshot | null;
   /** 后置计费总额（PostgreSQL numeric 类型，可能以字符串返回） */
   calculated_cost: number | string | null;
+  // ─── Token 统计列（热表，migration 08 恢复） ───
+  prompt_tokens: number | null;
+  completion_tokens: number | null;
+  total_tokens: number | null;
+  cached_tokens: number | null;
+  reasoning_tokens: number | null;
+  /** 全链路延迟（ms） */
+  duration_ms: number | null;
+  /** 首 Token 延迟（ms，流式专用） */
+  ttft_ms: number | null;
+  created_at: string;
+  updated_at: string;
+  // ─── 详情页专用（列表不返回） ───
+  /** GatewayContext 完整快照（仅详情点查时返回） */
+  gateway_context: GatewayContextSnapshot | null;
 }
 
 export interface CostBreakdown {

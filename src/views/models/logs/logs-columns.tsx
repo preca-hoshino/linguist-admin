@@ -59,16 +59,14 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
     },
     {
       id: 'request_model',
-      accessorFn: (row) =>
-        row.gateway_context?.requestModel != null && row.gateway_context.requestModel !== ''
-          ? row.gateway_context.requestModel
-          : '-',
+      // 直接读热表列 request_model，不再依赖 gateway_context
+      accessorFn: (row) => (row.request_model != null && row.request_model !== '' ? row.request_model : '-'),
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.requestModel', 'Virtual Model')} />
       ),
       meta: {},
       cell: ({ row }): React.JSX.Element => {
-        const val = row.original.gateway_context?.requestModel;
+        const val = row.original.request_model;
         return <span className="truncate font-mono font-bold text-xs">{val != null && val !== '' ? val : '-'}</span>;
       },
       enableSorting: true,
@@ -76,11 +74,12 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
     },
     {
       id: 'mode',
-      accessorFn: (row) => (row.gateway_context?.stream === true ? 'stream' : 'non-stream'),
+      // 直接读热表列 is_stream
+      accessorFn: (row) => (row.is_stream === true ? 'stream' : 'non-stream'),
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.mode', 'Mode')} />,
       meta: {},
       cell: ({ row }): React.JSX.Element => {
-        const isStream = row.original.gateway_context?.stream === true;
+        const isStream = row.original.is_stream === true;
         return (
           <Badge
             variant="outline"
@@ -98,16 +97,14 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
     },
     {
       id: 'source',
-      accessorFn: (row) =>
-        row.gateway_context?.userFormat != null && row.gateway_context.userFormat !== ''
-          ? row.gateway_context.userFormat
-          : '-',
+      // 直接读热表列 user_format
+      accessorFn: (row) => (row.user_format != null && row.user_format !== '' ? row.user_format : '-'),
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.userFormat', 'Client Format')} />
       ),
       meta: { className: 'ps-1 w-32', tdClassName: 'ps-4' },
       cell: ({ row }): React.JSX.Element => {
-        const fmt = row.original.gateway_context?.userFormat;
+        const fmt = row.original.user_format;
         if (fmt == null || fmt === '') {
           return <span className="text-muted-foreground">-</span>;
         }
@@ -123,13 +120,12 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
     },
     {
       id: 'ip',
-      accessorKey: 'ip',
-      accessorFn: (row) =>
-        row.gateway_context?.ip != null && row.gateway_context.ip !== '' ? row.gateway_context.ip : '-',
+      // 直接读热表列 ip
+      accessorFn: (row) => (row.ip != null && row.ip !== '' ? row.ip : '-'),
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.ip', 'IP')} />,
       meta: { className: 'w-24' },
       cell: ({ row }): React.JSX.Element => {
-        const ip = row.original.gateway_context?.ip;
+        const ip = row.original.ip;
         return (
           <span className="font-mono text-[11px] text-muted-foreground">{ip != null && ip !== '' ? ip : '-'}</span>
         );
@@ -138,45 +134,38 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
     },
     {
       id: 'provider_id',
-      accessorFn: (row) =>
-        row.gateway_context?.route?.providerId != null && row.gateway_context.route.providerId !== ''
-          ? row.gateway_context.route.providerId
-          : '-',
+      // 直接读热表列 provider_id / provider_kind
+      accessorFn: (row) => (row.provider_id != null && row.provider_id !== '' ? row.provider_id : '-'),
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.providerKind', 'Provider')} />
       ),
       meta: { className: 'w-32' },
       cell: ({ row }): React.JSX.Element => {
-        const route = row.original.gateway_context?.route;
-        if (route?.providerKind == null || route.providerKind === '') {
+        const kind = row.original.provider_kind;
+        const pid = row.original.provider_id;
+        if (kind == null || kind === '') {
           return <span className="text-muted-foreground">-</span>;
         }
-        return (
-          <ProviderCell kind={route.providerKind} id={route.providerId} name={route.providerName ?? ''} size="sm" />
-        );
+        return <ProviderCell kind={kind} id={pid ?? ''} name={''} size="sm" />;
       },
       enableSorting: true,
     },
     {
       id: 'app_id',
+      // 直接读热表列 app_name（fallback 到 app_id）
       accessorFn: (row): string => {
-        const ctx = row.gateway_context as (RequestLog['gateway_context'] & { appName?: string }) | null | undefined;
-        if (ctx?.appName != null && ctx.appName !== '') {
-          return ctx.appName;
+        if (row.app_name != null && row.app_name !== '') {
+          return row.app_name;
         }
-        if (ctx?.apiKeyName != null && ctx.apiKeyName !== '') {
-          return ctx.apiKeyName;
+        if (row.app_id != null && row.app_id !== '') {
+          return row.app_id;
         }
         return '-';
       },
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.app', 'App')} />,
       meta: {},
       cell: ({ row }): React.JSX.Element => {
-        const ctx = row.original.gateway_context as
-          | (RequestLog['gateway_context'] & { appName?: string })
-          | null
-          | undefined;
-        const name = ctx?.appName ?? ctx?.apiKeyName;
+        const name = row.original.app_name ?? row.original.app_id;
         return <span className="text-[11px] font-medium">{name != null && name !== '' ? name : '-'}</span>;
       },
       enableSorting: false,
@@ -218,22 +207,22 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
     },
     {
       id: 'tokens',
-      accessorFn: (row) => row.gateway_context?.response?.usage?.total_tokens ?? 0,
+      // 直接读热表列 total_tokens / prompt_tokens / completion_tokens
+      accessorFn: (row) => row.total_tokens ?? 0,
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.tokens', 'Token')} />,
       meta: { className: 'w-24' },
       cell: ({ row }): React.JSX.Element => {
-        const usage = row.original.gateway_context?.response?.usage;
-        if (usage == null || usage.total_tokens === 0) {
+        const total = row.original.total_tokens;
+        const p = row.original.prompt_tokens;
+        const c = row.original.completion_tokens;
+        if (total == null || total === 0) {
           return <span className="text-muted-foreground">-</span>;
         }
-        const total = usage.total_tokens;
-        const p = usage.prompt_tokens;
-        const c = usage.completion_tokens;
         return (
           <div className="flex flex-col text-[11px] font-mono">
             <span className="font-bold text-foreground">{total}</span>
             <span className="text-muted-foreground whitespace-nowrap tracking-tighter">
-              ↑{p} | ↓{c}
+              ↑{p ?? 0} | ↓{c ?? 0}
             </span>
           </div>
         );
@@ -242,19 +231,20 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
     },
     {
       id: 'cacheMode',
+      // 直接读热表列 cached_tokens / prompt_tokens
       accessorFn: (row): number => {
-        const usage = row.gateway_context?.response?.usage;
-        if (usage == null || usage.prompt_tokens === 0) {
+        const p = row.prompt_tokens;
+        const cached = row.cached_tokens;
+        if (p == null || p === 0 || cached == null) {
           return 0;
         }
-        return (usage.cached_tokens ?? 0) / usage.prompt_tokens;
+        return cached / p;
       },
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.cacheRate', 'Cache')} />,
       meta: { className: 'w-16' },
       cell: ({ row }): React.JSX.Element => {
-        const usage = row.original.gateway_context?.response?.usage;
-        const p = usage?.prompt_tokens ?? 0;
-        const cached = usage?.cached_tokens ?? 0;
+        const p = row.original.prompt_tokens ?? 0;
+        const cached = row.original.cached_tokens ?? 0;
         if (p === 0 || cached === 0) {
           return <span className="text-muted-foreground">-</span>;
         }
@@ -265,18 +255,17 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
     },
     {
       id: 'latency',
+      // 直接读热表列 duration_ms / ttft_ms（is_stream 判断流式）
       accessorFn: (row) => row.duration_ms ?? 0,
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.latency', 'Duration')} />
       ),
       meta: { className: 'w-20' },
       cell: ({ row }): React.JSX.Element => {
-        const isStream = row.original.gateway_context?.stream === true;
-        const ttft = row.original.gateway_context?.timing.ttft;
-        const start = row.original.gateway_context?.timing.start;
+        const isStream = row.original.is_stream === true;
+        const ttftMs = row.original.ttft_ms;
         const duration = row.original.duration_ms;
-        if (isStream && ttft != null && start != null) {
-          const ttftMs = Math.round(ttft - start);
+        if (isStream && ttftMs != null) {
           return (
             <div className="flex items-baseline gap-1.5">
               <span className="text-[11px] text-muted-foreground/80 tracking-tight">TTFT</span>
