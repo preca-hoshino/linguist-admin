@@ -262,9 +262,7 @@ export function useLogsColumns(
       enableSorting: true,
     },
     {
-      id: 'latency',
-      // 直接读热表列 duration_ms / ttft_ms（is_stream 判断流式）
-      accessorFn: (row) => row.duration_ms ?? 0,
+      accessorKey: 'duration_ms',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.latency', 'Duration')} />
       ),
@@ -295,7 +293,7 @@ export function useLogsColumns(
           </div>
         );
       },
-      enableSorting: false,
+      enableSorting: true,
     },
     {
       accessorKey: 'created_at',
