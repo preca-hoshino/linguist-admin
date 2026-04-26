@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Checkbox } from '@/components/ui/Checkbox';
 import type { RequestLog } from '@/types';
 import { LogsRowActions } from './logs-row-actions';
+import { formatLatency } from '@/utils/format-number';
 
 function formatDateTime(dateStr: string): React.JSX.Element {
   const d = new Date(dateStr);
@@ -276,7 +277,7 @@ export function useLogsColumns(
           return (
             <div className="flex items-baseline gap-1.5">
               <span className="text-[11px] text-muted-foreground/80 tracking-tight">TTFT</span>
-              <span className="font-mono text-[11px]">{ttftMs}ms</span>
+              <span className="font-mono text-[11px]">{formatLatency(ttftMs)}</span>
             </div>
           );
         }
@@ -284,7 +285,7 @@ export function useLogsColumns(
           return (
             <div className="flex items-baseline gap-1.5">
               <span className="text-[11px] text-muted-foreground/80 tracking-tight">E2E</span>
-              <span className="font-mono text-[11px]">{duration}ms</span>
+              <span className="font-mono text-[11px]">{formatLatency(duration)}</span>
             </div>
           );
         }

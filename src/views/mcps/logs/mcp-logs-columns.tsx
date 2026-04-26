@@ -6,6 +6,7 @@ import type { McpLog } from '@/types/mcp';
 import { McpLogsRowActions } from './mcp-logs-row-actions';
 import { DataTableColumnHeader } from '@/components/data-table';
 import type { TFunction } from 'i18next';
+import { formatLatency } from '@/utils/format-number';
 
 function formatDateTime(dateStr: string): React.JSX.Element {
   const d = new Date(dateStr);
@@ -182,7 +183,7 @@ export function getMcpLogsColumns(
         return (
           <div className="flex items-baseline gap-1.5">
             <span className="text-[11px] text-muted-foreground/80 tracking-tight">E2E</span>
-            <span className="font-mono text-[11px]">{d}ms</span>
+            <span className="font-mono text-[11px]">{formatLatency(d)}</span>
           </div>
         );
       },
