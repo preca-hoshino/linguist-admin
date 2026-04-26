@@ -71,16 +71,23 @@ export interface VirtualMcpUpdateInput extends Partial<VirtualMcpCreateInput> {
 export interface McpLog {
   id: string;
   virtual_mcp_id: string | null;
-  /** 关联的 MCP 提供商 ID（原 provider_mcp_id） */
+  /** 关联的 MCP 提供商 ID */
   mcp_provider_id: string | null;
   app_id: string | null;
   session_id: string;
+  /** 请求状态（冷热分离后以此替代旧的 error JSONB 字段判断成功/失败） */
+  status: 'processing' | 'completed' | 'error';
   method: string;
-  params: Record<string, unknown>;
-  result: Record<string, unknown>;
-  error: Record<string, unknown> | null;
-  duration_ms: number;
+  /** 工具名（仅 tools/call 时填充） */
+  tool_name: string | null;
+  /** 错误摘要（冗余至窄表，便于列表过滤） */
+  error_message: string | null;
+  duration_ms: number | null;
   created_at: string;
+  updated_at: string;
+  // ─── 详情页专用（列表不返回） ───
+  /** McpGatewayContext 完整快照（仅详情点查时返回） */
+  mcp_context?: Record<string, unknown> | null;
 }
 
 export interface McpToolInfo {
