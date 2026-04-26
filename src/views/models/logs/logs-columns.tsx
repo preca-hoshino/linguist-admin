@@ -180,7 +180,7 @@ export function useLogsColumns(
 
         return <AppCell name={name} size="sm" />;
       },
-      enableSorting: false,
+      enableSorting: true,
     },
     {
       id: 'status',
