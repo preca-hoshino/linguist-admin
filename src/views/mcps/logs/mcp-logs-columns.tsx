@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import { AppCell } from '@/components/app/AppCell';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/Badge';
 import { Checkbox } from '@/components/ui/Checkbox';
@@ -62,7 +63,7 @@ export function getMcpLogsColumns(
           {row.original.id.slice(0, 8)}
         </Link>
       ),
-      enableSorting: true,
+      enableSorting: false,
       enableColumnFilter: false,
     },
     {
@@ -75,11 +76,10 @@ export function getMcpLogsColumns(
         const val = row.original.virtual_mcp_id;
         const name = virtualMcpOptions.find((o) => o.value === val)?.label;
         const displayVal = name ?? (val != null && val !== '' ? val.slice(0, 8) : '-');
-        return (
-          <div className="w-[140px] truncate text-xs text-muted-foreground" title={name ?? val ?? ''}>
-            {displayVal}
-          </div>
-        );
+        if (displayVal === '-') {
+          return <span className="text-muted-foreground">-</span>;
+        }
+        return <AppCell name={displayVal} size="sm" />;
       },
       enableSorting: false,
       enableColumnFilter: true,
@@ -94,11 +94,10 @@ export function getMcpLogsColumns(
         const val = row.original.mcp_provider_id;
         const name = providerOptions.find((o) => o.value === val)?.label;
         const displayVal = name ?? (val != null && val !== '' ? val.slice(0, 8) : '-');
-        return (
-          <div className="w-[140px] truncate text-xs text-muted-foreground" title={name ?? val ?? ''}>
-            {displayVal}
-          </div>
-        );
+        if (displayVal === '-') {
+          return <span className="text-muted-foreground">-</span>;
+        }
+        return <AppCell name={displayVal} size="sm" />;
       },
       enableSorting: false,
       enableColumnFilter: true,
@@ -110,7 +109,7 @@ export function getMcpLogsColumns(
       cell: ({ row }): React.JSX.Element => {
         const method = String(row.getValue('method'));
         return (
-          <div className="w-[140px] truncate font-mono font-bold text-xs" title={method}>
+          <div className="font-mono font-bold text-xs max-w-[200px] truncate" title={method}>
             {method}
           </div>
         );
@@ -162,7 +161,7 @@ export function getMcpLogsColumns(
           return <span className="text-muted-foreground text-xs">-</span>;
         }
         return (
-          <div className="w-[140px] truncate font-mono text-xs" title={toolName}>
+          <div className="font-mono text-xs max-w-[250px] truncate" title={toolName}>
             {toolName}
           </div>
         );
