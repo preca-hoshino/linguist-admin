@@ -53,7 +53,7 @@ export function useLogsColumns(
     {
       accessorKey: 'id',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.id', 'ID')} />,
-      meta: { className: 'w-[70px]' },
+      meta: {},
       cell: ({ row }) => (
         <div className="truncate font-mono text-xs text-muted-foreground" title={row.original.id}>
           {row.original.id.slice(0, 8)}
@@ -107,7 +107,7 @@ export function useLogsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.userFormat', 'Client Format')} />
       ),
-      meta: { className: 'w-32' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const fmt = row.original.user_format;
         if (fmt == null || fmt === '') {
@@ -128,7 +128,7 @@ export function useLogsColumns(
       // 直接读热表列 ip
       accessorFn: (row) => (row.ip != null && row.ip !== '' ? row.ip : '-'),
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.ip', 'IP')} />,
-      meta: { className: 'w-24' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const ip = row.original.ip;
         return (
@@ -144,7 +144,7 @@ export function useLogsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.providerKind', 'Provider')} />
       ),
-      meta: { className: 'w-32' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const kind = row.original.provider_kind;
         const pid = row.original.provider_id;
@@ -186,7 +186,7 @@ export function useLogsColumns(
       id: 'status',
       accessorFn: (row) => row.status,
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.status', 'Status')} />,
-      meta: { className: 'w-20' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const status = row.original.status;
         let variant: 'outline' | 'destructive' | 'secondary' = 'secondary';
@@ -222,7 +222,7 @@ export function useLogsColumns(
       // 直接读热表列 total_tokens / prompt_tokens / completion_tokens
       accessorFn: (row) => row.total_tokens ?? 0,
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.tokens', 'Token')} />,
-      meta: { className: 'w-24' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const total = row.original.total_tokens;
         const p = row.original.prompt_tokens;
@@ -253,7 +253,7 @@ export function useLogsColumns(
         return cached / p;
       },
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.cacheRate', 'Cache')} />,
-      meta: { className: 'w-16' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const p = row.original.prompt_tokens ?? 0;
         const cached = row.original.cached_tokens ?? 0;
@@ -270,7 +270,7 @@ export function useLogsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.latency', 'Duration')} />
       ),
-      meta: { className: 'w-20' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const isStream = row.original.is_stream === true;
         const ttftMs = row.original.ttft_ms;

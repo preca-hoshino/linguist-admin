@@ -51,7 +51,7 @@ export function getMcpLogsColumns(
     {
       accessorKey: 'id',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.id', 'ID')} />,
-      meta: { className: 'w-[70px]' },
+      meta: {},
       cell: ({ row }) => (
         <Link
           to={`/mcps/logs/$id`}
@@ -70,7 +70,7 @@ export function getMcpLogsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.logs.virtualMcp', 'Virtual MCP')} />
       ),
-      meta: { className: 'w-40' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const val = row.original.virtual_mcp_id;
         const name = virtualMcpOptions.find((o) => o.value === val)?.label;
@@ -89,7 +89,7 @@ export function getMcpLogsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('mcpsPage.logs.providerMcp', 'Provider MCP')} />
       ),
-      meta: { className: 'w-40' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const val = row.original.mcp_provider_id;
         const name = providerOptions.find((o) => o.value === val)?.label;
@@ -106,7 +106,7 @@ export function getMcpLogsColumns(
     {
       accessorKey: 'method',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('mcpsPage.logs.method', 'Method')} />,
-      meta: { className: 'w-[160px]' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const method = String(row.getValue('method'));
         return (
@@ -122,7 +122,7 @@ export function getMcpLogsColumns(
       // 冷热分离后改读热表 status 字段（替代旧的 error JSONB 判断逻辑）
       accessorFn: (row) => row.status,
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.status', 'Status')} />,
-      meta: { className: 'w-20' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const status = row.original.status;
         const isError = status === 'error';
@@ -155,7 +155,7 @@ export function getMcpLogsColumns(
     {
       accessorKey: 'tool_name',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('mcpsPage.logs.toolName', 'Tool')} />,
-      meta: { className: 'w-[160px]' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const toolName = row.original.tool_name;
         if (toolName == null || toolName === '') {
@@ -174,7 +174,7 @@ export function getMcpLogsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.latency', 'Duration')} />
       ),
-      meta: { className: 'w-20' },
+      meta: {},
       cell: ({ row }): React.JSX.Element => {
         const d = row.original.duration_ms;
         if (d == null) {
