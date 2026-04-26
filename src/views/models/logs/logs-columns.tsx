@@ -170,11 +170,14 @@ export function useLogsColumns(
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.app', 'App')} />,
       meta: {},
       cell: ({ row }): React.JSX.Element => {
-        const name =
-          row.original.app_name ??
-          appOptions.find((o) => o.value === row.original.app_id)?.label ??
-          row.original.app_id;
-        return <span className="text-[11px] font-medium">{name != null && name !== '' ? name : '-'}</span>;
+        const appId = row.original.app_id;
+        const name = row.original.app_name ?? appOptions.find((o) => o.value === appId)?.label ?? appId;
+
+        if (name == null || name === '') {
+          return <span className="text-muted-foreground">-</span>;
+        }
+
+        return <ProviderCell kind={appId ?? ''} id={appId ?? ''} name={name} size="sm" />;
       },
       enableSorting: false,
     },
