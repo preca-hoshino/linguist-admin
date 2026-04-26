@@ -519,7 +519,7 @@ export default {
       id: 'ID',
       mode: '模式',
       source: '来源',
-      userFormat: '来源',
+      userFormat: 'API 格式',
       ip: 'IP',
       apiKey: 'API Key',
       cacheRate: '缓存',
@@ -569,7 +569,7 @@ export default {
         tabTags: '标记',
         tabMetadata: '元数据',
         noContext: '暂无上下文数据',
-        userFormat: '来源',
+        userFormat: 'API 格式',
         // 标记 Tab — 网关与路由卡片
         tagsGatewaySection: '网关与路由',
         tagsSourceSection: '请求来源',

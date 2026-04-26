@@ -524,7 +524,7 @@ export default {
       id: 'ID',
       mode: 'Mode',
       source: 'Source',
-      userFormat: 'Source',
+      userFormat: 'API Format',
       ip: 'IP',
       apiKey: 'API Key',
       cacheRate: 'Cache',
@@ -574,7 +574,7 @@ export default {
         tabTags: 'Tags',
         tabMetadata: 'Metadata',
         noContext: 'No context data available',
-        userFormat: 'Source',
+        userFormat: 'API Format',
         // Tags tab — gateway & routing card
         tagsGatewaySection: 'Gateway & Routing',
         tagsSourceSection: 'Request Source',

@@ -158,7 +158,7 @@ export function LogsTable(): React.JSX.Element {
           },
           {
             columnId: 'source',
-            title: t('modelsPage.logs.userFormat', 'Client Format'),
+            title: t('modelsPage.logs.userFormat', 'API Format'),
             options: [
               { label: 'Anthropic', value: 'anthropic', icon: AnthropicIcon },
               { label: 'OpenAI Compat', value: 'openaicompat', icon: OpenAIIcon },

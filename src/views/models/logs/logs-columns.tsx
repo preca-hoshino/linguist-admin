@@ -101,11 +101,25 @@ export function useLogsColumns(
       enableSorting: true,
     },
     {
+      id: 'ip',
+      // 直接读热表列 ip
+      accessorFn: (row) => (row.ip != null && row.ip !== '' ? row.ip : '-'),
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.ip', 'IP')} />,
+      meta: {},
+      cell: ({ row }): React.JSX.Element => {
+        const ip = row.original.ip;
+        return (
+          <span className="font-mono text-[11px] text-muted-foreground">{ip != null && ip !== '' ? ip : '-'}</span>
+        );
+      },
+      enableSorting: false,
+    },
+    {
       id: 'source',
       // 直接读热表列 user_format
       accessorFn: (row) => (row.user_format != null && row.user_format !== '' ? row.user_format : '-'),
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('modelsPage.logs.userFormat', 'Client Format')} />
+        <DataTableColumnHeader column={column} title={t('modelsPage.logs.userFormat', 'API Format')} />
       ),
       meta: {},
       cell: ({ row }): React.JSX.Element => {
@@ -122,20 +136,6 @@ export function useLogsColumns(
         return <ProviderCell kind={fmt} id={fmt} name={label} size="sm" />;
       },
       enableSorting: true,
-    },
-    {
-      id: 'ip',
-      // 直接读热表列 ip
-      accessorFn: (row) => (row.ip != null && row.ip !== '' ? row.ip : '-'),
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.ip', 'IP')} />,
-      meta: {},
-      cell: ({ row }): React.JSX.Element => {
-        const ip = row.original.ip;
-        return (
-          <span className="font-mono text-[11px] text-muted-foreground">{ip != null && ip !== '' ? ip : '-'}</span>
-        );
-      },
-      enableSorting: false,
     },
     {
       id: 'provider_id',
