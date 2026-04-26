@@ -17,7 +17,6 @@ export function UsersPage(): React.JSX.Element {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const [cursorMap, setCursorMap] = useState<Record<number, string | undefined>>({ 0: undefined });
   const [pageIndex, setPageIndex] = useState(0);
   const [total, setTotal] = useState(0);
   const limit = 10;
@@ -34,32 +33,19 @@ export function UsersPage(): React.JSX.Element {
     try {
       setLoading(true);
       setError('');
-      const startingAfter = cursorMap[pageIndex];
-      const res = await fetchUsers({ limit, ...(startingAfter == null ? {} : { starting_after: startingAfter }) });
+      const offset = pageIndex * limit;
+      const res = await fetchUsers({ limit, ...(offset > 0 ? { offset } : {}) });
       if (!res.ok) {
         throw new Error(res.error.message);
       }
       setUsers(res.data.data);
       setTotal(res.data.total);
-
-      if (res.data.data.length > 0) {
-        const nextCursor = res.data.data.at(-1)?.id;
-        setCursorMap((prev) => {
-          if (prev[pageIndex + 1] === nextCursor) {
-            return prev;
-          }
-          return {
-            ...prev,
-            [pageIndex + 1]: nextCursor,
-          };
-        });
-      }
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : 'Failed to load users');
     } finally {
       setLoading(false);
     }
-  }, [pageIndex, cursorMap]);
+  }, [pageIndex]);
 
   useEffect(() => {
     void loadUsers();
