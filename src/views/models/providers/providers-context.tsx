@@ -22,6 +22,7 @@ interface ProvidersContextType {
   loading: boolean;
   error: string;
   hasMore: boolean;
+  total: number;
   loadProviders: () => Promise<void>;
 }
 
@@ -34,7 +35,7 @@ export function ProvidersProvider({ children }: { readonly children: React.React
   const [open, setOpen] = useDialogState<ProvidersDialogType>(null);
   const [currentRow, setCurrentRow] = useState<Provider | null>(null);
   const [providers, setProviders] = useState<Provider[]>([]);
-  const cursorsRef = React.useRef<(string | undefined)[]>([undefined]);
+  const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(false);
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -55,10 +56,10 @@ export function ProvidersProvider({ children }: { readonly children: React.React
       setLoading(true);
       setError('');
 
-      const startingAfter = cursorsRef.current[pagination.pageIndex];
+      const offset = pagination.pageIndex * pagination.pageSize;
       const payload: Parameters<typeof listProviders>[0] = { limit: pagination.pageSize };
-      if (startingAfter !== undefined) {
-        payload.starting_after = startingAfter;
+      if (offset > 0) {
+        payload.offset = offset;
       }
       if (search) {
         payload.search = search;
@@ -73,13 +74,7 @@ export function ProvidersProvider({ children }: { readonly children: React.React
       }
       setProviders(res.data.data);
       setHasMore(res.data.has_more);
-
-      if (res.data.has_more && res.data.data.length > 0) {
-        const lastItem = res.data.data.at(-1);
-        if (lastItem) {
-          cursorsRef.current[pagination.pageIndex + 1] = lastItem.id;
-        }
-      }
+      setTotal(res.data.total);
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : t('common.loadFailed', 'Failed to load data'));
     } finally {
@@ -90,7 +85,6 @@ export function ProvidersProvider({ children }: { readonly children: React.React
   // Reset to first page on search/filter change
   // biome-ignore lint/correctness/useExhaustiveDependencies: react to search/filter change
   useEffect(() => {
-    cursorsRef.current = [undefined];
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   }, [search, kindFilter, pagination.pageSize]);
 
@@ -115,6 +109,7 @@ export function ProvidersProvider({ children }: { readonly children: React.React
         loading,
         error,
         hasMore,
+        total,
         loadProviders: load,
       }}
     >

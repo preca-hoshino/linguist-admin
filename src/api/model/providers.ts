@@ -3,7 +3,7 @@ import { request } from '../client';
 
 export const listProviders = async (params?: {
   limit?: number;
-  starting_after?: string;
+  offset?: number;
   search?: string;
   kind?: string;
 }): Promise<ApiResult<ListResponse<Provider>>> => {
@@ -11,8 +11,8 @@ export const listProviders = async (params?: {
   if (params?.limit !== undefined) {
     qs.set('limit', String(params.limit));
   }
-  if (params?.starting_after != null && params.starting_after !== '') {
-    qs.set('starting_after', params.starting_after);
+  if (params?.offset !== undefined && params.offset > 0) {
+    qs.set('offset', String(params.offset));
   }
   if (params?.search != null && params.search !== '') {
     qs.set('search', params.search);
