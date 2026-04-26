@@ -14,14 +14,19 @@ export function McpLogContentTab({ log }: McpLogContentTabProps): React.JSX.Elem
   const { t } = useTranslation();
   const { resolvedTheme } = useTheme();
 
+  // 冷热分离后，params/result 从 mcp_context JSONB（冷宽表，详情页 JOIN 后返回）读取
+  const ctx = log.mcp_context;
+  const auditParams = (ctx?.params ?? {}) as Record<string, unknown>;
+  const auditResult = (ctx?.result ?? {}) as Record<string, unknown>;
+
   // Handle specially formatted tools/call
   if (log.method === 'tools/call') {
-    const toolName = typeof log.params.name === 'string' ? log.params.name : 'Unknown Tool';
+    const toolName = typeof auditParams.name === 'string' ? auditParams.name : (log.tool_name ?? 'Unknown Tool');
     const toolArgs =
-      typeof log.params.arguments === 'object' && log.params.arguments !== null ? log.params.arguments : {};
+      typeof auditParams.arguments === 'object' && auditParams.arguments !== null ? auditParams.arguments : {};
 
     // Result is usually an array of content blocks for tools/call
-    const resultContents = Array.isArray(log.result.content) ? log.result.content : [];
+    const resultContents = Array.isArray(auditResult.content) ? auditResult.content : [];
 
     return (
       <div className="flex flex-col gap-6 bg-background h-full w-full">
@@ -73,7 +78,7 @@ export function McpLogContentTab({ log }: McpLogContentTabProps): React.JSX.Elem
               </div>
             )}
 
-            {resultContents.map((cb, idx: number) => {
+            {resultContents.map((cb: unknown, idx: number) => {
               const contentBlock = cb as Record<string, unknown> | null | undefined;
               if (contentBlock && typeof contentBlock === 'object' && contentBlock.type === 'text') {
                 return (
