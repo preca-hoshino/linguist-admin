@@ -273,23 +273,27 @@ export function useLogsColumns(
         const isStream = row.original.is_stream === true;
         const ttftMs = row.original.ttft_ms;
         const duration = row.original.duration_ms;
-        if (isStream && ttftMs != null) {
-          return (
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-[11px] text-muted-foreground/80 tracking-tight">TTFT</span>
-              <span className="font-mono text-[11px]">{formatLatency(ttftMs)}</span>
-            </div>
-          );
+
+        if (duration == null && ttftMs == null) {
+          return <span className="text-muted-foreground">-</span>;
         }
-        if (duration != null) {
-          return (
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-[11px] text-muted-foreground/80 tracking-tight">E2E</span>
-              <span className="font-mono text-[11px]">{formatLatency(duration)}</span>
-            </div>
-          );
-        }
-        return <span className="text-muted-foreground">-</span>;
+
+        return (
+          <div className="flex flex-col gap-0.5">
+            {isStream && ttftMs != null && (
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-[10px] text-muted-foreground/80 tracking-tight w-6">TTFT</span>
+                <span className="font-mono text-[11px]">{formatLatency(ttftMs)}</span>
+              </div>
+            )}
+            {duration != null && (
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-[10px] text-muted-foreground/80 tracking-tight w-6">E2E</span>
+                <span className="font-mono text-[11px]">{formatLatency(duration)}</span>
+              </div>
+            )}
+          </div>
+        );
       },
       enableSorting: false,
     },
