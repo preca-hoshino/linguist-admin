@@ -17,7 +17,10 @@ function formatDateTime(dateStr: string): React.JSX.Element {
   );
 }
 
-export function useLogsColumns(): ColumnDef<RequestLog>[] {
+export function useLogsColumns(
+  providerOptions: { label: string; value: string }[],
+  appOptions: { label: string; value: string }[],
+): ColumnDef<RequestLog>[] {
   const { t } = useTranslation();
 
   const columns: ColumnDef<RequestLog>[] = [
@@ -146,7 +149,8 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
         if (kind == null || kind === '') {
           return <span className="text-muted-foreground">-</span>;
         }
-        return <ProviderCell kind={kind} id={pid ?? ''} name={''} size="sm" />;
+        const providerName = providerOptions.find((o) => o.value === pid)?.label ?? '';
+        return <ProviderCell kind={kind} id={pid ?? ''} name={providerName} size="sm" />;
       },
       enableSorting: true,
     },
@@ -165,7 +169,10 @@ export function useLogsColumns(): ColumnDef<RequestLog>[] {
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('modelsPage.logs.app', 'App')} />,
       meta: {},
       cell: ({ row }): React.JSX.Element => {
-        const name = row.original.app_name ?? row.original.app_id;
+        const name =
+          row.original.app_name ??
+          appOptions.find((o) => o.value === row.original.app_id)?.label ??
+          row.original.app_id;
         return <span className="text-[11px] font-medium">{name != null && name !== '' ? name : '-'}</span>;
       },
       enableSorting: false,

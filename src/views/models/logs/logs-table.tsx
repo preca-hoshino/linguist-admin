@@ -46,10 +46,10 @@ export function LogsTable(): React.JSX.Element {
     setOpen,
     setSelectedIds,
   } = useLogs();
-  const columns = useLogsColumns();
-
   const [providerOptions, setProviderOptions] = useState<{ label: string; value: string }[]>([]);
   const [appOptions, setAppOptions] = useState<{ label: string; value: string }[]>([]);
+
+  const columns = useLogsColumns(providerOptions, appOptions);
 
   useEffect(() => {
     // 异步拉取全部已有 providers 以作为过滤选项（直接以具体实例的 id 作为筛选值）
