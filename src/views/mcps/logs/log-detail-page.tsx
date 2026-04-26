@@ -194,31 +194,26 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
         {/* Client */}
         {renderNode(
           <User className="h-5 w-5" />,
-          appNameFromCtx ?? t('mcpsPage.logs.clientNode', 'Client'),
+          appNameFromCtx ?? log.app_id ?? 'Unknown Client',
           null,
-          log.app_id,
+          virtualMcpName ?? log.virtual_mcp_id,
         )}
 
-        {/* Client -> Virtual MCP */}
+        {/* Client -> Linguist */}
         {renderEdge(log.method, false)}
 
-        {/* Virtual MCP (Router) */}
-        {renderNode(
-          <RouterIcon className="h-5 w-5" />,
-          virtualMcpName ?? t('mcpsPage.logs.virtualMcpNode', 'Virtual MCP'),
-          null,
-          log.virtual_mcp_id,
-        )}
+        {/* Linguist */}
+        {renderNode(<RouterIcon className="h-5 w-5" />, 'Linguist', null, null)}
 
-        {/* Virtual MCP -> Provider */}
+        {/* Linguist -> Provider */}
         {renderEdge(log.method, isError)}
 
         {/* Provider */}
         {renderNode(
           <Cloud className="h-5 w-5" />,
-          providerMcpName ?? t('mcpsPage.logs.mcpServerNode', 'MCP Server'),
+          providerMcpName ?? log.mcp_provider_id ?? 'Unknown Provider',
           null,
-          log.mcp_provider_id,
+          null,
         )}
       </div>
     </div>
