@@ -22,6 +22,7 @@ interface VirtualModelsContextType {
   loading: boolean;
   error: string;
   hasMore: boolean;
+  total: number;
   loadVirtualModels: () => Promise<void>;
 }
 
@@ -34,7 +35,7 @@ export function VirtualModelsProvider({ children }: { readonly children: React.R
   const [open, setOpen] = useDialogState<VirtualModelsDialogType>(null);
   const [currentRow, setCurrentRow] = useState<VirtualModel | null>(null);
   const [virtualModels, setVirtualModels] = useState<VirtualModel[]>([]);
-  const cursorsRef = React.useRef<(string | undefined)[]>([undefined]);
+  const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(false);
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -57,10 +58,10 @@ export function VirtualModelsProvider({ children }: { readonly children: React.R
       setLoading(true);
       setError('');
 
-      const startingAfter = cursorsRef.current[pagination.pageIndex];
+      const offset = pagination.pageIndex * pagination.pageSize;
       const payload: Parameters<typeof listVirtualModels>[0] = { limit: pagination.pageSize };
-      if (startingAfter !== undefined) {
-        payload.starting_after = startingAfter;
+      if (offset > 0) {
+        payload.offset = offset;
       }
       if (search) {
         payload.search = search;
@@ -81,13 +82,7 @@ export function VirtualModelsProvider({ children }: { readonly children: React.R
       }
       setVirtualModels(res.data.data);
       setHasMore(res.data.has_more);
-
-      if (res.data.has_more && res.data.data.length > 0) {
-        const lastItem = res.data.data.at(-1);
-        if (lastItem) {
-          cursorsRef.current[pagination.pageIndex + 1] = lastItem.id;
-        }
-      }
+      setTotal(res.data.total);
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : t('common.loadFailed', 'Failed to load data'));
     } finally {
@@ -98,7 +93,6 @@ export function VirtualModelsProvider({ children }: { readonly children: React.R
   // Reset to first page on search/filter change
   // biome-ignore lint/correctness/useExhaustiveDependencies: react to search/filter change
   useEffect(() => {
-    cursorsRef.current = [undefined];
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   }, [search, modelTypeFilter, routingStrategyFilter, isActiveFilter, pagination.pageSize]);
 
@@ -123,6 +117,7 @@ export function VirtualModelsProvider({ children }: { readonly children: React.R
         loading,
         error,
         hasMore,
+        total,
         loadVirtualModels: load,
       }}
     >
