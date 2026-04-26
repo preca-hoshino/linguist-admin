@@ -1,5 +1,17 @@
 import { Link, useLoaderData, useRouter } from '@tanstack/react-router';
-import { ArrowRight, ChevronLeft, Clock, Cloud, Code2, Database, FileText, Trash2, User, Info } from 'lucide-react';
+import {
+  Activity,
+  ArrowRight,
+  ChevronLeft,
+  Clock,
+  Cloud,
+  Code2,
+  Database,
+  FileText,
+  MessageSquare,
+  Trash2,
+  User,
+} from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -13,10 +25,10 @@ import { Main } from '@/layouts/Main';
 import type { McpLog } from '@/types/mcp';
 import { cn } from '@/utils/utils';
 import { McpLogContentTab } from './detail-tabs/McpLogContentTab';
-import { McpLogRawDataTab } from './detail-tabs/McpLogRawDataTab';
 import { McpLogMetadataTab } from './detail-tabs/McpLogMetadataTab';
+import { McpLogPerformanceTab } from './detail-tabs/McpLogPerformanceTab';
 
-const LOG_TABS = ['content', 'payload', 'metadata'] as const;
+const LOG_TABS = ['content', 'performance', 'metadata'] as const;
 type LogTab = (typeof LOG_TABS)[number];
 
 function relativeTime(dateStr: string, t: ReturnType<typeof useTranslation>['t']): string {
@@ -50,17 +62,31 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
     }
   };
 
-  const renderNode = (icon: React.ReactNode, title: string, desc1?: string | null): React.JSX.Element => (
-    <div className="flex flex-col items-center gap-2 shrink-0 z-10 w-24">
+  const renderNode = (
+    icon: React.ReactNode,
+    title: string,
+    desc1?: string | null,
+    desc2?: string | null,
+  ): React.JSX.Element => (
+    <div className="flex flex-col items-center gap-2 shrink-0 z-10 min-w-24 max-w-[250px]">
       <div className="flex h-12 w-12 items-center justify-center rounded-full border bg-background text-muted-foreground shadow-sm">
         {icon}
       </div>
       <div className="flex flex-col items-center text-center">
         <span className="text-sm font-semibold text-foreground">{title}</span>
         {desc1 != null && desc1 !== '' && (
-          <span className="text-[11px] font-mono text-muted-foreground mt-0.5 truncate max-w-[100px]" title={desc1}>
+          <span className="text-[11px] font-mono text-muted-foreground mt-0.5 truncate max-w-full" title={desc1}>
             {desc1}
           </span>
+        )}
+        {desc2 != null && desc2 !== '' && (
+          <Badge
+            variant="secondary"
+            className="text-[10px] mt-1 hover:bg-secondary font-normal truncate max-w-full"
+            title={desc2}
+          >
+            {desc2}
+          </Badge>
         )}
       </div>
     </div>
@@ -68,7 +94,7 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
 
   const renderEdge = (label: string, isError?: boolean): React.JSX.Element => (
     <div
-      className="flex flex-col items-center justify-center relative shrink-0 mx-6 -mt-6"
+      className="flex flex-col items-center justify-center relative shrink-0 mx-6 -mt-8"
       style={{ minWidth: '160px' }}
     >
       <div
@@ -83,7 +109,7 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
       <Badge
         variant="outline"
         className={cn(
-          'z-10 bg-background shadow-sm truncate max-w-full text-[10px]',
+          'z-10 bg-background shadow-sm truncate max-w-full text-[10px] font-mono',
           isError && 'border-destructive/50 text-destructive',
         )}
       >
@@ -124,24 +150,24 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
                   isCompleted &&
                     'border-green-300 text-green-700 bg-green-50/50 dark:border-green-900 dark:text-green-400 dark:bg-green-900/20',
                   isError && 'border-destructive/40 text-destructive bg-destructive/5',
+                  !isCompleted && !isError && 'text-muted-foreground',
                 )}
               >
-                {isCompleted ? t('common.success', 'Success') : t('common.error', 'Error')}
+                {((): string => {
+                  if (isCompleted) {
+                    return t('modelsPage.logs.statusCompleted', '成功');
+                  }
+                  if (isError) {
+                    return t('modelsPage.logs.statusError', '失败');
+                  }
+                  return t('modelsPage.logs.statusProcessing', '处理中');
+                })()}
               </Badge>
               <Badge
                 variant="outline"
-                className="text-xs font-mono text-blue-600/90 border-blue-400 dark:text-blue-400 dark:border-blue-900"
+                className="text-xs font-mono text-blue-600/90 border-blue-400 dark:text-blue-400 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-900/20"
               >
                 {log.method}
-              </Badge>
-              <Badge
-                variant="outline"
-                className={cn(
-                  'text-[11px] font-mono',
-                  (log.duration_ms ?? 0) > 2000 && 'border-amber-400 text-amber-600',
-                )}
-              >
-                {log.duration_ms == null ? '-' : `${log.duration_ms}ms`}
               </Badge>
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground ml-1">
                 <Clock className="h-3.5 w-3.5" />
@@ -166,17 +192,24 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
       </div>
 
       <div className="flex items-center justify-center px-4 py-8 relative max-w-full overflow-x-auto">
-        {renderNode(<User className="h-5 w-5" />, t('mcpsPage.logs.clientNode', 'Client'), log.app_id ?? 'Unknown')}
+        {renderNode(
+          <User className="h-5 w-5" />,
+          t('mcpsPage.logs.clientNode', 'Client'),
+          null,
+          log.app_id ?? 'Unknown',
+        )}
         {renderEdge(log.method, isError)}
         {renderNode(
           <Database className="h-5 w-5" />,
           t('mcpsPage.logs.virtualMcpNode', 'Virtual MCP'),
+          null,
           log.virtual_mcp_id ?? 'Unknown',
         )}
         {renderEdge(log.method, isError)}
         {renderNode(
           <Cloud className="h-5 w-5" />,
           t('mcpsPage.logs.mcpServerNode', 'MCP Server'),
+          null,
           log.mcp_provider_id ?? 'Unknown',
         )}
       </div>
@@ -211,24 +244,24 @@ export function McpLogDetailPage(): React.JSX.Element {
               value="content"
               className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pt-2 pb-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
             >
-              <FileText className="mr-2 h-4 w-4" />
-              {t('modelsPage.logs.detail.content', 'Content')}
+              <MessageSquare className="mr-1.5 h-3.5 w-3.5" />
+              {t('modelsPage.logs.detail.tabContent', '内容')}
             </TabsTrigger>
 
             <TabsTrigger
-              value="payload"
+              value="performance"
               className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pt-2 pb-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
             >
-              <Code2 className="mr-2 h-4 w-4" />
-              {t('modelsPage.logs.detail.rawData', 'Payload')}
+              <Activity className="mr-1.5 h-3.5 w-3.5" />
+              {t('modelsPage.logs.detail.tabPerformance', '性能')}
             </TabsTrigger>
 
             <TabsTrigger
               value="metadata"
               className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pt-2 pb-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
             >
-              <Info className="mr-2 h-4 w-4" />
-              {t('modelsPage.logs.detail.metadata', 'Metadata')}
+              <Code2 className="mr-1.5 h-3.5 w-3.5" />
+              {t('modelsPage.logs.detail.tabMetadata', '元数据')}
             </TabsTrigger>
           </TabsList>
         </div>
@@ -237,8 +270,8 @@ export function McpLogDetailPage(): React.JSX.Element {
           <McpLogContentTab log={log} />
         </TabsContent>
 
-        <TabsContent value="payload" className="outline-none">
-          <McpLogRawDataTab log={log} />
+        <TabsContent value="performance" className="outline-none">
+          <McpLogPerformanceTab log={log} />
         </TabsContent>
 
         <TabsContent value="metadata" className="outline-none">
