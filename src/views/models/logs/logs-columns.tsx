@@ -107,7 +107,7 @@ export function useLogsColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('modelsPage.logs.userFormat', 'Client Format')} />
       ),
-      meta: { className: 'ps-1 w-32', tdClassName: 'ps-4' },
+      meta: { className: 'w-32' },
       cell: ({ row }): React.JSX.Element => {
         const fmt = row.original.user_format;
         if (fmt == null || fmt === '') {
