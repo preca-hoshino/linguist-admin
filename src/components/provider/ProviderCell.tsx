@@ -31,7 +31,7 @@ export function ProviderCell({ kind, id, name, size = 'md' }: ProviderCellProps)
   const containerClass = isSm
     ? 'flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] border bg-background text-muted-foreground shadow-sm'
     : 'flex h-6 w-6 shrink-0 items-center justify-center rounded-md border text-muted-foreground shadow-sm';
-  const textClass = isSm ? 'truncate text-xs text-foreground max-w-[110px]' : 'text-sm text-foreground';
+  const textClass = isSm ? 'truncate text-xs text-foreground max-w-[200px]' : 'text-sm text-foreground';
   const iconSize = isSm ? 12 : 14;
 
   return (
