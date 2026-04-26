@@ -12,7 +12,7 @@ export const listRequestLogs = async (params?: {
   is_stream?: string;
   app_id?: string;
   limit?: number;
-  starting_after?: string;
+  offset?: number;
 }): Promise<ApiResult<RequestLogList>> => {
   const qs = new URLSearchParams();
   if (params) {
