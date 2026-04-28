@@ -51,7 +51,7 @@ describe('useUsageChart', () => {
       ok: true,
       data: {
         series: [
-          { time: '2026-04-05T08:00:00Z', requests: 0 },
+          { time: '2026-04-05T08:00:00Z', requests: 0, error_count: 0, timeout_count: 0, rate_limit_count: 0 },
           {
             time: '2026-04-05T09:00:00Z',
             requests: 10,
@@ -91,6 +91,8 @@ describe('useUsageChart', () => {
     const data = result.current.data;
     expect(data[0]?.requests).toBeNull();
     expect(data[0]?.tok_s_avg).toBeNull();
+    // requests=0 且 error_count=0 时，错误字段也应为 null
+    expect(data[0]?.error_count).toBeNull();
 
     const secondPoint = data[1];
     if (secondPoint != null) {
@@ -98,6 +100,37 @@ describe('useUsageChart', () => {
       expect(secondPoint.avg_latency_ms).toBe(500);
       expect(secondPoint.tok_s_avg).toBe(1000 / 20);
     }
+  });
+
+  it('should preserve error fields when requests=0 but error_count>0', async () => {
+    vi.mocked(getStatsTimeSeries).mockResolvedValueOnce({
+      ok: true,
+      data: {
+        series: [
+          {
+            time: '2026-04-05T08:00:00Z',
+            requests: 0,
+            error_count: 3,
+            timeout_count: 1,
+            rate_limit_count: 2,
+          },
+        ],
+      },
+    } as unknown as Awaited<ReturnType<typeof getStatsTimeSeries>>);
+
+    const { result } = renderHook(() => useUsageChart('today'));
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    const point = result.current.data[0];
+    // 请求类字段应为 null（断线）
+    expect(point?.requests).toBeNull();
+    expect(point?.total_tokens).toBeNull();
+    // 错误类字段应保留实际值（独立于 requests 判断）
+    expect(point?.error_count).toBe(3);
+    expect(point?.timeout_count).toBe(1);
+    expect(point?.rate_limit_count).toBe(2);
   });
 
   it('handles API error', async () => {
