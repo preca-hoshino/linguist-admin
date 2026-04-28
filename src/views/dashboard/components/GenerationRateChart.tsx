@@ -34,10 +34,11 @@ interface CustomTooltipProps {
 }
 
 function CustomTooltip({ active, payload, timeRange }: CustomTooltipProps): React.JSX.Element | null {
-  if (!active || payload === undefined || payload.length === 0) {
+  if (!active) {
     return null;
   }
-  const point = payload[0]?.payload;
+  // filterNull=false 时 payload 始终存在，但 point 可能为空（不应发生）
+  const point = payload?.[0]?.payload;
   if (!point) {
     return null;
   }
@@ -143,6 +144,7 @@ export function GenerationRateChart({ data, loading, timeRange }: GenerationRate
           content={<CustomTooltip timeRange={timeRange} />}
           cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
           isAnimationActive={false}
+          filterNull={false}
         />
         <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, paddingTop: 12 }} />
         {LINES.map((line) => (
