@@ -27,7 +27,8 @@ describe('useCostTrend', () => {
       expect(result.current.loading).toBe(false);
     });
     expect(result.current.data).toHaveLength(3);
-    expect(result.current.data[0]?.tickLabel).toMatch(/^\d{2}:\d{2}$/);
+    // tickLabel 现在始终为 "MM.DD HH:MM" 格式，确保每个点唯一
+    expect(result.current.data[0]?.tickLabel).toMatch(/^\d{2}\.\d{2} \d{2}:\d{2}$/);
     expect(result.current.data[1]?.total_cost).toBe(0);
     expect(result.current.data[2]?.total_cost).toBe(0);
   });
@@ -40,7 +41,8 @@ describe('useCostTrend', () => {
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
     });
-    expect(result.current.data[0]?.tickLabel).toMatch(/^(1[0-2]|[1-9])\.\d{1,2}$/);
+    // tickLabel 现在始终为 "MM.DD HH:MM" 格式
+    expect(result.current.data[0]?.tickLabel).toMatch(/^\d{2}\.\d{2} \d{2}:\d{2}$/);
   });
 
   it('should pass dimensions', async () => {

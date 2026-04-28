@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Bar, CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Skeleton } from '@/components/ui/Skeleton';
-import type { CostChartPoint } from '@/composables/use-cost-trend';
+import { formatCostTickDisplay, type CostChartPoint } from '@/composables/use-cost-trend';
 import { type ChartPoint, formatTooltipTime, getTickInterval, type TimeRange } from '@/composables/use-usage-chart';
 
 interface CostChartProps {
@@ -110,6 +110,7 @@ export function CostChart({ data, loading, timeRange }: CostChartProps): React.J
           minTickGap={40}
           className="fill-muted-foreground"
           padding={{ right: 30 }}
+          tickFormatter={(v: string) => formatCostTickDisplay(v, timeRange)}
         />
         <YAxis
           yAxisId="left"

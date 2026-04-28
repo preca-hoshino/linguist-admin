@@ -17,12 +17,24 @@ export interface CostChartPoint {
   [key: string]: string | number;
 }
 
-function formatTickLabel(isoTime: string, timeRange: TimeRange): string {
+/** tickLabel 保持唯一（含完整日期时间），确保每个数据点有独立的 tooltip snap 位置 */
+function formatTickLabel(isoTime: string): string {
   const d = new Date(isoTime);
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const h = String(d.getHours()).padStart(2, '0');
+  const m = String(d.getMinutes()).padStart(2, '0');
+  return `${month}.${day} ${h}:${m}`;
+}
+
+/** XAxis tickFormatter：将唯一的 tickLabel 转换为简短显示标签 */
+export function formatCostTickDisplay(tickLabel: string, timeRange: TimeRange): string {
+  const [datePart, timePart] = tickLabel.split(' ');
   if (timeRange === 'today') {
-    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    return timePart ?? tickLabel;
   }
-  return `${d.getMonth() + 1}.${d.getDate()}`;
+  const [month, day] = (datePart ?? '').split('.');
+  return `${Number(month)}.${Number(day)}`;
 }
 
 export interface UseCostTrendOptions {
@@ -60,7 +72,7 @@ export function useCostTrend(
       }
 
       const pts: CostChartPoint[] = res.data.series.map((p: TimeSeriesPoint) => ({
-        tickLabel: formatTickLabel(p.time, timeRange),
+        tickLabel: formatTickLabel(p.time),
         isoTime: p.time,
         total_cost: Math.max(0, p.cost),
         cost: Math.max(0, p.cost),
