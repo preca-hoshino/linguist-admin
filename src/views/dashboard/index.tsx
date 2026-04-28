@@ -18,7 +18,7 @@ export function DashboardPage(): React.JSX.Element {
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
   const [globalRange, setGlobalRange] = useState<GlobalTimeRange>('today');
   const [chartKey, setChartKey] = useState(0);
-  const { today, overview, loading, error, refresh } = useTodayStats();
+  const { today, overview, loading, error, refresh } = useTodayStats(globalRange);
 
   /** 刷新按钮：同时刷新 KPI 卡片数据和所有图表数据 */
   function handleRefresh(): void {
