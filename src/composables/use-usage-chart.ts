@@ -89,73 +89,119 @@ export function formatTooltipTime(isoTime: string, timeRange: TimeRange): string
   }
 }
 
-/** 将原始 TimeSeriesPoint 转为图表友好格式，无数据时用 null 断线 */
+/** 将请求类字段从原始点映射为图表点字段（无请求时全部置 null） */
+function buildRequestFields(
+  p: TimeSeriesPoint,
+  noRequests: boolean,
+): Pick<
+  ChartPoint,
+  | 'requests'
+  | 'total_tokens'
+  | 'rpm'
+  | 'tpm'
+  | 'prompt_tokens'
+  | 'completion_tokens'
+  | 'cached_tokens'
+  | 'avg_latency_ms'
+  | 'p50_latency_ms'
+  | 'p90_latency_ms'
+  | 'p99_latency_ms'
+  | 'ttft_avg_ms'
+  | 'ttft_p50_ms'
+  | 'ttft_p90_ms'
+  | 'ttft_p99_ms'
+  | 'itl_avg_ms'
+  | 'itl_p50_ms'
+  | 'itl_p90_ms'
+  | 'itl_p99_ms'
+  | 'tok_s_avg'
+  | 'tok_s_p50'
+  | 'tok_s_p90'
+  | 'tok_s_p99'
+> {
+  if (noRequests) {
+    return {
+      requests: null,
+      total_tokens: null,
+      rpm: null,
+      tpm: null,
+      prompt_tokens: null,
+      completion_tokens: null,
+      cached_tokens: null,
+      avg_latency_ms: null,
+      p50_latency_ms: null,
+      p90_latency_ms: null,
+      p99_latency_ms: null,
+      ttft_avg_ms: null,
+      ttft_p50_ms: null,
+      ttft_p90_ms: null,
+      ttft_p99_ms: null,
+      itl_avg_ms: null,
+      itl_p50_ms: null,
+      itl_p90_ms: null,
+      itl_p99_ms: null,
+      tok_s_avg: null,
+      tok_s_p50: null,
+      tok_s_p90: null,
+      tok_s_p99: null,
+    };
+  }
+  return {
+    requests: p.requests,
+    total_tokens: p.total_tokens,
+    rpm: p.rpm,
+    tpm: p.tpm,
+    prompt_tokens: p.prompt_tokens,
+    completion_tokens: p.completion_tokens,
+    cached_tokens: p.cached_tokens,
+    avg_latency_ms: p.avg_latency_ms,
+    p50_latency_ms: p.p50_latency_ms,
+    p90_latency_ms: p.p90_latency_ms,
+    p99_latency_ms: p.p99_latency_ms,
+    ttft_avg_ms: p.ttft_avg_ms,
+    ttft_p50_ms: p.ttft_p50_ms,
+    ttft_p90_ms: p.ttft_p90_ms,
+    ttft_p99_ms: p.ttft_p99_ms,
+    itl_avg_ms: p.itl_avg_ms,
+    itl_p50_ms: p.itl_p50_ms,
+    itl_p90_ms: p.itl_p90_ms,
+    itl_p99_ms: p.itl_p99_ms,
+    // 生成速率：由 ITL 推算，ITL 有效时才计算
+    tok_s_avg: p.itl_avg_ms !== null && p.itl_avg_ms > 0 ? 1000 / p.itl_avg_ms : null,
+    tok_s_p50: p.itl_p50_ms !== null && p.itl_p50_ms > 0 ? 1000 / p.itl_p50_ms : null,
+    tok_s_p90: p.itl_p90_ms !== null && p.itl_p90_ms > 0 ? 1000 / p.itl_p90_ms : null,
+    tok_s_p99: p.itl_p99_ms !== null && p.itl_p99_ms > 0 ? 1000 / p.itl_p99_ms : null,
+  };
+}
+
+/** 将错误类字段从原始点映射为图表点字段（独立于请求数判断，无错误时置 null 断线） */
+function buildErrorFields(p: TimeSeriesPoint): Pick<ChartPoint, 'error_count' | 'timeout_count' | 'rate_limit_count'> {
+  const noErrors = p.error_count <= 0;
+  return {
+    error_count: noErrors ? null : p.error_count,
+    timeout_count: noErrors ? null : p.timeout_count,
+    rate_limit_count: noErrors ? null : p.rate_limit_count,
+  };
+}
+
+/**
+ * 将原始 TimeSeriesPoint 转为图表友好格式，无数据时用 null 断线。
+ *
+ * 空值处理分为两个维度：
+ * - 请求类指标（requests/tokens/rpm/tpm/延迟/生成速率）：requests <= 0 时置 null
+ * - 错误类指标（error_count/timeout_count/rate_limit_count）：独立判断，
+ *   error_count <= 0 时才置 null，确保有错误但无请求的时间点能在 ErrorChart 上正确显示
+ */
 function toChartPoints(series: TimeSeriesPoint[], timeRange: TimeRange): ChartPoint[] {
   return series.map((p) => {
     const tickLabel = formatTickLabel(p.time, timeRange);
     const isoTime = p.time;
-    if (p.requests <= 0) {
-      return {
-        tickLabel,
-        isoTime,
-        requests: null,
-        total_tokens: null,
-        rpm: null,
-        tpm: null,
-        prompt_tokens: null,
-        completion_tokens: null,
-        cached_tokens: null,
-        error_count: null,
-        timeout_count: null,
-        rate_limit_count: null,
-        avg_latency_ms: null,
-        p50_latency_ms: null,
-        p90_latency_ms: null,
-        p99_latency_ms: null,
-        ttft_avg_ms: null,
-        ttft_p50_ms: null,
-        ttft_p90_ms: null,
-        ttft_p99_ms: null,
-        itl_avg_ms: null,
-        itl_p50_ms: null,
-        itl_p90_ms: null,
-        itl_p99_ms: null,
-        tok_s_avg: null,
-        tok_s_p50: null,
-        tok_s_p90: null,
-        tok_s_p99: null,
-      };
-    }
-
+    const noRequests = p.requests <= 0;
     return {
       tickLabel,
       isoTime,
-      requests: p.requests,
-      total_tokens: p.total_tokens,
-      rpm: p.rpm,
-      tpm: p.tpm,
-      prompt_tokens: p.prompt_tokens,
-      completion_tokens: p.completion_tokens,
-      cached_tokens: p.cached_tokens,
-      error_count: p.error_count,
-      timeout_count: p.timeout_count,
-      rate_limit_count: p.rate_limit_count,
-      avg_latency_ms: p.avg_latency_ms,
-      p50_latency_ms: p.p50_latency_ms,
-      p90_latency_ms: p.p90_latency_ms,
-      p99_latency_ms: p.p99_latency_ms,
-      ttft_avg_ms: p.ttft_avg_ms,
-      ttft_p50_ms: p.ttft_p50_ms,
-      ttft_p90_ms: p.ttft_p90_ms,
-      ttft_p99_ms: p.ttft_p99_ms,
-      itl_avg_ms: p.itl_avg_ms,
-      itl_p50_ms: p.itl_p50_ms,
-      itl_p90_ms: p.itl_p90_ms,
-      itl_p99_ms: p.itl_p99_ms,
-      tok_s_avg: p.itl_avg_ms !== null && p.itl_avg_ms > 0 ? 1000 / p.itl_avg_ms : null,
-      tok_s_p50: p.itl_p50_ms !== null && p.itl_p50_ms > 0 ? 1000 / p.itl_p50_ms : null,
-      tok_s_p90: p.itl_p90_ms !== null && p.itl_p90_ms > 0 ? 1000 / p.itl_p90_ms : null,
-      tok_s_p99: p.itl_p99_ms !== null && p.itl_p99_ms > 0 ? 1000 / p.itl_p99_ms : null,
+      ...buildRequestFields(p, noRequests),
+      ...buildErrorFields(p),
     };
   });
 }
