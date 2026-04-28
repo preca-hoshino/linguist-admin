@@ -55,11 +55,12 @@ interface CustomTooltipProps {
 }
 
 function CustomTooltip({ active, payload, metric, timeRange }: CustomTooltipProps): React.JSX.Element | null {
-  if (active !== true || payload === undefined || payload.length === 0) {
+  if (active !== true) {
     return null;
   }
 
-  const point = payload[0]?.payload;
+  // filterNull=false 时 payload 始终存在，但 point 可能为空（不应发生）
+  const point = payload?.[0]?.payload;
   if (!point) {
     return null;
   }
@@ -178,6 +179,7 @@ export function UsageChart({ data, metric, loading, timeRange }: UsageChartProps
           content={<CustomTooltip metric={metric} timeRange={timeRange} />}
           cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
           isAnimationActive={false}
+          filterNull={false}
         />
         {metric === 'tokens' ? (
           TOKEN_LINES.map((line) => (
