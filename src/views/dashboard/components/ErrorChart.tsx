@@ -33,10 +33,11 @@ interface CustomTooltipProps {
 }
 
 function CustomTooltip({ active, payload, timeRange }: CustomTooltipProps): React.JSX.Element | null {
-  if (!active || payload === undefined || payload.length === 0) {
+  if (!active) {
     return null;
   }
-  const point = payload[0]?.payload;
+  // filterNull=false 时 payload 始终存在，但 point 可能为空（不应发生）
+  const point = payload?.[0]?.payload;
   if (!point) {
     return null;
   }
@@ -136,6 +137,7 @@ export function ErrorChart({ data, loading, timeRange }: ErrorChartProps): React
           content={<CustomTooltip timeRange={timeRange} />}
           cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
           isAnimationActive={false}
+          filterNull={false}
         />
         {ERROR_LINES.map((line) => (
           <Area
