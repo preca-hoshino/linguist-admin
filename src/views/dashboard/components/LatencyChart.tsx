@@ -45,8 +45,8 @@ interface CustomTooltipProps {
   readonly point?: ChartPoint;
 }
 
-function CustomTooltip({ payload, timeRange }: CustomTooltipProps): React.JSX.Element | null {
-  if (!payload || payload.length === 0) {
+function CustomTooltip({ active, payload, timeRange }: CustomTooltipProps): React.JSX.Element | null {
+  if (active !== true || !payload || payload.length === 0) {
     return null;
   }
   const firstEntry = payload[0] as { payload?: ChartPoint } | undefined;
