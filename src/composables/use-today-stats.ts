@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getStatsOverview, getStatsToday } from '@/api/model/stats';
 import type { StatsOverview, StatsToday } from '@/types';
 
-/** today 端点 + 当日 overview 端点的并行数据 */
+/** today 端点 + 过去 24 小时 overview 端点的并行数据 */
 export interface TodayStatsData {
   today: StatsToday | null;
   overview: StatsOverview | null;
@@ -10,16 +10,14 @@ export interface TodayStatsData {
 
 const POLL_INTERVAL_MS = 60_000;
 
-/** 获取今日 00:00 的 ISO 字符串（当地时区） */
-function todayStartIso(): string {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  return start.toISOString();
-}
-
 /**
- * 并行请求 /api/stats/today 和 /api/stats/overview（from=今日零点）
+ * 并行请求 /api/stats/today 和 /api/stats/overview（range=24h，即过去 24 小时）
  * 提供 60 秒自动轮询与手动刷新。
+ *
+ * overview 使用 range=24h 而非 from/to 本地时区零点，原因：
+ *   - from/to 方式以本地时区零点为起点，零点之前的数据（如昨天深夜）一概查不到
+ *   - range=24h 以当前时刻往前推 24 小时，始终能覆盖最近的历史数据
+ *   - 与后端 getStatsToday 的 date_trunc('day', NOW()) 互补而非冲突
  */
 export function useTodayStats(): TodayStatsData & { loading: boolean; error: string | null; refresh: () => void } {
   const [data, setData] = useState<TodayStatsData>({ today: null, overview: null });
@@ -30,10 +28,7 @@ export function useTodayStats(): TodayStatsData & { loading: boolean; error: str
   const fetchData = useCallback(async () => {
     try {
       setError(null);
-      const [todayRes, overviewRes] = await Promise.all([
-        getStatsToday(),
-        getStatsOverview({ from: todayStartIso(), to: new Date().toISOString() }),
-      ]);
+      const [todayRes, overviewRes] = await Promise.all([getStatsToday(), getStatsOverview({ range: '24h' })]);
 
       if (!todayRes.ok) {
         throw new Error(todayRes.error.message);
