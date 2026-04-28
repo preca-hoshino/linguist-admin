@@ -53,20 +53,34 @@ const RANGE_CONFIG: Record<TimeRange, { range: StatsRange; interval: string }> =
   '30d': { range: '30d', interval: '6h' },
 };
 
-/** XAxis tick 标签格式化 */
-function formatTickLabel(isoTime: string, timeRange: TimeRange): string {
+/**
+ * XAxis dataKey 值：所有时间粒度下均保持唯一（含 HH:MM），
+ * 确保 recharts 能为每个数据点生成独立的 tooltip snap 位置。
+ * 显示标签由 formatTickDisplay / XAxis tickFormatter 控制。
+ */
+function formatTickLabel(isoTime: string): string {
   const d = new Date(isoTime);
-  switch (timeRange) {
-    case 'today': {
-      const h = String(d.getHours()).padStart(2, '0');
-      const m = String(d.getMinutes()).padStart(2, '0');
-      return `${h}:${m}`;
-    }
-    case '7d':
-    case '30d': {
-      return `${d.getMonth() + 1}.${d.getDate()}`;
-    }
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const h = String(d.getHours()).padStart(2, '0');
+  const m = String(d.getMinutes()).padStart(2, '0');
+  return `${month}.${day} ${h}:${m}`;
+}
+
+/**
+ * XAxis tickFormatter：将唯一的 tickLabel 转换为适合当前时间粒度的简短显示文本。
+ * - today  → "HH:MM"
+ * - 7d/30d → "M.DD"
+ */
+export function formatTickDisplay(tickLabel: string, timeRange: TimeRange): string {
+  // tickLabel 格式固定为 "MM.DD HH:MM"
+  const [datePart, timePart] = tickLabel.split(' ');
+  if (timeRange === 'today') {
+    return timePart ?? tickLabel;
   }
+  // 去掉前导零，例如 "04.28" → "4.28"
+  const [month, day] = (datePart ?? '').split('.');
+  return `${Number(month)}.${Number(day)}`;
 }
 
 /** Tooltip 完整时间格式化 */
@@ -192,9 +206,9 @@ function buildErrorFields(p: TimeSeriesPoint): Pick<ChartPoint, 'error_count' | 
  * - 错误类指标（error_count/timeout_count/rate_limit_count）：独立判断，
  *   error_count <= 0 时才置 null，确保有错误但无请求的时间点能在 ErrorChart 上正确显示
  */
-function toChartPoints(series: TimeSeriesPoint[], timeRange: TimeRange): ChartPoint[] {
+function toChartPoints(series: TimeSeriesPoint[], _timeRange: TimeRange): ChartPoint[] {
   return series.map((p) => {
-    const tickLabel = formatTickLabel(p.time, timeRange);
+    const tickLabel = formatTickLabel(p.time);
     const isoTime = p.time;
     const noRequests = p.requests <= 0;
     return {
