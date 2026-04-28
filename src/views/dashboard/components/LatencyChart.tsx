@@ -1,7 +1,13 @@
 import { useMemo } from 'react';
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { type ChartPoint, formatTooltipTime, getTickInterval, type TimeRange } from '@/composables/use-usage-chart';
+import {
+  type ChartPoint,
+  formatTickDisplay,
+  formatTooltipTime,
+  getTickInterval,
+  type TimeRange,
+} from '@/composables/use-usage-chart';
 import { renderIsolatedDot } from './ChartDot';
 
 export type LatencyMetricKey = 'e2e' | 'ttft' | 'itl';
@@ -134,6 +140,7 @@ export function LatencyChart({ data, metric, loading, timeRange }: LatencyChartP
           minTickGap={40}
           className="fill-muted-foreground"
           padding={{ right: 30 }}
+          tickFormatter={(v: string) => formatTickDisplay(v, timeRange)}
         />
         <YAxis
           tick={{ fontSize: 11 }}

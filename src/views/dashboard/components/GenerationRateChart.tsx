@@ -1,7 +1,13 @@
 import { useMemo } from 'react';
 import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { type ChartPoint, formatTooltipTime, getTickInterval, type TimeRange } from '@/composables/use-usage-chart';
+import {
+  type ChartPoint,
+  formatTickDisplay,
+  formatTooltipTime,
+  getTickInterval,
+  type TimeRange,
+} from '@/composables/use-usage-chart';
 import { renderIsolatedDot } from './ChartDot';
 
 // GenerationRateMetric 类型保留，供外部可能的引用兼容
@@ -131,6 +137,7 @@ export function GenerationRateChart({ data, loading, timeRange }: GenerationRate
           minTickGap={40}
           className="fill-muted-foreground"
           padding={{ right: 30 }}
+          tickFormatter={(v: string) => formatTickDisplay(v, timeRange)}
         />
         <YAxis
           tick={{ fontSize: 11 }}
