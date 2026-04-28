@@ -1,7 +1,13 @@
 import { useMemo } from 'react';
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { type ChartPoint, formatTooltipTime, getTickInterval, type TimeRange } from '@/composables/use-usage-chart';
+import {
+  type ChartPoint,
+  formatTickDisplay,
+  formatTooltipTime,
+  getTickInterval,
+  type TimeRange,
+} from '@/composables/use-usage-chart';
 import { renderIsolatedDot } from './ChartDot';
 
 export type LatencyMetricKey = 'e2e' | 'ttft' | 'itl';
@@ -45,11 +51,12 @@ interface CustomTooltipProps {
   readonly point?: ChartPoint;
 }
 
-function CustomTooltip({ payload, timeRange }: CustomTooltipProps): React.JSX.Element | null {
-  if (!payload || payload.length === 0) {
+function CustomTooltip({ active, payload, timeRange }: CustomTooltipProps): React.JSX.Element | null {
+  if (active !== true) {
     return null;
   }
-  const firstEntry = payload[0] as { payload?: ChartPoint } | undefined;
+  // filterNull=false 时 payload 始终存在，但 point 可能为空（不应发生）
+  const firstEntry = payload?.[0] as { payload?: ChartPoint } | undefined;
   const point = firstEntry?.payload;
   if (!point) {
     return null;
@@ -61,7 +68,7 @@ function CustomTooltip({ payload, timeRange }: CustomTooltipProps): React.JSX.El
     <div className="min-w-[140px] rounded-lg border bg-popover px-3 py-2 text-xs text-popover-foreground shadow-md">
       <p className="mb-1.5 font-medium text-muted-foreground">{title}</p>
       <div className="space-y-1">
-        {payload.map((entry) => {
+        {(payload ?? []).map((entry) => {
           const val = entry.value;
           return (
             <div key={String(entry.dataKey)} className="flex items-center justify-between gap-4">
@@ -133,6 +140,7 @@ export function LatencyChart({ data, metric, loading, timeRange }: LatencyChartP
           minTickGap={40}
           className="fill-muted-foreground"
           padding={{ right: 30 }}
+          tickFormatter={(v: string) => formatTickDisplay(v, timeRange)}
         />
         <YAxis
           tick={{ fontSize: 11 }}
@@ -146,6 +154,7 @@ export function LatencyChart({ data, metric, loading, timeRange }: LatencyChartP
           content={<CustomTooltip timeRange={timeRange} />}
           cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
           isAnimationActive={false}
+          filterNull={false}
         />
         <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, paddingTop: 12 }} />
         {PERCENTILE_LINES.map((line) => {

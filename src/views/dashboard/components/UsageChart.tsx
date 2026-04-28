@@ -1,7 +1,13 @@
 import { useMemo } from 'react';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { type ChartPoint, formatTooltipTime, getTickInterval, type TimeRange } from '@/composables/use-usage-chart';
+import {
+  type ChartPoint,
+  formatTickDisplay,
+  formatTooltipTime,
+  getTickInterval,
+  type TimeRange,
+} from '@/composables/use-usage-chart';
 import { renderIsolatedDot } from './ChartDot';
 
 /** 可视化指标类型 */
@@ -55,11 +61,12 @@ interface CustomTooltipProps {
 }
 
 function CustomTooltip({ active, payload, metric, timeRange }: CustomTooltipProps): React.JSX.Element | null {
-  if (active !== true || payload === undefined || payload.length === 0) {
+  if (active !== true) {
     return null;
   }
 
-  const point = payload[0]?.payload;
+  // filterNull=false 时 payload 始终存在，但 point 可能为空（不应发生）
+  const point = payload?.[0]?.payload;
   if (!point) {
     return null;
   }
@@ -165,6 +172,7 @@ export function UsageChart({ data, metric, loading, timeRange }: UsageChartProps
           minTickGap={40}
           className="fill-muted-foreground"
           padding={{ right: 30 }}
+          tickFormatter={(v: string) => formatTickDisplay(v, timeRange)}
         />
         <YAxis
           tick={{ fontSize: 11 }}
@@ -178,6 +186,7 @@ export function UsageChart({ data, metric, loading, timeRange }: UsageChartProps
           content={<CustomTooltip metric={metric} timeRange={timeRange} />}
           cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
           isAnimationActive={false}
+          filterNull={false}
         />
         {metric === 'tokens' ? (
           TOKEN_LINES.map((line) => (
