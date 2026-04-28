@@ -46,10 +46,11 @@ interface CustomTooltipProps {
 }
 
 function CustomTooltip({ active, payload, timeRange }: CustomTooltipProps): React.JSX.Element | null {
-  if (active !== true || !payload || payload.length === 0) {
+  if (active !== true) {
     return null;
   }
-  const firstEntry = payload[0] as { payload?: ChartPoint } | undefined;
+  // filterNull=false 时 payload 始终存在，但 point 可能为空（不应发生）
+  const firstEntry = payload?.[0] as { payload?: ChartPoint } | undefined;
   const point = firstEntry?.payload;
   if (!point) {
     return null;
@@ -61,7 +62,7 @@ function CustomTooltip({ active, payload, timeRange }: CustomTooltipProps): Reac
     <div className="min-w-[140px] rounded-lg border bg-popover px-3 py-2 text-xs text-popover-foreground shadow-md">
       <p className="mb-1.5 font-medium text-muted-foreground">{title}</p>
       <div className="space-y-1">
-        {payload.map((entry) => {
+        {(payload ?? []).map((entry) => {
           const val = entry.value;
           return (
             <div key={String(entry.dataKey)} className="flex items-center justify-between gap-4">
@@ -146,6 +147,7 @@ export function LatencyChart({ data, metric, loading, timeRange }: LatencyChartP
           content={<CustomTooltip timeRange={timeRange} />}
           cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
           isAnimationActive={false}
+          filterNull={false}
         />
         <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, paddingTop: 12 }} />
         {PERCENTILE_LINES.map((line) => {
