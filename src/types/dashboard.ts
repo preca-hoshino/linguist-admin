@@ -1,5 +1,11 @@
+export const DASHBOARD_MODES = ['model', 'mcp'] as const;
+export type DashboardMode = (typeof DASHBOARD_MODES)[number];
+
 export const DASHBOARD_TABS = ['overview', 'performance', 'distribution', 'errors', 'billing'] as const;
 export type DashboardTab = (typeof DASHBOARD_TABS)[number];
+
+export const MCP_DASHBOARD_TABS = ['overview', 'performance', 'methods', 'errors'] as const;
+export type McpDashboardTab = (typeof MCP_DASHBOARD_TABS)[number];
 
 export const GLOBAL_TIME_RANGES = ['today', '7d', '30d'] as const;
 export type GlobalTimeRange = (typeof GLOBAL_TIME_RANGES)[number];
