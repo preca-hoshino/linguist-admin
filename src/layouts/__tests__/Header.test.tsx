@@ -31,6 +31,10 @@ vi.mock('@/providers/SearchProvider', () => ({
   useSearch: (): { setOpen: ReturnType<typeof vi.fn> } => ({ setOpen: vi.fn() }),
 }));
 
+vi.mock('@/providers/HeaderSlotProvider', () => ({
+  useHeaderSlotContent: (): React.ReactNode => null,
+}));
+
 vi.mock('@tanstack/react-router', () => ({
   useRouter: (): { state: { location: { pathname: string } } } => ({ state: { location: { pathname: '/' } } }),
   Link: ({
