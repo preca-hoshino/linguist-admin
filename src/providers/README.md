@@ -16,7 +16,8 @@ providers/
 ├── FontProvider.tsx       # 注入当前字体设置的环境上下文
 ├── DirectionProvider.tsx  # LTR 抑或 RTL 文字渲染方向控制底层设施
 ├── LayoutProvider.tsx     # 页面及骨架尺寸与交互模式上下文（例如侧边栏启停）
-└── SearchProvider.tsx     # 控制整个应用快捷命令控制面板展示开关的 Context
+├── SearchProvider.tsx     # 控制整个应用快捷命令控制面板展示开关的 Context
+└── HeaderSlotProvider.tsx # 顶栏插槽 Context，供页面向 Header 声明式注入任意内容
 ```
 
 ## 核心模式
