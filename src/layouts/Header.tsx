@@ -6,6 +6,7 @@ import { ThemeSwitch } from '@/components/ThemeSwitch';
 import { ConnectDrawer } from '@/components/connect-drawer';
 import { Separator } from '@/components/ui/Separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { useHeaderSlotContent } from '@/providers/HeaderSlotProvider';
 import { cn } from '@/utils/utils';
 
 type HeaderProps = React.HTMLAttributes<HTMLElement> & {
@@ -15,6 +16,7 @@ type HeaderProps = React.HTMLAttributes<HTMLElement> & {
 
 export function Header({ className, fixed, children, ...props }: HeaderProps): React.JSX.Element {
   const [offset, setOffset] = useState(0);
+  const slot = useHeaderSlotContent();
 
   useEffect(() => {
     const onScroll = (): void => {
@@ -47,7 +49,7 @@ export function Header({ className, fixed, children, ...props }: HeaderProps): R
       >
         <SidebarTrigger variant="outline" className="max-md:scale-125" />
         <Separator orientation="vertical" className="h-6" />
-        {children}
+        {slot ?? children}
 
         {/* 右侧工具栏组件集成 */}
         <div className="ml-auto flex items-center space-x-2">

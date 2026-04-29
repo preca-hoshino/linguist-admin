@@ -52,6 +52,33 @@ export interface McpMethodBreakdownResult {
   data: McpMethodBreakdownItem[];
 }
 
+export interface McpStatsToday {
+  today_requests: number;
+  today_errors: number;
+  current_rpm: number;
+  avg_duration_ms: number | null;
+  p95_duration_ms: number | null;
+}
+
+export interface McpStatsErrorByMethod {
+  method: string;
+  count: number;
+}
+
+export interface McpStatsErrorSample {
+  id: string;
+  method: string;
+  error_message: string | null;
+  created_at: string;
+}
+
+export interface McpStatsErrors {
+  total_errors: number;
+  error_rate: number;
+  by_method: McpStatsErrorByMethod[];
+  recent_samples: McpStatsErrorSample[];
+}
+
 // ── 工具函数  ──────────────────────────────────────────────────────────────
 
 function buildMcpStatsQuery(params?: McpStatsParams): string {
@@ -77,3 +104,9 @@ export const getMcpStatsTimeSeries = async (params?: McpStatsParams): Promise<Ap
 
 export const getMcpMethodBreakdown = async (params?: McpStatsParams): Promise<ApiResult<McpMethodBreakdownResult>> =>
   await request<McpMethodBreakdownResult>('GET', `/mcp/stats/methods${buildMcpStatsQuery(params)}`);
+
+export const getMcpStatsToday = async (): Promise<ApiResult<McpStatsToday>> =>
+  await request<McpStatsToday>('GET', '/mcp/stats/today');
+
+export const getMcpStatsErrors = async (params?: McpStatsParams): Promise<ApiResult<McpStatsErrors>> =>
+  await request<McpStatsErrors>('GET', `/mcp/stats/errors${buildMcpStatsQuery(params)}`);

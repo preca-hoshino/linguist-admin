@@ -3,6 +3,7 @@ import { SkipToMain } from '@/components/SkipToMain';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/layouts/nav/AppSidebar';
 import { Header } from '@/layouts/Header';
+import { HeaderSlotProvider } from '@/providers/HeaderSlotProvider';
 import { LayoutProvider } from '@/providers/LayoutProvider';
 import { SearchProvider } from '@/providers/SearchProvider';
 import { getCookie } from '@/utils/cookies';
@@ -34,8 +35,10 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps): Rea
               'peer-data-[variant=inset]:has-data-[layout=fixed]:h-[calc(100svh-(var(--spacing)*4))]',
             )}
           >
-            <Header fixed />
-            {children ?? <Outlet />}
+            <HeaderSlotProvider>
+              <Header fixed />
+              {children ?? <Outlet />}
+            </HeaderSlotProvider>
           </SidebarInset>
         </SidebarProvider>
       </LayoutProvider>
