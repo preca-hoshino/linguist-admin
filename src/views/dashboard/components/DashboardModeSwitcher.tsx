@@ -1,7 +1,6 @@
-import { Box, Network } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import type { DashboardMode } from '@/types/dashboard';
+import { cn } from '@/utils/utils';
 
 interface DashboardModeSwitcherProps {
   readonly mode: DashboardMode;
@@ -12,26 +11,31 @@ export function DashboardModeSwitcher({ mode, onChange }: DashboardModeSwitcherP
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-center rounded-md border bg-muted/40 p-1">
-      <ToggleGroup
-        type="single"
-        value={mode}
-        onValueChange={(val) => {
-          if (val !== '' && val !== mode) {
-            onChange(val as DashboardMode);
-          }
+    <nav className="mx-4 flex items-center space-x-4 lg:space-x-6">
+      <button
+        type="button"
+        onClick={() => {
+          onChange('model');
         }}
-        className="h-7 gap-1"
+        className={cn(
+          'text-sm font-medium transition-colors hover:text-primary',
+          mode === 'model' ? 'text-primary' : 'text-muted-foreground',
+        )}
       >
-        <ToggleGroupItem value="model" aria-label="Toggle model mode" className="h-7 px-3 text-xs">
-          <Box className="mr-2 h-3.5 w-3.5" />
-          {t('dashboard.mode.model', 'Models')}
-        </ToggleGroupItem>
-        <ToggleGroupItem value="mcp" aria-label="Toggle mcp mode" className="h-7 px-3 text-xs">
-          <Network className="mr-2 h-3.5 w-3.5" />
-          {t('dashboard.mode.mcp', 'MCPs')}
-        </ToggleGroupItem>
-      </ToggleGroup>
-    </div>
+        {t('dashboard.mode.model', 'Models')}
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          onChange('mcp');
+        }}
+        className={cn(
+          'text-sm font-medium transition-colors hover:text-primary',
+          mode === 'mcp' ? 'text-primary' : 'text-muted-foreground',
+        )}
+      >
+        {t('dashboard.mode.mcp', 'MCPs')}
+      </button>
+    </nav>
   );
 }
