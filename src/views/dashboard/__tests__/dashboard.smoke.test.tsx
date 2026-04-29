@@ -2,6 +2,18 @@ import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { DashboardPage } from '../index';
 
+vi.mock('@tanstack/react-router', () => ({
+  getRouteApi: (): Record<string, unknown> => ({
+    useSearch: (): Record<string, unknown> => ({ mode: 'model' }),
+    useNavigate: (): unknown => vi.fn(),
+  }),
+  useNavigate: (): unknown => vi.fn(),
+}));
+
+vi.mock('@/providers/HeaderSlotProvider', () => ({
+  useHeaderSlot: (): unknown => null,
+}));
+
 vi.mock('react-i18next', () => ({
   useTranslation: (): { t: (k: string) => string } => ({ t: (k: string): string => k }),
 }));

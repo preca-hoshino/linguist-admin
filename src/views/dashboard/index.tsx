@@ -1,7 +1,7 @@
 import { RefreshCw } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getRouteApi, useNavigate } from '@tanstack/react-router';
+import { getRouteApi } from '@tanstack/react-router';
 import { Button } from '@/components/ui/Button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { useMcpTodayStats } from '@/composables/use-mcp-today-stats';
@@ -13,6 +13,7 @@ import type { DashboardMode, DashboardTab, GlobalTimeRange, McpDashboardTab } fr
 import { BillingTabContent } from '@/views/models/shared/BillingTabContent';
 import { DashboardModeSwitcher } from './components/DashboardModeSwitcher';
 import { TimeRangePicker } from './components/TimeRangePicker';
+import { McpOverviewTab } from './mcp-tabs/McpOverviewTab';
 import { DistributionTab } from './tabs/DistributionTab';
 import { ErrorTab } from './tabs/ErrorTab';
 import { OverviewTab } from './tabs/OverviewTab';
@@ -22,7 +23,7 @@ const routeApi = getRouteApi('/_authenticated/');
 
 export function DashboardPage(): React.JSX.Element {
   const { t } = useTranslation();
-  const navigate = useNavigate({ from: '/_authenticated/' });
+  const navigate = routeApi.useNavigate();
   const search = routeApi.useSearch();
   const mode: DashboardMode = search.mode ?? 'model';
 
@@ -49,7 +50,7 @@ export function DashboardPage(): React.JSX.Element {
 
   const handleModeChange = useCallback(
     (newMode: DashboardMode): void => {
-      void navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, mode: newMode }) });
+      void navigate({ search: (prev) => ({ ...prev, mode: newMode }) });
     },
     [navigate],
   );
@@ -137,7 +138,14 @@ export function DashboardPage(): React.JSX.Element {
       </div>
 
       <TabsContent value="overview" className="space-y-6 outline-none">
-        <div className="text-muted-foreground mt-8 text-center text-sm">MCP Overview is coming soon.</div>
+        <McpOverviewTab
+          timeRange={globalRange}
+          today={mcpStats.today}
+          overview={mcpStats.overview}
+          loading={mcpStats.loading}
+          error={mcpStats.error}
+          refreshKey={chartKey}
+        />
       </TabsContent>
 
       <TabsContent value="performance" className="outline-none">

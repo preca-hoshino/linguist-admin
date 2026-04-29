@@ -110,4 +110,3 @@ export const getMcpStatsToday = async (): Promise<ApiResult<McpStatsToday>> =>
 
 export const getMcpStatsErrors = async (params?: McpStatsParams): Promise<ApiResult<McpStatsErrors>> =>
   await request<McpStatsErrors>('GET', `/mcp/stats/errors${buildMcpStatsQuery(params)}`);
-

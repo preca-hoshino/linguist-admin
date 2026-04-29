@@ -61,6 +61,5 @@ export function useHeaderSlot(node: React.ReactNode): void {
       setSlot(null);
     };
     // node 变化时重新注入；组件卸载时清空
-     
   }, [node, setSlot]);
 }

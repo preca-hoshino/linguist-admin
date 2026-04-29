@@ -1,5 +1,6 @@
-import { Server, Cpu } from 'lucide-react';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Box, Network } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import type { DashboardMode } from '@/types/dashboard';
 
 interface DashboardModeSwitcherProps {
@@ -8,31 +9,29 @@ interface DashboardModeSwitcherProps {
 }
 
 export function DashboardModeSwitcher({ mode, onChange }: DashboardModeSwitcherProps): React.JSX.Element {
+  const { t } = useTranslation();
+
   return (
-    <div className="flex items-center space-x-4">
-      <div className="text-sm font-medium text-muted-foreground hidden sm:block">模式</div>
-      <ToggleGroup
-        type="single"
+    <div className="flex items-center">
+      <Tabs
         value={mode}
         onValueChange={(val) => {
           if (val !== '' && val !== mode) {
             onChange(val as DashboardMode);
           }
         }}
-        size="sm"
-        className="bg-muted p-1 rounded-md"
       >
-        <ToggleGroupItem value="model" className="gap-2 px-3 data-[state=on]:bg-background data-[state=on]:shadow-sm">
-          <Cpu className="h-4 w-4" />
-          <span className="hidden sm:inline">大模型聚合</span>
-          <span className="sm:hidden">模型</span>
-        </ToggleGroupItem>
-        <ToggleGroupItem value="mcp" className="gap-2 px-3 data-[state=on]:bg-background data-[state=on]:shadow-sm">
-          <Server className="h-4 w-4" />
-          <span className="hidden sm:inline">MCP 网络</span>
-          <span className="sm:hidden">MCP</span>
-        </ToggleGroupItem>
-      </ToggleGroup>
+        <TabsList className="h-9">
+          <TabsTrigger value="model" className="flex items-center gap-2 text-xs">
+            <Box className="h-3.5 w-3.5" />
+            <span>{t('dashboard.mode.model', 'Models')}</span>
+          </TabsTrigger>
+          <TabsTrigger value="mcp" className="flex items-center gap-2 text-xs">
+            <Network className="h-3.5 w-3.5" />
+            <span>{t('dashboard.mode.mcp', 'MCPs')}</span>
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
     </div>
   );
 }
