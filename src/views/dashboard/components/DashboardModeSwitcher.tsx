@@ -1,6 +1,6 @@
 import { Box, Network } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import type { DashboardMode } from '@/types/dashboard';
 
 interface DashboardModeSwitcherProps {
@@ -12,26 +12,26 @@ export function DashboardModeSwitcher({ mode, onChange }: DashboardModeSwitcherP
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-center">
-      <Tabs
+    <div className="flex items-center rounded-md border bg-muted/40 p-1">
+      <ToggleGroup
+        type="single"
         value={mode}
         onValueChange={(val) => {
           if (val !== '' && val !== mode) {
             onChange(val as DashboardMode);
           }
         }}
+        className="h-7 gap-1"
       >
-        <TabsList className="h-9">
-          <TabsTrigger value="model" className="flex items-center gap-2 text-xs">
-            <Box className="h-3.5 w-3.5" />
-            <span>{t('dashboard.mode.model', 'Models')}</span>
-          </TabsTrigger>
-          <TabsTrigger value="mcp" className="flex items-center gap-2 text-xs">
-            <Network className="h-3.5 w-3.5" />
-            <span>{t('dashboard.mode.mcp', 'MCPs')}</span>
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+        <ToggleGroupItem value="model" aria-label="Toggle model mode" className="h-7 px-3 text-xs">
+          <Box className="mr-2 h-3.5 w-3.5" />
+          {t('dashboard.mode.model', 'Models')}
+        </ToggleGroupItem>
+        <ToggleGroupItem value="mcp" aria-label="Toggle mcp mode" className="h-7 px-3 text-xs">
+          <Network className="mr-2 h-3.5 w-3.5" />
+          {t('dashboard.mode.mcp', 'MCPs')}
+        </ToggleGroupItem>
+      </ToggleGroup>
     </div>
   );
 }
