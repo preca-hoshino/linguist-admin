@@ -1,7 +1,9 @@
-# Linguist-Admin — 管理面板前端项目规范
+---
+description: 'Linguist-Admin — 管理面板前端项目专属规则'
+applyTo: '**/*.ts, **/*.tsx, **/*.jsx'
+---
 
-## 技术栈
-React 19 + Vite + TypeScript (ESM) + TanStack Router + Zustand + shadcn/ui (new-york) + Tailwind CSS v4 + i18next
+# Linguist-Admin 管理面板项目专属规则
 
 ## 代码风格
 - 文件名 kebab-case，组件 PascalCase，函数/变量 camelCase
@@ -9,6 +11,7 @@ React 19 + Vite + TypeScript (ESM) + TanStack Router + Zustand + shadcn/ui (new-
 - Props 类型使用 `interface` 且字段标记 `readonly`
 - 禁止 `any`，未知类型使用 `unknown`
 - 使用 `cn()`（clsx + tailwind-merge）合并 className
+- ESM 模块系统
 
 ## API 调用
 - 所有 API 调用必须通过 `src/api/client.ts` 的 `request<T>()` 函数
@@ -55,15 +58,3 @@ React 19 + Vite + TypeScript (ESM) + TanStack Router + Zustand + shadcn/ui (new-
 - 可复用的逻辑抽到 `src/composables/` 下的独立 hook 文件
 - Hook 必须是纯逻辑，不包含 JSX
 - 返回值使用 `useMemo`/`useCallback` 保持引用稳定
-
-## 测试
-- 使用 Vitest，配置文件通过 `vite.config.ts` 中的 `test` 字段
-- 测试文件与源文件同目录（`*.test.ts` / `*.test.tsx`）
-
-## 构建与运行
-```bash
-npm run dev          # 开发模式（Vite HMR）
-npm run build        # 构建（tsc -b + vite build）
-npm run check        # 全量检查（format + lint + types + deps + test）
-npm run preview      # 预览生产构建
-```
