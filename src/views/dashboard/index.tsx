@@ -13,7 +13,10 @@ import type { DashboardMode, DashboardTab, GlobalTimeRange, McpDashboardTab } fr
 import { BillingTabContent } from '@/views/models/shared/BillingTabContent';
 import { DashboardModeSwitcher } from './components/DashboardModeSwitcher';
 import { TimeRangePicker } from './components/TimeRangePicker';
+import { McpErrorTab } from './mcp-tabs/McpErrorTab';
+import { McpMethodsTab } from './mcp-tabs/McpMethodsTab';
 import { McpOverviewTab } from './mcp-tabs/McpOverviewTab';
+import { McpPerformanceTab } from './mcp-tabs/McpPerformanceTab';
 import { DistributionTab } from './tabs/DistributionTab';
 import { ErrorTab } from './tabs/ErrorTab';
 import { OverviewTab } from './tabs/OverviewTab';
@@ -149,15 +152,15 @@ export function DashboardPage(): React.JSX.Element {
       </TabsContent>
 
       <TabsContent value="performance" className="outline-none">
-        <div className="text-muted-foreground mt-8 text-center text-sm">MCP Performance is coming soon.</div>
+        <McpPerformanceTab timeRange={globalRange} refreshKey={chartKey} />
       </TabsContent>
 
       <TabsContent value="methods" className="outline-none">
-        <div className="text-muted-foreground mt-8 text-center text-sm">MCP Methods is coming soon.</div>
+        <McpMethodsTab timeRange={globalRange} refreshKey={chartKey} />
       </TabsContent>
 
       <TabsContent value="errors" className="outline-none">
-        <div className="text-muted-foreground mt-8 text-center text-sm">MCP Errors is coming soon.</div>
+        <McpErrorTab timeRange={globalRange} refreshKey={chartKey} />
       </TabsContent>
     </Tabs>
   );
