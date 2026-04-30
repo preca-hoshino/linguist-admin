@@ -15,6 +15,7 @@ export interface McpStatsParams {
   interval?: string;
   from?: string;
   to?: string;
+  groupBy?: 'virtual_mcp' | 'mcp_provider';
 }
 
 export interface McpStatsOverview {
@@ -50,6 +51,19 @@ export interface McpMethodBreakdownItem {
 export interface McpMethodBreakdownResult {
   object: 'list';
   data: McpMethodBreakdownItem[];
+}
+
+export interface McpStatsDistributionItem {
+  id: string | null;
+  name: string;
+  count: number;
+  error_count: number;
+  avg_duration_ms: number | null;
+}
+
+export interface McpDistributionResult {
+  object: 'list';
+  data: McpStatsDistributionItem[];
 }
 
 export interface McpStatsToday {
@@ -110,3 +124,6 @@ export const getMcpStatsToday = async (): Promise<ApiResult<McpStatsToday>> =>
 
 export const getMcpStatsErrors = async (params?: McpStatsParams): Promise<ApiResult<McpStatsErrors>> =>
   await request<McpStatsErrors>('GET', `/mcp/stats/errors${buildMcpStatsQuery(params)}`);
+
+export const getMcpDistribution = async (params?: McpStatsParams): Promise<ApiResult<McpDistributionResult>> =>
+  await request<McpDistributionResult>('GET', `/mcp/stats/distribution${buildMcpStatsQuery(params)}`);
