@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
-import { Activity, Box, BrainCircuit, Timer, Type, X } from 'lucide-react';
+import { Activity, Box, BrainCircuit, Lightbulb, Timer, Type, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/Dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
+import { Switch } from '@/components/ui/Switch';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import type { ProviderModel } from '@/types';
 import { CapabilitiesSelector } from './components/CapabilitiesSelector';
@@ -56,6 +57,11 @@ const formSchema = z.object({
   /** API 调用超时时间（毫秒），null = 使用系统默认 */
   timeout_ms: z.number().int().positive().nullable().optional(),
   request_overrides_ui: z.array(RequestOverrideUIRowSchema).optional(),
+  model_config: z
+    .object({
+      reasoning_content_backfill: z.boolean().optional(),
+    })
+    .optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -147,6 +153,7 @@ export function ProviderModelsMutateDialog({
       tpm_limit: null,
       timeout_ms: null,
       request_overrides_ui: [],
+      model_config: { reasoning_content_backfill: false },
     },
   });
 
@@ -185,6 +192,7 @@ export function ProviderModelsMutateDialog({
         tpm_limit: null,
         timeout_ms: null,
         request_overrides_ui: [],
+        model_config: { reasoning_content_backfill: false },
       });
       setSearchQuery('');
       return;
@@ -219,6 +227,12 @@ export function ProviderModelsMutateDialog({
       rpm_limit: currentRow.rpm_limit,
       tpm_limit: currentRow.tpm_limit,
       timeout_ms: currentRow.timeout_ms ?? null,
+      model_config: currentRow.model_config
+        ? {
+            reasoning_content_backfill:
+              (currentRow.model_config).reasoning_content_backfill === true,
+          }
+        : { reasoning_content_backfill: false },
     });
 
     // Initialize request overrides UI array
@@ -299,6 +313,11 @@ export function ProviderModelsMutateDialog({
 
       const parsedOverrides = buildRequestOverridesPayload(values.request_overrides_ui);
       payload.request_overrides = parsedOverrides;
+
+      // model_config: reasoning_content_backfill
+      if (values.model_config?.reasoning_content_backfill) {
+        payload.model_config = { reasoning_content_backfill: true };
+      }
 
       await (mode === 'edit' && currentRow
         ? updateProviderModel(currentRow.id, payload)
@@ -632,6 +651,33 @@ export function ProviderModelsMutateDialog({
                     />
 
                     <RequestOverridesEditor name="request_overrides_ui" />
+
+                    {/* DeepSeek reasoning content backfill */}
+                    {selectedProvider?.kind === 'deepseek' && (
+                      <FormField
+                        control={form.control}
+                        name="model_config.reasoning_content_backfill"
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                            <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                              <Lightbulb className="h-3.5 w-3.5" />
+                              <span className="font-medium text-foreground">思考内容回填</span>
+                            </FormLabel>
+                            <div className="space-y-1.5">
+                              <FormControl>
+                                <div className="flex items-center gap-3">
+                                  <Switch checked={field.value ?? false} onCheckedChange={field.onChange} />
+                                  <span className="text-sm text-muted-foreground">
+                                    多轮对话时自动补全 reasoning_content 字段
+                                  </span>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                    )}
 
                     <div className="text-foreground">
                       <PricingTiersSection
