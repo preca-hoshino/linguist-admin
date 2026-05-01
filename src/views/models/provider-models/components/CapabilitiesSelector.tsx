@@ -1,4 +1,3 @@
-import { Sparkles } from 'lucide-react';
 import type { Control, FieldValues, Path } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
@@ -26,8 +25,7 @@ export function CapabilitiesSelector<T extends FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem className="grid grid-cols-[140px_1fr] items-start gap-5 space-y-0">
-          <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-            <Sparkles className="h-3.5 w-3.5" />
+          <FormLabel className="text-left text-muted-foreground">
             <span className="font-medium text-foreground">
               {t('modelsPage.providerModels.capabilities', '模型能力')}
             </span>

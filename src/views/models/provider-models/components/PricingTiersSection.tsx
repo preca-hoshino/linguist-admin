@@ -1,4 +1,4 @@
-import { BadgeDollarSign, Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo } from 'react';
 import type { Path, PathValue, UseFormReturn, UseFormSetValue } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -43,146 +43,137 @@ export function PricingTiersSection<T extends FormWithPricing>({
   const { t } = useTranslation();
 
   return (
-    <>
-      <div className="mb-3 flex items-center justify-start gap-2 text-left text-sm font-medium leading-none text-muted-foreground lg:col-span-2">
-        <BadgeDollarSign className="h-3.5 w-3.5" />
-        <span className="font-medium text-foreground">
-          {t('modelsPage.providerModels.pricingTiers', '计费阶梯配置')}
-        </span>
+    <div className="space-y-6 px-1 pt-1 pb-2 lg:col-span-2">
+      <div className="flex items-center gap-5 px-1">
+        <span className="w-8 text-right text-[11px] font-medium text-muted-foreground">0K</span>
+        <Slider
+          max={currentMaxTokens}
+          step={1}
+          value={splitPoints}
+          onValueChange={(val) => {
+            onSliderChange(val);
+          }}
+          className="flex-1"
+        />
+        <span className="w-12 text-[11px] font-medium text-muted-foreground">{currentMaxTokens}K</span>
       </div>
 
-      <div className="space-y-6 px-1 pt-4 pb-2 lg:col-span-2">
-        <div className="flex items-center gap-5 px-1">
-          <span className="w-8 text-right text-[11px] font-medium text-muted-foreground">0K</span>
-          <Slider
-            max={currentMaxTokens}
-            step={1}
-            value={splitPoints}
-            onValueChange={(val) => {
-              onSliderChange(val);
-            }}
-            className="flex-1"
-          />
-          <span className="w-12 text-[11px] font-medium text-muted-foreground">{currentMaxTokens}K</span>
-        </div>
+      <div className="mt-2 flex justify-end pt-2 pb-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={splitPoints.length >= 4 || currentMaxTokens - (splitPoints.at(-1) ?? 0) <= 1}
+          className="h-7 border-dashed text-xs shadow-none"
+          onClick={onAddSplit}
+        >
+          <Plus className="mr-1 h-3 w-3" />
+          {t('modelsPage.providerModels.addPricingTier', 'Add Split Point')}
+        </Button>
+      </div>
 
-        <div className="mt-2 flex justify-end pt-2 pb-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={splitPoints.length >= 4 || currentMaxTokens - (splitPoints.at(-1) ?? 0) <= 1}
-            className="h-7 border-dashed text-xs shadow-none"
-            onClick={onAddSplit}
+      <div className="mt-4 space-y-3">
+        {currentPricingTiers.map((tier, idx) => (
+          <div
+            // biome-ignore lint/suspicious/noArrayIndexKey: no unique identifier available
+            key={idx}
+            className="grid grid-cols-4 items-end gap-3 rounded-lg border border-border/50 bg-background p-3 shadow-sm"
           >
-            <Plus className="mr-1 h-3 w-3" />
-            {t('modelsPage.providerModels.addPricingTier', 'Add Split Point')}
-          </Button>
-        </div>
+            {/* Info Column */}
+            <div className="flex h-full flex-col justify-center space-y-1 border-r border-border/50 py-1 pr-3">
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+                {t('modelsPage.providerModels.tierRange', 'Tier {{num}}', { num: idx + 1 })}
+              </span>
+              <span className="text-sm leading-snug font-medium text-foreground">
+                {tier.start_tokens}K&nbsp;&ndash;&nbsp;{tier.max_tokens}K
+              </span>
+              <span className="text-xs text-muted-foreground/70">/ 1M Tokens</span>
+            </div>
 
-        <div className="mt-4 space-y-3">
-          {currentPricingTiers.map((tier, idx) => (
-            <div
-              // biome-ignore lint/suspicious/noArrayIndexKey: no unique identifier available
-              key={idx}
-              className="grid grid-cols-4 items-end gap-3 rounded-lg border border-border/50 bg-background p-3 shadow-sm"
-            >
-              {/* Info Column */}
-              <div className="flex h-full flex-col justify-center space-y-1 border-r border-border/50 py-1 pr-3">
-                <span className="text-[11px] font-semibold text-muted-foreground uppercase">
-                  {t('modelsPage.providerModels.tierRange', 'Tier {{num}}', { num: idx + 1 })}
-                </span>
-                <span className="text-sm leading-snug font-medium text-foreground">
-                  {tier.start_tokens}K&nbsp;&ndash;&nbsp;{tier.max_tokens}K
-                </span>
-                <span className="text-xs text-muted-foreground/70">/ 1M Tokens</span>
-              </div>
-
-              <div className="space-y-1.5">
-                <FormLabel className="text-xs font-medium text-foreground">
-                  {t('modelsPage.providerModels.inputPrice', 'Input')}{' '}
-                  <span className="text-[10px] text-muted-foreground/50">/ 1M</span>
-                </FormLabel>
-                <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2.5">
-                    <span className="text-[13px] text-muted-foreground text-muted-foreground/70">¥</span>
-                  </div>
-                  <Input
-                    type="number"
-                    step="0.000001"
-                    min={0}
-                    {...form.register(`pricing_tiers.${idx}.input_price` as Parameters<typeof form.register>[0], {
-                      valueAsNumber: true,
-                    })}
-                    placeholder="0.000000"
-                    className="h-8 border-input bg-background pl-6 text-sm shadow-sm"
-                  />
+            <div className="space-y-1.5">
+              <FormLabel className="text-xs font-medium text-foreground">
+                {t('modelsPage.providerModels.inputPrice', 'Input')}{' '}
+                <span className="text-[10px] text-muted-foreground/50">/ 1M</span>
+              </FormLabel>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2.5">
+                  <span className="text-[13px] text-muted-foreground text-muted-foreground/70">¥</span>
                 </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <FormLabel className="text-xs font-medium text-foreground">
-                  {t('modelsPage.providerModels.outputPrice', 'Output')}{' '}
-                  <span className="text-[10px] text-muted-foreground/50">/ 1M</span>
-                </FormLabel>
-                <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2.5">
-                    <span className="text-[13px] text-muted-foreground text-muted-foreground/70">¥</span>
-                  </div>
-                  <Input
-                    type="number"
-                    step="0.000001"
-                    min={0}
-                    {...form.register(`pricing_tiers.${idx}.output_price` as Parameters<typeof form.register>[0], {
-                      valueAsNumber: true,
-                    })}
-                    placeholder="0.000000"
-                    className="h-8 border-input bg-background pl-6 text-sm shadow-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-end gap-3">
-                <div className="flex-1 space-y-1.5">
-                  <FormLabel className="text-xs font-medium text-foreground">
-                    {t('modelsPage.providerModels.cachePrice', 'Cache')}{' '}
-                    <span className="text-[10px] text-muted-foreground/50">/ 1M</span>
-                  </FormLabel>
-                  <div className="relative">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2.5">
-                      <span className="text-[13px] text-muted-foreground text-muted-foreground/70">¥</span>
-                    </div>
-                    <Input
-                      type="number"
-                      step="0.000001"
-                      min={0}
-                      {...form.register(`pricing_tiers.${idx}.cache_price` as Parameters<typeof form.register>[0], {
-                        valueAsNumber: true,
-                      })}
-                      placeholder="0.000000"
-                      className="h-8 border-input bg-background pl-6 text-sm shadow-sm focus-visible:ring-primary"
-                    />
-                  </div>
-                </div>
-                {idx > 0 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 shrink-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                    onClick={() => {
-                      onRemoveSplit(idx);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
+                <Input
+                  type="number"
+                  step="0.000001"
+                  min={0}
+                  {...form.register(`pricing_tiers.${idx}.input_price` as Parameters<typeof form.register>[0], {
+                    valueAsNumber: true,
+                  })}
+                  placeholder="0.000000"
+                  className="h-8 border-input bg-background pl-6 text-sm shadow-sm"
+                />
               </div>
             </div>
-          ))}
-        </div>
+
+            <div className="space-y-1.5">
+              <FormLabel className="text-xs font-medium text-foreground">
+                {t('modelsPage.providerModels.outputPrice', 'Output')}{' '}
+                <span className="text-[10px] text-muted-foreground/50">/ 1M</span>
+              </FormLabel>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2.5">
+                  <span className="text-[13px] text-muted-foreground text-muted-foreground/70">¥</span>
+                </div>
+                <Input
+                  type="number"
+                  step="0.000001"
+                  min={0}
+                  {...form.register(`pricing_tiers.${idx}.output_price` as Parameters<typeof form.register>[0], {
+                    valueAsNumber: true,
+                  })}
+                  placeholder="0.000000"
+                  className="h-8 border-input bg-background pl-6 text-sm shadow-sm"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-end gap-3">
+              <div className="flex-1 space-y-1.5">
+                <FormLabel className="text-xs font-medium text-foreground">
+                  {t('modelsPage.providerModels.cachePrice', 'Cache')}{' '}
+                  <span className="text-[10px] text-muted-foreground/50">/ 1M</span>
+                </FormLabel>
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2.5">
+                    <span className="text-[13px] text-muted-foreground text-muted-foreground/70">¥</span>
+                  </div>
+                  <Input
+                    type="number"
+                    step="0.000001"
+                    min={0}
+                    {...form.register(`pricing_tiers.${idx}.cache_price` as Parameters<typeof form.register>[0], {
+                      valueAsNumber: true,
+                    })}
+                    placeholder="0.000000"
+                    className="h-8 border-input bg-background pl-6 text-sm shadow-sm focus-visible:ring-primary"
+                  />
+                </div>
+              </div>
+              {idx > 0 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 shrink-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => {
+                    onRemoveSplit(idx);
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
-    </>
+    </div>
   );
 }
 

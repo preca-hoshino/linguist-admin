@@ -135,7 +135,10 @@ describe('ProviderModelsMutateDialog Integration', () => {
     const nameInput = screen.getByPlaceholderText('e.g., GPT-4o');
     fireEvent.change(nameInput, { target: { value: 'my-chat-model' } });
 
-    // Assuming layout has "modelsPage.providerModels.capStream" label for stream capability
+    // Open the "能力参数" accordion panel which contains capabilities & supported parameters
+    fireEvent.click(screen.getByText('modelsPage.providerModels.accordionCapabilities'));
+
+    // Click stream capability
     const streamCap = screen.getByText('modelsPage.providerModels.capStream');
     fireEvent.click(streamCap);
 
