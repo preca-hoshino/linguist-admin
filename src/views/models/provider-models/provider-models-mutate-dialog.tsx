@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
-import { Activity, Box, BrainCircuit, Globe, Lightbulb, Timer, Type, X } from 'lucide-react';
+import { Activity, Banknote, Box, BrainCircuit, SlidersHorizontal, Sparkles, Type, Wrench, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +16,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
+import { Card } from '@/components/ui/Card';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
 import { Switch } from '@/components/ui/Switch';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
@@ -461,6 +463,7 @@ export function ProviderModelsMutateDialog({
                       )}
                     />
 
+                    {/* ── 基础配置（始终可见）── */}
                     <FormField
                       control={form.control}
                       name="name"
@@ -559,182 +562,298 @@ export function ProviderModelsMutateDialog({
                       )}
                     />
 
-                    <FormField
-                      control={form.control}
-                      name="rpm_limit"
-                      render={({ field }) => (
-                        <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                          <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                            <Activity className="h-3.5 w-3.5" />
-                            <span className="font-medium text-foreground">
-                              {t('modelsPage.providerModels.rpmLimit', 'RPM 限制')}
+                    {/* ── 主题手风琴面板 ── */}
+                    <Accordion type="multiple" className="w-full space-y-3">
+                      {/* 速率限制 */}
+                      <Card className="gap-0 py-0">
+                        <AccordionItem value="rate-limit" className="border-b-0">
+                          <AccordionTrigger className="px-5 hover:no-underline">
+                            <span className="inline-flex items-center gap-2.5">
+                              <Activity className="h-4 w-4 text-muted-foreground" />
+                              {t('modelsPage.providerModels.accordionRateLimit', '速率限制')}
                             </span>
-                          </FormLabel>
-                          <div className="space-y-1.5">
-                            <FormControl>
-                              <Input
-                                type="number"
-                                min={0}
-                                placeholder={t('modelsPage.providerModels.unlimited', '留空或 0 代表无限制')}
-                                value={field.value === null ? '' : field.value}
-                                onChange={(e) => {
-                                  const val = e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
-                                  field.onChange(val);
-                                }}
-                                className="bg-muted/10 font-mono"
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <div className="space-y-5 px-5 pt-1 pb-4">
+                              <FormDescription>
+                                {t(
+                                  'modelsPage.providerModels.accordionRateLimitDesc',
+                                  '控制该模型的请求频率与单次调用超时上限。',
+                                )}
+                              </FormDescription>
+
+                              <FormField
+                                control={form.control}
+                                name="rpm_limit"
+                                render={({ field }) => (
+                                  <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                                    <FormLabel className="text-left text-muted-foreground">
+                                      <span className="font-medium text-foreground">
+                                        {t('modelsPage.providerModels.rpmLimit', 'RPM 限制')}
+                                      </span>
+                                    </FormLabel>
+                                    <div className="space-y-1.5">
+                                      <FormControl>
+                                        <Input
+                                          type="number"
+                                          min={0}
+                                          value={field.value === null ? '' : field.value}
+                                          onChange={(e) => {
+                                            const val =
+                                              e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
+                                            field.onChange(val);
+                                          }}
+                                          className="bg-muted/10 font-mono"
+                                        />
+                                      </FormControl>
+                                      <FormDescription>
+                                        {t('modelsPage.providerModels.rpmLimitHint', '留空或 0 = 无限制')}
+                                      </FormDescription>
+                                      <FormMessage />
+                                    </div>
+                                  </FormItem>
+                                )}
                               />
-                            </FormControl>
-                            <FormMessage />
-                          </div>
-                        </FormItem>
-                      )}
-                    />
 
-                    <FormField
-                      control={form.control}
-                      name="tpm_limit"
-                      render={({ field }) => (
-                        <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                          <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                            <Activity className="h-3.5 w-3.5" />
-                            <span className="font-medium text-foreground">
-                              {t('modelsPage.providerModels.tpmLimit', 'TPM 限制')}
-                            </span>
-                          </FormLabel>
-                          <div className="space-y-1.5">
-                            <FormControl>
-                              <Input
-                                type="number"
-                                min={0}
-                                placeholder={t('modelsPage.providerModels.unlimited', '留空或 0 代表无限制')}
-                                value={field.value === null ? '' : field.value}
-                                onChange={(e) => {
-                                  const val = e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
-                                  field.onChange(val);
-                                }}
-                                className="bg-muted/10 font-mono"
+                              <FormField
+                                control={form.control}
+                                name="tpm_limit"
+                                render={({ field }) => (
+                                  <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                                    <FormLabel className="text-left text-muted-foreground">
+                                      <span className="font-medium text-foreground">
+                                        {t('modelsPage.providerModels.tpmLimit', 'TPM 限制')}
+                                      </span>
+                                    </FormLabel>
+                                    <div className="space-y-1.5">
+                                      <FormControl>
+                                        <Input
+                                          type="number"
+                                          min={0}
+                                          value={field.value === null ? '' : field.value}
+                                          onChange={(e) => {
+                                            const val =
+                                              e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
+                                            field.onChange(val);
+                                          }}
+                                          className="bg-muted/10 font-mono"
+                                        />
+                                      </FormControl>
+                                      <FormDescription>
+                                        {t('modelsPage.providerModels.tpmLimitHint', '留空或 0 = 无限制')}
+                                      </FormDescription>
+                                      <FormMessage />
+                                    </div>
+                                  </FormItem>
+                                )}
                               />
-                            </FormControl>
-                            <FormMessage />
-                          </div>
-                        </FormItem>
-                      )}
-                    />
 
-                    <FormField
-                      control={form.control}
-                      name="timeout_ms"
-                      render={({ field }) => (
-                        <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                          <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                            <Timer className="h-3.5 w-3.5" />
-                            <span className="font-medium text-foreground">
-                              {t('modelsPage.providerModels.timeoutMs', '超时时间 (ms)')}
-                            </span>
-                          </FormLabel>
-                          <div className="space-y-1.5">
-                            <FormControl>
-                              <Input
-                                type="number"
-                                min={1}
-                                placeholder={t('modelsPage.providerModels.defaultTimeout', '留空则使用系统默认')}
-                                value={field.value ?? ''}
-                                onChange={(e) => {
-                                  const val = e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
-                                  field.onChange(val);
-                                }}
-                                className="bg-muted/10 font-mono"
+                              <FormField
+                                control={form.control}
+                                name="timeout_ms"
+                                render={({ field }) => (
+                                  <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                                    <FormLabel className="text-left text-muted-foreground">
+                                      <span className="font-medium text-foreground">
+                                        {t('modelsPage.providerModels.timeoutMs', '超时 (ms)')}
+                                      </span>
+                                    </FormLabel>
+                                    <div className="space-y-1.5">
+                                      <FormControl>
+                                        <Input
+                                          type="number"
+                                          min={1}
+                                          value={field.value ?? ''}
+                                          onChange={(e) => {
+                                            const val =
+                                              e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
+                                            field.onChange(val);
+                                          }}
+                                          className="bg-muted/10 font-mono"
+                                        />
+                                      </FormControl>
+                                      <FormDescription>
+                                        {t('modelsPage.providerModels.timeoutMsHint', '留空 = 系统默认')}
+                                      </FormDescription>
+                                      <FormMessage />
+                                    </div>
+                                  </FormItem>
+                                )}
                               />
-                            </FormControl>
-                            <FormMessage />
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-
-                    <CapabilitiesSelector control={form.control} name="capabilities" modelType={modelType} />
-
-                    <SupportedParametersSelector
-                      control={form.control}
-                      name="supported_parameters"
-                      modelType={modelType}
-                    />
-
-                    <RequestOverridesEditor name="request_overrides_ui" />
-
-                    {/* DeepSeek reasoning content backfill */}
-                    {selectedProvider?.kind === 'deepseek' && (
-                      <FormField
-                        control={form.control}
-                        name="model_config.reasoning_content_backfill"
-                        render={({ field }) => (
-                          <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                            <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                              <Lightbulb className="h-3.5 w-3.5" />
-                              <span className="font-medium text-foreground">思考内容回填</span>
-                            </FormLabel>
-                            <div className="space-y-1.5">
-                              <FormControl>
-                                <div className="flex items-center gap-3">
-                                  <Switch checked={field.value ?? false} onCheckedChange={field.onChange} />
-                                  <span className="text-sm text-muted-foreground">
-                                    多轮对话时自动补全 reasoning_content 字段
-                                  </span>
-                                </div>
-                              </FormControl>
-                              <FormMessage />
                             </div>
-                          </FormItem>
-                        )}
-                      />
-                    )}
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Card>
 
-                    {/* Volcengine endpoint type — 标准 / Coding Plan 切换 */}
-                    {selectedProvider?.kind === 'volcengine' && (
-                      <FormField
-                        control={form.control}
-                        name="model_config.endpoint_type"
-                        render={({ field }) => (
-                          <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                            <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                              <Globe className="h-3.5 w-3.5" />
-                              <span className="font-medium text-foreground">
-                                {t('modelsPage.providerModels.endpointType', '请求端点类型')}
+                      {/* 能力参数 */}
+                      <Card className="gap-0 py-0">
+                        <AccordionItem value="capabilities" className="border-b-0">
+                          <AccordionTrigger className="px-5 hover:no-underline">
+                            <span className="inline-flex items-center gap-2.5">
+                              <Sparkles className="h-4 w-4 text-muted-foreground" />
+                              {t('modelsPage.providerModels.accordionCapabilities', '能力参数')}
+                            </span>
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <div className="space-y-5 px-5 pt-1 pb-4">
+                              <FormDescription>
+                                {t(
+                                  'modelsPage.providerModels.accordionCapabilitiesDesc',
+                                  '声明模型原生支持的能力与调优参数，用于路由调度与参数过滤。',
+                                )}
+                              </FormDescription>
+
+                              <CapabilitiesSelector control={form.control} name="capabilities" modelType={modelType} />
+                              <SupportedParametersSelector
+                                control={form.control}
+                                name="supported_parameters"
+                                modelType={modelType}
+                              />
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Card>
+
+                      {/* 请求覆写 */}
+                      <Card className="gap-0 py-0">
+                        <AccordionItem value="overrides" className="border-b-0">
+                          <AccordionTrigger className="px-5 hover:no-underline">
+                            <span className="inline-flex items-center gap-2.5">
+                              <Wrench className="h-4 w-4 text-muted-foreground" />
+                              {t('modelsPage.providerModels.accordionRequestOverrides', '请求覆写')}
+                            </span>
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <div className="px-5 pt-1 pb-4">
+                              <FormDescription className="mb-4">
+                                {t(
+                                  'modelsPage.providerModels.accordionRequestOverridesDesc',
+                                  '自定义发往该模型的 HTTP 请求头与 Body 字段。',
+                                )}
+                              </FormDescription>
+
+                              <RequestOverridesEditor name="request_overrides_ui" />
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Card>
+
+                      {/* 计费阶梯 */}
+                      <Card className="gap-0 py-0">
+                        <AccordionItem value="pricing" className="border-b-0">
+                          <AccordionTrigger className="px-5 hover:no-underline">
+                            <span className="inline-flex items-center gap-2.5">
+                              <Banknote className="h-4 w-4 text-muted-foreground" />
+                              {t('modelsPage.providerModels.accordionPricing', '计费阶梯')}
+                            </span>
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <div className="px-5 pt-1 pb-4">
+                              <FormDescription className="mb-4">
+                                {t(
+                                  'modelsPage.providerModels.accordionPricingDesc',
+                                  '按 Token 区间分段配置输入、输出与缓存的每百万 Token 单价。',
+                                )}
+                              </FormDescription>
+
+                              <PricingTiersSection
+                                form={form}
+                                currentMaxTokens={currentMaxTokens}
+                                currentPricingTiers={currentPricingTiers}
+                                splitPoints={splitPoints}
+                                onSliderChange={handleSliderChange}
+                                onAddSplit={addSplit}
+                                onRemoveSplit={removeSplit}
+                              />
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Card>
+
+                      {/* 提供商专属配置 */}
+                      {selectedProvider != null && (
+                        <Card className="gap-0 py-0">
+                          <AccordionItem value="provider-config" className="border-b-0">
+                            <AccordionTrigger className="px-5 hover:no-underline">
+                              <span className="inline-flex items-center gap-2.5">
+                                <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+                                {t('modelsPage.providerModels.accordionProviderConfig', '专属配置')}
                               </span>
-                            </FormLabel>
-                            <div className="space-y-1.5">
-                              <Tabs
-                                onValueChange={field.onChange}
-                                value={field.value ?? 'normal'}
-                                className="w-full sm:max-w-[280px]"
-                              >
-                                <TabsList className="flex h-9 w-full">
-                                  <TabsTrigger value="normal" className="flex-1 px-3 text-sm">
-                                    {t('modelsPage.providerModels.endpointTypeNormal', '标准')}
-                                  </TabsTrigger>
-                                  <TabsTrigger value="coding_plan" className="flex-1 px-3 text-sm">
-                                    Coding Plan
-                                  </TabsTrigger>
-                                </TabsList>
-                              </Tabs>
-                              <FormMessage />
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-                    )}
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              <div className="space-y-5 px-5 pt-1 pb-4">
+                                <FormDescription>
+                                  {t(
+                                    'modelsPage.providerModels.accordionProviderConfigDesc',
+                                    '该提供商特有的高级配置项。',
+                                  )}
+                                </FormDescription>
 
-                    <div className="text-foreground">
-                      <PricingTiersSection
-                        form={form}
-                        currentMaxTokens={currentMaxTokens}
-                        currentPricingTiers={currentPricingTiers}
-                        splitPoints={splitPoints}
-                        onSliderChange={handleSliderChange}
-                        onAddSplit={addSplit}
-                        onRemoveSplit={removeSplit}
-                      />
-                    </div>
+                                {selectedProvider.kind === 'deepseek' && (
+                                  <FormField
+                                    control={form.control}
+                                    name="model_config.reasoning_content_backfill"
+                                    render={({ field }) => (
+                                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                                        <FormLabel className="text-left text-muted-foreground">
+                                          <span className="font-medium text-foreground">思考内容回填</span>
+                                        </FormLabel>
+                                        <div className="space-y-1.5">
+                                          <FormControl>
+                                            <Switch checked={field.value ?? false} onCheckedChange={field.onChange} />
+                                          </FormControl>
+                                          <FormDescription>多轮对话时自动补全 reasoning_content 字段</FormDescription>
+                                          <FormMessage />
+                                        </div>
+                                      </FormItem>
+                                    )}
+                                  />
+                                )}
+
+                                {selectedProvider.kind === 'volcengine' && (
+                                  <FormField
+                                    control={form.control}
+                                    name="model_config.endpoint_type"
+                                    render={({ field }) => (
+                                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                                        <FormLabel className="text-left text-muted-foreground">
+                                          <span className="font-medium text-foreground">
+                                            {t('modelsPage.providerModels.endpointType', '请求端点类型')}
+                                          </span>
+                                        </FormLabel>
+                                        <div className="space-y-1.5">
+                                          <Tabs
+                                            onValueChange={field.onChange}
+                                            value={field.value ?? 'normal'}
+                                            className="w-full sm:max-w-[280px]"
+                                          >
+                                            <TabsList className="flex h-9 w-full">
+                                              <TabsTrigger value="normal" className="flex-1 px-3 text-sm">
+                                                {t('modelsPage.providerModels.endpointTypeNormal', '标准')}
+                                              </TabsTrigger>
+                                              <TabsTrigger value="coding_plan" className="flex-1 px-3 text-sm">
+                                                Coding Plan
+                                              </TabsTrigger>
+                                            </TabsList>
+                                          </Tabs>
+                                          <FormMessage />
+                                        </div>
+                                      </FormItem>
+                                    )}
+                                  />
+                                )}
+
+                                {selectedProvider.kind !== 'deepseek' && selectedProvider.kind !== 'volcengine' && (
+                                  <FormDescription>
+                                    {t('modelsPage.providerModels.noProviderConfig', '当前提供商暂无专属配置项。')}
+                                  </FormDescription>
+                                )}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Card>
+                      )}
+                    </Accordion>
                   </div>
                 </form>
               </Form>
