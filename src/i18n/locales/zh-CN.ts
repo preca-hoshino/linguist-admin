@@ -430,6 +430,9 @@ export default {
       inputPrice: '输入单价',
       outputPrice: '输出单价',
       cachePrice: '缓存单价',
+      endpointType: '请求端点类型',
+      endpointTypeNormal: '标准',
+      endpointTypeCodingPlan: 'Coding Plan',
       tabs: {
         overview: '总览',
         performance: '性能',

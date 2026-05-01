@@ -230,10 +230,8 @@ export function ProviderModelsMutateDialog({
       timeout_ms: currentRow.timeout_ms ?? null,
       model_config: currentRow.model_config
         ? {
-            reasoning_content_backfill:
-              (currentRow.model_config).reasoning_content_backfill === true,
-            endpoint_type:
-              (currentRow.model_config).endpoint_type as 'normal' | 'coding_plan' | undefined,
+            reasoning_content_backfill: currentRow.model_config.reasoning_content_backfill === true,
+            endpoint_type: currentRow.model_config.endpoint_type as 'normal' | 'coding_plan' | undefined,
           }
         : { reasoning_content_backfill: false },
     });

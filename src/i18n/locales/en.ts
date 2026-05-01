@@ -434,6 +434,9 @@ export default {
       inputPrice: 'Input Price',
       outputPrice: 'Output Price',
       cachePrice: 'Cache Price',
+      endpointType: 'Endpoint Type',
+      endpointTypeNormal: 'Standard',
+      endpointTypeCodingPlan: 'Coding Plan',
       tabs: {
         overview: 'Overview',
         performance: 'Performance',
