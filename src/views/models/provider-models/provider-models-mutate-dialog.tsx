@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
-import { Activity, Box, BrainCircuit, Lightbulb, Timer, Type, X } from 'lucide-react';
+import { Activity, Box, BrainCircuit, Globe, Lightbulb, Timer, Type, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -60,6 +60,7 @@ const formSchema = z.object({
   model_config: z
     .object({
       reasoning_content_backfill: z.boolean().optional(),
+      endpoint_type: z.enum(['normal', 'coding_plan']).optional(),
     })
     .optional(),
 });
@@ -229,8 +230,8 @@ export function ProviderModelsMutateDialog({
       timeout_ms: currentRow.timeout_ms ?? null,
       model_config: currentRow.model_config
         ? {
-            reasoning_content_backfill:
-              (currentRow.model_config).reasoning_content_backfill === true,
+            reasoning_content_backfill: currentRow.model_config.reasoning_content_backfill === true,
+            endpoint_type: currentRow.model_config.endpoint_type as 'normal' | 'coding_plan' | undefined,
           }
         : { reasoning_content_backfill: false },
     });
@@ -314,9 +315,18 @@ export function ProviderModelsMutateDialog({
       const parsedOverrides = buildRequestOverridesPayload(values.request_overrides_ui);
       payload.request_overrides = parsedOverrides;
 
-      // model_config: reasoning_content_backfill
-      if (values.model_config?.reasoning_content_backfill) {
-        payload.model_config = { reasoning_content_backfill: true };
+      // model_config: reasoning_content_backfill + endpoint_type
+      if (values.model_config) {
+        const mc: Record<string, unknown> = {};
+        if (values.model_config.reasoning_content_backfill) {
+          mc.reasoning_content_backfill = true;
+        }
+        if (values.model_config.endpoint_type) {
+          mc.endpoint_type = values.model_config.endpoint_type;
+        }
+        if (Object.keys(mc).length > 0) {
+          payload.model_config = mc;
+        }
       }
 
       await (mode === 'edit' && currentRow
@@ -672,6 +682,41 @@ export function ProviderModelsMutateDialog({
                                   </span>
                                 </div>
                               </FormControl>
+                              <FormMessage />
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                    )}
+
+                    {/* Volcengine endpoint type — 标准 / Coding Plan 切换 */}
+                    {selectedProvider?.kind === 'volcengine' && (
+                      <FormField
+                        control={form.control}
+                        name="model_config.endpoint_type"
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                            <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                              <Globe className="h-3.5 w-3.5" />
+                              <span className="font-medium text-foreground">
+                                {t('modelsPage.providerModels.endpointType', '请求端点类型')}
+                              </span>
+                            </FormLabel>
+                            <div className="space-y-1.5">
+                              <Tabs
+                                onValueChange={field.onChange}
+                                value={field.value ?? 'normal'}
+                                className="w-full sm:max-w-[280px]"
+                              >
+                                <TabsList className="flex h-9 w-full">
+                                  <TabsTrigger value="normal" className="flex-1 px-3 text-sm">
+                                    {t('modelsPage.providerModels.endpointTypeNormal', '标准')}
+                                  </TabsTrigger>
+                                  <TabsTrigger value="coding_plan" className="flex-1 px-3 text-sm">
+                                    Coding Plan
+                                  </TabsTrigger>
+                                </TabsList>
+                              </Tabs>
                               <FormMessage />
                             </div>
                           </FormItem>
