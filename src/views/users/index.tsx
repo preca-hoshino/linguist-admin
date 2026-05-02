@@ -101,7 +101,7 @@ export function UsersPage(): React.JSX.Element {
 
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {t('common.cursorPage', 'Current Page: {{page}}', { page: pageIndex + 1 })}
+          {t('common.pageInfo', 'Current Page: {{page}}', { page: pageIndex + 1 })}
         </div>
         <div className="space-x-2">
           <Button
