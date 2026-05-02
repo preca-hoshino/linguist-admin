@@ -49,6 +49,6 @@ export const getMcpLog = async (id: string): Promise<ApiResult<McpLog>> => {
   return await request<McpLog>('GET', `/mcp/logs/${id}`);
 };
 
-export const deleteMcpLog = async (id: string): Promise<ApiResult<{ id: string; deleted: boolean }>> => {
-  return await request<{ id: string; deleted: boolean }>('DELETE', `/mcp/logs/${id}`);
+export const deleteMcpLog = async (id: string): Promise<ApiResult<{ id: string; object: string; deleted: true }>> => {
+  return await request<{ id: string; object: string; deleted: true }>('DELETE', `/mcp/logs/${id}`);
 };

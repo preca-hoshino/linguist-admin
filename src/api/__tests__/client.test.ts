@@ -245,7 +245,7 @@ describe('client API', () => {
 
       const result = await request('GET', '/slow');
       expect(result.ok).toBe(false);
-      expect((result as { error?: { code?: string } }).error?.code).toBe('REQUEST_TIMEOUT');
+      expect((result as { error?: { code?: string } }).error?.code).toBe('request_timeout');
     });
 
     it('should rethrow AbortError if user initiated abort', async () => {
@@ -264,7 +264,7 @@ describe('client API', () => {
 
       const result = await request('GET', '/down');
       expect(result.ok).toBe(false);
-      expect((result as { error?: { code?: string } }).error?.code).toBe('NETWORK_ERROR');
+      expect((result as { error?: { code?: string } }).error?.code).toBe('network_error');
     });
   });
 

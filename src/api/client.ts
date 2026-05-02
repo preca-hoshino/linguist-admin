@@ -26,10 +26,10 @@ function handleFetchError(error: unknown, aborted?: boolean): ApiResult<never> {
     }
     return {
       ok: false,
-      error: { code: 'REQUEST_TIMEOUT', message: 'Request timed out', type: 'server_error', param: null },
+      error: { code: 'request_timeout', message: 'Request timed out', type: 'server_error', param: null },
     };
   }
-  return { ok: false, error: { code: 'NETWORK_ERROR', message: String(error), type: 'server_error', param: null } };
+  return { ok: false, error: { code: 'network_error', message: String(error), type: 'server_error', param: null } };
 }
 
 export async function request<T>(
@@ -45,6 +45,11 @@ export async function request<T>(
   const { auth } = useAuthStore.getState();
   if (auth.accessToken) {
     headers.Authorization = `Bearer ${auth.accessToken}`;
+  }
+
+  // 所有 POST 请求自动附加幂等性 Key，支持安全重试
+  if (method === 'POST' && !customConfig?.headers) {
+    headers['Idempotency-Key'] = crypto.randomUUID();
   }
 
   const controller = new AbortController();

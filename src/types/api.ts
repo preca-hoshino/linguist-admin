@@ -4,6 +4,7 @@ import type { ResourceObjectType } from './resource-types';
 /** 列表响应结构 */
 export interface ListResponse<T> {
   readonly object: 'list';
+  readonly url: string;
   readonly data: T[];
   readonly has_more: boolean;
   readonly total: number;
