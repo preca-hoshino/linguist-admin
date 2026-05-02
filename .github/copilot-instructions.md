@@ -33,14 +33,14 @@ npm run preview      # 预览生产构建
 
 ## 细分规范索引
 
-| 领域 | 文件 | 覆盖范围 |
-|------|------|----------|
-| 工作流 | `.github/instructions/git-workflow.instructions.md` | 分支策略、原子提交、PR 闭环 |
-| 代码风格 | `.github/instructions/code-style.instructions.md` | 命名、组件声明、Props、cn() |
-| API 调用 | `.github/instructions/api-client.instructions.md` | request()、ApiResult、查询参数 |
-| 状态管理 | `.github/instructions/state-management.instructions.md` | Zustand selector、Context、防重入 |
-| 路由 | `.github/instructions/routing.instructions.md` | TanStack Router、鉴权守卫 |
-| 国际化 | `.github/instructions/i18n.instructions.md` | t() 函数、翻译文件、语言检测 |
-| 表单 | `.github/instructions/forms.instructions.md` | react-hook-form + zod + shadcn/ui Form |
-| UI 组件 | `.github/instructions/ui-components.instructions.md` | shadcn/ui new-york、Tailwind v4、图标 |
-| 测试 | `.github/instructions/testing.instructions.md` | Vitest、组件测试、Mock 策略 |
+| 领域 | 文件 |
+|------|------|
+| 工作流 | `.github/instructions/git-workflow.instructions.md` |
+| 代码风格 | `.github/instructions/code-style.instructions.md` |
+| API 调用 | `.github/instructions/api-client.instructions.md` |
+| 状态管理 | `.github/instructions/state-management.instructions.md` |
+| 路由 | `.github/instructions/routing.instructions.md` |
+| 国际化 | `.github/instructions/i18n.instructions.md` |
+| 表单 | `.github/instructions/forms.instructions.md` |
+| UI 组件 | `.github/instructions/ui-components.instructions.md` |
+| 测试 | `.github/instructions/testing.instructions.md` |
