@@ -20,6 +20,7 @@ interface McpLogsContextType {
   loading: boolean;
   error: string;
   hasMore: boolean;
+  total: number;
   pagination: PaginationState;
   setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
   columnFilters: ColumnFiltersState;
@@ -37,6 +38,7 @@ export function McpLogsProvider({ children }: { readonly children: React.ReactNo
   const [currentRow, setCurrentRow] = useState<McpLog | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [logs, setLogs] = useState<McpLog[]>([]);
+  const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -80,6 +82,7 @@ export function McpLogsProvider({ children }: { readonly children: React.ReactNo
       }
       setLogs(res.data.data);
       setHasMore(res.data.has_more);
+      setTotal(res.data.total);
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : t('common.loadFailed', 'Failed to load logs'));
     } finally {
@@ -117,6 +120,7 @@ export function McpLogsProvider({ children }: { readonly children: React.ReactNo
         error,
         pagination,
         hasMore,
+        total,
         setPagination,
         columnFilters,
         setColumnFilters,
