@@ -37,6 +37,7 @@ export function LogsTable(): React.JSX.Element {
     logs,
     loading,
     hasMore,
+    total,
     pagination,
     setPagination,
     columnFilters,
@@ -92,11 +93,20 @@ export function LogsTable(): React.JSX.Element {
     ip: false,
   });
 
+  let computedPageCount: number;
+  if (total > 0) {
+    computedPageCount = Math.max(1, Math.ceil(total / pagination.pageSize));
+  } else if (hasMore) {
+    computedPageCount = pagination.pageIndex + 2;
+  } else {
+    computedPageCount = pagination.pageIndex + 1;
+  }
+
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: logs,
     columns,
-    pageCount: hasMore ? pagination.pageIndex + 2 : pagination.pageIndex + 1,
+    pageCount: computedPageCount,
     state: {
       pagination,
       columnVisibility,
