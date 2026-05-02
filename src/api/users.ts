@@ -51,7 +51,7 @@ export async function createUserApi(data: {
 }
 
 export async function updateUserApi(id: string, data: UserUpdatePayload): Promise<ApiResult<User>> {
-  return await request<User>('POST', `/users/${id}`, data);
+  return await request<User>('PATCH', `/users/${id}`, data);
 }
 
 export async function deleteUserApi(id: string): Promise<ApiResult<{ deleted: true; id: string; object: 'user' }>> {
