@@ -56,7 +56,7 @@ export function useBreakdownStats(
       }
 
       // 只要前 5 名
-      setData(result.data.items.slice(0, limit));
+      setData(result.data.data.slice(0, limit));
     } catch (error_: unknown) {
       if (error_ instanceof DOMException && error_.name === 'AbortError') {
         // 请求被舍弃，不抛出异常

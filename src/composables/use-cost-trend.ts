@@ -71,7 +71,7 @@ export function useCostTrend(
         throw new Error(res.error.message);
       }
 
-      const pts: CostChartPoint[] = res.data.series.map((p: TimeSeriesPoint) => ({
+      const pts: CostChartPoint[] = res.data.data.map((p: TimeSeriesPoint) => ({
         tickLabel: formatTickLabel(p.time),
         isoTime: p.time,
         total_cost: Math.max(0, p.cost),

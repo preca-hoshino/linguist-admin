@@ -71,8 +71,11 @@ export interface TimeSeriesPoint {
 }
 
 export interface TimeSeriesResult {
-  interval: string;
-  series: TimeSeriesPoint[];
+  object: 'list';
+  url: string;
+  data: TimeSeriesPoint[];
+  total: number;
+  has_more: boolean;
 }
 
 export interface StatsErrors {
@@ -153,6 +156,9 @@ export type StatsBreakdownGroupBy =
   | 'user_format';
 
 export interface StatsBreakdown {
-  group_by: StatsBreakdownGroupBy;
-  items: StatsBreakdownItem[];
+  object: 'list';
+  url: string;
+  data: StatsBreakdownItem[];
+  total: number;
+  has_more: boolean;
 }

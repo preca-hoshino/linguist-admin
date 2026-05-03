@@ -12,7 +12,7 @@ describe('useCostTrend', () => {
   });
 
   const mockSeries = {
-    series: [
+    data: [
       { time: '2026-04-05T08:00:00Z', cost: 1.5 },
       { time: '2026-04-05T09:00:00Z', cost: null },
       { time: '2026-04-05T10:00:00Z', cost: -0.5 },
@@ -36,7 +36,7 @@ describe('useCostTrend', () => {
   it('should format 7d tick labels', async () => {
     const time = '2026-04-05T12:00:00Z';
     // biome-ignore lint/suspicious/noExplicitAny: Mocking API response
-    vi.mocked(getStatsTimeSeries).mockResolvedValueOnce({ ok: true, data: { series: [{ time, cost: 2 }] } } as any);
+    vi.mocked(getStatsTimeSeries).mockResolvedValueOnce({ ok: true, data: { data: [{ time, cost: 2 }] } } as any);
     const { result } = renderHook(() => useCostTrend('7d'));
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
@@ -47,7 +47,7 @@ describe('useCostTrend', () => {
 
   it('should pass dimensions', async () => {
     // biome-ignore lint/suspicious/noExplicitAny: Mocking API response
-    vi.mocked(getStatsTimeSeries).mockResolvedValueOnce({ ok: true, data: { series: [] } } as any);
+    vi.mocked(getStatsTimeSeries).mockResolvedValueOnce({ ok: true, data: { data: [] } } as any);
     const { result } = renderHook(() => useCostTrend('30d', { dimension: 'virtual_model', id: 'gpt4' }));
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
@@ -59,7 +59,7 @@ describe('useCostTrend', () => {
 
   it('should ignore global dimension', async () => {
     // biome-ignore lint/suspicious/noExplicitAny: Mocking API response
-    vi.mocked(getStatsTimeSeries).mockResolvedValueOnce({ ok: true, data: { series: [] } } as any);
+    vi.mocked(getStatsTimeSeries).mockResolvedValueOnce({ ok: true, data: { data: [] } } as any);
     const { result } = renderHook(() => useCostTrend('30d', { dimension: 'global', id: 'gpt4' }));
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
