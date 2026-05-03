@@ -1,0 +1,18 @@
+export default {
+  title: 'Theme Settings',
+  desc: 'Adjust the appearance and layout to suit your preferences.',
+  reset: 'Reset',
+  theme: 'Theme',
+  sidebar: 'Sidebar',
+  layout: 'Layout',
+  direction: 'Direction',
+  inset: 'Inset',
+  floating: 'Floating',
+  sidebar_variant: 'Sidebar',
+  layout_default: 'Default',
+  layout_compact: 'Compact',
+  layout_full: 'Full layout',
+  ltr: 'LTR',
+  leftToRight: 'Left to Right',
+  rightToLeft: 'Right to Left',
+};

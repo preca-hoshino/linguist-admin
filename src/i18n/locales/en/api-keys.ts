@@ -1,0 +1,33 @@
+export default {
+  title: 'API Keys',
+  desc: 'Manage API access keys.',
+  name: 'Name',
+  namePlaceholder: 'e.g. Production Key',
+  keyPrefix: 'Key Prefix',
+  status: 'Status',
+  createdAt: 'Created At',
+  expiresAt: 'Expires At',
+  expiresAtHelp: 'Leave blank if you want the key to never expire.',
+  neverExpires: 'Never Expires',
+  active: 'Active',
+  inactive: 'Inactive',
+  expired: 'Expired',
+  createKey: 'Create Key',
+  create: 'New API Key',
+  createDesc: 'Create a new API Key for integration.',
+  edit: 'Edit API Key',
+  editDesc: 'Update settings for this API Key.',
+  deleteConfirmTitle: 'Delete API Key?',
+  deleteConfirmDesc:
+    'Are you sure you want to delete this API Key? This action cannot be undone and any integrations using this key will immediately fail.',
+  rotateConfirmTitle: 'Rotate API Key?',
+  rotateConfirmDesc:
+    'Rotating an API key will invalidate the current key immediately and generate a new one. Do you want to proceed?',
+  copyTitle: 'Save Your API Key',
+  copyDesc:
+    'Please save this secret key somewhere safe and accessible. For security reasons, you will not be able to view it again.',
+  toggleEnable: 'Enable',
+  toggleDisable: 'Disable',
+  searchPlaceholder: 'Search API Keys by name...',
+  empty: 'No API Keys found',
+};
