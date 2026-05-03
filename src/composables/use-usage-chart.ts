@@ -273,7 +273,7 @@ export function useUsageChart(
       if (!result.ok) {
         throw new Error(result.error.message);
       }
-      setData(toChartPoints(result.data.series, timeRange));
+      setData(toChartPoints(result.data.data, timeRange));
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : String(error_));
     } finally {
