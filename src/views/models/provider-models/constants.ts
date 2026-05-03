@@ -238,10 +238,10 @@ export const CHAT_PARAMETERS = [
   createParameter('temperature', 'Temperature'),
   createParameter('top_p', 'Top P'),
   createParameter('top_k', 'Top K'),
+  createParameter('max_tokens', 'Max Tokens'),
   createParameter('frequency_penalty', 'Frequency Penalty'),
   createParameter('presence_penalty', 'Presence Penalty'),
   createParameter('stop', 'Stop Sequences'),
-  createParameter('logprobs', 'Logprobs'),
 ];
 
 export const EMBEDDING_PARAMETERS = [
@@ -276,6 +276,35 @@ export const PARAMETERS_MAP: Record<string, typeof CHAT_PARAMETERS> = {
   image: IMAGE_PARAMETERS,
   audio: AUDIO_PARAMETERS,
 };
+
+// ==================== 各提供商原生支持的 Chat 参数白名单 ====================
+// 必须与 Gateway src/model/http/providers/*/index.ts 中 supportedChatParameters 保持同步
+// 用于前端按提供商 kind 过滤可选的 supported_parameters，避免管理员声明不支持的参数
+
+export const PROVIDER_CHAT_PARAMETERS: Record<string, readonly string[]> = {
+  deepseek: ['temperature', 'top_p', 'max_tokens', 'frequency_penalty', 'presence_penalty', 'stop'],
+  gemini: ['temperature', 'top_p', 'top_k', 'max_tokens', 'stop'],
+  volcengine: ['temperature', 'top_p', 'top_k', 'max_tokens', 'frequency_penalty', 'presence_penalty', 'stop'],
+  copilot: ['temperature', 'top_p', 'max_tokens', 'frequency_penalty', 'presence_penalty', 'stop'],
+  mimo: ['temperature', 'top_p', 'max_tokens', 'frequency_penalty', 'presence_penalty', 'stop'],
+};
+
+export const PROVIDER_EMBEDDING_PARAMETERS: Record<string, readonly string[]> = {
+  volcengine: ['dimensions', 'encoding_format'],
+  copilot: ['dimensions', 'encoding_format'],
+};
+
+/** 按 providerKind + modelType 获取该提供商原生支持的参数 ID 集合 */
+export function getProviderSupportedParamIds(kind: string, modelType: string): Set<string> | null {
+  if (modelType === 'chat') {
+    return PROVIDER_CHAT_PARAMETERS[kind] ? new Set(PROVIDER_CHAT_PARAMETERS[kind]) : null;
+  }
+  if (modelType === 'embedding') {
+    return PROVIDER_EMBEDDING_PARAMETERS[kind] ? new Set(PROVIDER_EMBEDDING_PARAMETERS[kind]) : null;
+  }
+  // rerank / image / audio 暂无提供商定义
+  return null;
+}
 
 // 注意：Sparkles 图标用于能力 section 标题，保留导出供外部引用
 

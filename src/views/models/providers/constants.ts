@@ -26,6 +26,13 @@ export const KIND_OPTIONS: KindOption[] = [
     credentialType: 'api_key',
   },
   {
+    label: 'Xiaomi MiMo',
+    value: 'mimo',
+    defaultBaseUrl: 'https://api.xiaomimimo.com/v1',
+    exampleEndpoint: '/chat/completions',
+    credentialType: 'api_key',
+  },
+  {
     label: 'Volcengine',
     value: 'volcengine',
     defaultBaseUrl: 'https://ark.cn-beijing.volces.com/api/v3',

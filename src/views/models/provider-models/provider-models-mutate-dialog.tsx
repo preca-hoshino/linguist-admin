@@ -29,6 +29,7 @@ import { ProviderSelector } from './components/ProviderSelector';
 import { RequestOverridesEditor } from './components/RequestOverridesEditor';
 import { SupportedParametersSelector } from './components/SupportedParametersSelector';
 import { MODEL_TYPE_OPTIONS } from './constants';
+import { UnitInput, UnitTabs, useUnitInput, TIME_UNITS } from '@/components/UnitInput';
 
 // --- Definitions & Schemas ---
 const RequestOverrideUIRowSchema = z.object({
@@ -598,13 +599,14 @@ export function ProviderModelsMutateDialog({
                                         <Input
                                           type="number"
                                           min={0}
+                                          placeholder="0"
                                           value={field.value === null ? '' : field.value}
                                           onChange={(e) => {
                                             const val =
                                               e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
                                             field.onChange(val);
                                           }}
-                                          className="bg-muted/10 font-mono"
+                                          className="h-9 w-40 font-mono"
                                         />
                                       </FormControl>
                                       <FormDescription>
@@ -619,67 +621,83 @@ export function ProviderModelsMutateDialog({
                               <FormField
                                 control={form.control}
                                 name="tpm_limit"
-                                render={({ field }) => (
-                                  <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                                    <FormLabel className="text-left text-muted-foreground">
-                                      <span className="font-medium text-foreground">
-                                        {t('modelsPage.providerModels.tpmLimit', 'TPM 限制')}
-                                      </span>
-                                    </FormLabel>
-                                    <div className="space-y-1.5">
-                                      <FormControl>
-                                        <Input
-                                          type="number"
-                                          min={0}
-                                          value={field.value === null ? '' : field.value}
-                                          onChange={(e) => {
-                                            const val =
-                                              e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
-                                            field.onChange(val);
-                                          }}
-                                          className="bg-muted/10 font-mono"
-                                        />
-                                      </FormControl>
-                                      <FormDescription>
-                                        {t('modelsPage.providerModels.tpmLimitHint', '留空或 0 = 无限制')}
-                                      </FormDescription>
-                                      <FormMessage />
-                                    </div>
-                                  </FormItem>
-                                )}
+                                render={({ field }) => {
+                                  const unit = useUnitInput({
+                                    baseValue: field.value ?? null,
+                                    onChange: field.onChange,
+                                    min: 0,
+                                  });
+                                  return (
+                                    <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                                      <FormLabel className="text-left text-muted-foreground">
+                                        <span className="font-medium text-foreground">
+                                          {t('modelsPage.providerModels.tpmLimit', 'TPM 限制')}
+                                        </span>
+                                      </FormLabel>
+                                      <div className="space-y-1.5">
+                                        <FormControl>
+                                          <div className="flex items-center gap-2">
+                                            <UnitInput
+                                              value={unit.displayValue}
+                                              onChange={unit.onInputChange}
+                                              placeholder={unit.placeholder}                                            />
+                                            <UnitTabs
+                                              units={unit.units}
+                                              selected={unit.unitLabel}
+                                              onSelect={unit.onUnitChange}
+                                            />
+                                          </div>
+                                        </FormControl>
+                                        <FormDescription>
+                                          {t('modelsPage.providerModels.tpmLimitHint', '留空或 0 = 无限制')}
+                                        </FormDescription>
+                                        <FormMessage />
+                                      </div>
+                                    </FormItem>
+                                  );
+                                }}
                               />
 
                               <FormField
                                 control={form.control}
                                 name="timeout_ms"
-                                render={({ field }) => (
-                                  <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                                    <FormLabel className="text-left text-muted-foreground">
-                                      <span className="font-medium text-foreground">
-                                        {t('modelsPage.providerModels.timeoutMs', '超时 (ms)')}
-                                      </span>
-                                    </FormLabel>
-                                    <div className="space-y-1.5">
-                                      <FormControl>
-                                        <Input
-                                          type="number"
-                                          min={1}
-                                          value={field.value ?? ''}
-                                          onChange={(e) => {
-                                            const val =
-                                              e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
-                                            field.onChange(val);
-                                          }}
-                                          className="bg-muted/10 font-mono"
-                                        />
-                                      </FormControl>
-                                      <FormDescription>
-                                        {t('modelsPage.providerModels.timeoutMsHint', '留空 = 系统默认')}
-                                      </FormDescription>
-                                      <FormMessage />
-                                    </div>
-                                  </FormItem>
-                                )}
+                                render={({ field }) => {
+                                  const unit = useUnitInput({
+                                    baseValue: field.value ?? null,
+                                    onChange: field.onChange,
+                                    units: TIME_UNITS,
+                                    defaultUnit: 's',
+                                    min: 1,
+                                  });
+                                  return (
+                                    <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                                      <FormLabel className="text-left text-muted-foreground">
+                                        <span className="font-medium text-foreground">
+                                          {t('modelsPage.providerModels.timeoutMs', '超时')}
+                                        </span>
+                                      </FormLabel>
+                                      <div className="space-y-1.5">
+                                        <FormControl>
+                                          <div className="flex items-center gap-2">
+                                            <UnitInput
+                                              value={unit.displayValue}
+                                              onChange={unit.onInputChange}
+                                              placeholder={unit.placeholder}                                            />
+                                            <UnitTabs
+                                              units={unit.units}
+                                              selected={unit.unitLabel}
+                                              onSelect={unit.onUnitChange}
+                                            />
+                                          </div>
+                                        </FormControl>
+                                        <FormDescription>
+                                          {t('modelsPage.providerModels.timeoutMsHint', '留空 = 系统默认')}
+                                        </FormDescription>
+                                        <FormMessage />
+                                      </div>
+                                    </FormItem>
+                                  );
+                                }}
                               />
                             </div>
                           </AccordionContent>
@@ -709,6 +727,7 @@ export function ProviderModelsMutateDialog({
                                 control={form.control}
                                 name="supported_parameters"
                                 modelType={modelType}
+                                providerKind={selectedProvider?.kind}
                               />
                             </div>
                           </AccordionContent>
