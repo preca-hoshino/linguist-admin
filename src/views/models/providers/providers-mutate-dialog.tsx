@@ -525,12 +525,6 @@ export function ProvidersMutateDialog({
                     }}
                   />
                 </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
               </div>
             </form>
           </Form>
