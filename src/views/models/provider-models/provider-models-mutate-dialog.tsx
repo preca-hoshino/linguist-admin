@@ -208,7 +208,7 @@ export function ProviderModelsMutateDialog({
       max_tokens: Math.round(currentRow.max_tokens / 1000),
       provider_id: currentRow.provider_id,
       capabilities: currentRow.capabilities,
-      supported_parameters: (currentRow as { supported_parameters?: string[] }).supported_parameters ?? [],
+      supported_parameters: currentRow.supported_parameters ?? [],
       pricing_tiers:
         (currentRow.pricing_tiers?.length ?? 0) > 0
           ? (currentRow.pricing_tiers?.map((p) => ({
@@ -304,6 +304,7 @@ export function ProviderModelsMutateDialog({
         model_type: values.type as 'chat' | 'embedding',
         max_tokens: values.max_tokens * 1000,
         capabilities: values.capabilities,
+        supported_parameters: values.supported_parameters,
         pricing_tiers: values.pricing_tiers.map((t, index) => ({
           ...t,
           start_tokens: t.start_tokens * 1000,

@@ -4,15 +4,24 @@ import { Badge } from '@/components/ui/Badge';
 import { Progress } from '@/components/ui/Progress';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
+  AudioLines,
   Box,
   Braces,
   BrainCircuit,
   DatabaseZap,
   Eye,
+  FileCode,
   Globe,
   Images,
+  Languages,
   MessageSquare,
+  Mic,
+  Minimize2,
   Network,
+  Paintbrush,
+  PlayCircle,
+  Scaling,
+  Sparkles,
   Wrench,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -58,8 +67,19 @@ const CAP_TO_I18N: Record<string, string> = {
   thinking: 'capReasoning',
   cache: 'capCache',
   web_search: 'capWebSearch',
+  structured_output: 'capStructuredOutput',
+  stream: 'capStream',
   multimodal: 'capMultimodal',
   sparse_vector: 'capSparseVector',
+  dynamic_dim: 'capDynamicDim',
+  multilingual: 'capMultilingual',
+  cross_lingual: 'capCrossLingual',
+  inpaint: 'capInpaint',
+  upscale: 'capUpscale',
+  style_transfer: 'capStyleTransfer',
+  asr: 'capAsr',
+  tts: 'capTts',
+  voice_clone: 'capVoiceClone',
 };
 
 const CAP_TO_STYLE: Record<string, string> = {
@@ -71,10 +91,29 @@ const CAP_TO_STYLE: Record<string, string> = {
     'bg-emerald-50 border-emerald-300 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-500/30',
   cache: 'bg-rose-50 border-rose-300 text-rose-800 dark:bg-rose-500/10 dark:text-rose-300 dark:border-rose-500/30',
   web_search: 'bg-sky-50 border-sky-300 text-sky-800 dark:bg-sky-500/10 dark:text-sky-300 dark:border-sky-500/30',
+  structured_output:
+    'bg-indigo-50 border-indigo-300 text-indigo-800 dark:bg-indigo-500/10 dark:text-indigo-300 dark:border-indigo-500/30',
+  stream:
+    'bg-orange-50 border-orange-300 text-orange-800 dark:bg-orange-500/10 dark:text-orange-300 dark:border-orange-500/30',
   multimodal:
     'bg-fuchsia-50 border-fuchsia-300 text-fuchsia-800 dark:bg-fuchsia-500/10 dark:text-fuchsia-300 dark:border-fuchsia-500/30',
   sparse_vector:
     'bg-teal-50 border-teal-300 text-teal-800 dark:bg-teal-500/10 dark:text-teal-300 dark:border-teal-500/30',
+  dynamic_dim:
+    'bg-lime-50 border-lime-300 text-lime-800 dark:bg-lime-500/10 dark:text-lime-300 dark:border-lime-500/30',
+  multilingual:
+    'bg-blue-50 border-blue-300 text-blue-800 dark:bg-blue-500/10 dark:text-blue-300 dark:border-blue-500/30',
+  cross_lingual:
+    'bg-cyan-50 border-cyan-300 text-cyan-800 dark:bg-cyan-500/10 dark:text-cyan-300 dark:border-cyan-500/30',
+  inpaint: 'bg-pink-50 border-pink-300 text-pink-800 dark:bg-pink-500/10 dark:text-pink-300 dark:border-pink-500/30',
+  upscale:
+    'bg-purple-50 border-purple-300 text-purple-800 dark:bg-purple-500/10 dark:text-purple-300 dark:border-purple-500/30',
+  style_transfer:
+    'bg-yellow-50 border-yellow-300 text-yellow-800 dark:bg-yellow-500/10 dark:text-yellow-300 dark:border-yellow-500/30',
+  asr: 'bg-stone-50 border-stone-300 text-stone-800 dark:bg-stone-500/10 dark:text-stone-300 dark:border-stone-500/30',
+  tts: 'bg-zinc-50 border-zinc-300 text-zinc-800 dark:bg-zinc-500/10 dark:text-zinc-300 dark:border-zinc-500/30',
+  voice_clone:
+    'bg-rose-50 border-rose-300 text-rose-800 dark:bg-rose-500/10 dark:text-rose-300 dark:border-rose-500/30',
 };
 
 const CAP_TO_ICON: Record<string, React.ElementType> = {
@@ -83,9 +122,47 @@ const CAP_TO_ICON: Record<string, React.ElementType> = {
   thinking: BrainCircuit,
   cache: DatabaseZap,
   web_search: Globe,
+  structured_output: FileCode,
+  stream: PlayCircle,
   multimodal: Images,
   sparse_vector: Network,
+  dynamic_dim: Minimize2,
+  multilingual: Languages,
+  cross_lingual: Network,
+  inpaint: Paintbrush,
+  upscale: Scaling,
+  style_transfer: Sparkles,
+  asr: Mic,
+  tts: AudioLines,
+  voice_clone: Sparkles,
 };
+
+/** 所有能力的全局显示顺序，与弹窗 capabilities 选择器保持一致 */
+const CAP_ORDER: string[] = [
+  // chat
+  'vision',
+  'tools',
+  'thinking',
+  'cache',
+  'web_search',
+  'structured_output',
+  'stream',
+  // embedding
+  'multimodal',
+  'sparse_vector',
+  'dynamic_dim',
+  // rerank
+  'multilingual',
+  'cross_lingual',
+  // image
+  'inpaint',
+  'upscale',
+  'style_transfer',
+  // audio
+  'asr',
+  'tts',
+  'voice_clone',
+];
 
 const MODEL_TYPE_ICON: Record<string, React.ElementType> = {
   chat: MessageSquare,
@@ -185,9 +262,10 @@ export function useProviderModelsColumns(): ColumnDef<ProviderModel>[] {
         if (caps == null || caps.length === 0) {
           return <span className="text-xs text-muted-foreground">-</span>;
         }
+        const sorted = caps.toSorted((a, b) => CAP_ORDER.indexOf(a) - CAP_ORDER.indexOf(b));
         return (
           <div className="flex flex-wrap gap-1">
-            {caps.map((cap) => {
+            {sorted.map((cap) => {
               const Icon = CAP_TO_ICON[cap];
               return (
                 <Badge
