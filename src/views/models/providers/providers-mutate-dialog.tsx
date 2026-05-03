@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine } from '@lobehub/icons';
+import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine, XiaomiMiMo } from '@lobehub/icons';
 import { Activity, Globe, Network, Timer, Type, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
@@ -23,6 +23,7 @@ import { cn } from '@/utils/utils';
 import { CredentialSection } from './components/CredentialSection';
 import { type KindOption, ProviderKindSelector } from './components/ProviderKindSelector';
 import { KIND_OPTIONS } from './constants';
+import { UnitInput, UnitTabs, useUnitInput } from '@/components/UnitInput';
 
 interface ProvidersMutateDialogProps {
   readonly open: boolean;
@@ -39,9 +40,9 @@ const formSchema = z.object({
   api_key: z.string().optional(),
   // 高级配置
   http_proxy: z.string().optional(),
-  // 并发限制（字符串存储，提交时转换为数字或 null）
-  rpm_limit: z.string().optional(),
-  tpm_limit: z.string().optional(),
+  // 并发限制（原始 Token 数，null = 无限制）
+  rpm_limit: z.number().int().positive().nullable().optional(),
+  tpm_limit: z.number().int().positive().nullable().optional(),
 });
 
 export type ProviderForm = z.infer<typeof formSchema>;
@@ -80,8 +81,8 @@ export function ProvidersMutateDialog({
       base_url: KIND_OPTIONS[0]?.defaultBaseUrl ?? '',
       api_key: '',
       http_proxy: '',
-      rpm_limit: '',
-      tpm_limit: '',
+      rpm_limit: null,
+      tpm_limit: null,
     },
   });
 
@@ -97,8 +98,8 @@ export function ProvidersMutateDialog({
           base_url: currentRow.base_url,
           api_key: currentRow.credential_type === 'api_key' ? (currentRow.credential.key as string) || '' : '',
           http_proxy: currentRow.config.http_proxy,
-          rpm_limit: currentRow.rpm_limit === null ? '' : String(currentRow.rpm_limit),
-          tpm_limit: currentRow.tpm_limit === null ? '' : String(currentRow.tpm_limit),
+          rpm_limit: currentRow.rpm_limit,
+          tpm_limit: currentRow.tpm_limit,
         });
         setTimeout(() => {
           setProxyMode(currentRow.config.http_proxy ? 'custom' : 'off');
@@ -110,8 +111,8 @@ export function ProvidersMutateDialog({
           base_url: KIND_OPTIONS[0]?.defaultBaseUrl ?? '',
           api_key: '',
           http_proxy: '',
-          rpm_limit: '',
-          tpm_limit: '',
+          rpm_limit: null,
+          tpm_limit: null,
         });
         setTimeout(() => {
           setProxyMode('off');
@@ -139,12 +140,8 @@ export function ProvidersMutateDialog({
         config.github_info = copilotAuthData.user;
       }
 
-      const rpmParsed =
-        data.rpm_limit !== '' && data.rpm_limit !== undefined ? Number.parseInt(data.rpm_limit, 10) : null;
-      const tpmParsed =
-        data.tpm_limit !== '' && data.tpm_limit !== undefined ? Number.parseInt(data.tpm_limit, 10) : null;
-      const rpmLimitVal = rpmParsed !== null && !Number.isNaN(rpmParsed) && rpmParsed > 0 ? rpmParsed : null;
-      const tpmLimitVal = tpmParsed !== null && !Number.isNaN(tpmParsed) && tpmParsed > 0 ? tpmParsed : null;
+      const rpmLimitVal = data.rpm_limit ?? null;
+      const tpmLimitVal = data.tpm_limit ?? null;
 
       if (currentRow) {
         const payload: Record<string, unknown> = {
@@ -319,10 +316,12 @@ export function ProvidersMutateDialog({
                                     {val === 'gemini' && <Gemini size={16} className="fill-current" />}
                                     {val === 'deepseek' && <DeepSeek size={16} className="fill-current" />}
                                     {val === 'volcengine' && <Volcengine size={16} className="fill-current" />}
+                                    {val === 'mimo' && <XiaomiMiMo size={16} className="fill-current" />}
                                     {val === 'copilot' && <Github className="h-4 w-4" />}
                                     {val !== 'gemini' &&
                                       val !== 'deepseek' &&
                                       val !== 'volcengine' &&
+                                      val !== 'mimo' &&
                                       val !== 'copilot' && (
                                         <ProviderIcon
                                           provider={val as 'openai'}
@@ -474,13 +473,15 @@ export function ProvidersMutateDialog({
                       <FormItem>
                         <FormControl>
                           <Input
-                            {...field}
                             type="number"
-                            min="1"
-                            step="1"
-                            placeholder="No limit"
-                            className="h-9 w-40"
+                            min={0}
+                            placeholder="0"
                             value={field.value ?? ''}
+                            onChange={(e) => {
+                              const val = e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
+                              field.onChange(val);
+                            }}
+                            className="h-9 w-40 font-mono"
                           />
                         </FormControl>
                         <FormMessage />
@@ -497,18 +498,33 @@ export function ProvidersMutateDialog({
                   <FormField
                     control={form.control}
                     name="tpm_limit"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="number"
-                            min="1"
-                            step="1"
-                            placeholder="No limit"
-                            className="h-9 w-40"
-                            value={field.value ?? ''}
-                          />
+                    render={({ field }) => {
+                      const unit = useUnitInput({
+                        baseValue: field.value ?? null,
+                        onChange: field.onChange,
+                        min: 0,
+                      });
+                      return (
+                        <FormItem>
+                          <FormControl>
+                            <div className="flex items-center gap-2">
+                              <UnitInput
+                                value={unit.displayValue}
+                                onChange={unit.onInputChange}
+                                placeholder={unit.placeholder}                              />
+                              <UnitTabs
+                                units={unit.units}
+                                selected={unit.unitLabel}
+                                onSelect={unit.onUnitChange}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
+                  />
+                </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

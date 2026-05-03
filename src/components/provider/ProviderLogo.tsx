@@ -10,6 +10,7 @@ import {
   ProviderIcon,
   Trae,
   Volcengine,
+  XiaomiMiMo,
 } from '@lobehub/icons';
 import { forwardRef } from 'react';
 
@@ -45,6 +46,7 @@ export const ProviderLogo = forwardRef<SVGSVGElement, ProviderLogoProps>(
       gemini: Gemini,
       deepseek: DeepSeek,
       volcengine: Volcengine,
+      mimo: XiaomiMiMo,
       copilot: Github,
       'cherry-studio': CherryStudio,
       antigravity: Antigravity,

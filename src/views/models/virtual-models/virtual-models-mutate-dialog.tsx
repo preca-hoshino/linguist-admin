@@ -16,6 +16,7 @@ import type { ProviderModel, VirtualModel } from '@/types';
 import { cn } from '@/utils/utils';
 import { SortableBackendList } from './components/SortableBackendList';
 import { MODEL_TYPE_OPTIONS } from '@/views/models/provider-models/constants';
+import { UnitInput, UnitTabs, useUnitInput } from '@/components/UnitInput';
 
 interface VirtualModelsMutateDialogProps {
   readonly open: boolean;
@@ -387,13 +388,14 @@ export function VirtualModelsMutateDialog({
                             <Input
                               type="number"
                               min={0}
-                              placeholder={t('modelsPage.providerModels.unlimited', '留空或 0 代表无限制')}
+                              placeholder="0"
                               value={field.value === null ? '' : field.value}
                               onChange={(e) => {
-                                const val = e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
+                                const val =
+                                  e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
                                 field.onChange(val);
                               }}
-                              className="bg-muted/10 font-mono"
+                              className="h-9 w-40 font-mono"
                             />
                           </FormControl>
                           <FormMessage />
@@ -405,32 +407,39 @@ export function VirtualModelsMutateDialog({
                   <FormField
                     control={form.control}
                     name="tpm_limit"
-                    render={({ field }) => (
-                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                          <Activity className="h-3.5 w-3.5" />
-                          <span className="font-medium text-foreground">
-                            {t('modelsPage.providerModels.tpmLimit', 'TPM 限制')}
-                          </span>
-                        </FormLabel>
-                        <div className="space-y-1.5">
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min={0}
-                              placeholder={t('modelsPage.providerModels.unlimited', '留空或 0 代表无限制')}
-                              value={field.value === null ? '' : field.value}
-                              onChange={(e) => {
-                                const val = e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
-                                field.onChange(val);
-                              }}
-                              className="bg-muted/10 font-mono"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </div>
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      const unit = useUnitInput({
+                        baseValue: field.value ?? null,
+                        onChange: field.onChange,
+                        min: 0,
+                      });
+                      return (
+                        <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                          <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                            <Activity className="h-3.5 w-3.5" />
+                            <span className="font-medium text-foreground">
+                              {t('modelsPage.providerModels.tpmLimit', 'TPM 限制')}
+                            </span>
+                          </FormLabel>
+                          <div className="space-y-1.5">
+                            <FormControl>
+                              <div className="flex items-center gap-2">
+                                <UnitInput
+                                  value={unit.displayValue}
+                                  onChange={unit.onInputChange}
+                                  placeholder={unit.placeholder}                                />
+                                <UnitTabs
+                                  units={unit.units}
+                                  selected={unit.unitLabel}
+                                  onSelect={unit.onUnitChange}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </div>
+                        </FormItem>
+                      );
+                    }}
                   />
                 </div>
 

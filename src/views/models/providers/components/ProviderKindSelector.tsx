@@ -1,4 +1,4 @@
-import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine } from '@lobehub/icons';
+import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine, XiaomiMiMo } from '@lobehub/icons';
 import { Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Input } from '@/components/ui/Input';
@@ -80,6 +80,9 @@ export function ProviderKindSelector({
                       }
                       case 'volcengine': {
                         return <Volcengine size={24} className="fill-current" />;
+                      }
+                      case 'mimo': {
+                        return <XiaomiMiMo size={24} className="fill-current" />;
                       }
                       case 'copilot': {
                         return <Github size={24} className="fill-current" />;
