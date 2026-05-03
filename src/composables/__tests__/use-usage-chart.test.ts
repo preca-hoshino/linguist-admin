@@ -50,7 +50,7 @@ describe('useUsageChart', () => {
     vi.mocked(getStatsTimeSeries).mockResolvedValueOnce({
       ok: true,
       data: {
-        series: [
+        data: [
           { time: '2026-04-05T08:00:00Z', requests: 0, error_count: 0, timeout_count: 0, rate_limit_count: 0 },
           {
             time: '2026-04-05T09:00:00Z',
@@ -106,7 +106,7 @@ describe('useUsageChart', () => {
     vi.mocked(getStatsTimeSeries).mockResolvedValueOnce({
       ok: true,
       data: {
-        series: [
+        data: [
           {
             time: '2026-04-05T08:00:00Z',
             requests: 0,
@@ -165,7 +165,7 @@ describe('useUsageChart', () => {
   it('handles optional missing itl_avg_ms calculation', async () => {
     vi.mocked(getStatsTimeSeries).mockResolvedValueOnce({
       ok: true,
-      data: { series: [{ time: '2026-04-05T09:00:00Z', requests: 10, itl_avg_ms: 0, itl_p50_ms: null }] },
+      data: { data: [{ time: '2026-04-05T09:00:00Z', requests: 10, itl_avg_ms: 0, itl_p50_ms: null }] },
     } as unknown as Awaited<ReturnType<typeof getStatsTimeSeries>>);
     const { result } = renderHook(() => useUsageChart('30d'));
     await waitFor(() => {
@@ -175,7 +175,7 @@ describe('useUsageChart', () => {
   });
 
   it('polling and refresh test', async () => {
-    vi.mocked(getStatsTimeSeries).mockResolvedValue({ ok: true, data: { series: [] } } as unknown as Awaited<
+    vi.mocked(getStatsTimeSeries).mockResolvedValue({ ok: true, data: { data: [] } } as unknown as Awaited<
       ReturnType<typeof getStatsTimeSeries>
     >);
 
