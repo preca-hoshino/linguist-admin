@@ -16,7 +16,7 @@ describe('useBreakdownStats', () => {
   });
 
   const mockData = {
-    items: [
+    data: [
       { name: 'A', request_count: 100 },
       { name: 'B', request_count: 90 },
       { name: 'C', request_count: 80 },
@@ -37,7 +37,7 @@ describe('useBreakdownStats', () => {
   });
 
   it('should include dimension and id options in api call', async () => {
-    vi.mocked(getStatsBreakdown).mockResolvedValueOnce({ ok: true, data: { items: [] } } as never);
+    vi.mocked(getStatsBreakdown).mockResolvedValueOnce({ ok: true, data: { data: [] } } as never);
     const { result } = renderHook(() =>
       useBreakdownStats('virtual_model', '7d', 5, { dimension: 'provider', id: 'openai' }),
     );
@@ -109,14 +109,14 @@ describe('useBreakdownStats', () => {
 
     rerender({ range: '7d' as TimeRange });
     // biome-ignore lint/suspicious/noExplicitAny: Bypass strict typing for test resolution
-    const res1 = { ok: true, data: { items: [{ name: '1', request_count: 1 }] } } as any;
+    const res1 = { ok: true, data: { data: [{ name: '1', request_count: 1 }] } } as any;
 
     act(() => {
       resolve1(res1);
     });
     expect(result.current.loading).toBe(true);
     // biome-ignore lint/suspicious/noExplicitAny: Bypass strict typing for test resolution
-    const res2 = { ok: true, data: { items: [{ name: '2', request_count: 2 }] } } as any;
+    const res2 = { ok: true, data: { data: [{ name: '2', request_count: 2 }] } } as any;
 
     act(() => {
       resolve2(res2);
@@ -128,7 +128,7 @@ describe('useBreakdownStats', () => {
   });
 
   it('should trigger refresh when refreshKey changes', async () => {
-    vi.mocked(getStatsBreakdown).mockResolvedValue({ ok: true, data: { items: [] } } as never);
+    vi.mocked(getStatsBreakdown).mockResolvedValue({ ok: true, data: { data: [] } } as never);
     const { rerender } = renderHook(({ rk }) => useBreakdownStats('provider', '24h', 5, undefined, rk), {
       initialProps: { rk: 0 },
     });
