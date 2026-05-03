@@ -20,6 +20,7 @@ export function ProvidersTable(): React.JSX.Element {
     providers,
     isLoading,
     hasMore,
+    total,
     pagination,
     setPagination,
     globalFilter,
@@ -37,7 +38,7 @@ export function ProvidersTable(): React.JSX.Element {
   const table = useReactTable({
     data: providers,
     columns,
-    pageCount: hasMore ? pagination.pageIndex + 2 : pagination.pageIndex + 1,
+    pageCount: total > 0 ? Math.max(1, Math.ceil(total / pagination.pageSize)) : hasMore ? pagination.pageIndex + 2 : pagination.pageIndex + 1,
     state: {
       pagination,
       sorting,
