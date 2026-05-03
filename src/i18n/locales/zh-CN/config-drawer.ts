@@ -1,0 +1,18 @@
+export default {
+  title: '外观设置',
+  desc: '调整外观和布局以符合个人偏好。',
+  reset: '重置全部',
+  theme: '主题',
+  sidebar: '侧边栏',
+  layout: '布局',
+  direction: '文字方向',
+  inset: '内贴',
+  floating: '悬浮',
+  sidebar_variant: '标准',
+  layout_default: '默认',
+  layout_compact: '紧凑',
+  layout_full: '全屏',
+  ltr: 'LTR',
+  leftToRight: '从左到右 (LTR)',
+  rightToLeft: '从右到左 (RTL)',
+};

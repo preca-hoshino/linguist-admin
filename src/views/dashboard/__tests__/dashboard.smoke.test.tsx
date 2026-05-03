@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { DashboardPage } from '../index';
 
@@ -84,9 +84,10 @@ if (typeof globalThis.matchMedia === 'undefined') {
 }
 
 describe('Dashboard Smoke Tests', () => {
-  it('DashboardPage should render without crashing', () => {
+  it('DashboardPage should render without crashing', async () => {
     const { container } = render(<DashboardPage />);
-    expect(container).toBeInTheDocument();
-    expect(container.querySelector('h1')).toBeTruthy();
+    await waitFor(() => {
+      expect(container.querySelector('h1')).toBeTruthy();
+    });
   });
 });

@@ -1,0 +1,47 @@
+export default {
+  comingSoon: 'Coming soon',
+  resetAll: 'Reset All',
+  updateDisplay: 'Update display',
+  cancel: 'Cancel',
+  continue: 'Continue',
+  loading: 'Loading...',
+  saving: 'Saving...',
+  save: 'Save',
+  create: 'Create',
+  delete: 'Delete',
+  optional: 'optional',
+  enabled: 'Enabled',
+  disabled: 'Disabled',
+  edit: 'Edit',
+  realtime: 'Live',
+  // Status
+  active: 'Active',
+  inactive: 'Inactive',
+  success: 'Success',
+  error: 'Error',
+  // Navigation
+  backToList: 'Back to List',
+  // Table
+  id: 'ID',
+  status: 'Status',
+  actions: 'Actions',
+  selectAll: 'Select all',
+  selectRow: 'Select row',
+  selected: 'Selected',
+  // Search & empty states
+  search: 'Search',
+  noResults: 'No results found',
+  noItems: 'No items to display',
+  noDescription: 'No description',
+  noParams: 'No parameters defined or unable to parse as standard properties',
+  noParam: 'No parameters',
+  noResult: 'No result content',
+  notProvided: 'Not provided',
+  // Confirm
+  cannotBeUndone: 'This action cannot be undone.',
+  deletedSuccess: 'Successfully deleted',
+  // Misc
+  empty: 'Empty',
+  copy: 'Copy',
+  copied: 'Copied',
+};
