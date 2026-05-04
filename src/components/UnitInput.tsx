@@ -23,7 +23,14 @@ interface UnitInputProps {
   readonly disabled?: boolean;
 }
 
-export function UnitInput({ value, onChange, placeholder, min, className, disabled }: UnitInputProps): React.JSX.Element {
+export function UnitInput({
+  value,
+  onChange,
+  placeholder,
+  min,
+  className,
+  disabled,
+}: UnitInputProps): React.JSX.Element {
   return (
     <Input
       type="number"
@@ -66,12 +73,7 @@ export function UnitTabs({ units, selected, onSelect, className, disabled }: Uni
     >
       <TabsList className="h-9 rounded-lg">
         {units.map((u) => (
-          <TabsTrigger
-            key={u.label}
-            value={u.label}
-            disabled={disabled}
-            className="px-2.5 text-xs"
-          >
+          <TabsTrigger key={u.label} value={u.label} disabled={disabled} className="px-2.5 text-xs">
             {u.label}
           </TabsTrigger>
         ))}
@@ -124,9 +126,8 @@ export function useUnitInput({
   min = 0,
 }: UseUnitInputOptions): UseUnitInputReturn {
   const units = rawUnits ?? DEFAULT_TOKEN_UNITS;
-  const initialLabel = defaultUnit !== undefined && units.some((u) => u.label === defaultUnit)
-    ? defaultUnit
-    : (units[0]?.label ?? '');
+  const initialLabel =
+    defaultUnit !== undefined && units.some((u) => u.label === defaultUnit) ? defaultUnit : (units[0]?.label ?? '');
 
   const [unitLabel, setUnitLabel] = useState(initialLabel);
   const activeUnit = units.find((u) => u.label === unitLabel) ?? units[0];
@@ -156,4 +157,3 @@ export function useUnitInput({
 
   return { displayValue, onInputChange, unitLabel, onUnitChange, units, placeholder };
 }
-
