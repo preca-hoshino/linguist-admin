@@ -37,6 +37,7 @@ npm run preview      # 预览生产构建
 |------|------|
 | 工作流 | `.github/instructions/git-workflow.instructions.md` |
 | 代码风格 | `.github/instructions/code-style.instructions.md` |
+| 目录结构 | `.github/instructions/project-structure.instructions.md` |
 | API 调用 | `.github/instructions/api-client.instructions.md` |
 | 状态管理 | `.github/instructions/state-management.instructions.md` |
 | 路由 | `.github/instructions/routing.instructions.md` |
