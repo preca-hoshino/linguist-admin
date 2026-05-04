@@ -1,10 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
-import { Activity, Banknote, Box, BrainCircuit, SlidersHorizontal, Sparkles, Type, Wrench, X } from 'lucide-react';
+import { Banknote, Box, BrainCircuit, Sparkles, Type, Wrench, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
 import { createProviderModel, updateProviderModel } from '@/api/model/provider-models';
 import { listProviders } from '@/api/model/providers';
 import { Button } from '@/components/ui/Button';
@@ -20,104 +19,33 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Card } from '@/components/ui/Card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
-import { Switch } from '@/components/ui/Switch';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
-import type { ProviderModel } from '@/types';
 import { CapabilitiesSelector } from './components/CapabilitiesSelector';
 import { PricingTiersSection, usePricingTiersLogic } from './components/PricingTiersSection';
+import { ProviderConfigSection } from './components/ProviderConfigSection';
 import { ProviderSelector } from './components/ProviderSelector';
+import { RateLimitSection } from './components/RateLimitSection';
 import { RequestOverridesEditor } from './components/RequestOverridesEditor';
 import { SupportedParametersSelector } from './components/SupportedParametersSelector';
 import { MODEL_TYPE_OPTIONS } from './constants';
-import { UnitInput, UnitTabs, useUnitInput, TIME_UNITS } from '@/components/UnitInput';
+import { buildFormValuesFromRow, buildSubmitPayload } from './helpers';
+import { formSchema, type FormValues, type ProviderModelsMutateDialogProps } from './schema';
 
-// --- Definitions & Schemas ---
-const RequestOverrideUIRowSchema = z.object({
-  type: z.enum(['header', 'body']),
-  key: z.string().min(1),
-  value: z.string().optional(),
-});
-
-const PricingTierSchema = z.object({
-  start_tokens: z.number().min(0),
-  max_tokens: z.number().min(0),
-  input_price: z.number().min(0),
-  output_price: z.number().min(0),
-  cache_price: z.number().min(0),
-});
-
-const formSchema = z.object({
-  id: z.string(),
-  name: z.string().min(1, 'Name required'),
-  type: z.string().min(1, 'Type required'),
-  max_tokens: z.number().min(1),
-  provider_id: z.string().min(1, 'Provider required'),
-  capabilities: z.array(z.string()),
-  supported_parameters: z.array(z.string()),
-  pricing_tiers: z.array(PricingTierSchema),
-  rpm_limit: z.number().nullable().optional(),
-  tpm_limit: z.number().nullable().optional(),
-  /** API 调用超时时间（毫秒），null = 使用系统默认 */
-  timeout_ms: z.number().int().positive().nullable().optional(),
-  request_overrides_ui: z.array(RequestOverrideUIRowSchema).optional(),
-  model_config: z
-    .object({
-      reasoning_content_backfill: z.boolean().optional(),
-      endpoint_type: z.enum(['normal', 'coding_plan']).optional(),
-    })
-    .optional(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
-interface ProviderModelsMutateDialogProps {
-  readonly open: boolean;
-  readonly onOpenChange: (open: boolean) => void;
-  readonly currentRow?: ProviderModel | null;
-  readonly onSuccess?: () => void | Promise<void>;
-  readonly title?: string;
-  readonly description?: string;
-  readonly fixedProviderId?: string;
-}
-
-function tryParseJson(value: string): unknown {
-  try {
-    return JSON.parse(value);
-  } catch {
-    return value;
-  }
-}
-
-function buildRequestOverridesPayload(
-  uiOverrides: Array<{ type: 'header' | 'body'; key: string; value?: string | undefined }> | undefined,
-): { headers?: Record<string, string | null>; body?: Record<string, unknown> } | null {
-  if (!uiOverrides || uiOverrides.length === 0) {
-    return null;
-  }
-  const headers: Record<string, string | null> = {};
-  const body: Record<string, unknown> = {};
-
-  for (const item of uiOverrides) {
-    if (item.type === 'header') {
-      headers[item.key] = item.value === undefined || item.value.trim() === '' ? null : item.value;
-      continue;
-    }
-
-    const valIsNull = item.value === undefined || item.value.trim() === '';
-    const tempKey = tryParseJson(item.key);
-    body[typeof tempKey === 'string' ? tempKey : item.key] = valIsNull ? null : tryParseJson(item.value ?? '');
-  }
-
-  const overrides: { headers?: Record<string, string | null>; body?: Record<string, unknown> } = {};
-  if (Object.keys(headers).length > 0) {
-    overrides.headers = headers;
-  }
-  if (Object.keys(body).length > 0) {
-    overrides.body = body;
-  }
-
-  return Object.keys(overrides).length > 0 ? overrides : null;
-}
+const DEFAULT_VALUES: FormValues = {
+  id: '',
+  name: '',
+  type: 'chat',
+  max_tokens: 128,
+  provider_id: '',
+  capabilities: [],
+  supported_parameters: [],
+  pricing_tiers: [{ start_tokens: 0, max_tokens: 128, input_price: 0, output_price: 0, cache_price: 0 }],
+  rpm_limit: null,
+  tpm_limit: null,
+  timeout_ms: null,
+  request_overrides_ui: [],
+  model_config: { reasoning_content_backfill: false },
+};
 
 export function ProviderModelsMutateDialog({
   open,
@@ -135,30 +63,13 @@ export function ProviderModelsMutateDialog({
 
   const { data: providerRes, isLoading: providersLoading } = useQuery({
     queryKey: ['admin_providers_all'],
-    queryFn: async () =>
-      await listProviders({
-        limit: 500, // fetch all for selection
-      }),
+    queryFn: async () => await listProviders({ limit: 500 }),
     enabled: open,
   });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      id: '',
-      name: '',
-      type: 'chat',
-      max_tokens: 128,
-      provider_id: fixedProviderId ?? '',
-      capabilities: [],
-      supported_parameters: [],
-      pricing_tiers: [{ start_tokens: 0, max_tokens: 128, input_price: 0, output_price: 0, cache_price: 0 }],
-      rpm_limit: null,
-      tpm_limit: null,
-      timeout_ms: null,
-      request_overrides_ui: [],
-      model_config: { reasoning_content_backfill: false },
-    },
+    defaultValues: { ...DEFAULT_VALUES, provider_id: fixedProviderId ?? '' },
   });
 
   // Watch fields
@@ -167,117 +78,26 @@ export function ProviderModelsMutateDialog({
   const currentPricingTiers = useWatch({ control: form.control, name: 'pricing_tiers' });
   const modelType = useWatch({ control: form.control, name: 'type' });
 
-  // 提前计算提供商列表（须在 useWatch 之后、useEffect 之前）
   const providers = providerRes?.ok === true ? providerRes.data.data : [];
-
-  // 根据当前选中提供商动态过滤可用模型类型
   const selectedProvider = providers.find((p) => p.id === currentProviderId);
   const rawAllowed = selectedProvider?.supported_model_types ?? [];
   const allowedTypes: string[] = rawAllowed.length > 0 ? rawAllowed : MODEL_TYPE_OPTIONS.map((o) => o.id);
   const visibleTypeOptions = MODEL_TYPE_OPTIONS.filter((o) => allowedTypes.includes(o.id));
 
-  // Initialize form
+  // Initialize form on open
   useEffect(() => {
-    if (!open) {
-      return;
-    }
-
+    if (!open) { return; }
     if (!currentRow) {
-      form.reset({
-        id: '',
-        name: '',
-        type: 'chat',
-        max_tokens: 128,
-        provider_id: fixedProviderId ?? '',
-        capabilities: [],
-        supported_parameters: [],
-        pricing_tiers: [{ start_tokens: 0, max_tokens: 128, input_price: 0, output_price: 0, cache_price: 0 }],
-        rpm_limit: null,
-        tpm_limit: null,
-        timeout_ms: null,
-        request_overrides_ui: [],
-        model_config: { reasoning_content_backfill: false },
-      });
+      form.reset({ ...DEFAULT_VALUES, provider_id: fixedProviderId ?? '' });
       setSearchQuery('');
       return;
     }
-
-    form.reset({
-      id: currentRow.id,
-      name: currentRow.name,
-      type: (currentRow as { type?: string }).type ?? currentRow.model_type,
-      max_tokens: Math.round(currentRow.max_tokens / 1000),
-      provider_id: currentRow.provider_id,
-      capabilities: currentRow.capabilities,
-      supported_parameters: currentRow.supported_parameters ?? [],
-      pricing_tiers:
-        (currentRow.pricing_tiers?.length ?? 0) > 0
-          ? (currentRow.pricing_tiers?.map((p) => ({
-              start_tokens: Math.round(p.start_tokens / 1000),
-              max_tokens: Math.round((p.max_tokens ?? currentRow.max_tokens) / 1000),
-              input_price: p.input_price,
-              output_price: p.output_price,
-              cache_price: p.cache_price,
-            })) ?? [])
-          : [
-              {
-                start_tokens: 0,
-                max_tokens: Math.round(currentRow.max_tokens / 1000),
-                input_price: 0,
-                output_price: 0,
-                cache_price: 0,
-              },
-            ],
-      rpm_limit: currentRow.rpm_limit,
-      tpm_limit: currentRow.tpm_limit,
-      timeout_ms: currentRow.timeout_ms ?? null,
-      model_config: currentRow.model_config
-        ? {
-            reasoning_content_backfill: currentRow.model_config.reasoning_content_backfill === true,
-            endpoint_type: currentRow.model_config.endpoint_type as 'normal' | 'coding_plan' | undefined,
-          }
-        : { reasoning_content_backfill: false },
-    });
-
-    // Initialize request overrides UI array
-    const overridesUi: Array<{
-      type: 'header' | 'body';
-      key: string;
-      value: string;
-    }> = [];
-    const overrides = currentRow.request_overrides;
-
-    for (const [k, v] of Object.entries(overrides?.headers ?? {})) {
-      overridesUi.push({
-        type: 'header',
-        key: k,
-        value: v ?? '',
-      });
-    }
-
-    for (const [k, v] of Object.entries(overrides?.body ?? {})) {
-      let textValue = '';
-      if (v !== null && v !== undefined) {
-        textValue = typeof v === 'string' ? v : JSON.stringify(v);
-      }
-      overridesUi.push({
-        type: 'body',
-        key: k,
-        value: textValue,
-      });
-    }
-
-    form.setValue('request_overrides_ui', overridesUi);
+    form.reset(buildFormValuesFromRow(currentRow));
   }, [open, currentRow, form, fixedProviderId]);
 
-  // 当选定提供商变更且当前模型类型不再被支持时，自动重置为首个合法类型
+  // Auto-reset model type when provider changes
   useEffect(() => {
-    if (!currentProviderId) {
-      return;
-    }
-    if (allowedTypes.includes(modelType)) {
-      return;
-    }
+    if (!currentProviderId || allowedTypes.includes(modelType)) { return; }
     const firstAllowed = visibleTypeOptions[0]?.id;
     if (firstAllowed !== undefined) {
       form.setValue('type', firstAllowed, { shouldValidate: true });
@@ -296,59 +116,14 @@ export function ProviderModelsMutateDialog({
   const handleSubmit = async (values: FormValues): Promise<void> => {
     setIsSubmitting(true);
     try {
-      type CreationPayload = Omit<
-        ProviderModel,
-        'id' | 'provider_id' | 'object' | 'created_at' | 'updated_at' | 'is_active'
-      >;
-      const payload: CreationPayload = {
-        name: values.name,
-        model_type: values.type as 'chat' | 'embedding',
-        max_tokens: values.max_tokens * 1000,
-        capabilities: values.capabilities,
-        supported_parameters: values.supported_parameters,
-        pricing_tiers: values.pricing_tiers.map((t, index) => ({
-          ...t,
-          start_tokens: t.start_tokens * 1000,
-          max_tokens: index === values.pricing_tiers.length - 1 ? null : t.max_tokens * 1000,
-        })),
-        rpm_limit: values.rpm_limit ?? null,
-        tpm_limit: values.tpm_limit ?? null,
-        timeout_ms: values.timeout_ms ?? null,
-      };
-
-      const parsedOverrides = buildRequestOverridesPayload(values.request_overrides_ui);
-      payload.request_overrides = parsedOverrides;
-
-      // model_config: reasoning_content_backfill + endpoint_type
-      if (values.model_config) {
-        const mc: Record<string, unknown> = {};
-        if (values.model_config.reasoning_content_backfill) {
-          mc.reasoning_content_backfill = true;
-        }
-        if (values.model_config.endpoint_type) {
-          mc.endpoint_type = values.model_config.endpoint_type;
-        }
-        if (Object.keys(mc).length > 0) {
-          payload.model_config = mc;
-        }
-      }
-
+      const payload = buildSubmitPayload(values);
       await (mode === 'edit' && currentRow
         ? updateProviderModel(currentRow.id, payload)
-        : createProviderModel({
-            ...payload,
-            id: values.id || values.name,
-            provider_id: values.provider_id,
-          }));
-
-      if (onSuccess) {
-        await onSuccess();
-      }
+        : createProviderModel({ ...payload, id: values.id || values.name, provider_id: values.provider_id }));
+      if (onSuccess) { await onSuccess(); }
       onOpenChange(false);
     } catch (error) {
-      form.setError('root', {
-        message: error instanceof Error ? error.message : 'Operation failed',
-      });
+      form.setError('root', { message: error instanceof Error ? error.message : 'Operation failed' });
     } finally {
       setIsSubmitting(false);
     }
@@ -362,11 +137,6 @@ export function ProviderModelsMutateDialog({
 
   const handleProviderSelect = (id: string): void => {
     form.setValue('provider_id', id, { shouldValidate: true });
-    const matched = providers.find((p) => p.id === id);
-    if (mode === 'create' && matched && form.getValues('id') === '') {
-      // auto fill prefix
-      // form.setValue('id', `${matched.id}-`, { shouldDirty: false })
-    }
   };
 
   return (
@@ -374,16 +144,13 @@ export function ProviderModelsMutateDialog({
       open={open}
       onOpenChange={(v) => {
         onOpenChange(v);
-        if (!v) {
-          form.reset();
-        }
+        if (!v) { form.reset(); }
       }}
     >
       <DialogContent
         showCloseButton={false}
         className="flex h-[85vh] max-h-[850px] min-h-[540px] w-[95vw] flex-row gap-0 overflow-hidden p-0 sm:max-w-[1024px]"
       >
-        {/* 左侧选择栏 */}
         <ProviderSelector
           providers={filteredOpts}
           isLoading={providersLoading}
@@ -394,7 +161,6 @@ export function ProviderModelsMutateDialog({
           disabled={mode === 'edit'}
         />
 
-        {/* 右侧配置区 */}
         <div className="flex flex-1 flex-col overflow-hidden bg-background">
           <DialogHeader className="flex shrink-0 flex-row items-start justify-between border-b px-8 py-5">
             <div className="flex flex-col gap-1.5 text-left">
@@ -416,9 +182,7 @@ export function ProviderModelsMutateDialog({
               variant="ghost"
               size="icon"
               className="mt-0.5 -mr-2 h-8 w-8 text-muted-foreground"
-              onClick={() => {
-                onOpenChange(false);
-              }}
+              onClick={() => onOpenChange(false)}
             >
               <X className="h-4 w-4" />
             </Button>
@@ -452,7 +216,6 @@ export function ProviderModelsMutateDialog({
                         </FormItem>
                       )}
                     />
-
                     <FormField
                       control={form.control}
                       name="id"
@@ -465,7 +228,7 @@ export function ProviderModelsMutateDialog({
                       )}
                     />
 
-                    {/* ── 基础配置（始终可见）── */}
+                    {/* ── 基础配置 ── */}
                     <FormField
                       control={form.control}
                       name="name"
@@ -548,9 +311,7 @@ export function ProviderModelsMutateDialog({
                                   step="1"
                                   min={1}
                                   {...field}
-                                  onChange={(e) => {
-                                    field.onChange(Number.parseInt(e.target.value, 10));
-                                  }}
+                                  onChange={(e) => field.onChange(Number.parseInt(e.target.value, 10))}
                                   className="pr-10 font-mono"
                                 />
                               </FormControl>
@@ -564,145 +325,9 @@ export function ProviderModelsMutateDialog({
                       )}
                     />
 
-                    {/* ── 主题手风琴面板 ── */}
+                    {/* ── 手风琴面板 ── */}
                     <Accordion type="multiple" className="w-full space-y-3">
-                      {/* 速率限制 */}
-                      <Card className="gap-0 py-0">
-                        <AccordionItem value="rate-limit" className="border-b-0">
-                          <AccordionTrigger className="px-5 hover:no-underline">
-                            <span className="inline-flex items-center gap-2.5">
-                              <Activity className="h-4 w-4 text-muted-foreground" />
-                              {t('modelsPage.providerModels.accordionRateLimit', '速率限制')}
-                            </span>
-                          </AccordionTrigger>
-                          <AccordionContent>
-                            <div className="space-y-5 px-5 pt-1 pb-4">
-                              <FormDescription>
-                                {t(
-                                  'modelsPage.providerModels.accordionRateLimitDesc',
-                                  '控制该模型的请求频率与单次调用超时上限。',
-                                )}
-                              </FormDescription>
-
-                              <FormField
-                                control={form.control}
-                                name="rpm_limit"
-                                render={({ field }) => (
-                                  <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                                    <FormLabel className="text-left text-muted-foreground">
-                                      <span className="font-medium text-foreground">
-                                        {t('modelsPage.providerModels.rpmLimit', 'RPM 限制')}
-                                      </span>
-                                    </FormLabel>
-                                    <div className="space-y-1.5">
-                                      <FormControl>
-                                        <Input
-                                          type="number"
-                                          min={0}
-                                          placeholder="0"
-                                          value={field.value === null ? '' : field.value}
-                                          onChange={(e) => {
-                                            const val =
-                                              e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
-                                            field.onChange(val);
-                                          }}
-                                          className="h-9 w-40 font-mono"
-                                        />
-                                      </FormControl>
-                                      <FormDescription>
-                                        {t('modelsPage.providerModels.rpmLimitHint', '留空或 0 = 无限制')}
-                                      </FormDescription>
-                                      <FormMessage />
-                                    </div>
-                                  </FormItem>
-                                )}
-                              />
-
-                              <FormField
-                                control={form.control}
-                                name="tpm_limit"
-                                render={({ field }) => {
-                                  const unit = useUnitInput({
-                                    baseValue: field.value ?? null,
-                                    onChange: field.onChange,
-                                    min: 0,
-                                  });
-                                  return (
-                                    <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                                      <FormLabel className="text-left text-muted-foreground">
-                                        <span className="font-medium text-foreground">
-                                          {t('modelsPage.providerModels.tpmLimit', 'TPM 限制')}
-                                        </span>
-                                      </FormLabel>
-                                      <div className="space-y-1.5">
-                                        <FormControl>
-                                          <div className="flex items-center gap-2">
-                                            <UnitInput
-                                              value={unit.displayValue}
-                                              onChange={unit.onInputChange}
-                                              placeholder={unit.placeholder}                                            />
-                                            <UnitTabs
-                                              units={unit.units}
-                                              selected={unit.unitLabel}
-                                              onSelect={unit.onUnitChange}
-                                            />
-                                          </div>
-                                        </FormControl>
-                                        <FormDescription>
-                                          {t('modelsPage.providerModels.tpmLimitHint', '留空或 0 = 无限制')}
-                                        </FormDescription>
-                                        <FormMessage />
-                                      </div>
-                                    </FormItem>
-                                  );
-                                }}
-                              />
-
-                              <FormField
-                                control={form.control}
-                                name="timeout_ms"
-                                render={({ field }) => {
-                                  const unit = useUnitInput({
-                                    baseValue: field.value ?? null,
-                                    onChange: field.onChange,
-                                    units: TIME_UNITS,
-                                    defaultUnit: 's',
-                                    min: 1,
-                                  });
-                                  return (
-                                    <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                                      <FormLabel className="text-left text-muted-foreground">
-                                        <span className="font-medium text-foreground">
-                                          {t('modelsPage.providerModels.timeoutMs', '超时')}
-                                        </span>
-                                      </FormLabel>
-                                      <div className="space-y-1.5">
-                                        <FormControl>
-                                          <div className="flex items-center gap-2">
-                                            <UnitInput
-                                              value={unit.displayValue}
-                                              onChange={unit.onInputChange}
-                                              placeholder={unit.placeholder}                                            />
-                                            <UnitTabs
-                                              units={unit.units}
-                                              selected={unit.unitLabel}
-                                              onSelect={unit.onUnitChange}
-                                            />
-                                          </div>
-                                        </FormControl>
-                                        <FormDescription>
-                                          {t('modelsPage.providerModels.timeoutMsHint', '留空 = 系统默认')}
-                                        </FormDescription>
-                                        <FormMessage />
-                                      </div>
-                                    </FormItem>
-                                  );
-                                }}
-                              />
-                            </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Card>
+                      <RateLimitSection control={form.control} />
 
                       {/* 能力参数 */}
                       <Card className="gap-0 py-0">
@@ -721,7 +346,6 @@ export function ProviderModelsMutateDialog({
                                   '声明模型原生支持的能力与调优参数，用于路由调度与参数过滤。',
                                 )}
                               </FormDescription>
-
                               <CapabilitiesSelector control={form.control} name="capabilities" modelType={modelType} />
                               <SupportedParametersSelector
                                 control={form.control}
@@ -751,7 +375,6 @@ export function ProviderModelsMutateDialog({
                                   '自定义发往该模型的 HTTP 请求头与 Body 字段。',
                                 )}
                               </FormDescription>
-
                               <RequestOverridesEditor name="request_overrides_ui" />
                             </div>
                           </AccordionContent>
@@ -775,7 +398,6 @@ export function ProviderModelsMutateDialog({
                                   '按 Token 区间分段配置输入、输出与缓存的每百万 Token 单价。',
                                 )}
                               </FormDescription>
-
                               <PricingTiersSection
                                 form={form}
                                 currentMaxTokens={currentMaxTokens}
@@ -791,102 +413,14 @@ export function ProviderModelsMutateDialog({
                       </Card>
 
                       {/* 提供商专属配置 */}
-                      {selectedProvider != null && (
-                        <Card className="gap-0 py-0">
-                          <AccordionItem value="provider-config" className="border-b-0">
-                            <AccordionTrigger className="px-5 hover:no-underline">
-                              <span className="inline-flex items-center gap-2.5">
-                                <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-                                {t('modelsPage.providerModels.accordionProviderConfig', '专属配置')}
-                              </span>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                              <div className="space-y-5 px-5 pt-1 pb-4">
-                                <FormDescription>
-                                  {t(
-                                    'modelsPage.providerModels.accordionProviderConfigDesc',
-                                    '该提供商特有的高级配置项。',
-                                  )}
-                                </FormDescription>
-
-                                {selectedProvider.kind === 'deepseek' && (
-                                  <FormField
-                                    control={form.control}
-                                    name="model_config.reasoning_content_backfill"
-                                    render={({ field }) => (
-                                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                                        <FormLabel className="text-left text-muted-foreground">
-                                          <span className="font-medium text-foreground">思考内容回填</span>
-                                        </FormLabel>
-                                        <div className="space-y-1.5">
-                                          <FormControl>
-                                            <Switch checked={field.value ?? false} onCheckedChange={field.onChange} />
-                                          </FormControl>
-                                          <FormDescription>多轮对话时自动补全 reasoning_content 字段</FormDescription>
-                                          <FormMessage />
-                                        </div>
-                                      </FormItem>
-                                    )}
-                                  />
-                                )}
-
-                                {selectedProvider.kind === 'volcengine' && (
-                                  <FormField
-                                    control={form.control}
-                                    name="model_config.endpoint_type"
-                                    render={({ field }) => (
-                                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                                        <FormLabel className="text-left text-muted-foreground">
-                                          <span className="font-medium text-foreground">
-                                            {t('modelsPage.providerModels.endpointType', '请求端点类型')}
-                                          </span>
-                                        </FormLabel>
-                                        <div className="space-y-1.5">
-                                          <Tabs
-                                            onValueChange={field.onChange}
-                                            value={field.value ?? 'normal'}
-                                            className="w-full sm:max-w-[280px]"
-                                          >
-                                            <TabsList className="flex h-9 w-full">
-                                              <TabsTrigger value="normal" className="flex-1 px-3 text-sm">
-                                                {t('modelsPage.providerModels.endpointTypeNormal', '标准')}
-                                              </TabsTrigger>
-                                              <TabsTrigger value="coding_plan" className="flex-1 px-3 text-sm">
-                                                Coding Plan
-                                              </TabsTrigger>
-                                            </TabsList>
-                                          </Tabs>
-                                          <FormMessage />
-                                        </div>
-                                      </FormItem>
-                                    )}
-                                  />
-                                )}
-
-                                {selectedProvider.kind !== 'deepseek' && selectedProvider.kind !== 'volcengine' && (
-                                  <FormDescription>
-                                    {t('modelsPage.providerModels.noProviderConfig', '当前提供商暂无专属配置项。')}
-                                  </FormDescription>
-                                )}
-                              </div>
-                            </AccordionContent>
-                          </AccordionItem>
-                        </Card>
-                      )}
+                      <ProviderConfigSection control={form.control} providerKind={selectedProvider?.kind} />
                     </Accordion>
                   </div>
                 </form>
               </Form>
 
               <DialogFooter className="shrink-0 border-t bg-muted/30 px-6 py-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    onOpenChange(false);
-                  }}
-                  disabled={isSubmitting}
-                >
+                <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
                   {t('common.cancel', '取消')}
                 </Button>
                 <Button form="provider-models-form" type="submit" disabled={isSubmitting || !currentProviderId}>
