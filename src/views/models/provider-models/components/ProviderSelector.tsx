@@ -1,4 +1,4 @@
-import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine, XiaomiMiMo } from '@lobehub/icons';
+import { DeepSeek, Gemini, Github, NewAPI, ProviderIcon, Volcengine, XiaomiMiMo } from '@lobehub/icons';
 import { Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Input } from '@/components/ui/Input';
@@ -76,6 +76,10 @@ export function ProviderSelector({
               }
               case 'copilot': {
                 iconNode = <Github size={24} className="fill-current" />;
+                break;
+              }
+              case 'newapi': {
+                iconNode = <NewAPI size={24} className="fill-current" />;
                 break;
               }
               default: {

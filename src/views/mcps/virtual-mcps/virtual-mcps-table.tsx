@@ -68,7 +68,12 @@ export function VirtualMcpsTable(): React.JSX.Element {
   const table = useReactTable({
     data: servers,
     columns,
-    pageCount: total > 0 ? Math.max(1, Math.ceil(total / pagination.pageSize)) : hasMore ? pagination.pageIndex + 2 : pagination.pageIndex + 1,
+    pageCount:
+      total > 0
+        ? Math.max(1, Math.ceil(total / pagination.pageSize))
+        : hasMore
+          ? pagination.pageIndex + 2
+          : pagination.pageIndex + 1,
     state: {
       pagination,
       sorting,

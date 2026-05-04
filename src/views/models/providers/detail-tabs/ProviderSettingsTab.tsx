@@ -1,4 +1,4 @@
-import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine, XiaomiMiMo } from '@lobehub/icons';
+import { DeepSeek, Gemini, Github, NewAPI, ProviderIcon, Volcengine, XiaomiMiMo } from '@lobehub/icons';
 import { useRouter } from '@tanstack/react-router';
 import { Globe, Key, Network, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -45,6 +45,9 @@ function SettingsProviderIcon({ kind }: { readonly kind: string }): React.JSX.El
     }
     case 'copilot': {
       return <Github {...props} />;
+    }
+    case 'newapi': {
+      return <NewAPI {...props} />;
     }
 
     default: {

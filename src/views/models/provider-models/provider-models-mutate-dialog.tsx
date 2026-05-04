@@ -86,7 +86,9 @@ export function ProviderModelsMutateDialog({
 
   // Initialize form on open
   useEffect(() => {
-    if (!open) { return; }
+    if (!open) {
+      return;
+    }
     if (!currentRow) {
       form.reset({ ...DEFAULT_VALUES, provider_id: fixedProviderId ?? '' });
       setSearchQuery('');
@@ -97,7 +99,9 @@ export function ProviderModelsMutateDialog({
 
   // Auto-reset model type when provider changes
   useEffect(() => {
-    if (!currentProviderId || allowedTypes.includes(modelType)) { return; }
+    if (!currentProviderId || allowedTypes.includes(modelType)) {
+      return;
+    }
     const firstAllowed = visibleTypeOptions[0]?.id;
     if (firstAllowed !== undefined) {
       form.setValue('type', firstAllowed, { shouldValidate: true });
@@ -120,7 +124,9 @@ export function ProviderModelsMutateDialog({
       await (mode === 'edit' && currentRow
         ? updateProviderModel(currentRow.id, payload)
         : createProviderModel({ ...payload, id: values.id || values.name, provider_id: values.provider_id }));
-      if (onSuccess) { await onSuccess(); }
+      if (onSuccess) {
+        await onSuccess();
+      }
       onOpenChange(false);
     } catch (error) {
       form.setError('root', { message: error instanceof Error ? error.message : 'Operation failed' });
@@ -144,7 +150,9 @@ export function ProviderModelsMutateDialog({
       open={open}
       onOpenChange={(v) => {
         onOpenChange(v);
-        if (!v) { form.reset(); }
+        if (!v) {
+          form.reset();
+        }
       }}
     >
       <DialogContent

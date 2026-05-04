@@ -37,7 +37,7 @@ export function ProviderConfigSection({ control, providerKind }: ProviderConfigS
               {t('modelsPage.providerModels.accordionProviderConfigDesc', '该提供商特有的高级配置项。')}
             </FormDescription>
 
-            {providerKind === 'deepseek' && (
+            {(providerKind === 'deepseek' || providerKind === 'newapi') && (
               <FormField
                 control={control}
                 name="model_config.reasoning_content_backfill"
@@ -91,7 +91,7 @@ export function ProviderConfigSection({ control, providerKind }: ProviderConfigS
               />
             )}
 
-            {providerKind !== 'deepseek' && providerKind !== 'volcengine' && (
+            {providerKind !== 'deepseek' && providerKind !== 'newapi' && providerKind !== 'volcengine' && (
               <FormDescription>
                 {t('modelsPage.providerModels.noProviderConfig', '当前提供商暂无专属配置项。')}
               </FormDescription>

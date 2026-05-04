@@ -391,8 +391,7 @@ export function VirtualModelsMutateDialog({
                               placeholder="0"
                               value={field.value === null ? '' : field.value}
                               onChange={(e) => {
-                                const val =
-                                  e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
+                                const val = e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
                                 field.onChange(val);
                               }}
                               className="h-9 w-40 font-mono"
@@ -427,12 +426,9 @@ export function VirtualModelsMutateDialog({
                                 <UnitInput
                                   value={unit.displayValue}
                                   onChange={unit.onInputChange}
-                                  placeholder={unit.placeholder}                                />
-                                <UnitTabs
-                                  units={unit.units}
-                                  selected={unit.unitLabel}
-                                  onSelect={unit.onUnitChange}
+                                  placeholder={unit.placeholder}
                                 />
+                                <UnitTabs units={unit.units} selected={unit.unitLabel} onSelect={unit.onUnitChange} />
                               </div>
                             </FormControl>
                             <FormMessage />
