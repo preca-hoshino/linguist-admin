@@ -1,4 +1,4 @@
-import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine, XiaomiMiMo } from '@lobehub/icons';
+import { DeepSeek, Gemini, Github, NewAPI, ProviderIcon, Volcengine, XiaomiMiMo } from '@lobehub/icons';
 import { Link } from '@tanstack/react-router';
 import { ChevronLeft, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
@@ -42,6 +42,9 @@ function ProviderIconBlock({ kind }: { readonly kind: string }): React.JSX.Eleme
     }
     case 'copilot': {
       return <Github {...iconProps} />;
+    }
+    case 'newapi': {
+      return <NewAPI {...iconProps} />;
     }
     default: {
       return <ProviderIcon provider={kind as 'openai'} size={28} type="mono" className="fill-current" />;

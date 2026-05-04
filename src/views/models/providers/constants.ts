@@ -46,4 +46,11 @@ export const KIND_OPTIONS: KindOption[] = [
     exampleEndpoint: '/chat/completions',
     credentialType: 'copilot',
   },
+  {
+    label: 'New API',
+    value: 'newapi',
+    defaultBaseUrl: 'https://your-new-api-instance.com/v1',
+    exampleEndpoint: '/chat/completions',
+    credentialType: 'api_key',
+  },
 ];

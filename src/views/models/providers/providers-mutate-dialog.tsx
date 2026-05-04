@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DeepSeek, Gemini, Github, ProviderIcon, Volcengine, XiaomiMiMo } from '@lobehub/icons';
+import { DeepSeek, Gemini, Github, NewAPI, ProviderIcon, Volcengine, XiaomiMiMo } from '@lobehub/icons';
 import { Activity, Globe, Network, Timer, Type, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
@@ -318,11 +318,13 @@ export function ProvidersMutateDialog({
                                     {val === 'volcengine' && <Volcengine size={16} className="fill-current" />}
                                     {val === 'mimo' && <XiaomiMiMo size={16} className="fill-current" />}
                                     {val === 'copilot' && <Github className="h-4 w-4" />}
+                                    {val === 'newapi' && <NewAPI size={16} className="fill-current" />}
                                     {val !== 'gemini' &&
                                       val !== 'deepseek' &&
                                       val !== 'volcengine' &&
                                       val !== 'mimo' &&
-                                      val !== 'copilot' && (
+                                      val !== 'copilot' &&
+                                      val !== 'newapi' && (
                                         <ProviderIcon
                                           provider={val as 'openai'}
                                           size={16}
@@ -511,12 +513,9 @@ export function ProvidersMutateDialog({
                               <UnitInput
                                 value={unit.displayValue}
                                 onChange={unit.onInputChange}
-                                placeholder={unit.placeholder}                              />
-                              <UnitTabs
-                                units={unit.units}
-                                selected={unit.unitLabel}
-                                onSelect={unit.onUnitChange}
+                                placeholder={unit.placeholder}
                               />
+                              <UnitTabs units={unit.units} selected={unit.unitLabel} onSelect={unit.onUnitChange} />
                             </div>
                           </FormControl>
                           <FormMessage />
