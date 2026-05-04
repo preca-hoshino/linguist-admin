@@ -16,7 +16,7 @@ import { ProviderModelsMutateDialog } from './provider-models-mutate-dialog';
 
 export function ProviderModelsDialogs(): React.JSX.Element {
   const { t } = useTranslation();
-  const { open, setOpen, currentRow, loadProviderModels, setCurrentRow } = useProviderModels();
+  const { open, setOpen, currentRow, loadProviderModels, setCurrentRow, setColumnFilters } = useProviderModels();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleOpen = (type: ProviderModelsDialogType): void => {
@@ -59,7 +59,14 @@ export function ProviderModelsDialogs(): React.JSX.Element {
           }
         }}
         currentRow={currentRow}
-        onSuccess={loadProviderModels}
+        onSuccess={async () => {
+          // 创建新模型时，后端默认 is_active=false，若用户当前筛选"仅已启用"会导致新模型不可见。
+          // 这里创建后自动清除 is_active 筛选，确保新模型立即可见。
+          if (!currentRow) {
+            setColumnFilters((prev) => prev.filter((f) => f.id !== 'is_active'));
+          }
+          await loadProviderModels();
+        }}
       />
 
       <AlertDialog
