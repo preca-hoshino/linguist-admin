@@ -1,15 +1,17 @@
 ﻿import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import type { McpProviderCreateInput, McpProviderUpdateInput } from '@/types/mcp';
+import { deleteMcpProvider } from '@/api/mcp/provider-mcps';
 import { useProviders } from './providers-context';
 import { MutateProviderDialog } from './providers-mutate-dialog';
 
 export function ProvidersDialogs(): React.JSX.Element {
   const { dialogState, setDialogState, createProvider, updateProvider, deleteProvider } = useProviders();
   const { t } = useTranslation();
-  const { createOpen, editOpen, deleteOpen, selectedProvider } = dialogState;
+  const { createOpen, editOpen, deleteOpen, batchDeleteOpen, selectedProvider, batchSelectedIds } = dialogState;
 
   const closeCreate = (): void => {
     setDialogState((p) => ({ ...p, createOpen: false }));
@@ -97,6 +99,52 @@ export function ProvidersDialogs(): React.JSX.Element {
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        key="mcp-providers-batch-delete"
+        open={batchDeleteOpen}
+        onOpenChange={(val) => {
+          if (!val) {
+            setDialogState((p) => ({ ...p, batchDeleteOpen: false, batchSelectedIds: [] }));
+          }
+        }}
+        title={t('common.batchDeleteTitle', 'Delete Selected Items')}
+        desc={t(
+          'common.batchDeleteDesc',
+          'Are you sure you want to delete the selected items? This action cannot be undone.',
+          { count: batchSelectedIds.length },
+        )}
+        confirmText={t('common.delete', 'Delete')}
+        destructive
+        handleConfirm={() => {
+          void (async (): Promise<void> => {
+            if (batchSelectedIds.length === 0) {
+              return;
+            }
+            const total = batchSelectedIds.length;
+            const deletePromise = (async (): Promise<number> => {
+              let count = 0;
+              for (const id of batchSelectedIds) {
+                await deleteMcpProvider(id);
+                count++;
+              }
+              return count;
+            })();
+            toast.promise(deletePromise, {
+              loading: t('common.deletingBatch', { count: total, defaultValue: '正在删除 {{count}} 项...' }),
+              success: t('common.deleteBatchSuccess', { count: total, defaultValue: '成功删除 {{count}} 项' }),
+              error: t('common.deleteBatchError', { defaultValue: '批量删除遇到错误' }),
+            });
+            try {
+              await deletePromise;
+              setDialogState((p) => ({ ...p, batchDeleteOpen: false, batchSelectedIds: [] }));
+            } catch {
+              /* toast 已处理 */
+            }
+          })();
+        }}
+        className="max-w-md"
+      />
     </>
   );
 }
