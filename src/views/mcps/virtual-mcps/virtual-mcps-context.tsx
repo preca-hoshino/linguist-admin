@@ -26,7 +26,9 @@ interface VirtualMcpsContextType {
     createOpen: boolean;
     editOpen: boolean;
     deleteOpen: boolean;
+    batchDeleteOpen: boolean;
     selectedServer: VirtualMcp | null;
+    batchSelectedIds: string[];
   };
   setDialogState: React.Dispatch<React.SetStateAction<VirtualMcpsContextType['dialogState']>>;
 }
@@ -49,7 +51,9 @@ export function VirtualMcpsProvider({
     createOpen: false,
     editOpen: false,
     deleteOpen: false,
+    batchDeleteOpen: false,
     selectedServer: null,
+    batchSelectedIds: [],
   });
 
   const [pagination, setPagination] = useState<PaginationState>({
