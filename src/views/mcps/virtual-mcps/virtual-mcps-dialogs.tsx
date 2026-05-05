@@ -1,7 +1,9 @@
 ﻿import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/Dialog';
 import { Button } from '@/components/ui/Button';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { deleteVirtualMcp } from '@/api/mcp/virtual-mcps';
 import { useVirtualMcps } from './virtual-mcps-context';
 import type { VirtualMcpCreateInput, VirtualMcpUpdateInput } from '@/types/mcp';
 import { MutateVirtualMcpDialog } from './virtual-mcps-mutate-dialog';
@@ -9,7 +11,7 @@ import { MutateVirtualMcpDialog } from './virtual-mcps-mutate-dialog';
 export function VirtualMcpsDialogs(): React.JSX.Element {
   const { dialogState, setDialogState, createServer, updateServer, deleteServer } = useVirtualMcps();
   const { t } = useTranslation();
-  const { createOpen, editOpen, deleteOpen, selectedServer } = dialogState;
+  const { createOpen, editOpen, deleteOpen, batchDeleteOpen, selectedServer, batchSelectedIds } = dialogState;
 
   const closeCreate = (): void => {
     setDialogState((p) => ({ ...p, createOpen: false }));
@@ -94,6 +96,52 @@ export function VirtualMcpsDialogs(): React.JSX.Element {
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        key="virtual-mcps-batch-delete"
+        open={batchDeleteOpen}
+        onOpenChange={(val) => {
+          if (!val) {
+            setDialogState((p) => ({ ...p, batchDeleteOpen: false, batchSelectedIds: [] }));
+          }
+        }}
+        title={t('common.batchDeleteTitle', 'Delete Selected Items')}
+        desc={t(
+          'common.batchDeleteDesc',
+          'Are you sure you want to delete the selected items? This action cannot be undone.',
+          { count: batchSelectedIds.length },
+        )}
+        confirmText={t('common.delete', 'Delete')}
+        destructive
+        handleConfirm={() => {
+          void (async (): Promise<void> => {
+            if (batchSelectedIds.length === 0) {
+              return;
+            }
+            const total = batchSelectedIds.length;
+            const deletePromise = (async (): Promise<number> => {
+              let count = 0;
+              for (const id of batchSelectedIds) {
+                await deleteVirtualMcp(id);
+                count++;
+              }
+              return count;
+            })();
+            toast.promise(deletePromise, {
+              loading: t('common.deletingBatch', { count: total, defaultValue: '正在删除 {{count}} 项...' }),
+              success: t('common.deleteBatchSuccess', { count: total, defaultValue: '成功删除 {{count}} 项' }),
+              error: t('common.deleteBatchError', { defaultValue: '批量删除遇到错误' }),
+            });
+            try {
+              await deletePromise;
+              setDialogState((p) => ({ ...p, batchDeleteOpen: false, batchSelectedIds: [] }));
+            } catch {
+              /* toast 已处理 */
+            }
+          })();
+        }}
+        className="max-w-md"
+      />
     </>
   );
 }
