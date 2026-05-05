@@ -5,13 +5,15 @@ import { listApps } from '@/api/apps';
 import { useDialogState } from '@/composables/use-dialog-state';
 import type { App } from '@/types/app';
 
-export type AppsDialogType = 'create' | 'update' | 'delete' | 'rotate';
+export type AppsDialogType = 'create' | 'update' | 'delete' | 'rotate' | 'batch-delete';
 
 interface AppsContextType {
   open: AppsDialogType | null;
   setOpen: (str: AppsDialogType | null) => void;
   currentRow: App | null;
   setCurrentRow: React.Dispatch<React.SetStateAction<App | null>>;
+  selectedIds: string[];
+  setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>;
   apps: App[];
   pagination: PaginationState;
   setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
@@ -32,6 +34,7 @@ export function AppsProvider({ children }: { readonly children: React.ReactNode 
   const { t } = useTranslation();
   const [open, setOpen] = useDialogState<AppsDialogType>(null);
   const [currentRow, setCurrentRow] = useState<App | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [apps, setApps] = useState<App[]>([]);
   const [hasMore, setHasMore] = useState(false);
   const [total, setTotal] = useState(0);
@@ -95,6 +98,8 @@ export function AppsProvider({ children }: { readonly children: React.ReactNode 
         setOpen,
         currentRow,
         setCurrentRow,
+        selectedIds,
+        setSelectedIds,
         apps,
         pagination,
         setPagination,
