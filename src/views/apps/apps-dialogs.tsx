@@ -10,7 +10,7 @@ import { AppsMutateDialog } from './apps-mutate-dialog';
 
 export function AppsDialogs(): React.JSX.Element {
   const { t } = useTranslation();
-  const { open, setOpen, currentRow, loadApps, setCurrentRow } = useApps();
+  const { open, setOpen, currentRow, loadApps, setCurrentRow, selectedIds, setSelectedIds } = useApps();
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRotating, setIsRotating] = useState(false);
@@ -56,6 +56,39 @@ export function AppsDialogs(): React.JSX.Element {
       toast.error(t('apps.rotateFailed', 'Failed to rotate API Key'));
     } finally {
       setIsRotating(false);
+    }
+  };
+
+  const handleBatchDelete = async (): Promise<void> => {
+    if (selectedIds.length === 0) {
+      return;
+    }
+    const total = selectedIds.length;
+
+    const deletePromise = (async (): Promise<number> => {
+      let count = 0;
+      for (const id of selectedIds) {
+        await deleteApp(id);
+        count++;
+      }
+      return count;
+    })();
+
+    toast.promise(deletePromise, {
+      loading: t('common.deletingBatch', { count: total, defaultValue: '正在删除 {{count}} 项...' }),
+      success: t('common.deleteBatchSuccess', { count: total, defaultValue: '成功删除 {{count}} 项' }),
+      error: t('common.deleteBatchError', { defaultValue: '批量删除遇到错误' }),
+    });
+
+    try {
+      await deletePromise;
+      setOpen(null);
+      setTimeout(() => {
+        setSelectedIds([]);
+      }, 500);
+      void loadApps();
+    } catch {
+      // 错误被 toast.promise 捕获并提示 Error 状态
     }
   };
 
@@ -106,6 +139,31 @@ export function AppsDialogs(): React.JSX.Element {
         }}
         confirmText={isRotating ? t('common.updating', 'Updating...') : t('apps.rotateConfirmBtn', 'Yes, Rotate Key')}
       />
+
+      {selectedIds.length > 0 && (
+        <ConfirmDialog
+          key="apps-batch-delete"
+          open={open === 'batch-delete'}
+          onOpenChange={(val) => {
+            if (!val) {
+              setOpen(null);
+              setTimeout(() => {
+                setSelectedIds([]);
+              }, 500);
+            }
+          }}
+          title={t('common.batchDeleteTitle', 'Delete Selected Items')}
+          desc={t(
+            'common.batchDeleteDesc',
+            'Are you sure you want to delete the selected items? This action cannot be undone.',
+            { count: selectedIds.length },
+          )}
+          confirmText={t('common.delete', 'Delete')}
+          destructive
+          handleConfirm={() => void handleBatchDelete()}
+          className="max-w-md"
+        />
+      )}
     </>
   );
 }
