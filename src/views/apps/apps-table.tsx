@@ -6,9 +6,12 @@ import {
   type SortingState,
   useReactTable,
 } from '@tanstack/react-table';
+import { Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
+import { DataTableBulkActions } from '@/components/data-table/BulkActions';
+import { Button } from '@/components/ui/Button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { cn } from '@/utils/utils';
 import { useAppsColumns } from './apps-columns';
@@ -17,11 +20,23 @@ import { useApps } from './apps-context';
 export function AppsTable(): React.JSX.Element {
   const { t } = useTranslation();
   const columns = useAppsColumns();
-  const { apps, pagination, setPagination, search, setSearch, statusFilter, setStatusFilter, loading, hasMore } =
-    useApps();
+  const {
+    apps,
+    pagination,
+    setPagination,
+    search,
+    setSearch,
+    statusFilter,
+    setStatusFilter,
+    loading,
+    hasMore,
+    setOpen,
+    setSelectedIds,
+  } = useApps();
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [rowSelection, setRowSelection] = useState({});
 
   useEffect(() => {
     const activeF = columnFilters.find((f) => f.id === 'is_active');
@@ -47,9 +62,11 @@ export function AppsTable(): React.JSX.Element {
       columnFilters,
       globalFilter: search,
       pagination,
+      rowSelection,
     },
     manualPagination: true,
     manualFiltering: true,
+    onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setSearch,
@@ -139,6 +156,22 @@ export function AppsTable(): React.JSX.Element {
       </div>
 
       <DataTablePagination table={table} className="mt-auto" />
+
+      <DataTableBulkActions table={table} entityName={t('apps.entityName', 'app')}>
+        <Button
+          variant="destructive"
+          size="sm"
+          className="flex h-6 items-center gap-1.5 px-3 rounded-lg"
+          onClick={() => {
+            const ids = table.getFilteredSelectedRowModel().rows.map((r) => r.original.id);
+            setSelectedIds(ids);
+            setOpen('batch-delete');
+          }}
+        >
+          <Trash2 size={14} className="mr-1" />
+          {t('common.delete', 'Delete')}
+        </Button>
+      </DataTableBulkActions>
     </div>
   );
 }
