@@ -8,11 +8,14 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table';
+import { Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { listProviderModels } from '@/api/model/provider-models';
 import { listProviders } from '@/api/model/providers';
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
+import { DataTableBulkActions } from '@/components/data-table/BulkActions';
+import { Button } from '@/components/ui/Button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { cn } from '@/utils/utils';
 import { useProviderModelsColumns } from './provider-models-columns';
@@ -31,6 +34,8 @@ export function ProviderModelsTable(): React.JSX.Element {
     setColumnFilters,
     hasMore,
     total,
+    setOpen,
+    setSelectedIds,
   } = useProviderModels();
   const columns = useProviderModelsColumns();
 
@@ -195,6 +200,22 @@ export function ProviderModelsTable(): React.JSX.Element {
         </Table>
       </div>
       <DataTablePagination table={table} className="mt-auto" />
+
+      <DataTableBulkActions table={table} entityName={t('modelsPage.providerModels.entityName', 'model')}>
+        <Button
+          variant="destructive"
+          size="sm"
+          className="flex h-6 items-center gap-1.5 px-3 rounded-lg"
+          onClick={() => {
+            const ids = table.getFilteredSelectedRowModel().rows.map((r) => r.original.id);
+            setSelectedIds(ids);
+            setOpen('batch-delete');
+          }}
+        >
+          <Trash2 size={14} className="mr-1" />
+          {t('common.delete', 'Delete')}
+        </Button>
+      </DataTableBulkActions>
     </div>
   );
 }
