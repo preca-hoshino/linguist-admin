@@ -5,13 +5,15 @@ import { listVirtualModels } from '@/api/model/virtual-models';
 import { useDialogState } from '@/composables/use-dialog-state';
 import type { VirtualModel } from '@/types';
 
-export type VirtualModelsDialogType = 'create' | 'update' | 'delete';
+export type VirtualModelsDialogType = 'create' | 'update' | 'delete' | 'batch-delete';
 
 interface VirtualModelsContextType {
   open: VirtualModelsDialogType | null;
   setOpen: (str: VirtualModelsDialogType | null) => void;
   currentRow: VirtualModel | null;
   setCurrentRow: React.Dispatch<React.SetStateAction<VirtualModel | null>>;
+  selectedIds: string[];
+  setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>;
   virtualModels: VirtualModel[];
   pagination: PaginationState;
   setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
@@ -34,6 +36,7 @@ export function VirtualModelsProvider({ children }: { readonly children: React.R
   const { t } = useTranslation();
   const [open, setOpen] = useDialogState<VirtualModelsDialogType>(null);
   const [currentRow, setCurrentRow] = useState<VirtualModel | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [virtualModels, setVirtualModels] = useState<VirtualModel[]>([]);
   const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(false);
@@ -107,6 +110,8 @@ export function VirtualModelsProvider({ children }: { readonly children: React.R
         setOpen,
         currentRow,
         setCurrentRow,
+        selectedIds,
+        setSelectedIds,
         virtualModels,
         pagination,
         setPagination,
