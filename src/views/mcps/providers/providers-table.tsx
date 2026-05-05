@@ -7,9 +7,12 @@ import {
   type SortingState,
   useReactTable,
 } from '@tanstack/react-table';
+import { Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
+import { DataTableBulkActions } from '@/components/data-table/BulkActions';
+import { Button } from '@/components/ui/Button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { getProvidersColumns } from './providers-columns';
 import { useProviders } from './providers-context';
@@ -27,10 +30,12 @@ export function ProvidersTable(): React.JSX.Element {
     setGlobalFilter,
     columnFilters,
     setColumnFilters,
+    setDialogState,
   } = useProviders();
   const { t } = useTranslation();
 
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [rowSelection, setRowSelection] = useState({});
 
   const columns = getProvidersColumns(t);
 
@@ -49,10 +54,12 @@ export function ProvidersTable(): React.JSX.Element {
       sorting,
       globalFilter,
       columnFilters,
+      rowSelection,
     },
     manualPagination: true,
     manualFiltering: true,
     manualSorting: false,
+    onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
     onGlobalFilterChange: setGlobalFilter,
@@ -162,6 +169,21 @@ export function ProvidersTable(): React.JSX.Element {
         </Table>
       </div>
       <DataTablePagination table={table} className="mt-auto" />
+
+      <DataTableBulkActions table={table} entityName={t('mcpsPage.providers.entityName', 'provider')}>
+        <Button
+          variant="destructive"
+          size="sm"
+          className="flex h-6 items-center gap-1.5 px-3 rounded-lg"
+          onClick={() => {
+            const ids = table.getFilteredSelectedRowModel().rows.map((r) => r.original.id);
+            setDialogState((p) => ({ ...p, batchSelectedIds: ids, batchDeleteOpen: true }));
+          }}
+        >
+          <Trash2 size={14} className="mr-1" />
+          {t('common.delete', 'Delete')}
+        </Button>
+      </DataTableBulkActions>
     </div>
   );
 }
