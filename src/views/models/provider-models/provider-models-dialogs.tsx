@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { deleteProviderModel } from '@/api/model/provider-models';
 import {
   AlertDialog,
@@ -11,12 +12,22 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/AlertDialog';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { type ProviderModelsDialogType, useProviderModels } from './provider-models-context';
 import { ProviderModelsMutateDialog } from './provider-models-mutate-dialog';
 
 export function ProviderModelsDialogs(): React.JSX.Element {
   const { t } = useTranslation();
-  const { open, setOpen, currentRow, loadProviderModels, setCurrentRow, setColumnFilters } = useProviderModels();
+  const {
+    open,
+    setOpen,
+    currentRow,
+    loadProviderModels,
+    setCurrentRow,
+    setColumnFilters,
+    selectedIds,
+    setSelectedIds,
+  } = useProviderModels();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleOpen = (type: ProviderModelsDialogType): void => {
@@ -113,6 +124,57 @@ export function ProviderModelsDialogs(): React.JSX.Element {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {selectedIds.length > 0 && (
+        <ConfirmDialog
+          key="provider-models-batch-delete"
+          open={open === 'batch-delete'}
+          onOpenChange={(val) => {
+            if (!val) {
+              setOpen(null);
+              setTimeout(() => setSelectedIds([]), 500);
+            }
+          }}
+          title={t('common.batchDeleteTitle', 'Delete Selected Items')}
+          desc={t(
+            'common.batchDeleteDesc',
+            'Are you sure you want to delete the selected items? This action cannot be undone.',
+            { count: selectedIds.length },
+          )}
+          confirmText={t('common.delete', 'Delete')}
+          destructive
+          handleConfirm={() => {
+            void (async (): Promise<void> => {
+              if (selectedIds.length === 0) {
+                return;
+              }
+              const total = selectedIds.length;
+              const deletePromise = (async (): Promise<number> => {
+                let count = 0;
+                for (const id of selectedIds) {
+                  await deleteProviderModel(id);
+                  count++;
+                }
+                return count;
+              })();
+              toast.promise(deletePromise, {
+                loading: t('common.deletingBatch', { count: total, defaultValue: '正在删除 {{count}} 项...' }),
+                success: t('common.deleteBatchSuccess', { count: total, defaultValue: '成功删除 {{count}} 项' }),
+                error: t('common.deleteBatchError', { defaultValue: '批量删除遇到错误' }),
+              });
+              try {
+                await deletePromise;
+                setOpen(null);
+                setTimeout(() => setSelectedIds([]), 500);
+                void loadProviderModels();
+              } catch {
+                /* toast 已处理 */
+              }
+            })();
+          }}
+          className="max-w-md"
+        />
+      )}
     </>
   );
 }
