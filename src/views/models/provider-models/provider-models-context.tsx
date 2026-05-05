@@ -5,13 +5,15 @@ import { listProviderModels } from '@/api/model/provider-models';
 import { useDialogState } from '@/composables/use-dialog-state';
 import type { ProviderModel } from '@/types';
 
-export type ProviderModelsDialogType = 'create' | 'update' | 'delete';
+export type ProviderModelsDialogType = 'create' | 'update' | 'delete' | 'batch-delete';
 
 interface ProviderModelsContextType {
   open: ProviderModelsDialogType | null;
   setOpen: (str: ProviderModelsDialogType | null) => void;
   currentRow: ProviderModel | null;
   setCurrentRow: React.Dispatch<React.SetStateAction<ProviderModel | null>>;
+  selectedIds: string[];
+  setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>;
   providerModels: ProviderModel[];
   pagination: PaginationState;
   setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
@@ -36,6 +38,7 @@ export function ProviderModelsProvider({ children }: { readonly children: React.
   const { t } = useTranslation();
   const [open, setOpen] = useDialogState<ProviderModelsDialogType>(null);
   const [currentRow, setCurrentRow] = useState<ProviderModel | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [providerModels, setProviderModels] = useState<ProviderModel[]>([]);
   const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(false);
@@ -121,6 +124,8 @@ export function ProviderModelsProvider({ children }: { readonly children: React.
         setOpen,
         currentRow,
         setCurrentRow,
+        selectedIds,
+        setSelectedIds,
         providerModels,
         pagination,
         setPagination,

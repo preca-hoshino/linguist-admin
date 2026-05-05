@@ -44,4 +44,12 @@ export default {
   empty: 'Empty',
   copy: 'Copy',
   copied: 'Copied',
+
+  // Batch Operations
+  batchDeleteTitle: 'Delete Selected Items',
+  batchDeleteDesc: 'Are you sure you want to delete the selected items? This action cannot be undone.',
+  deletingBatch: 'Deleting {{count}} items...',
+  deleteBatchSuccess: 'Successfully deleted {{count}} items',
+  deleteBatchError: 'Batch delete encountered an error',
+  nSelected: '{{count}} selected',
 };

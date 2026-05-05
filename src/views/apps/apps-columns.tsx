@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { DataTableColumnHeader } from '@/components/data-table';
 import { CopyableId } from '@/components/CopyableId';
 import { Badge } from '@/components/ui/Badge';
+import { Checkbox } from '@/components/ui/Checkbox';
 import type { App } from '@/types/app';
 import { cn } from '@/utils/utils';
 import { AppCell } from '@/components/app/AppCell';
@@ -12,6 +13,30 @@ export function useAppsColumns(): ColumnDef<App>[] {
   const { t } = useTranslation();
 
   return [
+    {
+      id: 'select',
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() ? 'indeterminate' : false)}
+          onCheckedChange={(value) => {
+            table.toggleAllPageRowsSelected(value === true);
+          }}
+          aria-label={t('common.selectAll', 'Select all')}
+        />
+      ),
+      meta: { className: 'w-10 ps-4', tdClassName: 'ps-4' },
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => {
+            row.toggleSelected(value === true);
+          }}
+          aria-label={t('common.selectRow', 'Select row')}
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
     {
       accessorKey: 'id',
       header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,

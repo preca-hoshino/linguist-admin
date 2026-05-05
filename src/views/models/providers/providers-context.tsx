@@ -5,13 +5,15 @@ import { listProviders } from '@/api/model/providers';
 import { useDialogState } from '@/composables/use-dialog-state';
 import type { Provider } from '@/types';
 
-export type ProvidersDialogType = 'create' | 'update' | 'delete';
+export type ProvidersDialogType = 'create' | 'update' | 'delete' | 'batch-delete';
 
 interface ProvidersContextType {
   open: ProvidersDialogType | null;
   setOpen: (str: ProvidersDialogType | null) => void;
   currentRow: Provider | null;
   setCurrentRow: React.Dispatch<React.SetStateAction<Provider | null>>;
+  selectedIds: string[];
+  setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>;
   providers: Provider[];
   pagination: PaginationState;
   setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
@@ -34,6 +36,7 @@ export function ProvidersProvider({ children }: { readonly children: React.React
   const { t } = useTranslation();
   const [open, setOpen] = useDialogState<ProvidersDialogType>(null);
   const [currentRow, setCurrentRow] = useState<Provider | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [providers, setProviders] = useState<Provider[]>([]);
   const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(false);
@@ -99,6 +102,8 @@ export function ProvidersProvider({ children }: { readonly children: React.React
         setOpen,
         currentRow,
         setCurrentRow,
+        selectedIds,
+        setSelectedIds,
         providers,
         pagination,
         setPagination,

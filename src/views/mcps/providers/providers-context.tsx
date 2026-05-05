@@ -26,7 +26,9 @@ interface ProvidersContextType {
     createOpen: boolean;
     editOpen: boolean;
     deleteOpen: boolean;
+    batchDeleteOpen: boolean;
     selectedProvider: McpProvider | null;
+    batchSelectedIds: string[];
   };
   setDialogState: React.Dispatch<React.SetStateAction<ProvidersContextType['dialogState']>>;
 }
@@ -43,7 +45,9 @@ export function ProvidersProvider({ children }: { readonly children: React.React
     createOpen: false,
     editOpen: false,
     deleteOpen: false,
+    batchDeleteOpen: false,
     selectedProvider: null,
+    batchSelectedIds: [],
   });
 
   const [pagination, setPagination] = useState<PaginationState>({

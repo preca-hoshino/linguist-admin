@@ -1,6 +1,7 @@
-import { Plus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { deleteUserApi, fetchUsers, type User } from '@/api/users';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { Button } from '@/components/ui/Button';
@@ -28,6 +29,10 @@ export function UsersPage(): React.JSX.Element {
 
   // Delete Dialog state
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
+
+  // Batch selection state
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [batchDeleteOpen, setBatchDeleteOpen] = useState(false);
 
   const loadUsers = useCallback(async () => {
     try {
@@ -77,6 +82,34 @@ export function UsersPage(): React.JSX.Element {
     }
   };
 
+  const handleBatchDelete = async (): Promise<void> => {
+    if (selectedIds.length === 0) {
+      return;
+    }
+    const total = selectedIds.length;
+    const deletePromise = (async (): Promise<number> => {
+      let count = 0;
+      for (const id of selectedIds) {
+        await deleteUserApi(id);
+        count++;
+      }
+      return count;
+    })();
+    toast.promise(deletePromise, {
+      loading: t('common.deletingBatch', { count: total, defaultValue: '正在删除 {{count}} 项...' }),
+      success: t('common.deleteBatchSuccess', { count: total, defaultValue: '成功删除 {{count}} 项' }),
+      error: t('common.deleteBatchError', { defaultValue: '批量删除遇到错误' }),
+    });
+    try {
+      await deletePromise;
+      setBatchDeleteOpen(false);
+      setSelectedIds([]);
+      void loadUsers();
+    } catch {
+      /* toast 已处理 */
+    }
+  };
+
   return (
     <Main>
       <div className="mb-2 flex flex-wrap items-center justify-between space-y-2 gap-x-4">
@@ -97,7 +130,31 @@ export function UsersPage(): React.JSX.Element {
         </div>
       )}
 
-      <UserTable users={users} loading={loading} onEdit={openEditDialog} onDelete={setDeleteTarget} />
+      {selectedIds.length > 0 && (
+        <div className="mb-2 flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">
+            {t('common.nSelected', { count: selectedIds.length, defaultValue: '{{count}} selected' })}
+          </span>
+          <Button
+            variant="destructive"
+            size="sm"
+            className="flex h-7 items-center gap-1.5 px-3 rounded-lg"
+            onClick={() => setBatchDeleteOpen(true)}
+          >
+            <Trash2 size={14} />
+            {t('common.delete', 'Delete')}
+          </Button>
+        </div>
+      )}
+
+      <UserTable
+        users={users}
+        loading={loading}
+        onEdit={openEditDialog}
+        onDelete={setDeleteTarget}
+        selectedIds={selectedIds}
+        onSelectionChange={setSelectedIds}
+      />
 
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
@@ -153,6 +210,26 @@ export function UsersPage(): React.JSX.Element {
         destructive
         handleConfirm={() => void handleDelete()}
         className="sm:max-w-sm"
+      />
+
+      <ConfirmDialog
+        key="users-batch-delete"
+        open={batchDeleteOpen}
+        onOpenChange={(val) => {
+          if (!val) {
+            setBatchDeleteOpen(false);
+          }
+        }}
+        title={t('common.batchDeleteTitle', 'Delete Selected Items')}
+        desc={t(
+          'common.batchDeleteDesc',
+          'Are you sure you want to delete the selected items? This action cannot be undone.',
+          { count: selectedIds.length },
+        )}
+        confirmText={t('common.delete', 'Delete')}
+        destructive
+        handleConfirm={() => void handleBatchDelete()}
+        className="max-w-md"
       />
     </Main>
   );

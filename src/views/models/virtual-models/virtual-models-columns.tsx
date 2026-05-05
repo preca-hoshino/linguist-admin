@@ -3,6 +3,7 @@ import { Box, Braces, GitMerge, MessageSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { DataTableColumnHeader } from '@/components/data-table';
 import { Badge } from '@/components/ui/Badge';
+import { Checkbox } from '@/components/ui/Checkbox';
 import { Progress } from '@/components/ui/Progress';
 import type { VirtualModel } from '@/types';
 import { cn } from '@/utils/utils';
@@ -62,6 +63,30 @@ export function useVirtualModelsColumns(): ColumnDef<VirtualModel>[] {
   };
 
   return [
+    {
+      id: 'select',
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() ? 'indeterminate' : false)}
+          onCheckedChange={(value) => {
+            table.toggleAllPageRowsSelected(value === true);
+          }}
+          aria-label={t('common.selectAll', 'Select all')}
+        />
+      ),
+      meta: { className: 'w-10 ps-4', tdClassName: 'ps-4' },
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => {
+            row.toggleSelected(value === true);
+          }}
+          aria-label={t('common.selectRow', 'Select row')}
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
     {
       accessorKey: 'id',
       header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,

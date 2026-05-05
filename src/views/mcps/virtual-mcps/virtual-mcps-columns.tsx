@@ -1,5 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/Badge';
+import { Checkbox } from '@/components/ui/Checkbox';
 import type { VirtualMcp, VirtualMcpConfig } from '@/types/mcp';
 import { VirtualMcpsRowActions } from './virtual-mcps-row-actions';
 import { DataTableColumnHeader } from '@/components/data-table';
@@ -11,6 +12,30 @@ export function getVirtualMcpsColumns(
   providerMap: Record<string, string>,
 ): ColumnDef<VirtualMcp>[] {
   return [
+    {
+      id: 'select',
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() ? 'indeterminate' : false)}
+          onCheckedChange={(value) => {
+            table.toggleAllPageRowsSelected(value === true);
+          }}
+          aria-label={t('common.selectAll', 'Select all')}
+        />
+      ),
+      meta: { className: 'w-10 ps-4', tdClassName: 'ps-4' },
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => {
+            row.toggleSelected(value === true);
+          }}
+          aria-label={t('common.selectRow', 'Select row')}
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
     {
       accessorKey: 'id',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('common.id', 'ID')} />,
