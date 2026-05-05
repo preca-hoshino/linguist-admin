@@ -44,4 +44,12 @@ export default {
   empty: '空',
   copy: '复制',
   copied: '已复制',
+
+  // 批量操作
+  batchDeleteTitle: '删除选中项',
+  batchDeleteDesc: '确定要删除选中的项目吗？此操作不可撤销。',
+  deletingBatch: '正在删除 {{count}} 项...',
+  deleteBatchSuccess: '成功删除 {{count}} 项',
+  deleteBatchError: '批量删除遇到错误',
+  nSelected: '已选择 {{count}} 项',
 };
