@@ -1,20 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useQuery } from '@tanstack/react-query';
-import { Activity, Fingerprint, GitMerge, Type, X } from 'lucide-react';
+import { Activity, Fingerprint, GitMerge, Loader2, Type, X } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { listProviderModels } from '@/api/model/provider-models';
 import { createVirtualModel, updateVirtualModel } from '@/api/model/virtual-models';
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
-import type { ProviderModel, VirtualModel } from '@/types';
+import type { VirtualModel } from '@/types';
 import { cn } from '@/utils/utils';
-import { SortableBackendList } from './components/SortableBackendList';
+import { SortableBackendList, type BackendModelInfo } from './components/SortableBackendList';
 import { MODEL_TYPE_OPTIONS } from '@/views/models/provider-models/constants';
 import { UnitInput, UnitTabs, useUnitInput } from '@/components/UnitInput';
 
@@ -24,8 +22,6 @@ interface VirtualModelsMutateDialogProps {
   readonly currentRow?: VirtualModel | null;
   readonly onSuccess?: () => void | Promise<void>;
 }
-
-const emptyProviderModels: ProviderModel[] = [];
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -56,35 +52,20 @@ export function VirtualModelsMutateDialog({
   const { t } = useTranslation();
   const isUpdate = !!currentRow;
 
-  // 获取所有提供商模型以填充后端映射下拉列表
-  const { data: providerModels = emptyProviderModels, isLoading: isLoadingProviderModels } = useQuery({
-    queryKey: ['provider-models-list'],
-    queryFn: async () => {
-      const res = await listProviderModels();
-      if (!res.ok) {
-        throw new Error('Failed to load provider models');
-      }
-      return res.data.data;
-    },
-    enabled: open,
-    staleTime: 60_000,
-  });
-
-  // 避免渲染层级的多次循环和查找，将它计算为不重叠提供商
-  const uniqueProviders = useMemo(() => {
-    const map = new Map<string, { id: string; name: string; kind?: string | undefined }>();
-    for (const pm of providerModels) {
-      const pid = pm.provider_id;
-      if (!map.has(pid)) {
-        map.set(pid, {
-          id: pid,
-          name: (pm.provider_name ?? '') === '' ? pid : (pm.provider_name as string),
-          kind: pm.provider_kind,
+  // 编辑模式：从已有 backends 构建初始展示信息 Map
+  const initialModelInfo = useMemo(() => {
+    const map = new Map<string, BackendModelInfo>();
+    if (currentRow) {
+      for (const b of currentRow.backends) {
+        map.set(b.provider_model_id, {
+          name: b.provider_model_name ?? b.provider_model_id,
+          provider_name: b.provider_name ?? '',
+          provider_kind: b.provider_kind ?? '',
         });
       }
     }
-    return [...map.values()];
-  }, [providerModels]);
+    return map;
+  }, [currentRow]);
 
   const form = useForm<VirtualModelForm>({
     resolver: zodResolver(formSchema),
@@ -123,7 +104,7 @@ export function VirtualModelsMutateDialog({
           description: '',
           model_type: 'chat',
           routing_strategy: 'load_balance',
-          backends: [{ provider_id: '', provider_model_id: '', weight: 1 }],
+          backends: [],
           rpm_limit: null,
           tpm_limit: null,
         });
@@ -193,7 +174,7 @@ export function VirtualModelsMutateDialog({
         showCloseButton={false}
         className="flex h-[85vh] max-h-[850px] flex-col overflow-hidden p-0 sm:max-w-[700px] lg:h-[700px] lg:max-w-[1000px] xl:max-w-[1200px]"
       >
-        <DialogHeader className="flex shrink-0 flex-row items-start justify-between border-b bg-background px-8 py-5">
+        <DialogHeader className="flex shrink-0 flex-row items-start justify-between border-b border-border/60 bg-background px-8 py-5">
           <div className="flex flex-col gap-1.5 text-left">
             <DialogTitle>
               {isUpdate
@@ -231,7 +212,7 @@ export function VirtualModelsMutateDialog({
           >
             <div className="flex h-full min-h-0 w-full flex-col gap-6">
               {form.formState.errors.root && (
-                <div className="shrink-0 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                <div className="shrink-0 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
                   {form.formState.errors.root.message}
                 </div>
               )}
@@ -439,14 +420,12 @@ export function VirtualModelsMutateDialog({
                   />
                 </div>
 
-                {/* 后端模型绑定区，原大片由 SortableBackendList 抽离 */}
+                {/* 后端模型绑定区 */}
                 <SortableBackendList
                   form={form}
                   t={t}
-                  providerModels={providerModels}
-                  isLoadingProviderModels={isLoadingProviderModels}
-                  uniqueProviders={uniqueProviders}
                   currentStrategy={currentStrategy}
+                  initialModelInfo={initialModelInfo}
                 />
               </div>
             </div>
@@ -454,7 +433,7 @@ export function VirtualModelsMutateDialog({
         </Form>
 
         {/* 底部按钮栏 */}
-        <div className="flex shrink-0 items-center justify-end gap-3 border-t bg-muted/30 px-8 py-4">
+        <div className="flex shrink-0 items-center justify-end gap-3 border-t border-border/60 bg-muted/30 px-8 py-4">
           <Button
             type="button"
             variant="outline"
@@ -466,9 +445,7 @@ export function VirtualModelsMutateDialog({
             {t('common.cancel', 'Cancel')}
           </Button>
           <Button type="submit" form="virtual-models-form" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting && (
-              <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-            )}
+            {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isUpdate ? t('common.save', 'Save') : t('common.create', 'Create')}
           </Button>
         </div>
