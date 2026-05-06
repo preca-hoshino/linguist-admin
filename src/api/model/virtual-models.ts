@@ -36,7 +36,7 @@ export const listVirtualModels = async (params?: {
 };
 
 export const getVirtualModel = async (id: string): Promise<ApiResult<VirtualModel>> => {
-  return await request<VirtualModel>('GET', `/model/virtual-models/${id}`);
+  return await request<VirtualModel>('GET', `/model/virtual-models/${id}?expand=backends`);
 };
 
 export const createVirtualModel = async (data: {
