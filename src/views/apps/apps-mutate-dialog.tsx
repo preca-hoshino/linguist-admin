@@ -1,21 +1,20 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
-import type { TFunction } from 'i18next';
-import { Box, Braces, Fingerprint, ListFilter, MessageSquare, Plus, Trash2, X } from 'lucide-react';
+import { Box, Braces, Fingerprint, MessageSquare, X } from 'lucide-react';
 import { useEffect } from 'react';
-import { type UseFormReturn, useFieldArray, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { createApp, updateApp } from '@/api/apps';
 import { listVirtualModels } from '@/api/model/virtual-models';
 import { listVirtualMcps } from '@/api/mcp/virtual-mcps';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import type { App } from '@/types/app';
+import { AllowedResourcePanel } from './components/AllowedResourcePanel';
 
 interface AppsMutateDialogProps {
   readonly open: boolean;
@@ -32,105 +31,11 @@ const formSchema = z.object({
 
 type AppForm = z.infer<typeof formSchema>;
 
-interface AppAllowedListProps {
-  readonly form: UseFormReturn<AppForm>;
-  readonly name: 'allowed_model_ids' | 'allowed_mcp_ids';
-  readonly options?: { id: string; name: string; type?: string }[];
-  readonly isSelect?: boolean;
-  readonly t: TFunction<'translation', undefined>;
-  readonly itemName: string;
-}
-
+// ── 模型类型图标 ──────────────────────────────────────────────────────────
 const MODEL_TYPE_ICON: Record<string, typeof Box> = {
   chat: MessageSquare,
   embedding: Braces,
 };
-
-function AppAllowedList({ form, name, options, isSelect, t, itemName }: AppAllowedListProps): React.JSX.Element {
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name,
-  });
-
-  return (
-    <div className="flex flex-col gap-3 py-2">
-      {fields.length === 0 && (
-        <div className="rounded-md border border-dashed py-6 text-center text-sm text-muted-foreground">
-          {name === 'allowed_model_ids'
-            ? t('apps.noAllowedModels', 'No specific models configured. API keys will have no access to models.')
-            : t('apps.noAllowedMcps', 'No specific MCPs configured. API keys will have no access to MCPs.')}
-        </div>
-      )}
-
-      {fields.map((field, index) => (
-        <div key={field.id} className="flex items-center gap-3 rounded-md border bg-background p-2.5 shadow-sm">
-          <div className="min-w-0 flex-1">
-            <FormField
-              control={form.control}
-              name={`${name}.${index}.id`}
-              render={({ field }) => (
-                <FormItem className="space-y-0">
-                  {isSelect && options ? (
-                    <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder={`Select ${itemName}`} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {options.map((opt) => {
-                          const IconComp = (opt.type ?? '') === '' ? Box : (MODEL_TYPE_ICON[opt.type as string] ?? Box);
-                          return (
-                            <SelectItem key={opt.id} value={opt.id}>
-                              <div className="flex items-center gap-2">
-                                <IconComp className="h-4 w-4 shrink-0 text-muted-foreground" />
-                                <span className="block w-full truncate">{opt.name}</span>
-                              </div>
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <FormControl>
-                      <Input {...field} placeholder={`Enter ${itemName} ID`} />
-                    </FormControl>
-                  )}
-                  <FormMessage className="mt-1 text-xs" />
-                </FormItem>
-              )}
-            />
-          </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 shrink-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive/90"
-            onClick={() => {
-              remove(index);
-            }}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      ))}
-
-      <Button
-        type="button"
-        variant="outline"
-        className="mt-1 h-9 w-full border-dashed text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-        onClick={() => {
-          append({ id: '' });
-        }}
-      >
-        <Plus className="mr-2 h-4 w-4" />
-        {name === 'allowed_model_ids'
-          ? t('apps.addAllowedModel', 'Add Allowed Model')
-          : t('apps.addAllowedMcp', 'Add Allowed MCP')}
-      </Button>
-    </div>
-  );
-}
 
 export function AppsMutateDialog({
   open,
@@ -193,6 +98,53 @@ export function AppsMutateDialog({
       }
     }
   }, [open, currentRow, form]);
+
+  // ── 准入资源选择的派生状态 ─────────────────────────────────────────────
+  const selectedModelIds = form
+    .watch('allowed_model_ids')
+    .map((m) => m.id)
+    .filter((id) => id !== '');
+
+  const selectedMcpIds = form
+    .watch('allowed_mcp_ids')
+    .map((m) => m.id)
+    .filter((id) => id !== '');
+
+  const handleToggleModel = (id: string): void => {
+    const current = form.getValues('allowed_model_ids');
+    const idx = current.findIndex((m) => m.id === id);
+    if (idx >= 0) {
+      form.setValue(
+        'allowed_model_ids',
+        current.filter((_, i) => i !== idx),
+      );
+    } else {
+      form.setValue('allowed_model_ids', [...current, { id }]);
+    }
+  };
+
+  const handleToggleMcp = (id: string): void => {
+    const current = form.getValues('allowed_mcp_ids');
+    const idx = current.findIndex((m) => m.id === id);
+    if (idx >= 0) {
+      form.setValue(
+        'allowed_mcp_ids',
+        current.filter((_, i) => i !== idx),
+      );
+    } else {
+      form.setValue('allowed_mcp_ids', [...current, { id }]);
+    }
+  };
+
+  // ── 模型类型图标渲染器 ─────────────────────────────────────────────────
+  const renderModelIcon = (item: { type?: string }): React.JSX.Element => {
+    const IconComp = MODEL_TYPE_ICON[item.type ?? ''] ?? Box;
+    return (
+      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border bg-background text-muted-foreground shadow-sm">
+        <IconComp className="h-3.5 w-3.5" />
+      </span>
+    );
+  };
 
   const onSubmit = async (values: AppForm): Promise<void> => {
     try {
@@ -279,7 +231,7 @@ export function AppsMutateDialog({
                 </div>
               )}
 
-              <div className="grid min-h-0 flex-1 grid-cols-1 gap-10 lg:grid-cols-[360px_1fr]">
+              <div className="grid min-h-0 flex-1 grid-cols-1 gap-10 lg:grid-cols-2">
                 {/* 基础配置区 */}
                 <div className="-mr-4 flex flex-col gap-6 overflow-y-auto pt-1 pr-4 pb-4">
                   <FormField
@@ -302,46 +254,35 @@ export function AppsMutateDialog({
                   />
                 </div>
 
-                {/* 右侧手风琴区: 准入列表 */}
-                <div className="mt-1 -mr-4 flex flex-col gap-3 overflow-y-auto pt-1 pr-4 pb-4">
-                  <Accordion type="multiple" defaultValue={['models', 'mcps']} className="w-full">
-                    <AccordionItem value="models" className="border-none">
-                      <AccordionTrigger className="rounded-md bg-muted/40 px-4 py-3 text-sm font-medium hover:no-underline">
-                        <div className="flex items-center gap-2">
-                          <ListFilter className="h-4 w-4" />
-                          {t('apps.allowedModels', 'Allowed Models')}
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="px-1 pt-4 pb-2">
-                        <AppAllowedList
-                          form={form}
-                          name="allowed_model_ids"
-                          isSelect={true}
-                          options={virtualModels.map((vm) => ({ id: vm.id, name: vm.name, type: vm.model_type }))}
-                          t={t}
-                          itemName="Model"
-                        />
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="mcps" className="mt-4 border-none">
-                      <AccordionTrigger className="rounded-md bg-muted/40 px-4 py-3 text-sm font-medium hover:no-underline">
-                        <div className="flex items-center gap-2">
-                          <ListFilter className="h-4 w-4" />
-                          {t('apps.allowedMcps', 'Allowed MCPs')}
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="px-1 pt-4 pb-2">
-                        <AppAllowedList
-                          form={form}
-                          name="allowed_mcp_ids"
-                          isSelect={true}
-                          options={virtualMcps.map((vmcp) => ({ id: vmcp.id, name: vmcp.name }))}
-                          t={t}
-                          itemName="MCP"
-                        />
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
+                {/* 右侧 Tab 区: 准入虚拟模型 / 虚拟MCP */}
+                <div className="mt-1 -mr-4 flex flex-col overflow-hidden pt-1 pr-4 pb-4">
+                  <Tabs defaultValue="models" className="flex h-full flex-col">
+                    <TabsList className="w-full shrink-0">
+                      <TabsTrigger value="models">{t('apps.tabModels', 'Virtual Models')}</TabsTrigger>
+                      <TabsTrigger value="mcps">{t('apps.tabMcps', 'Virtual MCPs')}</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="models" className="flex-1 overflow-hidden pt-3">
+                      <AllowedResourcePanel
+                        items={virtualModels.map((vm) => ({
+                          id: vm.id,
+                          name: vm.name,
+                          type: vm.model_type,
+                        }))}
+                        selectedIds={selectedModelIds}
+                        onToggle={handleToggleModel}
+                        t={t}
+                        renderIcon={renderModelIcon}
+                      />
+                    </TabsContent>
+                    <TabsContent value="mcps" className="flex-1 overflow-hidden pt-3">
+                      <AllowedResourcePanel
+                        items={virtualMcps.map((vmcp) => ({ id: vmcp.id, name: vmcp.name }))}
+                        selectedIds={selectedMcpIds}
+                        onToggle={handleToggleMcp}
+                        t={t}
+                      />
+                    </TabsContent>
+                  </Tabs>
                 </div>
               </div>
             </div>

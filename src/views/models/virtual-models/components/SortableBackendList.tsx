@@ -17,16 +17,24 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 
 import type { TFunction } from 'i18next';
-import { GripVertical, Plus, Trash2 } from 'lucide-react';
-import { useMemo } from 'react';
+import { GripVertical, Trash2 } from 'lucide-react';
+import { useMemo, useRef, useCallback } from 'react';
 import { type UseFormReturn, useFieldArray } from 'react-hook-form';
 import { Button } from '@/components/ui/Button';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
-import { ProviderLogo } from '@/components/provider/ProviderLogo';
+import { Separator } from '@/components/ui/Separator';
 import type { ProviderModel } from '@/types';
 import type { VirtualModelForm } from '../virtual-models-mutate-dialog';
+import { ModelSearchPalette } from './ModelSearchPalette';
+import { ModelIdentityBlock } from './ModelIdentityBlock';
+
+/** 已选后端模型的展示信息 */
+export interface BackendModelInfo {
+  name: string;
+  provider_name: string;
+  provider_kind: string;
+}
 
 // ── 策略配置 ──
 interface RenderFieldOptions {
@@ -103,17 +111,15 @@ export const STRATEGY_CONFIG = {
   },
 } satisfies Record<string, StrategyConfig>;
 
-// ── 拖拽项组件 ──
+// ── 拖拽项组件（只读展示） ──
 interface SortableBackendItemProps {
   readonly id: string;
   readonly index: number;
   readonly form: UseFormReturn<VirtualModelForm>;
   readonly remove: (index: number) => void;
-  readonly isLoadingProviderModels: boolean;
-  readonly providerModels: ProviderModel[];
-  readonly uniqueProviders: { readonly id: string; readonly name: string; readonly kind?: string | undefined }[];
   readonly t: TFunction<'translation', undefined>;
   readonly currentStrategy?: string;
+  readonly modelInfo: BackendModelInfo | undefined;
 }
 
 function SortableBackendItem({
@@ -121,11 +127,9 @@ function SortableBackendItem({
   index,
   form,
   remove,
-  isLoadingProviderModels,
-  providerModels,
-  uniqueProviders,
   t,
   currentStrategy,
+  modelInfo,
 }: SortableBackendItemProps): React.ReactNode {
   const strategyConfig = STRATEGY_CONFIG[(currentStrategy ?? 'load_balance') as keyof typeof STRATEGY_CONFIG];
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
@@ -135,16 +139,11 @@ function SortableBackendItem({
     transition,
   };
 
-  const currentProviderId = form.watch(`backends.${index}.provider_id`);
-  const filteredModels = useMemo(() => {
-    return providerModels.filter((pm) => pm.provider_id === currentProviderId);
-  }, [providerModels, currentProviderId]);
-
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="group flex items-center gap-3 rounded-md border bg-background p-2.5 shadow-sm transition-shadow hover:shadow-md"
+      className="group flex items-center gap-3 rounded-md border border-border/60 bg-background p-2.5 shadow-sm transition-all hover:border-border hover:shadow-md"
     >
       <div
         {...attributes}
@@ -154,90 +153,12 @@ function SortableBackendItem({
         <GripVertical className="h-4 w-4" />
       </div>
 
-      <div className="relative flex min-w-0 flex-1 -space-x-px rounded-md shadow-sm">
-        <FormField
-          control={form.control}
-          name={`backends.${index}.provider_id`}
-          render={({ field }) => (
-            <FormItem className="relative w-[35%] min-w-0 space-y-0">
-              <Select
-                onValueChange={(val) => {
-                  field.onChange(val);
-                  form.setValue(`backends.${index}.provider_model_id`, '');
-                }}
-                defaultValue={field.value}
-                value={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger className="relative w-full overflow-hidden rounded-r-none bg-background focus:z-10">
-                    <SelectValue placeholder={t('modelsPage.virtualModels.backendProvider', 'Provider')} />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {isLoadingProviderModels ? (
-                    <div className="p-2 text-center text-sm">{t('common.loading', 'Loading...')}</div>
-                  ) : (
-                    uniqueProviders.map((p) => (
-                      <SelectItem key={p.id} value={p.id}>
-                        <div className="flex w-full items-center gap-2 overflow-hidden">
-                          {(p.kind ?? p.id) !== '' && (
-                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border bg-background text-muted-foreground shadow-sm">
-                              <ProviderLogo provider={p.kind ?? p.id} size={14} type="mono" className="fill-current" />
-                            </span>
-                          )}
-                          <span className="truncate">{p.name}</span>
-                        </div>
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-              <FormMessage className="text-xs" />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name={`backends.${index}.provider_model_id`}
-          render={({ field }) => (
-            <FormItem className="relative w-[65%] min-w-0 space-y-0">
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                value={field.value}
-                disabled={!currentProviderId}
-              >
-                <FormControl>
-                  <SelectTrigger className="relative w-full overflow-hidden rounded-l-none bg-background focus:z-10">
-                    <SelectValue placeholder={t('modelsPage.virtualModels.backendModel', 'Model')} />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {currentProviderId === '' && (
-                    <div className="p-2 text-center text-xs text-muted-foreground">
-                      {t('common.selectProviderFirst', 'Select Provider First')}
-                    </div>
-                  )}
-                  {currentProviderId !== '' && filteredModels.length === 0 && (
-                    <div className="p-2 text-center text-xs text-muted-foreground">
-                      {t('common.noModels', 'No models available')}
-                    </div>
-                  )}
-                  {currentProviderId !== '' &&
-                    filteredModels.length > 0 &&
-                    filteredModels.map((pm) => (
-                      <SelectItem key={pm.id} value={pm.id}>
-                        <span className="block w-full truncate">{pm.name}</span>
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-              <FormMessage className="text-xs" />
-            </FormItem>
-          )}
-        />
-      </div>
+      {/* 只读展示：ModelIdentityBlock + 模型名 + 提供商名 */}
+      <ModelIdentityBlock
+        modelName={modelInfo?.name ?? (form.watch(`backends.${index}.provider_model_id`) as string)}
+        providerName={modelInfo?.provider_name ?? ''}
+        providerKind={modelInfo?.provider_kind ?? ''}
+      />
 
       {strategyConfig.renderField({ form, index, t, remove })}
     </div>
@@ -247,24 +168,44 @@ function SortableBackendItem({
 export interface SortableBackendListProps {
   readonly form: UseFormReturn<VirtualModelForm>;
   readonly t: TFunction<'translation', undefined>;
-  readonly providerModels: ProviderModel[];
-  readonly isLoadingProviderModels: boolean;
-  readonly uniqueProviders: { readonly id: string; readonly name: string; readonly kind?: string | undefined }[];
   readonly currentStrategy: string;
+  /** 编辑模式时从已有 backends 初始化的模型展示信息 */
+  readonly initialModelInfo: ReadonlyMap<string, BackendModelInfo>;
 }
 
 export function SortableBackendList({
   form,
   t,
-  providerModels,
-  isLoadingProviderModels,
-  uniqueProviders,
   currentStrategy,
+  initialModelInfo,
 }: SortableBackendListProps): React.ReactNode {
   const { fields, append, remove, move } = useFieldArray({
     control: form.control,
     name: 'backends',
   });
+
+  // 维护已选模型的展示信息（用于只读展示行）
+  const modelInfoMapRef = useRef<Map<string, BackendModelInfo>>(new Map(initialModelInfo));
+
+  // 已选 provider_model_id 集合（用于搜索面板判断 "已添加"）
+  const selectedIds = useMemo(() => new Set(fields.map((f) => f.provider_model_id).filter(Boolean)), [fields]);
+
+  const handleAdd = useCallback(
+    (model: ProviderModel) => {
+      // 写入展示信息
+      modelInfoMapRef.current.set(model.id, {
+        name: model.name,
+        provider_name: model.provider_name ?? '',
+        provider_kind: model.provider_kind ?? '',
+      });
+      append({
+        provider_id: model.provider_id,
+        provider_model_id: model.id,
+        weight: currentStrategy === 'load_balance' ? 1 : undefined,
+      });
+    },
+    [append, currentStrategy],
+  );
 
   // dnd-kit sensors
   const sensors = useSensors(
@@ -286,76 +227,76 @@ export function SortableBackendList({
   const strategyConfig = STRATEGY_CONFIG[currentStrategy as keyof typeof STRATEGY_CONFIG];
 
   return (
-    <div className="mt-1 -mr-4 flex flex-col gap-3 overflow-y-auto pt-1 pr-4 pb-4">
-      {fields.length > 0 && (
-        <div className="flex gap-3 px-4 pr-12 text-xs font-medium text-muted-foreground uppercase">
-          <span className="w-6 shrink-0"></span>
-          <span className="flex-1 px-1">{t('modelsPage.virtualModels.providerModel', 'Provider Model')}</span>
-          {((): React.ReactNode => {
-            const title = strategyConfig.columnTitle;
-            if ((title ?? '') !== '') {
-              return (
-                <span className={`${strategyConfig.columnWidth} text-center`}>
-                  {t(title as string, (title as string).split('.').pop() ?? 'Weight')}
-                </span>
-              );
-            }
-            return null;
-          })()}
-        </div>
-      )}
+    <div className="mt-1 -mr-4 flex h-full flex-col overflow-hidden pt-1 pr-4">
+      {/* 顶部：搜索面板 */}
+      <div className="shrink-0">
+        <ModelSearchPalette selectedIds={selectedIds} onAdd={handleAdd} t={t} />
+      </div>
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-        modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
-      >
-        <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
-          <div className="space-y-2">
-            {fields.map((field, index) => (
-              <SortableBackendItem
-                key={field.id}
-                id={field.id}
-                index={index}
-                form={form}
-                remove={remove}
-                isLoadingProviderModels={isLoadingProviderModels}
-                providerModels={providerModels}
-                uniqueProviders={uniqueProviders}
-                t={t}
-                currentStrategy={currentStrategy}
-              />
-            ))}
+      <Separator className="my-3" />
+
+      {/* 下部：已选后端列表 */}
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto pb-4">
+        {fields.length > 0 && (
+          <div className="mb-2 flex items-center gap-3 pl-1 pr-12 text-xs font-medium text-muted-foreground">
+            <span className="w-4 shrink-0" />
+            <span className="flex-1 pl-3 tracking-wide uppercase">
+              {t('modelsPage.virtualModels.backends', 'Backend Models')}
+              <span className="ml-1.5 font-normal normal-case text-muted-foreground/60">({fields.length})</span>
+            </span>
+            {((): React.ReactNode => {
+              const title = strategyConfig.columnTitle;
+              if ((title ?? '') !== '') {
+                return (
+                  <span className={`${strategyConfig.columnWidth} text-center`}>
+                    {t(title as string, (title as string).split('.').pop() ?? 'Weight')}
+                  </span>
+                );
+              }
+              return null;
+            })()}
           </div>
-        </SortableContext>
-      </DndContext>
+        )}
 
-      {fields.length === 0 && (
-        <div className="rounded-md border border-dashed py-6 text-center text-sm text-muted-foreground">
-          {t('modelsPage.virtualModels.noBackends', 'No backend configured.')}
-        </div>
-      )}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+          modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
+        >
+          <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
+            <div className="space-y-2">
+              {fields.map((field, index) => (
+                <SortableBackendItem
+                  key={field.id}
+                  id={field.id}
+                  index={index}
+                  form={form}
+                  remove={remove}
+                  t={t}
+                  currentStrategy={currentStrategy}
+                  modelInfo={modelInfoMapRef.current.get(field.provider_model_id)}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
 
-      <Button
-        type="button"
-        variant="outline"
-        className="mt-1 h-9 w-full border-dashed text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-        onClick={() => {
-          append({
-            provider_id: '',
-            provider_model_id: '',
-            weight: currentStrategy === 'load_balance' ? 1 : undefined,
-          });
-        }}
-      >
-        <Plus className="mr-2 h-4 w-4" />
-        {t('modelsPage.virtualModels.addBackend', 'Add Backend')}
-      </Button>
+        {fields.length === 0 && (
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border/60 py-10 text-center">
+            <p className="text-sm text-muted-foreground">
+              {t('modelsPage.virtualModels.noBackends', 'No backend configured.')}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground/60">
+              {t('modelsPage.virtualModels.noBackendsHint', 'Use the search box above to add models.')}
+            </p>
+          </div>
+        )}
 
-      {form.formState.errors.backends?.root && (
-        <div className="mt-1 text-xs text-destructive">{form.formState.errors.backends.root.message}</div>
-      )}
+        {form.formState.errors.backends?.root && (
+          <div className="mt-1 text-xs text-destructive">{form.formState.errors.backends.root.message}</div>
+        )}
+      </div>
     </div>
   );
 }

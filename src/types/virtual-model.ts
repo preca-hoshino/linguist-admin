@@ -5,6 +5,7 @@ export interface VirtualModelBackend {
   provider_model_name?: string;
   provider_name?: string;
   provider_id?: string;
+  provider_kind?: string;
 }
 
 export interface VirtualModel {
