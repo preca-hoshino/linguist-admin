@@ -125,8 +125,8 @@ export function GenerationRateTopCards({
                   providerKind={item.provider_kind ?? null}
                   modelName={item.name}
                 />
-                <div className="mt-2 flex items-center justify-between">
-                  <div className="flex flex-wrap items-baseline gap-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-baseline gap-2">
                     <span className="w-8 shrink-0 font-mono text-xl font-bold text-muted-foreground/50">
                       #{index + 1}
                     </span>
