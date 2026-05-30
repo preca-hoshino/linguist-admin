@@ -7,7 +7,6 @@ import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/
 import { Card } from '@/components/ui/Card';
 import { FormDescription, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/Form';
 import { Switch } from '@/components/ui/Switch';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import type { FormValues } from '../schema';
 
 interface ProviderConfigSectionProps {
@@ -58,40 +57,7 @@ export function ProviderConfigSection({ control, providerKind }: ProviderConfigS
               />
             )}
 
-            {providerKind === 'volcengine' && (
-              <FormField
-                control={control}
-                name="model_config.endpoint_type"
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                    <FormLabel className="text-left text-muted-foreground">
-                      <span className="font-medium text-foreground">
-                        {t('modelsPage.providerModels.endpointType', '请求端点类型')}
-                      </span>
-                    </FormLabel>
-                    <div className="space-y-1.5">
-                      <Tabs
-                        onValueChange={field.onChange}
-                        value={field.value ?? 'normal'}
-                        className="w-full sm:max-w-[280px]"
-                      >
-                        <TabsList className="flex h-9 w-full">
-                          <TabsTrigger value="normal" className="flex-1 px-3 text-sm">
-                            {t('modelsPage.providerModels.endpointTypeNormal', '标准')}
-                          </TabsTrigger>
-                          <TabsTrigger value="coding_plan" className="flex-1 px-3 text-sm">
-                            Coding Plan
-                          </TabsTrigger>
-                        </TabsList>
-                      </Tabs>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-            )}
-
-            {providerKind !== 'deepseek' && providerKind !== 'newapi' && providerKind !== 'volcengine' && (
+            {providerKind !== 'deepseek' && providerKind !== 'newapi' && (
               <FormDescription>
                 {t('modelsPage.providerModels.noProviderConfig', '当前提供商暂无专属配置项。')}
               </FormDescription>
