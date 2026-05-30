@@ -28,10 +28,8 @@ export function LatencyCard({ today, overview, loading }: LatencyCardProps): Rea
     return (
       <Card className="gap-4 py-4">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-muted-foreground" />
-            <CardTitle className="text-sm font-medium">{t('dashboard.latency')}</CardTitle>
-          </div>
+          <CardTitle className="text-sm font-medium">{t('dashboard.todayLatency')}</CardTitle>
+          <Clock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent className="pt-0">
           <Skeleton className="h-10 w-20" />
@@ -51,10 +49,8 @@ export function LatencyCard({ today, overview, loading }: LatencyCardProps): Rea
   return (
     <Card className="gap-4 py-5">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
-        <div className="flex items-center gap-2">
-          <Clock className="h-5 w-5 text-muted-foreground" />
-          <CardTitle className="text-sm font-medium">{t('dashboard.latency')}</CardTitle>
-        </div>
+        <CardTitle className="text-sm font-medium">{t('dashboard.todayLatency')}</CardTitle>
+        <Clock className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent className="pt-0">
         <div className="flex items-baseline">
