@@ -35,8 +35,8 @@ export function VirtualModelOverviewTab({
 
       {/* 行 1: 4 KPI 卡片 */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <RequestCard today={today} overview={overview} loading={loading} />
-        <TokenCard today={today} overview={overview} loading={loading} />
+        <RequestCard today={today} loading={loading} />
+        <TokenCard today={today} loading={loading} />
         <SuccessRateCard today={today} loading={loading} />
         <LatencyCard today={today} overview={overview} loading={loading} />
       </div>
