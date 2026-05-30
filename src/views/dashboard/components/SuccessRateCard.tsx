@@ -17,10 +17,8 @@ export function SuccessRateCard({ today, loading }: SuccessRateCardProps): React
     return (
       <Card className="gap-4 py-4">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 text-muted-foreground" />
-            <CardTitle className="text-sm font-medium">{t('dashboard.successRate')}</CardTitle>
-          </div>
+          <CardTitle className="text-sm font-medium">{t('dashboard.todaySuccessRate')}</CardTitle>
+          <ShieldCheck className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent className="pt-0">
           <Skeleton className="h-10 w-24" />
@@ -38,10 +36,8 @@ export function SuccessRateCard({ today, loading }: SuccessRateCardProps): React
   return (
     <Card className="gap-4 py-5">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="h-5 w-5 text-muted-foreground" />
-          <CardTitle className="text-sm font-medium">{t('dashboard.successRate')}</CardTitle>
-        </div>
+        <CardTitle className="text-sm font-medium">{t('dashboard.todaySuccessRate')}</CardTitle>
+        <ShieldCheck className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent className="pt-0">
         <div className="flex items-baseline">
