@@ -17,10 +17,8 @@ export function McpLatencyCard({ overview, loading }: McpLatencyCardProps): Reac
     return (
       <Card className="gap-4">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-muted-foreground" />
-            <CardTitle className="text-sm font-medium">{t('dashboard.latency', 'Latency')}</CardTitle>
-          </div>
+          <CardTitle className="text-sm font-medium">{t('dashboard.todayLatency')}</CardTitle>
+          <Clock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent className="pt-0">
           <Skeleton className="h-10 w-24" />
@@ -36,10 +34,8 @@ export function McpLatencyCard({ overview, loading }: McpLatencyCardProps): Reac
   return (
     <Card className="gap-4 py-5">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
-        <div className="flex items-center gap-2">
-          <Clock className="h-5 w-5 text-muted-foreground" />
-          <CardTitle className="text-sm font-medium">{t('dashboard.latency', 'Latency')}</CardTitle>
-        </div>
+        <CardTitle className="text-sm font-medium">{t('dashboard.todayLatency')}</CardTitle>
+        <Clock className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent className="pt-0">
         <div className="flex items-baseline gap-1.5">
