@@ -36,7 +36,6 @@ export const formSchema = z.object({
   model_config: z
     .object({
       reasoning_content_backfill: z.boolean().optional(),
-      endpoint_type: z.enum(['normal', 'coding_plan']).optional(),
     })
     .optional(),
 });

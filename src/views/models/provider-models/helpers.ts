@@ -84,7 +84,6 @@ export function buildFormValuesFromRow(currentRow: ProviderModel): FormValues {
     model_config: currentRow.model_config
       ? {
           reasoning_content_backfill: currentRow.model_config.reasoning_content_backfill === true,
-          endpoint_type: currentRow.model_config.endpoint_type as 'normal' | 'coding_plan' | undefined,
         }
       : { reasoning_content_backfill: false },
     request_overrides_ui: buildOverridesUiFromRow(currentRow),
@@ -144,14 +143,11 @@ export function buildSubmitPayload(
   const parsedOverrides = buildRequestOverridesPayload(values.request_overrides_ui);
   payload.request_overrides = parsedOverrides;
 
-  // model_config: reasoning_content_backfill + endpoint_type
+  // model_config: reasoning_content_backfill
   if (values.model_config) {
     const mc: Record<string, unknown> = {};
     if (values.model_config.reasoning_content_backfill) {
       mc.reasoning_content_backfill = true;
-    }
-    if (values.model_config.endpoint_type) {
-      mc.endpoint_type = values.model_config.endpoint_type;
     }
     if (Object.keys(mc).length > 0) {
       payload.model_config = mc;
