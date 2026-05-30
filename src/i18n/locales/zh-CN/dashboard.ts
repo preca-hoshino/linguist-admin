@@ -23,6 +23,7 @@ export default {
   total: '总计',
   latency: '延迟',
   todayLatency: '今日延迟',
+  todayErrors: '今日错误',
   gatewayOverhead: '网关损耗',
   no_data: '暂无数据',
   stats: {

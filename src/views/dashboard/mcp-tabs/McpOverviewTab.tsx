@@ -31,7 +31,7 @@ export function McpOverviewTab({
       )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <McpRequestCard today={today} overview={overview} loading={loading} />
+        <McpRequestCard today={today} loading={loading} />
         <McpErrorRateCard today={today} overview={overview} loading={loading} />
         <McpLatencyCard today={today} overview={overview} loading={loading} />
       </div>
