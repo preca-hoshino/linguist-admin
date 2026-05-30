@@ -28,6 +28,7 @@ import type { NavCollapsible, NavGroup as NavGroupProps, NavItem, NavLink } from
 export function NavGroup({ title, items }: Readonly<NavGroupProps>): React.JSX.Element {
   const { state, isMobile } = useSidebar();
   const href = useLocation({ select: (location) => location.href });
+  const isCollapsed = state === 'collapsed' && !isMobile;
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{title}</SidebarGroupLabel>
@@ -39,14 +40,24 @@ export function NavGroup({ title, items }: Readonly<NavGroupProps>): React.JSX.E
             return <SidebarMenuLink key={key} item={item} href={href} />;
           }
 
-          if (state === 'collapsed' && !isMobile) {
-            return <SidebarMenuCollapsedDropdown key={key} item={item} href={href} />;
-          }
-
-          return <SidebarMenuCollapsible key={key} item={item} href={href} />;
+          return (
+            <NavCollapsibleItem key={key} item={item} href={href} isCollapsed={isCollapsed} />
+          );
         })}
       </SidebarMenu>
     </SidebarGroup>
+  );
+}
+
+function NavCollapsibleItem({
+  item,
+  href,
+  isCollapsed,
+}: Readonly<{ item: NavCollapsible; href: string; isCollapsed: boolean }>): React.JSX.Element {
+  return isCollapsed ? (
+    <SidebarMenuCollapsedDropdown item={item} href={href} />
+  ) : (
+    <SidebarMenuCollapsible item={item} href={href} />
   );
 }
 

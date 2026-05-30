@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar';
 import { useLayout } from '@/providers/LayoutProvider';
@@ -11,7 +12,7 @@ export function AppSidebar(): React.JSX.Element {
   // 订阅语言变化以驱动侧边栏重新生成翻译后的菜单数据
   const { i18n } = useTranslation();
   // 以 i18n.language 为隐式 key，确保语言切换后菜单标题同步刷新
-  const sidebarData = getSidebarData(i18n.language);
+  const sidebarData = React.useMemo(() => getSidebarData(i18n.language), [i18n.language]);
   return (
     <Sidebar collapsible={collapsible} variant={variant}>
       <SidebarHeader>

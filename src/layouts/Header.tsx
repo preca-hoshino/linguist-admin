@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { LangSwitch } from '@/components/LangSwitch';
 import { ProfileDropdown } from '@/components/ProfileDropdown';
 import { Search } from '@/components/Search';
@@ -17,17 +17,22 @@ type HeaderProps = React.HTMLAttributes<HTMLElement> & {
 export function Header({ className, fixed, children, ...props }: HeaderProps): React.JSX.Element {
   const [offset, setOffset] = useState(0);
   const slot = useHeaderSlotContent();
+  const rafRef = useRef(0);
+
+  const handleScroll = useCallback(() => {
+    cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      setOffset(document.body.scrollTop || document.documentElement.scrollTop);
+    });
+  }, []);
 
   useEffect(() => {
-    const onScroll = (): void => {
-      setOffset(document.body.scrollTop || document.documentElement.scrollTop);
-    };
-
-    document.addEventListener('scroll', onScroll, { passive: true });
+    document.addEventListener('scroll', handleScroll, { passive: true });
     return (): void => {
-      document.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(rafRef.current);
+      document.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [handleScroll]);
 
   return (
     <header
