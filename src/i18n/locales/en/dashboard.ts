@@ -23,6 +23,7 @@ export default {
   total: 'Total',
   latency: 'Latency',
   todayLatency: 'Today Latency',
+  todayErrors: 'Today Errors',
   gatewayOverhead: 'Gateway Overhead',
   no_data: 'No data',
   stats: {
