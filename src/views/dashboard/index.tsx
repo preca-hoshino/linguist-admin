@@ -171,7 +171,7 @@ export function DashboardPage(): React.JSX.Element {
         {/* 页面标题 + 全局时间选择器 + 刷新按钮 */}
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
-            {mode === 'mcp' ? 'MCP 网络' : t('dashboard.title')}
+            {t('dashboard.title')}
           </h1>
           <div className="flex items-center gap-2">
             <TimeRangePicker value={globalRange} onChange={setGlobalRange} />
