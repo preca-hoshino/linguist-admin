@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { usePageTitle } from '@/composables/use-page-title';
 import { Main } from '@/layouts/Main';
 import { useAuthStore } from '@/stores/auth-store';
+import { usePermission } from '@/stores/permission-store';
 import { UserMutateDialog } from './components/UserMutateDialog';
 import { UserTable } from './components/UserTable';
 
@@ -16,6 +17,7 @@ export function UsersPage(): React.JSX.Element {
   const { t } = useTranslation();
   usePageTitle(t('users.title', 'User Management'));
 
+  const canEditUsers = usePermission('users', 'edit');
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -124,12 +126,10 @@ export function UsersPage(): React.JSX.Element {
           <p className="text-muted-foreground">{t('users.desc', 'Manage administrator accounts')}</p>
         </div>
 
-        <PermissionGuard module="users" level="edit">
-          <Button className="space-x-1" onClick={openCreateDialog}>
-            <Plus className="h-4 w-4" />
-            <span>{t('users.create', 'New User')}</span>
-          </Button>
-        </PermissionGuard>
+        <Button className="space-x-1" disabled={!canEditUsers} onClick={openCreateDialog}>
+          <Plus className="h-4 w-4" />
+          <span>{t('users.create', 'New User')}</span>
+        </Button>
       </div>
 
       {error && (

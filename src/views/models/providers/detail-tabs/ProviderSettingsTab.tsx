@@ -6,8 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
-import { PermissionGuard } from '@/components/PermissionGuard';
 import { Separator } from '@/components/ui/Separator';
+import { usePermission } from '@/stores/permission-store';
 import type { Provider } from '@/types';
 import { ProvidersMutateDialog } from '../providers-mutate-dialog';
 import { ProviderModelsProvider, useProviderModelsContext } from './provider-models-context';
@@ -16,18 +16,18 @@ import { ProviderModelsTable } from './provider-models-table';
 function ProviderModelsCreateButton(): React.JSX.Element {
   const { t } = useTranslation();
   const { setOpen } = useProviderModelsContext();
+  const canEdit = usePermission('models', 'edit');
   return (
-    <PermissionGuard module="models" level="edit">
-      <Button
-        className="space-x-1"
-        onClick={() => {
-          setOpen('create');
-        }}
-      >
-        <Plus className="h-4 w-4" />
-        <span>{t('modelsPage.providerModels.create', 'New Model')}</span>
-      </Button>
-    </PermissionGuard>
+    <Button
+      className="space-x-1"
+      disabled={!canEdit}
+      onClick={() => {
+        setOpen('create');
+      }}
+    >
+      <Plus className="h-4 w-4" />
+      <span>{t('modelsPage.providerModels.create', 'New Model')}</span>
+    </Button>
   );
 }
 
@@ -86,6 +86,7 @@ function DetailRow({
 export function ProviderSettingsTab({ provider }: ProviderSettingsTabProps): React.JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
+  const canEdit = usePermission('models', 'edit');
   const [editOpen, setEditOpen] = useState(false);
 
   const hasCredential = provider.credential_type === 'api_key';
@@ -96,18 +97,17 @@ export function ProviderSettingsTab({ provider }: ProviderSettingsTabProps): Rea
       <div className="flex flex-col gap-2">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h3 className="text-sm font-semibold">{t('modelsPage.providers.configuration', 'Configuration')}</h3>
-          <PermissionGuard module="models" level="edit">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setEditOpen(true);
-              }}
-            >
-              <Pencil className="mr-1.5 h-3.5 w-3.5" />
-              {t('modelsPage.providers.editConfig', 'Edit Configuration')}
-            </Button>
-          </PermissionGuard>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={!canEdit}
+            onClick={() => {
+              setEditOpen(true);
+            }}
+          >
+            <Pencil className="mr-1.5 h-3.5 w-3.5" />
+            {t('modelsPage.providers.editConfig', 'Edit Configuration')}
+          </Button>
         </div>
         {/* 左右并列配置项 */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
