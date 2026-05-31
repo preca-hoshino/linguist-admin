@@ -15,14 +15,14 @@ import { Button } from '@/components/ui/Button';
 import { PermissionGuard } from '@/components/PermissionGuard';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { cn } from '@/utils/utils';
-import { useAppsColumns } from './apps-columns';
-import { useApps } from './apps-context';
+import { useUsersColumns } from './users-columns';
+import { useUsers } from './users-context';
 
-export function AppsTable(): React.JSX.Element {
+export function UsersTable(): React.JSX.Element {
   const { t } = useTranslation();
-  const columns = useAppsColumns();
+  const columns = useUsersColumns();
   const {
-    apps,
+    users,
     pagination,
     setPagination,
     search,
@@ -33,7 +33,7 @@ export function AppsTable(): React.JSX.Element {
     hasMore,
     setOpen,
     setSelectedIds,
-  } = useApps();
+  } = useUsers();
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -55,7 +55,7 @@ export function AppsTable(): React.JSX.Element {
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
-    data: apps,
+    data: users,
     columns,
     pageCount: hasMore ? -1 : pagination.pageIndex + 1,
     state: {
@@ -94,7 +94,7 @@ export function AppsTable(): React.JSX.Element {
       return (
         <TableRow>
           <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
-            {t('apps.empty', 'No applications found')}
+            {t('users.empty', 'No users found')}
           </TableCell>
         </TableRow>
       );
@@ -122,14 +122,14 @@ export function AppsTable(): React.JSX.Element {
     <div className="flex flex-col gap-4">
       <DataTableToolbar
         table={table}
-        searchPlaceholder={t('apps.searchPlaceholder', 'Search apps by name...')}
+        searchPlaceholder={t('users.searchPlaceholder', 'Search users...')}
         filters={[
           {
             columnId: 'is_active',
             title: t('common.status', 'Status'),
             options: [
-              { label: t('apps.active', 'Active'), value: 'true' },
-              { label: t('apps.inactive', 'Inactive'), value: 'false' },
+              { label: t('common.active', 'Active'), value: 'true' },
+              { label: t('common.inactive', 'Inactive'), value: 'false' },
             ],
           },
         ]}
@@ -158,8 +158,8 @@ export function AppsTable(): React.JSX.Element {
 
       <DataTablePagination table={table} className="mt-auto" />
 
-      <DataTableBulkActions table={table} entityName={t('apps.entityName', 'app')}>
-        <PermissionGuard module="apps" level="edit">
+      <DataTableBulkActions table={table} entityName={t('users.entityName', 'user')}>
+        <PermissionGuard module="users" level="edit">
           <Button
             variant="destructive"
             size="sm"

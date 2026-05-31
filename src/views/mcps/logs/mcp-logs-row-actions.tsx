@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import type { McpLog } from '@/types/mcp';
 import { useMcpLogs } from './mcp-logs-context';
 
@@ -32,16 +33,18 @@ export function McpLogsRowActions({ log }: { readonly log: McpLog }): React.JSX.
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(log);
-            setOpen('delete');
-          }}
-          className="text-destructive focus:text-destructive"
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          {t('common.delete', 'Delete')}
-        </DropdownMenuItem>
+        <PermissionGuard module="mcp" level="edit">
+          <DropdownMenuItem
+            onClick={() => {
+              setCurrentRow(log);
+              setOpen('delete');
+            }}
+            className="text-destructive focus:text-destructive"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            {t('common.delete', 'Delete')}
+          </DropdownMenuItem>
+        </PermissionGuard>
       </DropdownMenuContent>
     </DropdownMenu>
   );

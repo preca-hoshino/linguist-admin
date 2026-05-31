@@ -2,6 +2,7 @@ import { toast } from 'sonner';
 import { create } from 'zustand';
 import { fetchMe } from '@/api/me';
 import type { User } from '@/api/users';
+import { usePermissionStore } from '@/stores/permission-store';
 import { getCookie, removeCookie, setCookie } from '@/utils/cookies';
 import { validateAuthToken } from '@/utils/jwt';
 
@@ -86,10 +87,14 @@ export const useAuthStore = create<AuthState>()((set, get) => {
             ...state,
             auth: { ...state.auth, user: res.data, isInitialized: true },
           }));
+
+          // 同步权限到 permission store
+          usePermissionStore.getState().setUserPermissions(res.data);
         } catch {
           // Token 请求失败（如后端拦截 401过期 或用户被禁用）
           toast.error('Session expired, please sign in again');
           removeCookie(ACCESS_TOKEN_KEY);
+          usePermissionStore.getState().reset();
           set((state) => ({
             ...state,
             auth: { ...state.auth, user: null, accessToken: '', isInitialized: true },
@@ -101,6 +106,7 @@ export const useAuthStore = create<AuthState>()((set, get) => {
       },
       reset: (): void => {
         removeCookie(ACCESS_TOKEN_KEY);
+        usePermissionStore.getState().reset();
         set((state) => ({
           ...state,
           auth: { ...state.auth, user: null, accessToken: '', isInitialized: true },

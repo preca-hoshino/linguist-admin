@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
+import { usePermission } from '@/stores/permission-store';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
 import type { Provider } from '@/types';
@@ -55,6 +56,7 @@ export function ProvidersMutateDialog({
 }: ProvidersMutateDialogProps): React.JSX.Element {
   const { t } = useTranslation();
   const isUpdate = !!currentRow;
+  const canEdit = usePermission('models', 'edit');
 
   const [searchQuery, setSearchQuery] = useState('');
   const filteredKindOptions = KIND_OPTIONS.filter(
@@ -539,7 +541,7 @@ export function ProvidersMutateDialog({
             >
               {t('common.cancel', 'Cancel')}
             </Button>
-            <Button form="providers-form" type="submit" disabled={form.formState.isSubmitting}>
+            <Button form="providers-form" type="submit" disabled={form.formState.isSubmitting || !canEdit}>
               {form.formState.isSubmitting ? (
                 <span className="flex items-center gap-2">
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />

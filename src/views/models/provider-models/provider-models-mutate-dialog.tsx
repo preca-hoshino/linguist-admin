@@ -15,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
+import { usePermission } from '@/stores/permission-store';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Card } from '@/components/ui/Card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
@@ -58,6 +59,7 @@ export function ProviderModelsMutateDialog({
 }: ProviderModelsMutateDialogProps): React.JSX.Element {
   const { t } = useTranslation();
   const mode = currentRow ? 'edit' : 'create';
+  const canEdit = usePermission('models', 'edit');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -431,7 +433,7 @@ export function ProviderModelsMutateDialog({
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
                   {t('common.cancel', '取消')}
                 </Button>
-                <Button form="provider-models-form" type="submit" disabled={isSubmitting || !currentProviderId}>
+                <Button form="provider-models-form" type="submit" disabled={isSubmitting || !currentProviderId || !canEdit}>
                   {isSubmitting && (
                     <span className="flex items-center gap-2">
                       <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />

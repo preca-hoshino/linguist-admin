@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
 import { Separator } from '@/components/ui/Separator';
+import { usePermission } from '@/stores/permission-store';
 import type { Provider } from '@/types';
 import { ProvidersMutateDialog } from '../providers-mutate-dialog';
 import { ProviderModelsProvider, useProviderModelsContext } from './provider-models-context';
@@ -15,9 +16,11 @@ import { ProviderModelsTable } from './provider-models-table';
 function ProviderModelsCreateButton(): React.JSX.Element {
   const { t } = useTranslation();
   const { setOpen } = useProviderModelsContext();
+  const canEdit = usePermission('models', 'edit');
   return (
     <Button
       className="space-x-1"
+      disabled={!canEdit}
       onClick={() => {
         setOpen('create');
       }}
@@ -83,6 +86,7 @@ function DetailRow({
 export function ProviderSettingsTab({ provider }: ProviderSettingsTabProps): React.JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
+  const canEdit = usePermission('models', 'edit');
   const [editOpen, setEditOpen] = useState(false);
 
   const hasCredential = provider.credential_type === 'api_key';
@@ -96,6 +100,7 @@ export function ProviderSettingsTab({ provider }: ProviderSettingsTabProps): Rea
           <Button
             variant="outline"
             size="sm"
+            disabled={!canEdit}
             onClick={() => {
               setEditOpen(true);
             }}

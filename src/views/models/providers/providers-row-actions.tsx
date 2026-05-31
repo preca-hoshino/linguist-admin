@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import type { Provider } from '@/types';
 import { useProviders } from './providers-context';
 
@@ -48,16 +49,18 @@ export function ProvidersRowActions({ row }: ProvidersRowActionsProps): React.JS
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(provider);
-            setOpen('delete');
-          }}
-          className="text-destructive focus:text-destructive"
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          {t('common.delete', 'Delete')}
-        </DropdownMenuItem>
+        <PermissionGuard module="models" level="edit">
+          <DropdownMenuItem
+            onClick={() => {
+              setCurrentRow(provider);
+              setOpen('delete');
+            }}
+            className="text-destructive focus:text-destructive"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            {t('common.delete', 'Delete')}
+          </DropdownMenuItem>
+        </PermissionGuard>
       </DropdownMenuContent>
     </DropdownMenu>
   );

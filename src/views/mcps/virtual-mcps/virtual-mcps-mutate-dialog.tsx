@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Checkbox } from '@/components/ui/Checkbox';
+import { usePermission } from '@/stores/permission-store';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/utils/utils';
 import type {
@@ -56,6 +57,7 @@ export function MutateVirtualMcpDialog({
   readonly onSubmit: (data: VirtualMcpCreateInput | VirtualMcpUpdateInput) => Promise<void>;
 }): React.JSX.Element {
   const { t } = useTranslation();
+  const canEdit = usePermission('mcp', 'edit');
   const [providers, setProviders] = useState<McpProvider[]>([]);
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [tools, setTools] = useState<McpToolInfo[]>([]);
@@ -445,7 +447,7 @@ export function MutateVirtualMcpDialog({
           >
             {t('common.cancel', 'Cancel')}
           </Button>
-          <Button type="submit" form="virtual-mcp-form" disabled={form.formState.isSubmitting}>
+          <Button type="submit" form="virtual-mcp-form" disabled={form.formState.isSubmitting || !canEdit}>
             {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isEdit ? t('common.save', 'Save Changes') : t('common.create', 'Create')}
           </Button>

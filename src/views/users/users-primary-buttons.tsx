@@ -2,12 +2,12 @@ import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { usePermission } from '@/stores/permission-store';
-import { useApps } from './apps-context';
+import { useUsers } from './users-context';
 
-export function AppsPrimaryButtons(): React.JSX.Element {
+export function UsersPrimaryButtons(): React.JSX.Element {
   const { t } = useTranslation();
-  const { setOpen, setCurrentRow } = useApps();
-  const canEdit = usePermission('apps', 'edit');
+  const { setOpen, setCurrentRow } = useUsers();
+  const canEdit = usePermission('users', 'edit');
 
   return (
     <div className="flex gap-2">
@@ -19,7 +19,7 @@ export function AppsPrimaryButtons(): React.JSX.Element {
         }}
       >
         <Plus className="mr-2 h-4 w-4" />
-        {t('apps.create', 'Create App')}
+        {t('users.create', 'New User')}
       </Button>
     </div>
   );

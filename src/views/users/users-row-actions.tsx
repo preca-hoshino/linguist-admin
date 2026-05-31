@@ -1,10 +1,9 @@
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
-import { useNavigate } from '@tanstack/react-router';
 import type { Row } from '@tanstack/react-table';
-import { FileText, Pencil, Power, PowerOff, Trash2, RefreshCw } from 'lucide-react';
+import { Pencil, Power, PowerOff, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { updateApp } from '@/api/apps';
+import { updateUserApi, type User } from '@/api/users';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
@@ -14,31 +13,34 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
 import { PermissionGuard } from '@/components/PermissionGuard';
-import type { App } from '@/types/app';
-import { useApps } from './apps-context';
+import { usePermissionStore } from '@/stores/permission-store';
+import { canManageUser } from '@/types/permissions';
+import { useUsers } from './users-context';
 
-interface AppsRowActionsProps {
-  readonly row: Row<App>;
+interface UsersRowActionsProps {
+  readonly row: Row<User>;
 }
 
-export function AppsRowActions({ row }: AppsRowActionsProps): React.JSX.Element {
+export function UsersRowActions({ row }: UsersRowActionsProps): React.JSX.Element {
   const model = row.original;
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { setOpen, setCurrentRow, loadApps } = useApps();
+  const { setOpen, setCurrentRow, loadUsers } = useUsers();
+  const myPermissions = usePermissionStore((s) => s.permissions);
   const [isToggling, setIsToggling] = useState(false);
 
   const handleToggle = (): void => {
     void (async (): Promise<void> => {
       try {
         setIsToggling(true);
-        await updateApp(model.id, { is_active: !model.is_active });
-        await loadApps();
+        await updateUserApi(model.id, { is_active: !model.is_active });
+        await loadUsers();
       } finally {
         setIsToggling(false);
       }
     })();
   };
+
+  const canDelete = myPermissions && model.permissions && canManageUser(myPermissions, model.permissions);
 
   return (
     <DropdownMenu modal={false}>
@@ -52,17 +54,6 @@ export function AppsRowActions({ row }: AppsRowActionsProps): React.JSX.Element 
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem
-          onClick={() => {
-            void navigate({ to: `/apps/${model.id}` });
-          }}
-        >
-          <FileText className="mr-2 h-4 w-4" />
-          {t('apps.viewDetails', 'View Details')}
-        </DropdownMenuItem>
-
-        <DropdownMenuSeparator />
-
         <DropdownMenuItem
           onClick={() => {
             setCurrentRow(model);
@@ -79,40 +70,31 @@ export function AppsRowActions({ row }: AppsRowActionsProps): React.JSX.Element 
           {model.is_active ? (
             <>
               <PowerOff className="mr-2 h-4 w-4 text-orange-500" />
-              {t('apps.toggleDisable', 'Disable')}
+              {t('common.inactive', 'Disable')}
             </>
           ) : (
             <>
               <Power className="mr-2 h-4 w-4 text-green-500" />
-              {t('apps.toggleEnable', 'Enable')}
+              {t('common.active', 'Enable')}
             </>
           )}
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
-        <PermissionGuard module="apps" level="edit">
-          <DropdownMenuItem
-            onClick={() => {
-              setCurrentRow(model);
-              setOpen('rotate');
-            }}
-            className="text-destructive focus:text-destructive"
-          >
-            <RefreshCw className="mr-2 h-4 w-4" />
-            {t('apps.rotateKey', 'Rotate Key')}
-          </DropdownMenuItem>
-
-          <DropdownMenuItem
-            onClick={() => {
-              setCurrentRow(model);
-              setOpen('delete');
-            }}
-            className="text-destructive focus:text-destructive"
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            {t('common.delete', 'Delete')}
-          </DropdownMenuItem>
+        <PermissionGuard module="users" level="edit">
+          {canDelete && (
+            <DropdownMenuItem
+              onClick={() => {
+                setCurrentRow(model);
+                setOpen('delete');
+              }}
+              className="text-destructive focus:text-destructive"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              {t('common.delete', 'Delete')}
+            </DropdownMenuItem>
+          )}
         </PermissionGuard>
       </DropdownMenuContent>
     </DropdownMenu>

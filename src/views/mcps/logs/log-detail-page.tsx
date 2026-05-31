@@ -21,6 +21,7 @@ import { ProviderBadge } from '@/components/provider/ProviderBadge';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import { usePageTitle } from '@/composables/use-page-title';
 import { Main } from '@/layouts/Main';
 import type { McpLog } from '@/types/mcp';
@@ -178,15 +179,17 @@ function LogPageHeader({ log }: { readonly log: McpLog }): React.JSX.Element {
 
         {/* 右侧操作区 */}
         <div className="flex items-center gap-2 shrink-0">
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 text-destructive border-destructive/20 hover:bg-destructive/10 hover:text-destructive"
-            onClick={() => void handleDelete()}
-          >
-            <Trash2 className="h-4 w-4 mr-1.5" />
-            {t('common.delete', '删除')}
-          </Button>
+          <PermissionGuard module="mcp" level="edit">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 text-destructive border-destructive/20 hover:bg-destructive/10 hover:text-destructive"
+              onClick={() => void handleDelete()}
+            >
+              <Trash2 className="h-4 w-4 mr-1.5" />
+              {t('common.delete', '删除')}
+            </Button>
+          </PermissionGuard>
         </div>
       </div>
 

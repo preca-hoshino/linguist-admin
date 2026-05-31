@@ -10,6 +10,7 @@ import { listVirtualModels } from '@/api/model/virtual-models';
 import { listVirtualMcps } from '@/api/mcp/virtual-mcps';
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
+import { usePermission } from '@/stores/permission-store';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
@@ -45,6 +46,7 @@ export function AppsMutateDialog({
 }: AppsMutateDialogProps): React.JSX.Element {
   const { t } = useTranslation();
   const isUpdate = !!currentRow;
+  const canEdit = usePermission('apps', 'edit');
 
   const { data: virtualModels = [] } = useQuery({
     queryKey: ['virtual-models-list'],
@@ -301,7 +303,7 @@ export function AppsMutateDialog({
           >
             {t('common.cancel', 'Cancel')}
           </Button>
-          <Button type="submit" form="apps-form" disabled={form.formState.isSubmitting}>
+          <Button type="submit" form="apps-form" disabled={form.formState.isSubmitting || !canEdit}>
             {form.formState.isSubmitting && (
               <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
             )}

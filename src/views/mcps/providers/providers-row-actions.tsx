@@ -8,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import type { McpProvider } from '@/types/mcp';
 import { useProviders } from './providers-context';
 
@@ -39,18 +40,20 @@ export function ProvidersRowActions({ provider }: { readonly provider: McpProvid
           }}
         >
           <Edit className="mr-2 h-4 w-4" />
-          Edit
+          {t('common.edit', 'Edit')}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="text-destructive focus:text-destructive"
-          onClick={() => {
-            setDialogState((prev) => ({ ...prev, deleteOpen: true, selectedProvider: provider }));
-          }}
-        >
-          <Trash className="mr-2 h-4 w-4" />
-          Delete
-        </DropdownMenuItem>
+        <PermissionGuard module="mcp" level="edit">
+          <DropdownMenuItem
+            className="text-destructive focus:text-destructive"
+            onClick={() => {
+              setDialogState((prev) => ({ ...prev, deleteOpen: true, selectedProvider: provider }));
+            }}
+          >
+            <Trash className="mr-2 h-4 w-4" />
+            {t('common.delete', 'Delete')}
+          </DropdownMenuItem>
+        </PermissionGuard>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import type { VirtualModel } from '@/types';
 import { useVirtualModels } from './virtual-models-context';
 
@@ -75,16 +76,18 @@ export function VirtualModelsRowActions({ row }: VirtualModelsRowActionsProps): 
           )}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(model);
-            setOpen('delete');
-          }}
-          className="text-destructive focus:text-destructive"
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          {t('common.delete', 'Delete')}
-        </DropdownMenuItem>
+        <PermissionGuard module="models" level="edit">
+          <DropdownMenuItem
+            onClick={() => {
+              setCurrentRow(model);
+              setOpen('delete');
+            }}
+            className="text-destructive focus:text-destructive"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            {t('common.delete', 'Delete')}
+          </DropdownMenuItem>
+        </PermissionGuard>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -28,9 +28,10 @@ const GLOBAL_RANGE_MAP: Record<GlobalTimeRange, StatsRange> = {
  */
 export function useTodayStats(
   globalRange: GlobalTimeRange = 'today',
+  enabled = true,
 ): TodayStatsData & { loading: boolean; error: string | null; refresh: () => void } {
   const [data, setData] = useState<TodayStatsData>({ today: null, overview: null });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -58,11 +59,19 @@ export function useTodayStats(
   }, [globalRange]);
 
   const refresh = useCallback(() => {
+    if (!enabled) {
+      return;
+    }
     setLoading(true);
     void fetchData();
-  }, [fetchData]);
+  }, [fetchData, enabled]);
 
   useEffect(() => {
+    if (!enabled) {
+      setData({ today: null, overview: null });
+      setLoading(false);
+      return;
+    }
     void fetchData();
     timerRef.current = setInterval((): void => {
       void fetchData();
@@ -72,7 +81,7 @@ export function useTodayStats(
         clearInterval(timerRef.current);
       }
     };
-  }, [fetchData]);
+  }, [fetchData, enabled]);
 
   return { ...data, loading, error, refresh };
 }

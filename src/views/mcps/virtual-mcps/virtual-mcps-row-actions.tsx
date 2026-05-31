@@ -8,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import type { VirtualMcp } from '@/types/mcp';
 import { useVirtualMcps } from './virtual-mcps-context';
 import { useTranslation } from 'react-i18next';
@@ -56,15 +57,17 @@ export function VirtualMcpsRowActions({
           {t('common.edit', 'Edit')}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="text-destructive focus:text-destructive"
-          onClick={() => {
-            setDialogState((prev) => ({ ...prev, deleteOpen: true, selectedServer: server }));
-          }}
-        >
-          <Trash className="mr-2 h-4 w-4" />
-          {t('common.delete', 'Delete')}
-        </DropdownMenuItem>
+        <PermissionGuard module="mcp" level="edit">
+          <DropdownMenuItem
+            className="text-destructive focus:text-destructive"
+            onClick={() => {
+              setDialogState((prev) => ({ ...prev, deleteOpen: true, selectedServer: server }));
+            }}
+          >
+            <Trash className="mr-2 h-4 w-4" />
+            {t('common.delete', 'Delete')}
+          </DropdownMenuItem>
+        </PermissionGuard>
       </DropdownMenuContent>
     </DropdownMenu>
   );
