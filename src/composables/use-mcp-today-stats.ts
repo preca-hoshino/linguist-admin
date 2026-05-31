@@ -20,9 +20,10 @@ const POLL_INTERVAL_MS = 60_000;
  */
 export function useMcpTodayStats(
   globalRange: GlobalTimeRange = 'today',
+  enabled = true,
 ): McpTodayStatsData & { loading: boolean; error: string | null; refresh: () => void } {
   const [data, setData] = useState<McpTodayStatsData>({ today: null, overview: null });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -51,11 +52,19 @@ export function useMcpTodayStats(
   }, [globalRange]);
 
   const refresh = useCallback(() => {
+    if (!enabled) {
+      return;
+    }
     setLoading(true);
     void fetchData();
-  }, [fetchData]);
+  }, [fetchData, enabled]);
 
   useEffect(() => {
+    if (!enabled) {
+      setData({ today: null, overview: null });
+      setLoading(false);
+      return;
+    }
     void fetchData();
     timerRef.current = setInterval((): void => {
       void fetchData();
@@ -65,7 +74,7 @@ export function useMcpTodayStats(
         clearInterval(timerRef.current);
       }
     };
-  }, [fetchData]);
+  }, [fetchData, enabled]);
 
   return { ...data, loading, error, refresh };
 }
