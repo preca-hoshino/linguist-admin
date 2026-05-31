@@ -2,6 +2,7 @@ import { ChevronDown, Pencil, ShieldCheck, UserPlus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createUserApi, type User, type UserUpdatePayload, updateUserApi } from '@/api/users';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/Collapsible';
 import {
@@ -14,10 +15,9 @@ import {
 } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { useAuthStore } from '@/stores/auth-store';
 import { usePermission, usePermissionStore } from '@/stores/permission-store';
-import type { PermissionLevel, PermissionModule, UserPermissions } from '@/types/permissions';
+import type { PermissionModule, UserPermissions } from '@/types/permissions';
 import { DEFAULT_PERMISSIONS, hasPermission, PERMISSION_MODULES } from '@/types/permissions';
 
 interface UserMutateDialogProps {
@@ -70,8 +70,19 @@ export function UserMutateDialog({
     }
   }, [open, isEdit, targetUser]);
 
-  const setModulePermission = (module: PermissionModule, level: PermissionLevel): void => {
-    setPermissions((prev) => ({ ...prev, [module]: level }));
+  const toggleModulePermission = (module: PermissionModule): void => {
+    const canGrantEdit = hasPermission(
+      operatorPermissions ?? { ...DEFAULT_PERMISSIONS },
+      module,
+      'edit',
+    );
+    if (!canGrantEdit) {
+      return;
+    }
+    setPermissions((prev) => ({
+      ...prev,
+      [module]: prev[module] === 'edit' ? 'view' : 'edit',
+    }));
   };
 
   const handleSubmit = async (): Promise<void> => {
@@ -195,44 +206,37 @@ export function UserMutateDialog({
               <ChevronDown className={`h-4 w-4 transition-transform ${permsOpen ? 'rotate-180' : ''}`} />
             </Button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-3 pt-2">
-            {PERMISSION_MODULES.map((module) => {
-              // 自保护：编辑自己时禁用所有权限选择器
-              // 权限天花板：只能授予自己已拥有的权限级别
-              const canGrantEdit = hasPermission(
-                operatorPermissions ?? { ...DEFAULT_PERMISSIONS },
-                module,
-                'edit',
-              );
-              const isDisabled = isEditingSelf;
-              return (
-                <div key={module} className="flex items-center justify-between">
-                  <Label className="text-sm">
-                    {t(`users.permissions.modules.${module}`, module)}
-                    {isEditingSelf && (
-                      <span className="ml-1 text-xs text-muted-foreground">
-                        ({t('users.permissions.selfProtect', 'cannot change own permissions')})
-                      </span>
-                    )}
-                  </Label>
-                  <Select
-                    value={permissions[module]}
-                    onValueChange={(v) => setModulePermission(module, v as PermissionLevel)}
-                    disabled={isDisabled}
+          <CollapsibleContent className="pt-2">
+            {isEditingSelf && (
+              <p className="mb-3 text-xs text-muted-foreground">
+                {t('users.permissions.selfProtect', 'cannot change own permissions')}
+              </p>
+            )}
+            <div className="flex flex-wrap gap-2">
+              {PERMISSION_MODULES.map((module) => {
+                const level = permissions[module] ?? 'view';
+                const isEdit = level === 'edit';
+                const canGrantEdit = hasPermission(
+                  operatorPermissions ?? { ...DEFAULT_PERMISSIONS },
+                  module,
+                  'edit',
+                );
+                return (
+                  <Badge
+                    key={module}
+                    variant={isEdit ? 'default' : 'outline'}
+                    className={`text-xs${isEditingSelf || !canGrantEdit ? '' : ' cursor-pointer select-none hover:opacity-80'}`}
+                    onClick={() => {
+                      if (!isEditingSelf) {
+                        toggleModulePermission(module);
+                      }
+                    }}
                   >
-                    <SelectTrigger className="w-28">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="view">{t('users.permissions.levels.view', 'View')}</SelectItem>
-                      {canGrantEdit && (
-                        <SelectItem value="edit">{t('users.permissions.levels.edit', 'Edit')}</SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
-              );
-            })}
+                    {t(`users.permissions.modules.${module}`, module)}
+                  </Badge>
+                );
+              })}
+            </div>
           </CollapsibleContent>
         </Collapsible>
 
