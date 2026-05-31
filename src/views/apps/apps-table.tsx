@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
 import { DataTableBulkActions } from '@/components/data-table/BulkActions';
 import { Button } from '@/components/ui/Button';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { cn } from '@/utils/utils';
 import { useAppsColumns } from './apps-columns';
@@ -158,19 +159,21 @@ export function AppsTable(): React.JSX.Element {
       <DataTablePagination table={table} className="mt-auto" />
 
       <DataTableBulkActions table={table} entityName={t('apps.entityName', 'app')}>
-        <Button
-          variant="destructive"
-          size="sm"
-          className="flex h-6 items-center gap-1.5 px-3 rounded-lg"
-          onClick={() => {
-            const ids = table.getFilteredSelectedRowModel().rows.map((r) => r.original.id);
-            setSelectedIds(ids);
-            setOpen('batch-delete');
-          }}
-        >
-          <Trash2 size={14} className="mr-1" />
-          {t('common.delete', 'Delete')}
-        </Button>
+        <PermissionGuard module="apps" level="edit">
+          <Button
+            variant="destructive"
+            size="sm"
+            className="flex h-6 items-center gap-1.5 px-3 rounded-lg"
+            onClick={() => {
+              const ids = table.getFilteredSelectedRowModel().rows.map((r) => r.original.id);
+              setSelectedIds(ids);
+              setOpen('batch-delete');
+            }}
+          >
+            <Trash2 size={14} className="mr-1" />
+            {t('common.delete', 'Delete')}
+          </Button>
+        </PermissionGuard>
       </DataTableBulkActions>
     </div>
   );

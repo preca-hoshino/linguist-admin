@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import type { App } from '@/types/app';
 import { useApps } from './apps-context';
 
@@ -62,55 +63,61 @@ export function AppsRowActions({ row }: AppsRowActionsProps): React.JSX.Element 
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(model);
-            setOpen('update');
-          }}
-        >
-          <Pencil className="mr-2 h-4 w-4" />
-          {t('common.edit', 'Edit')}
-        </DropdownMenuItem>
+        <PermissionGuard module="apps" level="edit">
+          <DropdownMenuItem
+            onClick={() => {
+              setCurrentRow(model);
+              setOpen('update');
+            }}
+          >
+            <Pencil className="mr-2 h-4 w-4" />
+            {t('common.edit', 'Edit')}
+          </DropdownMenuItem>
+        </PermissionGuard>
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem onClick={handleToggle} disabled={isToggling}>
-          {model.is_active ? (
-            <>
-              <PowerOff className="mr-2 h-4 w-4 text-orange-500" />
-              {t('apps.toggleDisable', 'Disable')}
-            </>
-          ) : (
-            <>
-              <Power className="mr-2 h-4 w-4 text-green-500" />
-              {t('apps.toggleEnable', 'Enable')}
-            </>
-          )}
-        </DropdownMenuItem>
+        <PermissionGuard module="apps" level="edit">
+          <DropdownMenuItem onClick={handleToggle} disabled={isToggling}>
+            {model.is_active ? (
+              <>
+                <PowerOff className="mr-2 h-4 w-4 text-orange-500" />
+                {t('apps.toggleDisable', 'Disable')}
+              </>
+            ) : (
+              <>
+                <Power className="mr-2 h-4 w-4 text-green-500" />
+                {t('apps.toggleEnable', 'Enable')}
+              </>
+            )}
+          </DropdownMenuItem>
+        </PermissionGuard>
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(model);
-            setOpen('rotate');
-          }}
-          className="text-destructive focus:text-destructive"
-        >
-          <RefreshCw className="mr-2 h-4 w-4" />
-          {t('apps.rotateKey', 'Rotate Key')}
-        </DropdownMenuItem>
+        <PermissionGuard module="apps" level="edit">
+          <DropdownMenuItem
+            onClick={() => {
+              setCurrentRow(model);
+              setOpen('rotate');
+            }}
+            className="text-destructive focus:text-destructive"
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            {t('apps.rotateKey', 'Rotate Key')}
+          </DropdownMenuItem>
 
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(model);
-            setOpen('delete');
-          }}
-          className="text-destructive focus:text-destructive"
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          {t('common.delete', 'Delete')}
-        </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              setCurrentRow(model);
+              setOpen('delete');
+            }}
+            className="text-destructive focus:text-destructive"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            {t('common.delete', 'Delete')}
+          </DropdownMenuItem>
+        </PermissionGuard>
       </DropdownMenuContent>
     </DropdownMenu>
   );
