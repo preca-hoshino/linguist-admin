@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { useAuthStore } from '@/stores/auth-store';
-import { usePermissionStore } from '@/stores/permission-store';
+import { usePermission, usePermissionStore } from '@/stores/permission-store';
 import type { PermissionLevel, PermissionModule, UserPermissions } from '@/types/permissions';
 import { DEFAULT_PERMISSIONS, hasPermission, PERMISSION_MODULES } from '@/types/permissions';
 
@@ -40,6 +40,7 @@ export function UserMutateDialog({
   const currentUser = useAuthStore((s) => s.auth.user);
   const isEditingSelf = isEdit && targetUser?.id === currentUser?.id;
   const operatorPermissions = usePermissionStore((s) => s.permissions);
+  const canEditUsers = usePermission('users', 'edit');
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -245,7 +246,7 @@ export function UserMutateDialog({
           >
             {t('common.cancel', 'Cancel')}
           </Button>
-          <Button onClick={() => void handleSubmit()} disabled={isSubmitting || !isValid}>
+          <Button onClick={() => void handleSubmit()} disabled={isSubmitting || !isValid || !canEditUsers}>
             {isSubmitting && (
               <span className="flex items-center gap-2">
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />

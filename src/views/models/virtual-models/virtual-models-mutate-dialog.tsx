@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { createVirtualModel, updateVirtualModel } from '@/api/model/virtual-models';
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
+import { usePermission } from '@/stores/permission-store';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
@@ -51,6 +52,7 @@ export function VirtualModelsMutateDialog({
 }: VirtualModelsMutateDialogProps): React.JSX.Element {
   const { t } = useTranslation();
   const isUpdate = !!currentRow;
+  const canEdit = usePermission('models', 'edit');
 
   // 编辑模式：从已有 backends 构建初始展示信息 Map
   const initialModelInfo = useMemo(() => {
@@ -444,7 +446,7 @@ export function VirtualModelsMutateDialog({
           >
             {t('common.cancel', 'Cancel')}
           </Button>
-          <Button type="submit" form="virtual-models-form" disabled={form.formState.isSubmitting}>
+          <Button type="submit" form="virtual-models-form" disabled={form.formState.isSubmitting || !canEdit}>
             {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isUpdate ? t('common.save', 'Save') : t('common.create', 'Create')}
           </Button>
