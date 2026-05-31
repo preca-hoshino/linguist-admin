@@ -7,7 +7,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
 import { DataTableBulkActions } from '@/components/data-table/BulkActions';
@@ -27,6 +27,8 @@ export function UsersTable(): React.JSX.Element {
     setPagination,
     search,
     setSearch,
+    statusFilter,
+    setStatusFilter,
     loading,
     hasMore,
     setOpen,
@@ -36,6 +38,20 @@ export function UsersTable(): React.JSX.Element {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState({});
+
+  useEffect(() => {
+    const activeF = columnFilters.find((f) => f.id === 'is_active');
+    if (!activeF || !Array.isArray(activeF.value) || activeF.value.length === 0 || activeF.value.length > 1) {
+      if (statusFilter !== 'all') {
+        setStatusFilter('all');
+      }
+    } else {
+      const val = (activeF.value as string[])[0];
+      if (statusFilter !== val) {
+        setStatusFilter(val as 'all' | 'true' | 'false');
+      }
+    }
+  }, [columnFilters, statusFilter, setStatusFilter]);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
@@ -107,6 +123,16 @@ export function UsersTable(): React.JSX.Element {
       <DataTableToolbar
         table={table}
         searchPlaceholder={t('users.searchPlaceholder', 'Search users...')}
+        filters={[
+          {
+            columnId: 'is_active',
+            title: t('common.status', 'Status'),
+            options: [
+              { label: t('common.active', 'Active'), value: 'true' },
+              { label: t('common.inactive', 'Inactive'), value: 'false' },
+            ],
+          },
+        ]}
       />
 
       <div className="overflow-hidden rounded-md border">
