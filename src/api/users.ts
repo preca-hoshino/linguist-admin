@@ -1,4 +1,4 @@
-import type { ApiResult, ListResponse } from '../types';
+import type { ApiResult, ListResponse, UserPermissions } from '../types';
 import { request } from './client';
 
 export interface User {
@@ -8,6 +8,7 @@ export interface User {
   email: string;
   avatar_url: string;
   is_active: boolean;
+  permissions: UserPermissions;
   created_at: string;
   updated_at: string;
 }
@@ -19,6 +20,7 @@ export interface UserUpdatePayload {
   password?: string;
   avatar_data?: string;
   is_active?: boolean;
+  permissions?: UserPermissions;
 }
 
 export async function fetchUsers(params?: {
@@ -46,6 +48,7 @@ export async function createUserApi(data: {
   email: string;
   password: string;
   avatar_data?: string;
+  permissions?: UserPermissions;
 }): Promise<ApiResult<User>> {
   return await request<User>('POST', '/users', data);
 }
