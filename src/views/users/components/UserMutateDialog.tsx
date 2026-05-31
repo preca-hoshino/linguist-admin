@@ -258,21 +258,20 @@ export function UserMutateDialog({
                 </div>
 
                 {/* ── 右列：权限配置面板 ───────────────────────── */}
-                <div className="-mr-4 flex flex-col overflow-y-auto pt-1 pr-4 pb-4">
-                  <div className="rounded-lg border p-5">
-                    <div className="mb-4 flex items-center gap-2 text-sm font-medium">
-                      <ShieldCheck className="h-4 w-4" />
-                      {t('users.permissions.configure', 'Configure Permissions')}
-                    </div>
+                <div className="-mr-4 flex flex-col gap-6 overflow-y-auto pt-1 pr-4 pb-4">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <ShieldCheck className="h-4 w-4" />
+                    {t('users.permissions.configure', 'Configure Permissions')}
+                  </div>
 
-                    {isEditingSelf && (
-                      <p className="mb-3 text-xs text-muted-foreground">
-                        {t('users.permissions.selfProtect', 'cannot change own permissions')}
-                      </p>
-                    )}
+                  {isEditingSelf && (
+                    <p className="text-xs text-muted-foreground">
+                      {t('users.permissions.selfProtect', 'cannot change own permissions')}
+                    </p>
+                  )}
 
-                    <div className="flex flex-wrap gap-2">
-                      {PERMISSION_MODULES.map((module) => {
+                  <div className="flex flex-wrap gap-2">
+                    {PERMISSION_MODULES.map((module) => {
                         const level = permissions[module] ?? 'view';
                         const isEditLevel = level === 'edit';
                         const canGrantEdit = hasPermission(
@@ -293,7 +292,6 @@ export function UserMutateDialog({
                           </Badge>
                         );
                       })}
-                    </div>
                   </div>
                 </div>
               </div>
