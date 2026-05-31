@@ -1,8 +1,9 @@
-import { Pencil, UserPlus } from 'lucide-react';
+import { ChevronDown, Pencil, ShieldCheck, UserPlus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createUserApi, type User, type UserUpdatePayload, updateUserApi } from '@/api/users';
 import { Button } from '@/components/ui/Button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/Collapsible';
 import {
   Dialog,
   DialogContent,
@@ -13,6 +14,11 @@ import {
 } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
+import { useAuthStore } from '@/stores/auth-store';
+import { usePermissionStore } from '@/stores/permission-store';
+import type { PermissionLevel, PermissionModule, UserPermissions } from '@/types/permissions';
+import { DEFAULT_PERMISSIONS, hasPermission, PERMISSION_MODULES } from '@/types/permissions';
 
 interface UserMutateDialogProps {
   open: boolean;
@@ -31,10 +37,15 @@ export function UserMutateDialog({
 }: Readonly<UserMutateDialogProps>): React.JSX.Element {
   const { t } = useTranslation();
   const isEdit = mode === 'edit';
+  const currentUser = useAuthStore((s) => s.auth.user);
+  const isEditingSelf = isEdit && targetUser?.id === currentUser?.id;
+  const operatorPermissions = usePermissionStore((s) => s.permissions);
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [permissions, setPermissions] = useState<UserPermissions>({ ...DEFAULT_PERMISSIONS });
+  const [permsOpen, setPermsOpen] = useState(true);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -45,14 +56,22 @@ export function UserMutateDialog({
         setUsername(targetUser.username);
         setEmail(targetUser.email);
         setPassword('');
+        if (targetUser.permissions) {
+          setPermissions({ ...targetUser.permissions });
+        }
       } else {
         setUsername('');
         setEmail('');
         setPassword('');
+        setPermissions({ ...DEFAULT_PERMISSIONS });
       }
       setErrorMsg('');
     }
   }, [open, isEdit, targetUser]);
+
+  const setModulePermission = (module: PermissionModule, level: PermissionLevel): void => {
+    setPermissions((prev) => ({ ...prev, [module]: level }));
+  };
 
   const handleSubmit = async (): Promise<void> => {
     setIsSubmitting(true);
@@ -69,6 +88,11 @@ export function UserMutateDialog({
         if (password) {
           payload.password = password;
         }
+        // 仅在权限有变化时传递
+        const permsChanged = PERMISSION_MODULES.some((m) => permissions[m] !== targetUser.permissions?.[m]);
+        if (permsChanged) {
+          payload.permissions = permissions;
+        }
 
         if (Object.keys(payload).length > 0) {
           await updateUserApi(targetUser.id, payload);
@@ -78,6 +102,7 @@ export function UserMutateDialog({
           username,
           email,
           password,
+          permissions,
         });
       }
       onOpenChange(false);
@@ -157,6 +182,58 @@ export function UserMutateDialog({
             />
           </div>
         </div>
+
+        {/* 权限配置 */}
+        <Collapsible open={permsOpen} onOpenChange={setPermsOpen}>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" className="flex w-full items-center justify-between px-0 py-2">
+              <span className="flex items-center gap-2 text-sm font-medium">
+                <ShieldCheck className="h-4 w-4" />
+                {t('users.permissions.configure', 'Configure Permissions')}
+              </span>
+              <ChevronDown className={`h-4 w-4 transition-transform ${permsOpen ? 'rotate-180' : ''}`} />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-3 pt-2">
+            {PERMISSION_MODULES.map((module) => {
+              // 自保护：编辑自己时禁用所有权限选择器
+              // 权限天花板：只能授予自己已拥有的权限级别
+              const canGrantEdit = hasPermission(
+                operatorPermissions ?? { ...DEFAULT_PERMISSIONS },
+                module,
+                'edit',
+              );
+              const isDisabled = isEditingSelf;
+              return (
+                <div key={module} className="flex items-center justify-between">
+                  <Label className="text-sm">
+                    {t(`users.permissions.modules.${module}`, module)}
+                    {isEditingSelf && (
+                      <span className="ml-1 text-xs text-muted-foreground">
+                        ({t('users.permissions.selfProtect', 'cannot change own permissions')})
+                      </span>
+                    )}
+                  </Label>
+                  <Select
+                    value={permissions[module]}
+                    onValueChange={(v) => setModulePermission(module, v as PermissionLevel)}
+                    disabled={isDisabled}
+                  >
+                    <SelectTrigger className="w-28">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="view">{t('users.permissions.levels.view', 'View')}</SelectItem>
+                      {canGrantEdit && (
+                        <SelectItem value="edit">{t('users.permissions.levels.edit', 'Edit')}</SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              );
+            })}
+          </CollapsibleContent>
+        </Collapsible>
 
         <DialogFooter>
           <Button
