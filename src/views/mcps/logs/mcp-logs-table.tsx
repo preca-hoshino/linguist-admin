@@ -13,6 +13,7 @@ import { listVirtualMcps } from '@/api/mcp/virtual-mcps';
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
 import { DataTableBulkActions } from '@/components/data-table/BulkActions';
 import { Button } from '@/components/ui/Button';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import { Trash2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { getMcpLogsColumns } from './mcp-logs-columns';
@@ -207,19 +208,21 @@ export function McpLogsTable(): React.JSX.Element {
       </div>
       <DataTablePagination table={table} className="mt-auto" />
       <DataTableBulkActions table={table} entityName={t('mcpsPage.logs.logName', 'log')}>
-        <Button
-          variant="destructive"
-          size="sm"
-          className="flex h-6 items-center gap-1.5 px-3 rounded-lg"
-          onClick={() => {
-            const selectedLogIds = table.getFilteredSelectedRowModel().rows.map((r) => r.original.id);
-            setSelectedIds(selectedLogIds);
-            setOpen('batch-delete');
-          }}
-        >
-          <Trash2 size={14} className="mr-1" />
-          {t('common.delete', 'Delete')}
-        </Button>
+        <PermissionGuard module="mcp" level="edit">
+          <Button
+            variant="destructive"
+            size="sm"
+            className="flex h-6 items-center gap-1.5 px-3 rounded-lg"
+            onClick={() => {
+              const selectedLogIds = table.getFilteredSelectedRowModel().rows.map((r) => r.original.id);
+              setSelectedIds(selectedLogIds);
+              setOpen('batch-delete');
+            }}
+          >
+            <Trash2 size={14} className="mr-1" />
+            {t('common.delete', 'Delete')}
+          </Button>
+        </PermissionGuard>
       </DataTableBulkActions>
     </div>
   );
