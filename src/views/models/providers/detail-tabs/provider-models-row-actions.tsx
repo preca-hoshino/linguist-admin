@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import type { ProviderModel } from '@/types';
 import { useProviderModelsContext } from './provider-models-context';
 
@@ -52,44 +53,48 @@ export function ProviderModelsRowActions({ row }: ProviderModelsRowActionsProps)
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(model);
-            setOpen('update');
-          }}
-        >
-          <Pencil className="mr-2 h-4 w-4" />
-          {t('common.edit', 'Edit')}
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => {
-            void handleToggle();
-          }}
-          disabled={isToggling}
-        >
-          {model.is_active ? (
-            <>
-              <PowerOff className="mr-2 h-4 w-4 text-orange-500" />
-              {t('modelsPage.providerModels.toggleDisable', 'Disable')}
-            </>
-          ) : (
-            <>
-              <Power className="mr-2 h-4 w-4 text-green-500" />
-              {t('modelsPage.providerModels.toggleEnable', 'Enable')}
-            </>
-          )}
-        </DropdownMenuItem>
+        <PermissionGuard module="models" level="edit">
+          <DropdownMenuItem
+            onClick={() => {
+              setCurrentRow(model);
+              setOpen('update');
+            }}
+          >
+            <Pencil className="mr-2 h-4 w-4" />
+            {t('common.edit', 'Edit')}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              void handleToggle();
+            }}
+            disabled={isToggling}
+          >
+            {model.is_active ? (
+              <>
+                <PowerOff className="mr-2 h-4 w-4 text-orange-500" />
+                {t('modelsPage.providerModels.toggleDisable', 'Disable')}
+              </>
+            ) : (
+              <>
+                <Power className="mr-2 h-4 w-4 text-green-500" />
+                {t('modelsPage.providerModels.toggleEnable', 'Enable')}
+              </>
+            )}
+          </DropdownMenuItem>
+        </PermissionGuard>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(model);
-            setOpen('delete');
-          }}
-          className="text-destructive focus:text-destructive"
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          {t('common.delete', 'Delete')}
-        </DropdownMenuItem>
+        <PermissionGuard module="models" level="edit">
+          <DropdownMenuItem
+            onClick={() => {
+              setCurrentRow(model);
+              setOpen('delete');
+            }}
+            className="text-destructive focus:text-destructive"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            {t('common.delete', 'Delete')}
+          </DropdownMenuItem>
+        </PermissionGuard>
       </DropdownMenuContent>
     </DropdownMenu>
   );
