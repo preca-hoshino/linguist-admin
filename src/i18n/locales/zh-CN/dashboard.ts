@@ -2,7 +2,10 @@ export default {
   title: '概览',
   desc: '关键指标和活动的概览。',
   refresh: '刷新',
-  tabs: {
+  noDataAccess: {
+    title: '暂无数据权限',
+    desc: '您当前没有查看统计数据的权限，请联系管理员。',
+  },  tabs: {
     overview: '总览',
     performance: '性能',
     distribution: '分布',
