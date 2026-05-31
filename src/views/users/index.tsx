@@ -4,9 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { deleteUserApi, fetchUsers, type User } from '@/api/users';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import { Button } from '@/components/ui/Button';
 import { usePageTitle } from '@/composables/use-page-title';
 import { Main } from '@/layouts/Main';
+import { useAuthStore } from '@/stores/auth-store';
 import { UserMutateDialog } from './components/UserMutateDialog';
 import { UserTable } from './components/UserTable';
 
@@ -33,6 +35,8 @@ export function UsersPage(): React.JSX.Element {
   // Batch selection state
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [batchDeleteOpen, setBatchDeleteOpen] = useState(false);
+
+  const currentUserId = useAuthStore((s) => s.auth.user?.id);
 
   const loadUsers = useCallback(async () => {
     try {
@@ -83,13 +87,15 @@ export function UsersPage(): React.JSX.Element {
   };
 
   const handleBatchDelete = async (): Promise<void> => {
-    if (selectedIds.length === 0) {
+    // 排除自己，防止自删除
+    const idsToDelete = selectedIds.filter((id) => id !== currentUserId);
+    if (idsToDelete.length === 0) {
       return;
     }
-    const total = selectedIds.length;
+    const total = idsToDelete.length;
     const deletePromise = (async (): Promise<number> => {
       let count = 0;
-      for (const id of selectedIds) {
+      for (const id of idsToDelete) {
         await deleteUserApi(id);
         count++;
       }
@@ -118,10 +124,12 @@ export function UsersPage(): React.JSX.Element {
           <p className="text-muted-foreground">{t('users.desc', 'Manage administrator accounts')}</p>
         </div>
 
-        <Button className="space-x-1" onClick={openCreateDialog}>
-          <Plus className="h-4 w-4" />
-          <span>{t('users.create', 'New User')}</span>
-        </Button>
+        <PermissionGuard module="users" level="edit">
+          <Button className="space-x-1" onClick={openCreateDialog}>
+            <Plus className="h-4 w-4" />
+            <span>{t('users.create', 'New User')}</span>
+          </Button>
+        </PermissionGuard>
       </div>
 
       {error && (
@@ -135,15 +143,17 @@ export function UsersPage(): React.JSX.Element {
           <span className="text-sm text-muted-foreground">
             {t('common.nSelected', { count: selectedIds.length, defaultValue: '{{count}} selected' })}
           </span>
-          <Button
-            variant="destructive"
-            size="sm"
-            className="flex h-7 items-center gap-1.5 px-3 rounded-lg"
-            onClick={() => setBatchDeleteOpen(true)}
-          >
-            <Trash2 size={14} />
-            {t('common.delete', 'Delete')}
-          </Button>
+          <PermissionGuard module="users" level="edit">
+            <Button
+              variant="destructive"
+              size="sm"
+              className="flex h-7 items-center gap-1.5 px-3 rounded-lg"
+              onClick={() => setBatchDeleteOpen(true)}
+            >
+              <Trash2 size={14} />
+              {t('common.delete', 'Delete')}
+            </Button>
+          </PermissionGuard>
         </div>
       )}
 
