@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import { Separator } from '@/components/ui/Separator';
 import type { Provider } from '@/types';
 import { ProvidersMutateDialog } from '../providers-mutate-dialog';
@@ -16,15 +17,17 @@ function ProviderModelsCreateButton(): React.JSX.Element {
   const { t } = useTranslation();
   const { setOpen } = useProviderModelsContext();
   return (
-    <Button
-      className="space-x-1"
-      onClick={() => {
-        setOpen('create');
-      }}
-    >
-      <Plus className="h-4 w-4" />
-      <span>{t('modelsPage.providerModels.create', 'New Model')}</span>
-    </Button>
+    <PermissionGuard module="models" level="edit">
+      <Button
+        className="space-x-1"
+        onClick={() => {
+          setOpen('create');
+        }}
+      >
+        <Plus className="h-4 w-4" />
+        <span>{t('modelsPage.providerModels.create', 'New Model')}</span>
+      </Button>
+    </PermissionGuard>
   );
 }
 
@@ -93,16 +96,18 @@ export function ProviderSettingsTab({ provider }: ProviderSettingsTabProps): Rea
       <div className="flex flex-col gap-2">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h3 className="text-sm font-semibold">{t('modelsPage.providers.configuration', 'Configuration')}</h3>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              setEditOpen(true);
-            }}
-          >
-            <Pencil className="mr-1.5 h-3.5 w-3.5" />
-            {t('modelsPage.providers.editConfig', 'Edit Configuration')}
-          </Button>
+          <PermissionGuard module="models" level="edit">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setEditOpen(true);
+              }}
+            >
+              <Pencil className="mr-1.5 h-3.5 w-3.5" />
+              {t('modelsPage.providers.editConfig', 'Edit Configuration')}
+            </Button>
+          </PermissionGuard>
         </div>
         {/* 左右并列配置项 */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
