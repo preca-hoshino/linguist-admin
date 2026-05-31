@@ -44,4 +44,5 @@ npm run preview      # 预览生产构建
 | 国际化 | `.github/instructions/i18n.instructions.md` |
 | 表单 | `.github/instructions/forms.instructions.md` |
 | UI 组件 | `.github/instructions/ui-components.instructions.md` |
+| 权限模型 | `.github/instructions/permission-model.instructions.md` |
 | 测试 | `.github/instructions/testing.instructions.md` |
