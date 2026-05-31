@@ -18,6 +18,8 @@ interface UsersContextType {
   setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
+  statusFilter: string;
+  setStatusFilter: React.Dispatch<React.SetStateAction<string>>;
   loading: boolean;
   error: string;
   loadUsers: () => Promise<void>;
@@ -41,6 +43,7 @@ export function UsersProvider({ children }: { readonly children: React.ReactNode
     pageSize: 10,
   });
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -59,6 +62,9 @@ export function UsersProvider({ children }: { readonly children: React.ReactNode
       if (search) {
         payload.search = search;
       }
+      if (statusFilter !== 'all') {
+        payload.is_active = statusFilter === 'true';
+      }
 
       const res = await fetchUsers(payload);
 
@@ -74,17 +80,17 @@ export function UsersProvider({ children }: { readonly children: React.ReactNode
     } finally {
       setLoading(false);
     }
-  }, [t, pagination.pageSize, pagination.pageIndex, search]);
+  }, [t, pagination.pageSize, pagination.pageIndex, search, statusFilter]);
 
   useEffect(() => {
     void load();
   }, [load]);
 
-  // Reset pagination when search changes
+  // Reset pagination when search/filter changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: react to search change
   useEffect(() => {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, [search]);
+  }, [search, statusFilter]);
 
   return (
     <UsersContext.Provider
@@ -100,6 +106,8 @@ export function UsersProvider({ children }: { readonly children: React.ReactNode
         setPagination,
         search,
         setSearch,
+        statusFilter,
+        setStatusFilter,
         loading,
         error,
         loadUsers: load,
