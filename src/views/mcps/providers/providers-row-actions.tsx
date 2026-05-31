@@ -34,16 +34,14 @@ export function ProvidersRowActions({ provider }: { readonly provider: McpProvid
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <PermissionGuard module="mcp" level="edit">
-          <DropdownMenuItem
-            onClick={() => {
-              setDialogState((prev) => ({ ...prev, editOpen: true, selectedProvider: provider }));
-            }}
-          >
-            <Edit className="mr-2 h-4 w-4" />
-            {t('common.edit', 'Edit')}
-          </DropdownMenuItem>
-        </PermissionGuard>
+        <DropdownMenuItem
+          onClick={() => {
+            setDialogState((prev) => ({ ...prev, editOpen: true, selectedProvider: provider }));
+          }}
+        >
+          <Edit className="mr-2 h-4 w-4" />
+          {t('common.edit', 'Edit')}
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <PermissionGuard module="mcp" level="edit">
           <DropdownMenuItem

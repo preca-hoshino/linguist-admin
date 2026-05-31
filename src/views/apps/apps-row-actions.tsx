@@ -63,35 +63,31 @@ export function AppsRowActions({ row }: AppsRowActionsProps): React.JSX.Element 
 
         <DropdownMenuSeparator />
 
-        <PermissionGuard module="apps" level="edit">
-          <DropdownMenuItem
-            onClick={() => {
-              setCurrentRow(model);
-              setOpen('update');
-            }}
-          >
-            <Pencil className="mr-2 h-4 w-4" />
-            {t('common.edit', 'Edit')}
-          </DropdownMenuItem>
-        </PermissionGuard>
+        <DropdownMenuItem
+          onClick={() => {
+            setCurrentRow(model);
+            setOpen('update');
+          }}
+        >
+          <Pencil className="mr-2 h-4 w-4" />
+          {t('common.edit', 'Edit')}
+        </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
-        <PermissionGuard module="apps" level="edit">
-          <DropdownMenuItem onClick={handleToggle} disabled={isToggling}>
-            {model.is_active ? (
-              <>
-                <PowerOff className="mr-2 h-4 w-4 text-orange-500" />
-                {t('apps.toggleDisable', 'Disable')}
-              </>
-            ) : (
-              <>
-                <Power className="mr-2 h-4 w-4 text-green-500" />
-                {t('apps.toggleEnable', 'Enable')}
-              </>
-            )}
-          </DropdownMenuItem>
-        </PermissionGuard>
+        <DropdownMenuItem onClick={handleToggle} disabled={isToggling}>
+          {model.is_active ? (
+            <>
+              <PowerOff className="mr-2 h-4 w-4 text-orange-500" />
+              {t('apps.toggleDisable', 'Disable')}
+            </>
+          ) : (
+            <>
+              <Power className="mr-2 h-4 w-4 text-green-500" />
+              {t('apps.toggleEnable', 'Enable')}
+            </>
+          )}
+        </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 

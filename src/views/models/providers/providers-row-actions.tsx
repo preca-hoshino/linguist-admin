@@ -33,17 +33,15 @@ export function ProvidersRowActions({ row }: ProvidersRowActionsProps): React.JS
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <PermissionGuard module="models" level="edit">
-          <DropdownMenuItem
-            onClick={() => {
-              setCurrentRow(provider);
-              setOpen('update');
-            }}
-          >
-            <Pencil className="mr-2 h-4 w-4" />
-            {t('modelsPage.providers.edit', 'Edit')}
-          </DropdownMenuItem>
-        </PermissionGuard>
+        <DropdownMenuItem
+          onClick={() => {
+            setCurrentRow(provider);
+            setOpen('update');
+          }}
+        >
+          <Pencil className="mr-2 h-4 w-4" />
+          {t('modelsPage.providers.edit', 'Edit')}
+        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link to="/models/providers/$id" params={{ id: provider.id }}>
             <Eye className="mr-2 h-4 w-4" />

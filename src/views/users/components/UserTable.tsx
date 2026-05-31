@@ -163,30 +163,28 @@ export function UserTable({
                 <TableCell className="text-muted-foreground">{formatDate(user.created_at)}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => {
+                        onEdit(user);
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
                     <PermissionGuard module="users" level="edit">
                       {myPermissions && user.permissions && canManageUser(myPermissions, user.permissions) ? (
-                        <>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => {
-                              onEdit(user);
-                            }}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-destructive hover:text-destructive"
-                            onClick={() => {
-                              onDelete(user);
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive hover:text-destructive"
+                          onClick={() => {
+                            onDelete(user);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       ) : (
                         <span className="text-xs text-muted-foreground">—</span>
                       )}

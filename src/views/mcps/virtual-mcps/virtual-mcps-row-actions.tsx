@@ -39,27 +39,23 @@ export function VirtualMcpsRowActions({
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <PermissionGuard module="mcp" level="edit">
-          <DropdownMenuItem
-            onClick={() => {
-              onToggleActive(server.id, server.is_active);
-            }}
-          >
-            {server.is_active ? <PowerOff className="mr-2 h-4 w-4" /> : <Power className="mr-2 h-4 w-4" />}
-            {server.is_active ? t('common.disable', 'Disable') : t('common.enable', 'Enable')}
-          </DropdownMenuItem>
-        </PermissionGuard>
+        <DropdownMenuItem
+          onClick={() => {
+            onToggleActive(server.id, server.is_active);
+          }}
+        >
+          {server.is_active ? <PowerOff className="mr-2 h-4 w-4" /> : <Power className="mr-2 h-4 w-4" />}
+          {server.is_active ? t('common.disable', 'Disable') : t('common.enable', 'Enable')}
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <PermissionGuard module="mcp" level="edit">
-          <DropdownMenuItem
-            onClick={() => {
-              setDialogState((prev) => ({ ...prev, editOpen: true, selectedServer: server }));
-            }}
-          >
-            <Edit className="mr-2 h-4 w-4" />
-            {t('common.edit', 'Edit')}
-          </DropdownMenuItem>
-        </PermissionGuard>
+        <DropdownMenuItem
+          onClick={() => {
+            setDialogState((prev) => ({ ...prev, editOpen: true, selectedServer: server }));
+          }}
+        >
+          <Edit className="mr-2 h-4 w-4" />
+          {t('common.edit', 'Edit')}
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <PermissionGuard module="mcp" level="edit">
           <DropdownMenuItem
