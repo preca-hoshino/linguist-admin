@@ -5,7 +5,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Checkbox } from '@/components/ui/Checkbox';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
+import { usePermissionStore } from '@/stores/permission-store';
+import { canManageUser, isFullAccess } from '@/types/permissions';
 
 function getInitials(name: string): string {
   return name.charAt(0).toUpperCase();
@@ -13,6 +17,39 @@ function getInitials(name: string): string {
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleString();
+}
+
+function PermissionsBadges({ user }: { readonly user: User }): React.JSX.Element {
+  const { t } = useTranslation();
+  if (!user.permissions || isFullAccess(user.permissions)) {
+    return (
+      <Badge variant="default" className="text-xs">
+        {t('users.permissions.fullAccess', 'Full Access')}
+      </Badge>
+    );
+  }
+  const modules = Object.entries(user.permissions).filter(([, level]) => level === 'edit') as [string, string][];
+  if (modules.length === 0) {
+    return (
+      <Badge variant="secondary" className="text-xs">
+        {t('users.permissions.levels.view', 'View Only')}
+      </Badge>
+    );
+  }
+  return (
+    <div className="flex flex-wrap gap-1">
+      {modules.map(([mod]) => (
+        <Tooltip key={mod}>
+          <TooltipTrigger>
+            <Badge variant="default" className="text-xs">
+              {t(`users.permissions.modules.${mod}`, mod)}
+            </Badge>
+          </TooltipTrigger>
+          <TooltipContent>{t('users.permissions.levels.edit', 'Edit')}</TooltipContent>
+        </Tooltip>
+      ))}
+    </div>
+  );
 }
 
 interface UserTableProps {
@@ -33,6 +70,7 @@ export function UserTable({
   onSelectionChange,
 }: Readonly<UserTableProps>): React.JSX.Element {
   const { t } = useTranslation();
+  const myPermissions = usePermissionStore((s) => s.permissions);
 
   const allSelected = users.length > 0 && users.every((u) => selectedIds.includes(u.id));
   const someSelected = users.some((u) => selectedIds.includes(u.id));
@@ -70,6 +108,7 @@ export function UserTable({
             <TableHead>{t('users.username', 'Username')}</TableHead>
             <TableHead>{t('users.email', 'Email')}</TableHead>
             <TableHead>{t('users.status', 'Status')}</TableHead>
+            <TableHead>{t('users.permissions.title', 'Permissions')}</TableHead>
             <TableHead>{t('users.createdAt', 'Created')}</TableHead>
             <TableHead className="w-24 text-right">{t('common.actions', 'Actions')}</TableHead>
           </TableRow>
@@ -116,29 +155,42 @@ export function UserTable({
                     {user.is_active ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                   </Badge>
                 </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1">
+                    <PermissionsBadges user={user} />
+                  </div>
+                </TableCell>
                 <TableCell className="text-muted-foreground">{formatDate(user.created_at)}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => {
-                        onEdit(user);
-                      }}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-destructive hover:text-destructive"
-                      onClick={() => {
-                        onDelete(user);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <PermissionGuard module="users" level="edit">
+                      {myPermissions && user.permissions && canManageUser(myPermissions, user.permissions) ? (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => {
+                              onEdit(user);
+                            }}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                            onClick={() => {
+                              onDelete(user);
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </PermissionGuard>
                   </div>
                 </TableCell>
               </TableRow>
