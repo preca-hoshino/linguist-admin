@@ -6,8 +6,7 @@ import { CopyableId } from '@/components/CopyableId';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Checkbox } from '@/components/ui/Checkbox';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
-import { isFullAccess } from '@/types/permissions';
+import { DEFAULT_PERMISSIONS, PERMISSION_MODULES } from '@/types/permissions';
 import { cn } from '@/utils/utils';
 import { UsersRowActions } from './users-row-actions';
 
@@ -17,33 +16,22 @@ function getInitials(name: string): string {
 
 function PermissionsBadges({ user }: { readonly user: User }): React.JSX.Element {
   const { t } = useTranslation();
-  if (!user.permissions || isFullAccess(user.permissions)) {
-    return (
-      <Badge variant="default" className="text-xs">
-        {t('users.permissions.fullAccess', 'Full Access')}
-      </Badge>
-    );
-  }
-  const modules = Object.entries(user.permissions).filter(([, level]) => level === 'edit') as [string, string][];
-  if (modules.length === 0) {
-    return (
-      <Badge variant="secondary" className="text-xs">
-        {t('users.permissions.levels.view', 'View Only')}
-      </Badge>
-    );
-  }
+  const perms = user.permissions ?? { ...DEFAULT_PERMISSIONS };
   return (
     <div className="flex flex-wrap gap-1">
-      {modules.map(([mod]) => (
-        <Tooltip key={mod}>
-          <TooltipTrigger>
-            <Badge variant="default" className="text-xs">
-              {t(`users.permissions.modules.${mod}`, mod)}
-            </Badge>
-          </TooltipTrigger>
-          <TooltipContent>{t('users.permissions.levels.edit', 'Edit')}</TooltipContent>
-        </Tooltip>
-      ))}
+      {PERMISSION_MODULES.map((mod) => {
+        const level = perms[mod] ?? 'view';
+        const isEdit = level === 'edit';
+        return (
+          <Badge
+            key={mod}
+            variant={isEdit ? 'default' : 'outline'}
+            className="text-xs"
+          >
+            {t(`users.permissions.modules.${mod}`, mod)}
+          </Badge>
+        );
+      })}
     </div>
   );
 }
