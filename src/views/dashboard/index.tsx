@@ -8,6 +8,7 @@ import { useMcpTodayStats } from '@/composables/use-mcp-today-stats';
 import { useTodayStats } from '@/composables/use-today-stats';
 import { Main } from '@/layouts/Main';
 import { useHeaderSlot } from '@/providers/HeaderSlotProvider';
+import { usePermissionStore } from '@/stores/permission-store';
 import { DASHBOARD_TABS, MCP_DASHBOARD_TABS } from '@/types/dashboard';
 import type { DashboardMode, DashboardTab, GlobalTimeRange, McpDashboardTab } from '@/types/dashboard';
 import { BillingTabContent } from '@/views/models/shared/BillingTabContent';
@@ -28,16 +29,37 @@ export function DashboardPage(): React.JSX.Element {
   const { t } = useTranslation();
   const navigate = routeApi.useNavigate();
   const search = routeApi.useSearch();
-  const mode: DashboardMode = search.mode ?? 'model';
+
+  // 权限检查
+  const hasModelAccess = usePermissionStore((s) => s.hasPermission('models', 'view'));
+  const hasMcpAccess = usePermissionStore((s) => s.hasPermission('mcp', 'view'));
+
+  // 根据可用权限决定可用模式列表和初始模式
+  const availableModes: DashboardMode[] = useMemo(() => {
+    const modes: DashboardMode[] = [];
+    if (hasModelAccess) {
+      modes.push('model');
+    }
+    if (hasMcpAccess) {
+      modes.push('mcp');
+    }
+    return modes;
+  }, [hasModelAccess, hasMcpAccess]);
+
+  // 如果 URL 指定的模式不可用，回退到第一个可用模式
+  const requestedMode: DashboardMode = search.mode ?? 'model';
+  const mode: DashboardMode = availableModes.includes(requestedMode)
+    ? requestedMode
+    : availableModes[0] ?? 'model';
 
   const [activeModelTab, setActiveModelTab] = useState<DashboardTab>('overview');
   const [activeMcpTab, setActiveMcpTab] = useState<McpDashboardTab>('overview');
   const [globalRange, setGlobalRange] = useState<GlobalTimeRange>('today');
   const [chartKey, setChartKey] = useState(0);
 
-  // -- 数据获取 --
-  const modelStats = useTodayStats(globalRange);
-  const mcpStats = useMcpTodayStats(globalRange);
+  // -- 数据获取（条件化） --
+  const modelStats = useTodayStats(globalRange, hasModelAccess);
+  const mcpStats = useMcpTodayStats(globalRange, hasMcpAccess);
 
   const isLoading = mode === 'model' ? modelStats.loading : mcpStats.loading;
 
@@ -60,8 +82,8 @@ export function DashboardPage(): React.JSX.Element {
 
   // 注入模式切换器至顶栏
   const switcherNode = useMemo(
-    () => <DashboardModeSwitcher mode={mode} onChange={handleModeChange} />,
-    [mode, handleModeChange],
+    () => <DashboardModeSwitcher mode={mode} onChange={handleModeChange} availableModes={availableModes} />,
+    [mode, handleModeChange, availableModes],
   );
   useHeaderSlot(switcherNode);
 
@@ -182,7 +204,16 @@ export function DashboardPage(): React.JSX.Element {
           </div>
         </div>
 
-        {mode === 'model' ? renderModelTabs() : renderMcpTabs()}
+        {availableModes.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-muted-foreground">
+            <p className="text-lg font-medium">{t('dashboard.noDataAccess.title', 'No Data Access')}</p>
+            <p className="mt-1 text-sm">{t('dashboard.noDataAccess.desc', "You don't have permission to view statistics. Contact your administrator.")}</p>
+          </div>
+        ) : mode === 'model' ? (
+          renderModelTabs()
+        ) : (
+          renderMcpTabs()
+        )}
       </div>
     </Main>
   );
