@@ -1,6 +1,16 @@
 export default {
   title: '用户',
   desc: '管理系统用户与权限。',
+  entityName: '用户',
+  searchPlaceholder: '搜索用户…',
+  empty: '暂无用户',
+  create: '新建用户',
+  username: '用户名',
+  email: '邮箱',
+  status: '状态',
+  createdAt: '创建时间',
+  deleteConfirmTitle: '删除用户？',
+  deleteConfirmDesc: '确定要删除此用户吗？此操作不可撤销。',
   permissions: {
     title: '权限',
     configure: '配置权限',

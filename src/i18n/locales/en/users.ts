@@ -1,6 +1,16 @@
 export default {
   title: 'Users',
   desc: 'Manage system users and permissions.',
+  entityName: 'user',
+  searchPlaceholder: 'Search users...',
+  empty: 'No users found',
+  create: 'New User',
+  username: 'Username',
+  email: 'Email',
+  status: 'Status',
+  createdAt: 'Created At',
+  deleteConfirmTitle: 'Delete User?',
+  deleteConfirmDesc: 'Are you sure you want to delete this user? This action cannot be undone.',
   permissions: {
     title: 'Permissions',
     configure: 'Configure Permissions',
