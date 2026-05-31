@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, ShieldCheck, X } from 'lucide-react';
+import { AtSign, KeyRound, ShieldCheck, UserIcon, X } from 'lucide-react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -190,8 +190,9 @@ export function UserMutateDialog({
                     control={form.control}
                     name="username"
                     render={({ field }) => (
-                      <FormItem className="grid grid-cols-[120px_1fr] items-center gap-5 space-y-0">
-                        <FormLabel className="text-left text-muted-foreground">
+                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                          <UserIcon className="h-3.5 w-3.5" />
                           <span className="font-medium text-foreground">{t('users.username', 'Username')}</span>
                         </FormLabel>
                         <div className="space-y-1.5">
@@ -208,8 +209,9 @@ export function UserMutateDialog({
                     control={form.control}
                     name="email"
                     render={({ field }) => (
-                      <FormItem className="grid grid-cols-[120px_1fr] items-center gap-5 space-y-0">
-                        <FormLabel className="text-left text-muted-foreground">
+                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                          <AtSign className="h-3.5 w-3.5" />
                           <span className="font-medium text-foreground">{t('users.email', 'Email')}</span>
                         </FormLabel>
                         <div className="space-y-1.5">
@@ -226,8 +228,9 @@ export function UserMutateDialog({
                     control={form.control}
                     name="password"
                     render={({ field }) => (
-                      <FormItem className="grid grid-cols-[120px_1fr] items-center gap-5 space-y-0">
-                        <FormLabel className="text-left text-muted-foreground">
+                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                          <KeyRound className="h-3.5 w-3.5" />
                           <span className="font-medium text-foreground">
                             {t('auth.password', 'Password')}
                             {isUpdate && (
@@ -309,7 +312,9 @@ export function UserMutateDialog({
             {t('common.cancel', 'Cancel')}
           </Button>
           <Button type="submit" form="users-form" disabled={form.formState.isSubmitting || !canEditUsers}>
-            {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {form.formState.isSubmitting && (
+              <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+            )}
             {isUpdate ? t('common.save', 'Save') : t('common.create', 'Create')}
           </Button>
         </div>
