@@ -8,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import type { VirtualMcp } from '@/types/mcp';
 import { useVirtualMcps } from './virtual-mcps-context';
 import { useTranslation } from 'react-i18next';
@@ -38,33 +39,39 @@ export function VirtualMcpsRowActions({
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => {
-            onToggleActive(server.id, server.is_active);
-          }}
-        >
-          {server.is_active ? <PowerOff className="mr-2 h-4 w-4" /> : <Power className="mr-2 h-4 w-4" />}
-          {server.is_active ? t('common.disable', 'Disable') : t('common.enable', 'Enable')}
-        </DropdownMenuItem>
+        <PermissionGuard module="mcp" level="edit">
+          <DropdownMenuItem
+            onClick={() => {
+              onToggleActive(server.id, server.is_active);
+            }}
+          >
+            {server.is_active ? <PowerOff className="mr-2 h-4 w-4" /> : <Power className="mr-2 h-4 w-4" />}
+            {server.is_active ? t('common.disable', 'Disable') : t('common.enable', 'Enable')}
+          </DropdownMenuItem>
+        </PermissionGuard>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => {
-            setDialogState((prev) => ({ ...prev, editOpen: true, selectedServer: server }));
-          }}
-        >
-          <Edit className="mr-2 h-4 w-4" />
-          {t('common.edit', 'Edit')}
-        </DropdownMenuItem>
+        <PermissionGuard module="mcp" level="edit">
+          <DropdownMenuItem
+            onClick={() => {
+              setDialogState((prev) => ({ ...prev, editOpen: true, selectedServer: server }));
+            }}
+          >
+            <Edit className="mr-2 h-4 w-4" />
+            {t('common.edit', 'Edit')}
+          </DropdownMenuItem>
+        </PermissionGuard>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="text-destructive focus:text-destructive"
-          onClick={() => {
-            setDialogState((prev) => ({ ...prev, deleteOpen: true, selectedServer: server }));
-          }}
-        >
-          <Trash className="mr-2 h-4 w-4" />
-          {t('common.delete', 'Delete')}
-        </DropdownMenuItem>
+        <PermissionGuard module="mcp" level="edit">
+          <DropdownMenuItem
+            className="text-destructive focus:text-destructive"
+            onClick={() => {
+              setDialogState((prev) => ({ ...prev, deleteOpen: true, selectedServer: server }));
+            }}
+          >
+            <Trash className="mr-2 h-4 w-4" />
+            {t('common.delete', 'Delete')}
+          </DropdownMenuItem>
+        </PermissionGuard>
       </DropdownMenuContent>
     </DropdownMenu>
   );
