@@ -78,8 +78,6 @@ export function UsersDialogs(): React.JSX.Element {
     }
   };
 
-  const mutateMode = open === 'create' ? 'create' : 'edit';
-
   return (
     <>
       <UserMutateDialog
@@ -88,8 +86,7 @@ export function UsersDialogs(): React.JSX.Element {
         onOpenChange={(isOpen) => {
           handleOpenChange(open as UsersDialogType, isOpen);
         }}
-        mode={mutateMode}
-        targetUser={currentRow}
+        currentRow={open === 'update' ? currentRow : null}
         onSuccess={loadUsers}
       />
 
