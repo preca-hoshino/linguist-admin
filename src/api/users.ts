@@ -27,6 +27,7 @@ export async function fetchUsers(params?: {
   limit?: number;
   offset?: number;
   search?: string;
+  is_active?: boolean;
 }): Promise<ApiResult<ListResponse<User>>> {
   const qs = new URLSearchParams();
   if (params?.limit !== undefined) {
@@ -37,6 +38,9 @@ export async function fetchUsers(params?: {
   }
   if (params?.search != null && params.search !== '') {
     qs.set('search', params.search);
+  }
+  if (params?.is_active !== undefined) {
+    qs.set('is_active', String(params.is_active));
   }
   const query = qs.toString();
   const queryStr = query ? `?${query}` : '';
