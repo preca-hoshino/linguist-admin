@@ -2,15 +2,16 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { deleteApp, rotateAppKey } from '@/api/apps';
 import { toast } from 'sonner';
+import { deleteApp, rotateAppKey } from '@/api/apps';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
+import type { App } from '@/types/app';
 import { type AppsDialogType, useApps } from './apps-context';
 import { AppsMutateDialog } from './apps-mutate-dialog';
 
 export function AppsDialogs(): React.JSX.Element {
   const { t } = useTranslation();
-  const { open, setOpen, currentRow, loadApps, setCurrentRow, selectedIds, setSelectedIds } = useApps();
+  const { open, setOpen, currentRow, loadData, setCurrentRow, selectedIds, setSelectedIds } = useApps();
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRotating, setIsRotating] = useState(false);
@@ -22,35 +23,37 @@ export function AppsDialogs(): React.JSX.Element {
       setOpen(null);
       setTimeout(() => {
         setCurrentRow(null);
-      }, 200); // Wait for animation to finish
+      }, 200);
     }
   };
 
+  const row = currentRow as App | null;
+
   const handleDelete = async (): Promise<void> => {
-    if (currentRow?.id === undefined || currentRow.id === '') {
+    if (row === null || row.id === '') {
       return;
     }
     try {
       setIsDeleting(true);
-      await deleteApp(currentRow.id);
-      await loadApps();
+      await deleteApp(row.id);
+      await loadData();
       handleOpenChange('delete', false);
     } catch {
-      // Ignored here, assume interceptors or toast handled the error
+      // error handled by interceptor
     } finally {
       setIsDeleting(false);
     }
   };
 
   const handleRotateKey = async (): Promise<void> => {
-    if (currentRow?.id === undefined || currentRow.id === '') {
+    if (row === null || row.id === '') {
       return;
     }
     try {
       setIsRotating(true);
-      await rotateAppKey(currentRow.id);
+      await rotateAppKey(row.id);
       toast.success(t('apps.rotateSuccess', 'API Key rotated successfully'));
-      await loadApps();
+      await loadData();
       handleOpenChange('rotate', false);
     } catch {
       toast.error(t('apps.rotateFailed', 'Failed to rotate API Key'));
@@ -86,22 +89,24 @@ export function AppsDialogs(): React.JSX.Element {
       setTimeout(() => {
         setSelectedIds([]);
       }, 500);
-      void loadApps();
+      void loadData();
     } catch {
-      // 错误被 toast.promise 捕获并提示 Error 状态
+      // 错误被 toast.promise 捕获
     }
   };
 
   return (
     <>
       <AppsMutateDialog
-        key={currentRow?.id ?? 'new'}
+        key={row?.id ?? 'new'}
         open={open === 'create' || open === 'update'}
         onOpenChange={(isOpen) => {
           handleOpenChange(open as AppsDialogType, isOpen);
         }}
-        currentRow={currentRow}
-        onSuccess={loadApps}
+        currentRow={row}
+        onSuccess={() => {
+          void loadData();
+        }}
       />
 
       <ConfirmDialog
@@ -114,7 +119,7 @@ export function AppsDialogs(): React.JSX.Element {
           'apps.deleteConfirmDesc',
           'Are you sure you want to delete this application? All API Keys associated with it will be immediately DELETED and any integrations using these keys will fail.',
         )}
-        destructive={true}
+        destructive
         isLoading={isDeleting}
         handleConfirm={() => {
           void handleDelete();
@@ -132,7 +137,7 @@ export function AppsDialogs(): React.JSX.Element {
           'apps.rotateConfirmDesc',
           'Rotating the API key will immediately invalidate the current key. All existing integrations using the old key will stop working until they are updated with the new key. This action cannot be undone.',
         )}
-        destructive={true}
+        destructive
         isLoading={isRotating}
         handleConfirm={() => {
           void handleRotateKey();
@@ -153,15 +158,16 @@ export function AppsDialogs(): React.JSX.Element {
             }
           }}
           title={t('common.batchDeleteTitle', 'Delete Selected Items')}
-          desc={t(
-            'common.batchDeleteDesc',
-            'Are you sure you want to delete the selected items? This action cannot be undone.',
-            { count: selectedIds.length },
-          )}
-          confirmText={t('common.delete', 'Delete')}
+          desc={t('common.batchDeleteDesc', {
+            count: selectedIds.length,
+            defaultValue: `Are you sure you want to delete ${selectedIds.length} selected items? This action cannot be undone.`,
+          })}
           destructive
-          handleConfirm={() => void handleBatchDelete()}
-          className="max-w-md"
+          isLoading={false}
+          handleConfirm={() => {
+            void handleBatchDelete();
+          }}
+          confirmText={t('common.delete', 'Delete')}
         />
       )}
     </>

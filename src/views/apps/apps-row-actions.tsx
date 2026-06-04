@@ -1,10 +1,11 @@
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { useNavigate } from '@tanstack/react-router';
 import type { Row } from '@tanstack/react-table';
-import { FileText, Pencil, Power, PowerOff, Trash2, RefreshCw } from 'lucide-react';
+import { FileText, Pencil, Power, PowerOff, RefreshCw, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { updateApp } from '@/api/apps';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
@@ -13,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
-import { PermissionGuard } from '@/components/PermissionGuard';
 import type { App } from '@/types/app';
 import { useApps } from './apps-context';
 
@@ -25,7 +25,7 @@ export function AppsRowActions({ row }: AppsRowActionsProps): React.JSX.Element 
   const model = row.original;
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { setOpen, setCurrentRow, loadApps } = useApps();
+  const { setOpen, setCurrentRow, loadData } = useApps();
   const [isToggling, setIsToggling] = useState(false);
 
   const handleToggle = (): void => {
@@ -33,7 +33,7 @@ export function AppsRowActions({ row }: AppsRowActionsProps): React.JSX.Element 
       try {
         setIsToggling(true);
         await updateApp(model.id, { is_active: !model.is_active });
-        await loadApps();
+        await loadData();
       } finally {
         setIsToggling(false);
       }

@@ -1,12 +1,12 @@
 import type { ColumnDef, Row } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
-import { DataTableColumnHeader } from '@/components/data-table';
+import { AppCell } from '@/components/app/AppCell';
 import { CopyableId } from '@/components/CopyableId';
+import { DataTableColumnHeader } from '@/components/data-table';
 import { Badge } from '@/components/ui/Badge';
 import { Checkbox } from '@/components/ui/Checkbox';
 import type { App } from '@/types/app';
 import { cn } from '@/utils/utils';
-import { AppCell } from '@/components/app/AppCell';
 import { AppsRowActions } from './apps-row-actions';
 
 export function useAppsColumns(): ColumnDef<App>[] {
