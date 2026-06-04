@@ -3,7 +3,8 @@ import type { Row } from '@tanstack/react-table';
 import { Pencil, Power, PowerOff, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { updateUserApi, type User } from '@/api/users';
+import { type User, updateUserApi } from '@/api/users';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
@@ -12,7 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
-import { PermissionGuard } from '@/components/PermissionGuard';
 import { usePermissionStore } from '@/stores/permission-store';
 import { canManageUser } from '@/types/permissions';
 import { useUsers } from './users-context';
@@ -24,7 +24,7 @@ interface UsersRowActionsProps {
 export function UsersRowActions({ row }: UsersRowActionsProps): React.JSX.Element {
   const model = row.original;
   const { t } = useTranslation();
-  const { setOpen, setCurrentRow, loadUsers } = useUsers();
+  const { setOpen, setCurrentRow, loadData } = useUsers();
   const myPermissions = usePermissionStore((s) => s.permissions);
   const [isToggling, setIsToggling] = useState(false);
 
@@ -33,7 +33,7 @@ export function UsersRowActions({ row }: UsersRowActionsProps): React.JSX.Elemen
       try {
         setIsToggling(true);
         await updateUserApi(model.id, { is_active: !model.is_active });
-        await loadUsers();
+        await loadData();
       } finally {
         setIsToggling(false);
       }

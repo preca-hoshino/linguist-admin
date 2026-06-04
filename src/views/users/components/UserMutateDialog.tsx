@@ -90,9 +90,13 @@ export function UserMutateDialog({
   const permissions = form.watch('permissions') ?? DEFAULT_PERMISSIONS;
 
   const toggleModulePermission = (module: PermissionModule): void => {
-    if (isEditingSelf) return;
+    if (isEditingSelf) {
+      return;
+    }
     const canGrantEdit = hasPermission(operatorPermissions ?? { ...DEFAULT_PERMISSIONS }, module, 'edit');
-    if (!canGrantEdit) return;
+    if (!canGrantEdit) {
+      return;
+    }
     const current = (permissions[module] ?? 'view') as 'view' | 'edit';
     const next: UserPermissions = {
       ...permissions,
@@ -106,13 +110,21 @@ export function UserMutateDialog({
     try {
       if (currentRow) {
         const payload: UserUpdatePayload = {};
-        if (values.username !== currentRow.username) payload.username = values.username;
-        if (values.email !== currentRow.email) payload.email = values.email;
-        if (values.password) payload.password = values.password;
+        if (values.username !== currentRow.username) {
+          payload.username = values.username;
+        }
+        if (values.email !== currentRow.email) {
+          payload.email = values.email;
+        }
+        if (values.password) {
+          payload.password = values.password;
+        }
         const permsChanged = PERMISSION_MODULES.some(
           (m) => (values.permissions?.[m] ?? 'view') !== (currentRow.permissions?.[m] ?? 'view'),
         );
-        if (permsChanged) payload.permissions = values.permissions as UserPermissions;
+        if (permsChanged) {
+          payload.permissions = values.permissions as UserPermissions;
+        }
         if (Object.keys(payload).length > 0) {
           await updateUserApi(currentRow.id, payload);
         }
@@ -136,7 +148,9 @@ export function UserMutateDialog({
       open={open}
       onOpenChange={(v) => {
         onOpenChange(v);
-        if (!v) form.reset();
+        if (!v) {
+          form.reset();
+        }
       }}
     >
       <DialogContent
@@ -146,9 +160,7 @@ export function UserMutateDialog({
         {/* ── Header ─────────────────────────────────────────────────── */}
         <DialogHeader className="flex shrink-0 flex-row items-start justify-between border-b bg-background px-8 py-5">
           <div className="flex flex-col gap-1.5 text-left">
-            <DialogTitle>
-              {isUpdate ? t('users.edit', 'Edit User') : t('users.create', 'New User')}
-            </DialogTitle>
+            <DialogTitle>{isUpdate ? t('users.edit', 'Edit User') : t('users.create', 'New User')}</DialogTitle>
             <DialogDescription>
               {isUpdate
                 ? t('users.editDesc', 'Modify user information. Leave password blank to keep current.')
@@ -272,26 +284,26 @@ export function UserMutateDialog({
 
                   <div className="flex flex-wrap gap-2">
                     {PERMISSION_MODULES.map((module) => {
-                        const level = permissions[module] ?? 'view';
-                        const isEditLevel = level === 'edit';
-                        const canGrantEdit = hasPermission(
-                          operatorPermissions ?? { ...DEFAULT_PERMISSIONS },
-                          module,
-                          'edit',
-                        );
-                        return (
-                          <Badge
-                            key={module}
-                            variant={isEditLevel ? 'default' : 'outline'}
-                            className={`text-xs${
-                              isEditingSelf || !canGrantEdit ? '' : ' cursor-pointer select-none hover:opacity-80'
-                            }`}
-                            onClick={() => toggleModulePermission(module)}
-                          >
-                            {t(`users.permissions.modules.${module}`, module)}
-                          </Badge>
-                        );
-                      })}
+                      const level = permissions[module] ?? 'view';
+                      const isEditLevel = level === 'edit';
+                      const canGrantEdit = hasPermission(
+                        operatorPermissions ?? { ...DEFAULT_PERMISSIONS },
+                        module,
+                        'edit',
+                      );
+                      return (
+                        <Badge
+                          key={module}
+                          variant={isEditLevel ? 'default' : 'outline'}
+                          className={`text-xs${
+                            isEditingSelf || !canGrantEdit ? '' : ' cursor-pointer select-none hover:opacity-80'
+                          }`}
+                          onClick={() => toggleModulePermission(module)}
+                        >
+                          {t(`users.permissions.modules.${module}`, module)}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
