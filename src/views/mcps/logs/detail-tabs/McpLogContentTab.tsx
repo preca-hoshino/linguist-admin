@@ -1,10 +1,10 @@
+import { useTranslation } from 'react-i18next';
+import JsonView from 'react18-json-view';
 import { useTheme } from '@/providers/ThemeProvider';
 import type { McpLog } from '@/types/mcp';
-import { useTranslation } from 'react-i18next';
 import { SmartContentViewer } from '@/views/models/logs/detail-tabs/components/SmartContentViewer';
-import JsonView from 'react18-json-view';
 import 'react18-json-view/src/style.css';
-import { Wrench, FileText, Component } from 'lucide-react';
+import { Component, FileText, Wrench } from 'lucide-react';
 
 interface McpLogContentTabProps {
   readonly log: McpLog;

@@ -6,7 +6,7 @@ import { useMcpLogs } from './mcp-logs-context';
 
 export function McpLogsDialogs(): React.JSX.Element {
   const { t } = useTranslation();
-  const { open, setOpen, currentRow, setCurrentRow, selectedIds, setSelectedIds, loadLogs } = useMcpLogs();
+  const { open, setOpen, currentRow, setCurrentRow, selectedIds, setSelectedIds, loadData } = useMcpLogs();
 
   // ── 单条删除
   const handleDelete = async (): Promise<void> => {
@@ -19,7 +19,7 @@ export function McpLogsDialogs(): React.JSX.Element {
       setTimeout(() => {
         setCurrentRow(null);
       }, 500);
-      void loadLogs();
+      void loadData();
     } catch {
       // 错误由 API client 统一处理
     }
@@ -53,7 +53,7 @@ export function McpLogsDialogs(): React.JSX.Element {
       setTimeout(() => {
         setSelectedIds([]);
       }, 500);
-      void loadLogs();
+      void loadData();
     } catch {
       // 错误被 toast.promise 捕获并提示 Error 状态
     }

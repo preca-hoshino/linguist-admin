@@ -6,24 +6,24 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table';
+import { Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { listMcpProviders } from '@/api/mcp/provider-mcps';
 import { listVirtualMcps } from '@/api/mcp/virtual-mcps';
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
 import { DataTableBulkActions } from '@/components/data-table/BulkActions';
-import { Button } from '@/components/ui/Button';
 import { PermissionGuard } from '@/components/PermissionGuard';
-import { Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
+import { cn } from '@/utils/utils';
 import { getMcpLogsColumns } from './mcp-logs-columns';
 import { useMcpLogs } from './mcp-logs-context';
-import { cn } from '@/utils/utils';
 
 export function McpLogsTable(): React.JSX.Element {
   const { t } = useTranslation();
   const {
-    logs,
+    data: logs,
     loading,
     hasMore,
     total,
@@ -31,8 +31,8 @@ export function McpLogsTable(): React.JSX.Element {
     setPagination,
     columnFilters,
     setColumnFilters,
-    globalFilter,
-    setGlobalFilter,
+    search: globalFilter,
+    setSearch: setGlobalFilter,
     setOpen,
     setSelectedIds,
   } = useMcpLogs();
