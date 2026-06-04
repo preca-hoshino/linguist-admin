@@ -1,6 +1,6 @@
-import { ProviderLogo } from './ProviderLogo';
 import { Badge } from '@/components/ui/Badge';
 import { cn } from '@/utils/utils';
+import { ProviderLogo } from './ProviderLogo';
 
 export interface ProviderBadgeProps {
   /** 指定提供商标识（用于渲染 Logo，如果不填则没有 Logo） */
