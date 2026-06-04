@@ -1,13 +1,13 @@
 // src/views/models/provider-models/components/RateLimitSection.tsx — 速率限制手风琴面板
 
 import { Activity } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import type { Control } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { TIME_UNITS, UnitInput, UnitTabs, useUnitInput } from '@/components/UnitInput';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Card } from '@/components/ui/Card';
-import { FormDescription, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/Form';
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
-import { UnitInput, UnitTabs, useUnitInput, TIME_UNITS } from '@/components/UnitInput';
 import type { FormValues } from '../schema';
 
 interface RateLimitSectionProps {

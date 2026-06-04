@@ -1,8 +1,3 @@
-import { ProviderCell } from '@/components/provider/ProviderCell';
-import { DataTableColumnHeader } from '@/components/data-table';
-import { Badge } from '@/components/ui/Badge';
-import { Checkbox } from '@/components/ui/Checkbox';
-import { Progress } from '@/components/ui/Progress';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
   AudioLines,
@@ -26,6 +21,11 @@ import {
   Wrench,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { DataTableColumnHeader } from '@/components/data-table';
+import { ProviderCell } from '@/components/provider/ProviderCell';
+import { Badge } from '@/components/ui/Badge';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { Progress } from '@/components/ui/Progress';
 import type { ProviderModel } from '@/types';
 import { cn } from '@/utils/utils';
 import { ProviderModelsRowActions } from './provider-models-row-actions';

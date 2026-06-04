@@ -6,7 +6,9 @@ import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { createProviderModel, updateProviderModel } from '@/api/model/provider-models';
 import { listProviders } from '@/api/model/providers';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import {
   Dialog,
   DialogContent,
@@ -15,12 +17,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
-import { usePermission } from '@/stores/permission-store';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
-import { Card } from '@/components/ui/Card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { usePermission } from '@/stores/permission-store';
 import { CapabilitiesSelector } from './components/CapabilitiesSelector';
 import { PricingTiersSection, usePricingTiersLogic } from './components/PricingTiersSection';
 import { ProviderConfigSection } from './components/ProviderConfigSection';
@@ -30,7 +30,7 @@ import { RequestOverridesEditor } from './components/RequestOverridesEditor';
 import { SupportedParametersSelector } from './components/SupportedParametersSelector';
 import { MODEL_TYPE_OPTIONS } from './constants';
 import { buildFormValuesFromRow, buildSubmitPayload } from './helpers';
-import { formSchema, type FormValues, type ProviderModelsMutateDialogProps } from './schema';
+import { type FormValues, formSchema, type ProviderModelsMutateDialogProps } from './schema';
 
 const DEFAULT_VALUES: FormValues = {
   id: '',
@@ -433,7 +433,11 @@ export function ProviderModelsMutateDialog({
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
                   {t('common.cancel', '取消')}
                 </Button>
-                <Button form="provider-models-form" type="submit" disabled={isSubmitting || !currentProviderId || !canEdit}>
+                <Button
+                  form="provider-models-form"
+                  type="submit"
+                  disabled={isSubmitting || !currentProviderId || !canEdit}
+                >
                   {isSubmitting && (
                     <span className="flex items-center gap-2">
                       <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
