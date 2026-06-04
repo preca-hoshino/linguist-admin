@@ -5,7 +5,8 @@ export default {
   noDataAccess: {
     title: '暂无数据权限',
     desc: '您当前没有查看统计数据的权限，请联系管理员。',
-  },  tabs: {
+  },
+  tabs: {
     overview: '总览',
     performance: '性能',
     distribution: '分布',

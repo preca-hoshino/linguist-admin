@@ -1,17 +1,17 @@
-import common from './zh-CN/common';
-import nav from './zh-CN/nav';
-import settings from './zh-CN/settings';
+import apiKeys from './zh-CN/api-keys';
+import apps from './zh-CN/apps';
 import auth from './zh-CN/auth';
+import command from './zh-CN/command';
+import common from './zh-CN/common';
+import configDrawer from './zh-CN/config-drawer';
+import connectDrawer from './zh-CN/connect-drawer';
 import dashboard from './zh-CN/dashboard';
 import data from './zh-CN/data';
-import users from './zh-CN/users';
-import apiKeys from './zh-CN/api-keys';
-import modelsPage from './zh-CN/models-page';
 import mcpsPage from './zh-CN/mcps-page';
-import command from './zh-CN/command';
-import connectDrawer from './zh-CN/connect-drawer';
-import configDrawer from './zh-CN/config-drawer';
-import apps from './zh-CN/apps';
+import modelsPage from './zh-CN/models-page';
+import nav from './zh-CN/nav';
+import settings from './zh-CN/settings';
+import users from './zh-CN/users';
 
 export default {
   common,
