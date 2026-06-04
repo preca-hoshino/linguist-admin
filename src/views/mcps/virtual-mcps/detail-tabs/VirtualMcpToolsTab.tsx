@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Code, Download, Eye, Loader2, Search, Wrench, ShieldAlert } from 'lucide-react';
+import { Code, Download, Eye, Loader2, Search, ShieldAlert, Wrench } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import JsonView from 'react18-json-view';
@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
-import { Tabs as UiTabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { TabsList, TabsTrigger, Tabs as UiTabs } from '@/components/ui/Tabs';
 import { useTheme } from '@/providers/ThemeProvider';
 import type { McpToolInfo, VirtualMcp } from '@/types/mcp';
 import { cn } from '@/utils/utils';

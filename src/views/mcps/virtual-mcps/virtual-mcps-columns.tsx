@@ -1,10 +1,10 @@
 import type { ColumnDef } from '@tanstack/react-table';
+import type { TFunction } from 'i18next';
+import { DataTableColumnHeader } from '@/components/data-table';
 import { Badge } from '@/components/ui/Badge';
 import { Checkbox } from '@/components/ui/Checkbox';
 import type { VirtualMcp, VirtualMcpConfig } from '@/types/mcp';
 import { VirtualMcpsRowActions } from './virtual-mcps-row-actions';
-import { DataTableColumnHeader } from '@/components/data-table';
-import type { TFunction } from 'i18next';
 
 export function getVirtualMcpsColumns(
   t: TFunction,

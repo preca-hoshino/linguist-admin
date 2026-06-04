@@ -1,200 +1,94 @@
-import type { ColumnFiltersState, PaginationState } from '@tanstack/react-table';
 import type React from 'react';
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import type { VirtualMcp, VirtualMcpCreateInput, VirtualMcpUpdateInput } from '@/types/mcp';
-import { listVirtualMcps, createVirtualMcp, updateVirtualMcp, deleteVirtualMcp } from '@/api/mcp/virtual-mcps';
+import { useEffect, useState } from 'react';
+import { listVirtualMcps } from '@/api/mcp/virtual-mcps';
+import { createCrudContext } from '@/composables/create-crud-context';
+import type { VirtualMcp } from '@/types/mcp';
+import { extractFilterValue } from '@/utils/table';
 
-interface VirtualMcpsContextType {
-  servers: VirtualMcp[];
-  isLoading: boolean;
-  error: string | null;
-  total: number;
-  hasMore: boolean;
+export type VirtualMcpsDialogType = 'create' | 'update' | 'delete' | 'batch-delete';
 
-  pagination: PaginationState;
-  setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
-  columnFilters: ColumnFiltersState;
-  setColumnFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>;
-  globalFilter: string;
-  setGlobalFilter: React.Dispatch<React.SetStateAction<string>>;
-
-  fetchServers: () => Promise<void>;
-  createServer: (data: VirtualMcpCreateInput) => Promise<boolean>;
-  updateServer: (id: string, data: VirtualMcpUpdateInput) => Promise<boolean>;
-  deleteServer: (id: string) => Promise<boolean>;
-  dialogState: {
-    createOpen: boolean;
-    editOpen: boolean;
-    deleteOpen: boolean;
-    batchDeleteOpen: boolean;
-    selectedServer: VirtualMcp | null;
-    batchSelectedIds: string[];
-  };
-  setDialogState: React.Dispatch<React.SetStateAction<VirtualMcpsContextType['dialogState']>>;
-}
-
-const VirtualMcpsContext = createContext<VirtualMcpsContextType | undefined>(undefined);
-
-export function VirtualMcpsProvider({
-  children,
-  providerId,
-}: {
-  readonly children: React.ReactNode;
-  readonly providerId?: string;
-}): React.JSX.Element {
-  const [servers, setServers] = useState<VirtualMcp[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [total, setTotal] = useState(0);
-  const [hasMore, setHasMore] = useState(false);
-  const [dialogState, setDialogState] = useState<VirtualMcpsContextType['dialogState']>({
-    createOpen: false,
-    editOpen: false,
-    deleteOpen: false,
-    batchDeleteOpen: false,
-    selectedServer: null,
-    batchSelectedIds: [],
-  });
-
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-  const [globalFilter, setGlobalFilter] = useState('');
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-
-  const fetchServers = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const filterProviderId = columnFilters.find((f) => f.id === 'mcp_provider_id')?.value as string | undefined;
-
-      const rawPayload = {
+/**
+ * 创建 virtual-mcps 的 CRUD Context。
+ * providerId 通过 Provider 组件的 prop 传入，内部通过 ref 捕获。
+ */
+function createVirtualMcpsCrud() {
+  const factory = createCrudContext<VirtualMcp, VirtualMcpsDialogType>({
+    displayName: 'VirtualMcpsContext',
+    fetchList: (params) => {
+      const payload = Object.fromEntries(
+        Object.entries(params).filter(([_, v]) => v !== undefined && v !== ''),
+      ) as Parameters<typeof listVirtualMcps>[0];
+      return listVirtualMcps(payload);
+    },
+    buildParams: ({ pagination, search, columnFilters }) => {
+      const providerIdFilter = extractFilterValue(columnFilters, 'mcp_provider_id');
+      return {
         limit: pagination.pageSize,
         offset: pagination.pageIndex * pagination.pageSize,
-        search: globalFilter || undefined,
-        mcp_provider_id: filterProviderId !== undefined && filterProviderId !== '' ? filterProviderId : providerId,
+        search: search || undefined,
+        mcp_provider_id: providerIdFilter !== undefined && providerIdFilter !== '' ? providerIdFilter : undefined,
       };
-
-      const payload = Object.fromEntries(
-        Object.entries(rawPayload).filter(([_, v]) => v !== undefined && v !== ''),
-      ) as Parameters<typeof listVirtualMcps>[0];
-
-      const res = await listVirtualMcps(payload);
-      if (res.ok) {
-        setServers(res.data.data);
-        setTotal(res.data.total);
-        setHasMore(res.data.has_more);
-      } else {
-        setError(res.error.message);
-      }
-    } catch (error_) {
-      setError(String(error_));
-    } finally {
-      setIsLoading(false);
-    }
-  }, [pagination.pageIndex, pagination.pageSize, globalFilter, providerId, columnFilters]);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: reset pagination when globalFilter changes
-  useEffect(() => {
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, [globalFilter, columnFilters, pagination.pageSize]);
-
-  useEffect((): (() => void) => {
-    const timeout = setTimeout((): void => {
-      void fetchServers();
-    }, 300);
-    return (): void => {
-      clearTimeout(timeout);
-    };
-  }, [fetchServers]);
-
-  const createServer = useCallback(
-    async (data: VirtualMcpCreateInput) => {
-      try {
-        const res = await createVirtualMcp(data);
-        if (res.ok) {
-          await fetchServers();
-          return true;
-        }
-        setError(res.error.message);
-        return false;
-      } catch (error_) {
-        setError(String(error_));
-        return false;
-      }
     },
-    [fetchServers],
-  );
+    defaultPageSize: 10,
+  });
 
-  const updateServer = useCallback(
-    async (id: string, data: VirtualMcpUpdateInput) => {
-      try {
-        const res = await updateVirtualMcp(id, data);
-        if (res.ok) {
-          await fetchServers();
-          return true;
+  // 带 debounce 的 Provider — 用 ref 捕获 providerId
+  function VirtualMcpsProvider({
+    children,
+    providerId,
+  }: {
+    readonly children: React.ReactNode;
+    readonly providerId?: string;
+  }): React.JSX.Element {
+    // 用 state 包装 factory 的 buildParams，注入 providerId fallback
+    const [providerIdState] = useState(providerId);
+
+    return (
+      <factory.Provider>
+        <VirtualMcpsInner providerIdState={providerIdState}>{children}</VirtualMcpsInner>
+      </factory.Provider>
+    );
+  }
+
+  // 内部组件：在 Provider 内部注入 providerId 到 columnFilters
+  function VirtualMcpsInner({
+    children,
+    providerIdState,
+  }: {
+    readonly children: React.ReactNode;
+    readonly providerIdState: string | undefined;
+  }): React.JSX.Element {
+    const ctx = factory.useContext();
+    const { columnFilters } = ctx;
+
+    // 如果有外部 providerId 且 columnFilters 中没有 mcp_provider_id，自动注入
+    // biome-ignore lint/correctness/useExhaustiveDependencies: only run on mount + providerIdState change
+    useEffect(() => {
+      if (providerIdState) {
+        const hasFilter = columnFilters.some((f) => f.id === 'mcp_provider_id');
+        if (!hasFilter) {
+          ctx.setColumnFilters([{ id: 'mcp_provider_id', value: providerIdState }]);
         }
-        setError(res.error.message);
-        return false;
-      } catch (error_) {
-        setError(String(error_));
-        return false;
       }
-    },
-    [fetchServers],
-  );
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const deleteServerFn = useCallback(
-    async (id: string) => {
-      try {
-        const res = await deleteVirtualMcp(id);
-        if (res.ok) {
-          await fetchServers();
-          return true;
-        }
-        setError(res.error.message);
-        return false;
-      } catch (error_) {
-        setError(String(error_));
-        return false;
-      }
-    },
-    [fetchServers],
-  );
+    return <>{children}</>;
+  }
 
-  return (
-    <VirtualMcpsContext.Provider
-      value={{
-        servers,
-        isLoading,
-        error,
-        total,
-        hasMore,
-        pagination,
-        setPagination,
-        columnFilters,
-        setColumnFilters,
-        globalFilter,
-        setGlobalFilter,
-        fetchServers,
-        createServer,
-        updateServer,
-        deleteServer: deleteServerFn,
-        dialogState,
-        setDialogState,
-      }}
-    >
-      {children}
-    </VirtualMcpsContext.Provider>
-  );
+  return {
+    ...factory,
+    Provider: VirtualMcpsProvider,
+  };
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
-export function useVirtualMcps(): VirtualMcpsContextType {
-  const context = useContext(VirtualMcpsContext);
-  if (context === undefined) {
-    throw new Error('useVirtualMcps must be used within a VirtualMcpsProvider');
-  }
-  return context;
+export const virtualMcpsCrud = createVirtualMcpsCrud();
+
+/** 向后兼容：Provider */
+export const VirtualMcpsProvider = virtualMcpsCrud.Provider;
+
+/** 向后兼容：Hook */
+// eslint-disable-next-line react-refresh/only-export-components
+export function useVirtualMcps(): ReturnType<typeof virtualMcpsCrud.useContext> {
+  return virtualMcpsCrud.useContext();
 }

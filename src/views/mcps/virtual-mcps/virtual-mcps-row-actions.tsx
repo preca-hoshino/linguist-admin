@@ -1,5 +1,7 @@
 import { Link } from '@tanstack/react-router';
-import { Edit, Eye, MoreHorizontal, Trash, Power, PowerOff } from 'lucide-react';
+import { Edit, Eye, MoreHorizontal, Power, PowerOff, Trash } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
@@ -8,19 +10,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
-import { PermissionGuard } from '@/components/PermissionGuard';
 import type { VirtualMcp } from '@/types/mcp';
 import { useVirtualMcps } from './virtual-mcps-context';
-import { useTranslation } from 'react-i18next';
 
-export function VirtualMcpsRowActions({
-  server,
-  onToggleActive,
-}: {
+interface VirtualMcpsRowActionsProps {
   readonly server: VirtualMcp;
   readonly onToggleActive: (id: string, current: boolean) => void;
-}): React.JSX.Element {
-  const { setDialogState } = useVirtualMcps();
+}
+
+export function VirtualMcpsRowActions({ server, onToggleActive }: VirtualMcpsRowActionsProps): React.JSX.Element {
+  const { setOpen, setCurrentRow } = useVirtualMcps();
   const { t } = useTranslation();
 
   return (
@@ -50,7 +49,8 @@ export function VirtualMcpsRowActions({
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
-            setDialogState((prev) => ({ ...prev, editOpen: true, selectedServer: server }));
+            setCurrentRow(server);
+            setOpen('update');
           }}
         >
           <Edit className="mr-2 h-4 w-4" />
@@ -61,7 +61,8 @@ export function VirtualMcpsRowActions({
           <DropdownMenuItem
             className="text-destructive focus:text-destructive"
             onClick={() => {
-              setDialogState((prev) => ({ ...prev, deleteOpen: true, selectedServer: server }));
+              setCurrentRow(server);
+              setOpen('delete');
             }}
           >
             <Trash className="mr-2 h-4 w-4" />
