@@ -1,10 +1,10 @@
 import type { ColumnDef } from '@tanstack/react-table';
+import type { TFunction } from 'i18next';
+import { DataTableColumnHeader } from '@/components/data-table';
 import { Badge } from '@/components/ui/Badge';
 import { Checkbox } from '@/components/ui/Checkbox';
 import type { McpProvider, McpProviderConfig } from '@/types/mcp';
 import { ProvidersRowActions } from './providers-row-actions';
-import { DataTableColumnHeader } from '@/components/data-table';
-import type { TFunction } from 'i18next';
 
 export function getProvidersColumns(t: TFunction): ColumnDef<McpProvider>[] {
   return [
