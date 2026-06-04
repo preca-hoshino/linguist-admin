@@ -40,9 +40,7 @@ export function NavGroup({ title, items }: Readonly<NavGroupProps>): React.JSX.E
             return <SidebarMenuLink key={key} item={item} href={href} />;
           }
 
-          return (
-            <NavCollapsibleItem key={key} item={item} href={href} isCollapsed={isCollapsed} />
-          );
+          return <NavCollapsibleItem key={key} item={item} href={href} isCollapsed={isCollapsed} />;
         })}
       </SidebarMenu>
     </SidebarGroup>

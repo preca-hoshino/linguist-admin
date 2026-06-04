@@ -3,8 +3,8 @@
 
 import { Check, Copy } from 'lucide-react';
 import { useCallback, useState } from 'react';
-import { cn } from '@/utils/utils';
 import { Button } from '@/components/ui/Button';
+import { cn } from '@/utils/utils';
 
 interface CodeViewerProps {
   /** 代码内容 */

@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { getTickInterval } from '@/composables/use-usage-chart';
 import {
-  type McpChartPoint,
-  type McpTimeRange,
   formatMcpTickDisplay,
   formatMcpTooltipTime,
+  type McpChartPoint,
+  type McpTimeRange,
 } from '@/composables/use-mcp-usage-chart';
+import { getTickInterval } from '@/composables/use-usage-chart';
 import { renderIsolatedDot } from '../../components/ChartDot';
 
 export type McpMetricKey = 'requests' | 'errors' | 'avg_duration_ms' | 'p95_duration_ms';

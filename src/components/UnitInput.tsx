@@ -67,7 +67,9 @@ export function UnitTabs({ units, selected, onSelect, className, disabled }: Uni
     <Tabs
       value={selected}
       onValueChange={(v) => {
-        if (v) onSelect(v);
+        if (v) {
+          onSelect(v);
+        }
       }}
       className={className}
     >

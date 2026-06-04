@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  getMcpStatsTimeSeries,
   type McpStatsDimension,
   type McpStatsParams,
   type McpStatsRange,
-  getMcpStatsTimeSeries,
 } from '@/api/mcp/stats';
 
 export type McpTimeRange = 'today' | '7d' | '30d';

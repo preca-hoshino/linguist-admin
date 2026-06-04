@@ -5,7 +5,8 @@ export default {
   noDataAccess: {
     title: 'No Data Access',
     desc: "You don't have permission to view statistics. Contact your administrator.",
-  },  tabs: {
+  },
+  tabs: {
     overview: 'Overview',
     performance: 'Performance',
     distribution: 'Distribution',

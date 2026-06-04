@@ -1,8 +1,8 @@
 // src/components/PermissionGuard.tsx — 权限保护组件
 
 import type { ReactNode } from 'react';
-import type { PermissionLevel, PermissionModule } from '@/types/permissions';
 import { usePermission } from '@/stores/permission-store';
+import type { PermissionLevel, PermissionModule } from '@/types/permissions';
 
 interface PermissionGuardProps {
   readonly module: PermissionModule;

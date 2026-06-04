@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { ConnectDrawer } from '@/components/connect-drawer';
 import { LangSwitch } from '@/components/LangSwitch';
 import { ProfileDropdown } from '@/components/ProfileDropdown';
 import { Search } from '@/components/Search';
 import { ThemeSwitch } from '@/components/ThemeSwitch';
-import { ConnectDrawer } from '@/components/connect-drawer';
 import { Separator } from '@/components/ui/Separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useHeaderSlotContent } from '@/providers/HeaderSlotProvider';

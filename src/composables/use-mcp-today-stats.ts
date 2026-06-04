@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getMcpStatsOverview, getMcpStatsToday } from '@/api/mcp/stats';
 import type { McpStatsOverview, McpStatsToday } from '@/api/mcp/stats';
+import { getMcpStatsOverview, getMcpStatsToday } from '@/api/mcp/stats';
 import type { GlobalTimeRange } from '@/types/dashboard';
 import { mapGlobalRangeToApi } from '@/types/dashboard';
 

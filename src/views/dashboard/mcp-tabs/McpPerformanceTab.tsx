@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { type McpStatsRange, getMcpStatsOverview, getMcpStatsTimeSeries } from '@/api/mcp/stats';
+import { getMcpStatsOverview, getMcpStatsTimeSeries, type McpStatsRange } from '@/api/mcp/stats';
 import type { GlobalTimeRange } from '@/types/dashboard';
 import { mapGlobalRangeToApi } from '@/types/dashboard';
 import { McpLatencySection } from '@/views/mcps/shared/McpLatencySection';

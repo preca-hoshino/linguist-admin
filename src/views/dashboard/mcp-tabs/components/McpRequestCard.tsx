@@ -1,8 +1,8 @@
 import { Activity } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import type { McpStatsToday } from '@/api/mcp/stats';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/Skeleton';
-import type { McpStatsToday } from '@/api/mcp/stats';
 import { formatCompact } from '@/utils/format-number';
 
 interface McpRequestCardProps {

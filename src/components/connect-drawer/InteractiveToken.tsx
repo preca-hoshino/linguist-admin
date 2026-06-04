@@ -1,7 +1,7 @@
 ﻿// src/components/connect-drawer/InteractiveToken.tsx
 
-import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 export function InteractiveToken({ value }: { readonly value: string }): React.JSX.Element {
   const { t } = useTranslation();

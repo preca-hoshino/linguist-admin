@@ -11,10 +11,7 @@ export function AppSidebar(): React.JSX.Element {
   const { collapsible, variant } = useLayout();
   // 订阅语言变化以驱动侧边栏重新生成翻译后的菜单数据
   const { i18n } = useTranslation();
-  const sidebarData = React.useMemo(
-    () => getSidebarData(i18n.language),
-    [i18n.language],
-  );
+  const sidebarData = React.useMemo(() => getSidebarData(i18n.language), [i18n.language]);
   return (
     <Sidebar collapsible={collapsible} variant={variant}>
       <SidebarHeader>

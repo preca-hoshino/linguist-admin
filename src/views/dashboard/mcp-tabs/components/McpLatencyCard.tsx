@@ -1,8 +1,8 @@
 import { Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import type { McpStatsOverview, McpStatsToday } from '@/api/mcp/stats';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/Skeleton';
-import type { McpStatsOverview, McpStatsToday } from '@/api/mcp/stats';
 
 interface McpLatencyCardProps {
   readonly today: McpStatsToday | null;

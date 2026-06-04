@@ -2,32 +2,32 @@
 // Unified barrel export for the sidebar module
 
 export { useSidebar } from './context';
-export { SidebarProvider } from './SidebarProvider';
 export {
   Sidebar,
-  SidebarTrigger,
-  SidebarRail,
-  SidebarInset,
   SidebarInput,
+  SidebarInset,
+  SidebarRail,
+  SidebarTrigger,
 } from './Sidebar';
 export {
-  SidebarHeader,
-  SidebarFooter,
   SidebarContent,
-  SidebarSeparator,
+  SidebarFooter,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarGroupAction,
   SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarSeparator,
 } from './SidebarLayout';
 export {
   SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
   SidebarMenuAction,
   SidebarMenuBadge,
+  SidebarMenuButton,
+  SidebarMenuItem,
   SidebarMenuSkeleton,
   SidebarMenuSub,
-  SidebarMenuSubItem,
   SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from './SidebarMenu';
+export { SidebarProvider } from './SidebarProvider';

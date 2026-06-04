@@ -1,7 +1,7 @@
+import { getRouteApi } from '@tanstack/react-router';
 import { RefreshCw } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getRouteApi } from '@tanstack/react-router';
 import { Button } from '@/components/ui/Button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { useMcpTodayStats } from '@/composables/use-mcp-today-stats';
@@ -9,8 +9,8 @@ import { useTodayStats } from '@/composables/use-today-stats';
 import { Main } from '@/layouts/Main';
 import { useHeaderSlot } from '@/providers/HeaderSlotProvider';
 import { usePermissionStore } from '@/stores/permission-store';
-import { DASHBOARD_TABS, MCP_DASHBOARD_TABS } from '@/types/dashboard';
 import type { DashboardMode, DashboardTab, GlobalTimeRange, McpDashboardTab } from '@/types/dashboard';
+import { DASHBOARD_TABS, MCP_DASHBOARD_TABS } from '@/types/dashboard';
 import { BillingTabContent } from '@/views/models/shared/BillingTabContent';
 import { DashboardModeSwitcher } from './components/DashboardModeSwitcher';
 import { TimeRangePicker } from './components/TimeRangePicker';
@@ -48,9 +48,7 @@ export function DashboardPage(): React.JSX.Element {
 
   // 如果 URL 指定的模式不可用，回退到第一个可用模式
   const requestedMode: DashboardMode = search.mode ?? 'model';
-  const mode: DashboardMode = availableModes.includes(requestedMode)
-    ? requestedMode
-    : availableModes[0] ?? 'model';
+  const mode: DashboardMode = availableModes.includes(requestedMode) ? requestedMode : (availableModes[0] ?? 'model');
 
   const [activeModelTab, setActiveModelTab] = useState<DashboardTab>('overview');
   const [activeMcpTab, setActiveMcpTab] = useState<McpDashboardTab>('overview');
@@ -192,9 +190,7 @@ export function DashboardPage(): React.JSX.Element {
       <div className="relative flex flex-col gap-6">
         {/* 页面标题 + 全局时间选择器 + 刷新按钮 */}
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
-            {t('dashboard.title')}
-          </h1>
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{t('dashboard.title')}</h1>
           <div className="flex items-center gap-2">
             <TimeRangePicker value={globalRange} onChange={setGlobalRange} />
             <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading} className="h-9">
@@ -207,7 +203,12 @@ export function DashboardPage(): React.JSX.Element {
         {availableModes.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-muted-foreground">
             <p className="text-lg font-medium">{t('dashboard.noDataAccess.title', 'No Data Access')}</p>
-            <p className="mt-1 text-sm">{t('dashboard.noDataAccess.desc', "You don't have permission to view statistics. Contact your administrator.")}</p>
+            <p className="mt-1 text-sm">
+              {t(
+                'dashboard.noDataAccess.desc',
+                "You don't have permission to view statistics. Contact your administrator.",
+              )}
+            </p>
           </div>
         ) : mode === 'model' ? (
           renderModelTabs()

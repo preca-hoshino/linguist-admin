@@ -1,8 +1,9 @@
 ﻿// src/components/ui/sidebar/Sidebar.tsx
+
 // Sidebar + SidebarTrigger + SidebarRail + SidebarInset + SidebarInput
 
-import * as React from 'react';
 import { PanelLeftIcon } from 'lucide-react';
+import * as React from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/Sheet';
