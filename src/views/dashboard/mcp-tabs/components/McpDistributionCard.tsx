@@ -1,7 +1,7 @@
-import { Loader2, Database, Box, PlayCircle } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { type McpStatsRange, getMcpDistribution, getMcpMethodBreakdown } from '@/api/mcp/stats';
+import { Box, Database, Loader2, PlayCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { getMcpDistribution, getMcpMethodBreakdown, type McpStatsRange } from '@/api/mcp/stats';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { type GlobalTimeRange, mapGlobalRangeToApi } from '@/types/dashboard';
 

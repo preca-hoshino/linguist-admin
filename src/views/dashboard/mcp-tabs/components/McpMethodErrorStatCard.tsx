@@ -1,8 +1,8 @@
+import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
-import { type McpStatsRange, getMcpStatsErrors } from '@/api/mcp/stats';
+import { getMcpStatsErrors, type McpStatsRange } from '@/api/mcp/stats';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { type GlobalTimeRange, mapGlobalRangeToApi } from '@/types/dashboard';
 

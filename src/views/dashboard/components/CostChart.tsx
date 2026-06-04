@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Bar, CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { formatCostTickDisplay, type CostChartPoint } from '@/composables/use-cost-trend';
+import { type CostChartPoint, formatCostTickDisplay } from '@/composables/use-cost-trend';
 import { type ChartPoint, formatTooltipTime, getTickInterval, type TimeRange } from '@/composables/use-usage-chart';
 
 interface CostChartProps {

@@ -1,9 +1,9 @@
+import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { type ReactElement, type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { useQuery } from '@tanstack/react-query';
-import { type McpStatsRange, getMcpDistribution } from '@/api/mcp/stats';
+import { getMcpDistribution, type McpStatsRange } from '@/api/mcp/stats';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
