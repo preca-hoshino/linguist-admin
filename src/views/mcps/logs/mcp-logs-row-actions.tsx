@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { Eye, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
@@ -9,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
-import { PermissionGuard } from '@/components/PermissionGuard';
 import type { McpLog } from '@/types/mcp';
 import { useMcpLogs } from './mcp-logs-context';
 

@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router';
 import type { Row } from '@tanstack/react-table';
 import { Eye, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
@@ -11,7 +12,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
-import { PermissionGuard } from '@/components/PermissionGuard';
 import type { RequestLog } from '@/types';
 import { useLogs } from './logs-context';
 

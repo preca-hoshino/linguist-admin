@@ -1,14 +1,14 @@
 import { Link } from '@tanstack/react-router';
-import { AppCell } from '@/components/app/AppCell';
 import type { ColumnDef } from '@tanstack/react-table';
+import type { TFunction } from 'i18next';
+import { Box, Database } from 'lucide-react';
+import { AppCell } from '@/components/app/AppCell';
+import { DataTableColumnHeader } from '@/components/data-table';
 import { Badge } from '@/components/ui/Badge';
 import { Checkbox } from '@/components/ui/Checkbox';
-import { Box, Database } from 'lucide-react';
 import type { McpLog } from '@/types/mcp';
-import { McpLogsRowActions } from './mcp-logs-row-actions';
-import { DataTableColumnHeader } from '@/components/data-table';
-import type { TFunction } from 'i18next';
 import { formatLatency } from '@/utils/format-number';
+import { McpLogsRowActions } from './mcp-logs-row-actions';
 
 function formatDateTime(dateStr: string): React.JSX.Element {
   const d = new Date(dateStr);

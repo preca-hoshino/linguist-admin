@@ -5,17 +5,17 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { createVirtualModel, updateVirtualModel } from '@/api/model/virtual-models';
+import { UnitInput, UnitTabs, useUnitInput } from '@/components/UnitInput';
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
-import { usePermission } from '@/stores/permission-store';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
+import { usePermission } from '@/stores/permission-store';
 import type { VirtualModel } from '@/types';
 import { cn } from '@/utils/utils';
-import { SortableBackendList, type BackendModelInfo } from './components/SortableBackendList';
 import { MODEL_TYPE_OPTIONS } from '@/views/models/provider-models/constants';
-import { UnitInput, UnitTabs, useUnitInput } from '@/components/UnitInput';
+import { type BackendModelInfo, SortableBackendList } from './components/SortableBackendList';
 
 interface VirtualModelsMutateDialogProps {
   readonly open: boolean;

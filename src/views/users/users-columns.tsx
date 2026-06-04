@@ -1,8 +1,8 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import type { User } from '@/api/users';
-import { DataTableColumnHeader } from '@/components/data-table';
 import { CopyableId } from '@/components/CopyableId';
+import { DataTableColumnHeader } from '@/components/data-table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Checkbox } from '@/components/ui/Checkbox';
@@ -23,11 +23,7 @@ function PermissionsBadges({ user }: { readonly user: User }): React.JSX.Element
         const level = perms[mod] ?? 'view';
         const isEdit = level === 'edit';
         return (
-          <Badge
-            key={mod}
-            variant={isEdit ? 'default' : 'outline'}
-            className="text-xs"
-          >
+          <Badge key={mod} variant={isEdit ? 'default' : 'outline'} className="text-xs">
             {t(`users.permissions.modules.${mod}`, mod)}
           </Badge>
         );

@@ -13,9 +13,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
-import { usePermission } from '@/stores/permission-store';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
+import { usePermission } from '@/stores/permission-store';
 import type { McpProvider, McpProviderConfig, McpProviderCreateInput, McpProviderUpdateInput } from '@/types/mcp';
 import { cn } from '@/utils/utils';
 

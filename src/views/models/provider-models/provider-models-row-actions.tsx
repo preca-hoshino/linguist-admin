@@ -5,6 +5,7 @@ import { Eye, Pencil, Power, PowerOff, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { updateProviderModel } from '@/api/model/provider-models';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
@@ -13,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
-import { PermissionGuard } from '@/components/PermissionGuard';
 import type { ProviderModel } from '@/types';
 import { useProviderModels } from './provider-models-context';
 
@@ -24,14 +24,14 @@ interface ProviderModelsRowActionsProps {
 export function ProviderModelsRowActions({ row }: ProviderModelsRowActionsProps): React.JSX.Element {
   const model = row.original;
   const { t } = useTranslation();
-  const { setOpen, setCurrentRow, loadProviderModels } = useProviderModels();
+  const { setOpen, setCurrentRow, loadData } = useProviderModels();
   const [isToggling, setIsToggling] = useState(false);
 
   const handleToggle = async (): Promise<void> => {
     try {
       setIsToggling(true);
       await updateProviderModel(model.id, { is_active: !model.is_active });
-      await loadProviderModels();
+      await loadData();
     } finally {
       setIsToggling(false);
     }
@@ -84,11 +84,11 @@ export function ProviderModelsRowActions({ row }: ProviderModelsRowActionsProps)
         <DropdownMenuSeparator />
         <PermissionGuard module="models" level="edit">
           <DropdownMenuItem
+            className="text-destructive focus:text-destructive"
             onClick={() => {
               setCurrentRow(model);
               setOpen('delete');
             }}
-            className="text-destructive focus:text-destructive"
           >
             <Trash2 className="mr-2 h-4 w-4" />
             {t('common.delete', 'Delete')}

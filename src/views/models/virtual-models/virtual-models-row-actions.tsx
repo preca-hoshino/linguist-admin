@@ -5,6 +5,7 @@ import { FileText, Pencil, Power, PowerOff, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { updateVirtualModel } from '@/api/model/virtual-models';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
@@ -13,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
-import { PermissionGuard } from '@/components/PermissionGuard';
 import type { VirtualModel } from '@/types';
 import { useVirtualModels } from './virtual-models-context';
 
@@ -24,14 +24,14 @@ interface VirtualModelsRowActionsProps {
 export function VirtualModelsRowActions({ row }: VirtualModelsRowActionsProps): React.JSX.Element {
   const model = row.original;
   const { t } = useTranslation();
-  const { setOpen, setCurrentRow, loadVirtualModels } = useVirtualModels();
+  const { setOpen, setCurrentRow, loadData } = useVirtualModels();
   const [isToggling, setIsToggling] = useState(false);
 
   const handleToggle = async (): Promise<void> => {
     try {
       setIsToggling(true);
       await updateVirtualModel(model.id, { is_active: !model.is_active });
-      await loadVirtualModels();
+      await loadData();
     } finally {
       setIsToggling(false);
     }

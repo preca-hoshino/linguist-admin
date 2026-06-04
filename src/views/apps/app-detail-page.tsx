@@ -1,14 +1,12 @@
 import { Link, useLoaderData, useRouter } from '@tanstack/react-router';
-import { AppWindow, ChevronLeft, Settings, KeyRound, RefreshCw, AlertTriangle } from 'lucide-react';
+import { AlertTriangle, AppWindow, ChevronLeft, KeyRound, RefreshCw, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { rotateAppKey } from '@/api/apps';
 import { CopyableId } from '@/components/CopyableId';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
-import { usePageTitle } from '@/composables/use-page-title';
-import { Main } from '@/layouts/Main';
-import { cn } from '@/utils/utils';
 import {
   Dialog,
   DialogContent,
@@ -18,8 +16,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/Dialog';
-import { rotateAppKey } from '@/api/apps';
-import { toast } from 'sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { usePageTitle } from '@/composables/use-page-title';
+import { Main } from '@/layouts/Main';
+import { cn } from '@/utils/utils';
 import { AppsMutateDialog } from './apps-mutate-dialog';
 
 export function AppDetailPage(): React.JSX.Element {

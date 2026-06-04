@@ -1,13 +1,13 @@
-import { ProviderCell } from '@/components/provider/ProviderCell';
-import { AppCell } from '@/components/app/AppCell';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
+import { AppCell } from '@/components/app/AppCell';
 import { DataTableColumnHeader } from '@/components/data-table';
+import { ProviderCell } from '@/components/provider/ProviderCell';
 import { Badge } from '@/components/ui/Badge';
 import { Checkbox } from '@/components/ui/Checkbox';
 import type { RequestLog } from '@/types';
-import { LogsRowActions } from './logs-row-actions';
 import { formatLatency } from '@/utils/format-number';
+import { LogsRowActions } from './logs-row-actions';
 
 function formatDateTime(dateStr: string): React.JSX.Element {
   const d = new Date(dateStr);

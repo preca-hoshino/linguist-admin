@@ -8,6 +8,7 @@ import { useTheme } from '@/providers/ThemeProvider';
 import type { GatewayContextSnapshot } from '@/types';
 import type { McpLog } from '@/types/mcp';
 import { formatBytes } from '@/utils/format-number';
+
 // ── Body Card -> Message Card (For JSON-RPC)
 function MessageCard({ data, title }: { readonly data: unknown; readonly title: string }): React.JSX.Element {
   const { t } = useTranslation();

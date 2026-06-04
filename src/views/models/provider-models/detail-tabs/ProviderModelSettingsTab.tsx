@@ -25,13 +25,13 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ProviderLogo } from '@/components/provider/ProviderLogo';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
 import { Separator } from '@/components/ui/Separator';
 import type { ProviderModel } from '@/types';
 import { cn } from '@/utils/utils';
-import { ProviderLogo } from '@/components/provider/ProviderLogo';
 import { ProviderModelsMutateDialog } from '../provider-models-mutate-dialog';
 
 /* 能力 Badge 体系 */

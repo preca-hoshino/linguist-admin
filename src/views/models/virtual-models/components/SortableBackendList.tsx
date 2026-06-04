@@ -18,7 +18,7 @@ import { CSS } from '@dnd-kit/utilities';
 
 import type { TFunction } from 'i18next';
 import { GripVertical, Trash2 } from 'lucide-react';
-import { useMemo, useRef, useCallback } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { type UseFormReturn, useFieldArray } from 'react-hook-form';
 import { Button } from '@/components/ui/Button';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/Form';
@@ -26,8 +26,8 @@ import { Input } from '@/components/ui/Input';
 import { Separator } from '@/components/ui/Separator';
 import type { ProviderModel } from '@/types';
 import type { VirtualModelForm } from '../virtual-models-mutate-dialog';
-import { ModelSearchPalette } from './ModelSearchPalette';
 import { ModelIdentityBlock } from './ModelIdentityBlock';
+import { ModelSearchPalette } from './ModelSearchPalette';
 
 /** 已选后端模型的展示信息 */
 export interface BackendModelInfo {

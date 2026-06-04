@@ -1,7 +1,6 @@
-﻿import type { GatewayContextSnapshot } from '@/types';
-import { Wrench } from 'lucide-react';
+﻿import { Wrench } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { AuditToolDefinition } from '@/types';
+import type { AuditToolDefinition, GatewayContextSnapshot } from '@/types';
 import { ToolCallsResult } from './components/ToolCallsResult';
 import { ToolWorkspace } from './components/ToolWorkspace';
 import { asUserChatReq, asUserChatResp } from './components/utils';

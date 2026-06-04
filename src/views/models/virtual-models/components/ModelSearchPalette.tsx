@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
+import type { TFunction } from 'i18next';
 import { Loader2, Plus, Search, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import type { TFunction } from 'i18next';
 import { listProviderModels } from '@/api/model/provider-models';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';

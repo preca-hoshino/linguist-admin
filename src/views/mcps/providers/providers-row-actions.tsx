@@ -1,5 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { Edit, Eye, MoreHorizontal, Trash } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
@@ -8,11 +10,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
-import { PermissionGuard } from '@/components/PermissionGuard';
 import type { McpProvider } from '@/types/mcp';
 import { useProviders } from './providers-context';
-
-import { useTranslation } from 'react-i18next';
 
 export function ProvidersRowActions({ provider }: { readonly provider: McpProvider }): React.JSX.Element {
   const { setDialogState } = useProviders();

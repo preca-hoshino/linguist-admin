@@ -1,33 +1,33 @@
-﻿import { useEffect, useState, useMemo } from 'react';
+﻿import { zodResolver } from '@hookform/resolvers/zod';
+import { Fingerprint, Info, Loader2, Search, Server, Wrench, X } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
-import { X, Wrench, Server, Loader2, Fingerprint, Info, Search } from 'lucide-react';
+import { listMcpProviders, listMcpProviderTools } from '@/api/mcp/provider-mcps';
+import { Button } from '@/components/ui/Button';
+import { Checkbox } from '@/components/ui/Checkbox';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/Dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
-import { Checkbox } from '@/components/ui/Checkbox';
 import { usePermission } from '@/stores/permission-store';
-import { useTranslation } from 'react-i18next';
-import { cn } from '@/utils/utils';
 import type {
   McpProvider,
+  McpToolInfo,
   VirtualMcp,
+  VirtualMcpConfig,
   VirtualMcpCreateInput,
   VirtualMcpUpdateInput,
-  McpToolInfo,
-  VirtualMcpConfig,
 } from '@/types/mcp';
-import { listMcpProviders, listMcpProviderTools } from '@/api/mcp/provider-mcps';
+import { cn } from '@/utils/utils';
 
 const virtualMcpSchema = z.object({
   name: z

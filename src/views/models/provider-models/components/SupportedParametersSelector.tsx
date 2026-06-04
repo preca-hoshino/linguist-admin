@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { cn } from '@/utils/utils';
-import { PARAMETERS_MAP, CHAT_PARAMETERS, getProviderSupportedParamIds } from '../constants';
+import { CHAT_PARAMETERS, getProviderSupportedParamIds, PARAMETERS_MAP } from '../constants';
 
 interface SupportedParametersSelectorProps<T extends FieldValues> {
   readonly control: Control<T>;

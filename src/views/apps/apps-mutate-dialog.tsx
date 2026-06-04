@@ -6,14 +6,14 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { createApp, updateApp } from '@/api/apps';
-import { listVirtualModels } from '@/api/model/virtual-models';
 import { listVirtualMcps } from '@/api/mcp/virtual-mcps';
+import { listVirtualModels } from '@/api/model/virtual-models';
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
-import { usePermission } from '@/stores/permission-store';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { usePermission } from '@/stores/permission-store';
 import type { App } from '@/types/app';
 import { AllowedResourcePanel } from './components/AllowedResourcePanel';
 

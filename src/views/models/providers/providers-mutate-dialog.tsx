@@ -7,6 +7,7 @@ import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { createProvider, updateProvider } from '@/api/model/providers';
+import { UnitInput, UnitTabs, useUnitInput } from '@/components/UnitInput';
 import { Button } from '@/components/ui/Button';
 import {
   Dialog,
@@ -16,15 +17,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
-import { usePermission } from '@/stores/permission-store';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
+import { usePermission } from '@/stores/permission-store';
 import type { Provider } from '@/types';
 import { cn } from '@/utils/utils';
 import { CredentialSection } from './components/CredentialSection';
 import { type KindOption, ProviderKindSelector } from './components/ProviderKindSelector';
 import { KIND_OPTIONS } from './constants';
-import { UnitInput, UnitTabs, useUnitInput } from '@/components/UnitInput';
 
 interface ProvidersMutateDialogProps {
   readonly open: boolean;

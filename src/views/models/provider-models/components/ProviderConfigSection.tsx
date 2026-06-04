@@ -1,11 +1,11 @@
 // src/views/models/provider-models/components/ProviderConfigSection.tsx — 提供商专属配置面板
 
 import { SlidersHorizontal } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import type { Control } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Card } from '@/components/ui/Card';
-import { FormDescription, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/Form';
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Switch } from '@/components/ui/Switch';
 import type { FormValues } from '../schema';
 
