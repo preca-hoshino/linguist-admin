@@ -5,6 +5,7 @@ import { Eye, Pencil, Power, PowerOff, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { updateProviderModel } from '@/api/model/provider-models';
+import { PermissionGuard } from '@/components/PermissionGuard';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
@@ -13,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
-import { PermissionGuard } from '@/components/PermissionGuard';
 import type { ProviderModel } from '@/types';
 import { useProviderModelsContext } from './provider-models-context';
 

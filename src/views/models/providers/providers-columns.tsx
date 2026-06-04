@@ -1,9 +1,9 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { DataTableColumnHeader } from '@/components/data-table';
-import { Checkbox } from '@/components/ui/Checkbox';
 import { ProviderBadge } from '@/components/provider/ProviderBadge';
 import { Badge } from '@/components/ui/Badge';
+import { Checkbox } from '@/components/ui/Checkbox';
 import type { Provider } from '@/types';
 import { ProvidersRowActions } from './providers-row-actions';
 

@@ -1,5 +1,5 @@
-﻿import { Eye, EyeOff, Key } from 'lucide-react';
-import { Github } from '@lobehub/icons';
+﻿import { Github } from '@lobehub/icons';
+import { Eye, EyeOff, Key } from 'lucide-react';
 
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';

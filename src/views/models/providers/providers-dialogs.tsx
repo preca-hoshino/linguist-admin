@@ -7,7 +7,7 @@ import { ProvidersMutateDialog } from './providers-mutate-dialog';
 
 export function ProvidersDialogs(): React.JSX.Element {
   const { t } = useTranslation();
-  const { open, setOpen, currentRow, setCurrentRow, loadProviders, selectedIds, setSelectedIds } = useProviders();
+  const { open, setOpen, currentRow, setCurrentRow, loadData, selectedIds, setSelectedIds } = useProviders();
 
   const handleDelete = async (): Promise<void> => {
     if (!currentRow) {
@@ -19,7 +19,7 @@ export function ProvidersDialogs(): React.JSX.Element {
       setTimeout(() => {
         setCurrentRow(null);
       }, 500);
-      void loadProviders();
+      void loadData();
     } catch {
       // 错误由 API client 统一处理
     }
@@ -34,7 +34,9 @@ export function ProvidersDialogs(): React.JSX.Element {
         onOpenChange={() => {
           setOpen('create');
         }}
-        onSuccess={loadProviders}
+        onSuccess={() => {
+          void loadData();
+        }}
       />
 
       {/* 编辑 Dialog & 删除确认 */}
@@ -50,7 +52,9 @@ export function ProvidersDialogs(): React.JSX.Element {
               }, 500);
             }}
             currentRow={currentRow}
-            onSuccess={loadProviders}
+            onSuccess={() => {
+              void loadData();
+            }}
           />
 
           <ConfirmDialog
@@ -118,7 +122,7 @@ export function ProvidersDialogs(): React.JSX.Element {
                 await deletePromise;
                 setOpen(null);
                 setTimeout(() => setSelectedIds([]), 500);
-                void loadProviders();
+                void loadData();
               } catch {
                 /* toast 已处理 */
               }
