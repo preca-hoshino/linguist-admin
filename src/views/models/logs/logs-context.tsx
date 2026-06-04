@@ -1,188 +1,55 @@
-import type { ColumnFiltersState, PaginationState } from '@tanstack/react-table';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { listRequestLogs } from '@/api/model/logs';
-import { useDialogState } from '@/composables/use-dialog-state';
+import { createCrudContext } from '@/composables/create-crud-context';
 import type { RequestLog } from '@/types';
+import { extractFilterValue } from '@/utils/table';
 
 export type LogsDialogType = 'delete' | 'batch-delete';
 
-interface LogsContextType {
-  open: LogsDialogType | null;
-  setOpen: (str: LogsDialogType | null) => void;
-  currentRow: RequestLog | null;
-  setCurrentRow: React.Dispatch<React.SetStateAction<RequestLog | null>>;
-  selectedIds: string[];
-  setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>;
-  logs: RequestLog[];
-  loading: boolean;
-  error: string;
-  hasMore: boolean;
-  total: number;
-  pagination: PaginationState;
-  setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
-  columnFilters: ColumnFiltersState;
-  setColumnFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>;
-  globalFilter: string;
-  setGlobalFilter: React.Dispatch<React.SetStateAction<string>>;
-  loadLogs: () => Promise<void>;
-}
-
-const LogsContext = React.createContext<LogsContextType | null>(null);
-
-import { extractFilterValue } from '@/utils/table';
-
 function getIsStreamApiValue(val?: string): string | undefined {
-  const mode = val;
-  if (mode === 'stream') {
+  if (val === 'stream') {
     return 'true';
   }
-  if (mode === 'unary' || mode === 'non-stream') {
+  if (val === 'unary' || val === 'non-stream') {
     return 'false';
   }
   return undefined;
 }
 
-export function LogsProvider({ children }: { readonly children: React.ReactNode }): React.JSX.Element {
-  const { t } = useTranslation();
-  const [open, setOpen] = useDialogState<LogsDialogType>(null);
-  const [currentRow, setCurrentRow] = useState<RequestLog | null>(null);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [logs, setLogs] = useState<RequestLog[]>([]);
-  const [total, setTotal] = useState(0);
-  const [hasMore, setHasMore] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  // Table Server-side State
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-
-  // Table filters state mapped to API
-  const [globalFilter, setGlobalFilter] = useState(''); // mapped to request_model
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-
-  // 提取 API 参数
-  const statusFilter = extractFilterValue(columnFilters, 'status');
-  const providerKindFilter = extractFilterValue(columnFilters, 'provider_kind');
-  const providerIdFilter = extractFilterValue(columnFilters, 'provider_id');
-  const keyPrefixFilter = extractFilterValue(columnFilters, 'api_key');
-  const sourceFilter = extractFilterValue(columnFilters, 'source');
-  const isStreamFilter = extractFilterValue(columnFilters, 'mode');
-  const appIdFilter = extractFilterValue(columnFilters, 'app_id');
-
-  const load = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError('');
-
-      const offset = pagination.pageIndex * pagination.pageSize;
-
-      const rawPayload = {
-        limit: pagination.pageSize,
-        offset: offset > 0 ? offset : undefined,
-        request_model: globalFilter === '' ? undefined : globalFilter,
-        status: statusFilter,
-        provider_kind: providerKindFilter,
-        provider_id: providerIdFilter,
-        api_key_prefix: keyPrefixFilter?.trim(),
-        user_format: sourceFilter,
-        is_stream: isStreamFilter === undefined ? undefined : getIsStreamApiValue(isStreamFilter),
-        app_id: appIdFilter,
-      };
-
-      // 移除未定义的值
-      const payload = Object.fromEntries(
-        Object.entries(rawPayload).filter(([_, v]) => v !== undefined && v !== ''),
-      ) as Parameters<typeof listRequestLogs>[0];
-
-      const res = await listRequestLogs(payload);
-      if (!res.ok) {
-        throw new Error(res.error.message);
-      }
-      setLogs(res.data.data);
-      setHasMore(res.data.has_more);
-      setTotal(res.data.total ?? 0);
-    } catch (error_) {
-      setError(error_ instanceof Error ? error_.message : t('common.loadFailed', 'Failed to load logs'));
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    pagination.pageIndex,
-    pagination.pageSize,
-    globalFilter,
-    statusFilter,
-    providerKindFilter,
-    providerIdFilter,
-    keyPrefixFilter,
-    sourceFilter,
-    isStreamFilter,
-    appIdFilter,
-    t,
-  ]);
-
-  // Reset to first page on search/filter change
-  // biome-ignore lint/correctness/useExhaustiveDependencies: react to search/filter change
-  useEffect(() => {
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, [
-    globalFilter,
-    statusFilter,
-    providerKindFilter,
-    providerIdFilter,
-    keyPrefixFilter,
-    sourceFilter,
-    isStreamFilter,
-    appIdFilter,
-    pagination.pageSize,
-  ]);
-
-  // Reload when triggered
-  useEffect((): (() => void) => {
-    const timeout = setTimeout((): void => {
-      void load();
-    }, 300); // debounce API calls
-    return (): void => {
-      clearTimeout(timeout);
-    };
-  }, [load]);
-
-  return (
-    <LogsContext.Provider
-      value={{
-        open,
-        setOpen,
-        currentRow,
-        setCurrentRow,
-        selectedIds,
-        setSelectedIds,
-        logs,
-        loading,
-        error,
-        pagination,
-        hasMore,
-        total,
-        setPagination,
-        columnFilters,
-        setColumnFilters,
-        globalFilter,
-        setGlobalFilter,
-        loadLogs: load,
-      }}
-    >
-      {children}
-    </LogsContext.Provider>
-  );
-}
-
 // eslint-disable-next-line react-refresh/only-export-components
-export function useLogs(): LogsContextType {
-  const ctx = React.useContext(LogsContext);
-  if (ctx == null) {
-    throw new Error('useLogs must be used within <LogsProvider>');
-  }
-  return ctx;
+export const logsCrud = createCrudContext<RequestLog, LogsDialogType>({
+  displayName: 'LogsContext',
+  fetchList: listRequestLogs,
+  buildParams: ({ pagination, search, columnFilters }) => {
+    const statusFilter = extractFilterValue(columnFilters, 'status');
+    const providerKindFilter = extractFilterValue(columnFilters, 'provider_kind');
+    const providerIdFilter = extractFilterValue(columnFilters, 'provider_id');
+    const keyPrefixFilter = extractFilterValue(columnFilters, 'api_key');
+    const sourceFilter = extractFilterValue(columnFilters, 'source');
+    const isStreamFilter = extractFilterValue(columnFilters, 'mode');
+    const appIdFilter = extractFilterValue(columnFilters, 'app_id');
+
+    const raw: Record<string, unknown> = {
+      limit: pagination.pageSize,
+      offset: pagination.pageIndex * pagination.pageSize,
+      request_model: search || undefined,
+      status: statusFilter,
+      provider_kind: providerKindFilter,
+      provider_id: providerIdFilter,
+      api_key_prefix: keyPrefixFilter?.trim(),
+      user_format: sourceFilter,
+      is_stream: isStreamFilter === undefined ? undefined : getIsStreamApiValue(isStreamFilter),
+      app_id: appIdFilter,
+    };
+    return Object.fromEntries(Object.entries(raw).filter(([, v]) => v !== undefined && v !== ''));
+  },
+  defaultPageSize: 10,
+});
+
+/** 向后兼容：Provider */
+export const LogsProvider = logsCrud.Provider;
+
+/** 向后兼容：Hook */
+// eslint-disable-next-line react-refresh/only-export-components
+export function useLogs(): ReturnType<typeof logsCrud.useContext> {
+  return logsCrud.useContext();
 }

@@ -14,8 +14,8 @@ import { listApps } from '@/api/apps';
 import { listProviders } from '@/api/model/providers';
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
 import { DataTableBulkActions } from '@/components/data-table/BulkActions';
-import { Button } from '@/components/ui/Button';
 import { PermissionGuard } from '@/components/PermissionGuard';
+import { Button } from '@/components/ui/Button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { cn } from '@/utils/utils';
 import { useLogsColumns } from './logs-columns';
@@ -35,7 +35,7 @@ const GeminiIcon = ({ className }: { className?: string }): React.JSX.Element =>
 export function LogsTable(): React.JSX.Element {
   const { t } = useTranslation();
   const {
-    logs,
+    data: logs,
     loading,
     hasMore,
     total,
@@ -43,8 +43,8 @@ export function LogsTable(): React.JSX.Element {
     setPagination,
     columnFilters,
     setColumnFilters,
-    globalFilter,
-    setGlobalFilter,
+    search: globalFilter,
+    setSearch: setGlobalFilter,
     setOpen,
     setSelectedIds,
   } = useLogs();

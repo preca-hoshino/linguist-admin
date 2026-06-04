@@ -6,7 +6,7 @@ import { useLogs } from './logs-context';
 
 export function LogsDialogs(): React.JSX.Element {
   const { t } = useTranslation();
-  const { open, setOpen, currentRow, setCurrentRow, selectedIds, setSelectedIds, loadLogs } = useLogs();
+  const { open, setOpen, currentRow, setCurrentRow, selectedIds, setSelectedIds, loadData } = useLogs();
 
   const handleDelete = async (): Promise<void> => {
     if (!currentRow) {
@@ -18,7 +18,7 @@ export function LogsDialogs(): React.JSX.Element {
       setTimeout(() => {
         setCurrentRow(null);
       }, 500);
-      void loadLogs();
+      void loadData();
     } catch {
       // 错误由 API client 统一处理
     }
@@ -52,7 +52,7 @@ export function LogsDialogs(): React.JSX.Element {
       setTimeout(() => {
         setSelectedIds([]);
       }, 500);
-      void loadLogs();
+      void loadData();
     } catch {
       // 错误被 toast.promise 捕获并提示 Error 状态
     }
