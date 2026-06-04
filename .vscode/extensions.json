@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "biomejs.biome",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.js-debug",
+    "ms-vscode.js-debug-companion",
+    "christian-kohler.path-intellisense",
+    "mhutchie.git-graph",
+    "bradlc.vscode-tailwindcss"
+  ]
+}
