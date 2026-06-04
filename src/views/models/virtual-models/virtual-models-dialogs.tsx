@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { deleteVirtualModel } from '@/api/model/virtual-models';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,14 +13,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/AlertDialog';
-import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { useVirtualModels, type VirtualModelsDialogType } from './virtual-models-context';
 import { VirtualModelsMutateDialog } from './virtual-models-mutate-dialog';
 
 export function VirtualModelsDialogs(): React.JSX.Element {
   const { t } = useTranslation();
-  const { open, setOpen, currentRow, loadVirtualModels, setCurrentRow, selectedIds, setSelectedIds } =
-    useVirtualModels();
+  const { open, setOpen, currentRow, loadData, setCurrentRow, selectedIds, setSelectedIds } = useVirtualModels();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleOpenDialog = (type: VirtualModelsDialogType): void => {
@@ -40,7 +39,7 @@ export function VirtualModelsDialogs(): React.JSX.Element {
     try {
       setIsDeleting(true);
       await deleteVirtualModel(currentRow?.id as string);
-      await loadVirtualModels();
+      await loadData();
       handleCloseDialog();
     } catch {
       // 捕获后忽略或通过通用错误处理器处理
@@ -62,7 +61,7 @@ export function VirtualModelsDialogs(): React.JSX.Element {
           }
         }}
         currentRow={currentRow}
-        onSuccess={loadVirtualModels}
+        onSuccess={loadData}
       />
 
       <AlertDialog
@@ -151,7 +150,7 @@ export function VirtualModelsDialogs(): React.JSX.Element {
                 await deletePromise;
                 setOpen(null);
                 setTimeout(() => setSelectedIds([]), 500);
-                void loadVirtualModels();
+                void loadData();
               } catch {
                 /* toast 已处理 */
               }
