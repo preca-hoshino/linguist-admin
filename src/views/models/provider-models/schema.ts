@@ -40,7 +40,6 @@ export const formSchema = z.object({
     .optional(),
   thinking_config: z
     .object({
-      enabled: z.boolean().optional(),
       reasoning_content_backfill: z.boolean().optional(),
       levels: z
         .array(
