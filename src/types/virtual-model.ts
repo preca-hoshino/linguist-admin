@@ -22,7 +22,7 @@ export interface VirtualModel {
   rpm_limit?: number | null;
   tpm_limit?: number | null;
   /** 模型思考能力配置 */
-  thinking_config?: { enabled?: boolean; reasoning_content_backfill?: boolean; levels?: Array<{ name: string; ratio: number }> };
+  thinking_config?: { reasoning_content_backfill?: boolean; levels?: Array<{ name: string; ratio: number }> };
   throughput?: {
     rpm: number;
     tpm: number;
