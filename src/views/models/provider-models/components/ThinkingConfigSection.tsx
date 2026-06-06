@@ -55,7 +55,7 @@ export function ThinkingConfigSection({
             <FormDescription>
               {t(
                 'modelsPage.providerModels.accordionThinkingConfigDesc',
-                '配置模型的思考推理能力，包括 reasoning effort 档位和 reasoning_content 自动回填。',
+                '配置模型的思考推理能力。档位列表为空时模型不支持思考强度控制，仅保留推理内容回填功能。',
               )}
             </FormDescription>
 
@@ -100,13 +100,13 @@ export function ThinkingConfigSection({
               <FormDescription>
                 {t(
                   'modelsPage.providerModels.thinkingLevelsDesc',
-                  '定义 reasoning_effort 档位名称与 budget_tokens 比例（ratio × max_tokens）。未配置时使用硬编码默认值。',
+                  '定义 reasoning_effort 档位名称与 budget_tokens 比例（ratio × max_tokens）。未配置档位时 reasoning_effort 不生效。',
                 )}
               </FormDescription>
 
               {levels.length === 0 && (
                 <p className="text-sm text-muted-foreground italic">
-                  {t('modelsPage.providerModels.thinkingLevelsEmpty', '未配置档位，将使用系统默认值。')}
+                  {t('modelsPage.providerModels.thinkingLevelsEmpty', '未配置档位，该模型不支持思考强度控制。')}
                 </p>
               )}
 
