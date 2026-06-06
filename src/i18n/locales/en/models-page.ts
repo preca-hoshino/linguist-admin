@@ -145,8 +145,6 @@ export default {
     accordionProviderConfigDesc: 'Advanced settings specific to this provider.',
     accordionThinkingConfig: 'Thinking Config',
     accordionThinkingConfigDesc: 'Configure reasoning capabilities including effort levels and reasoning_content auto-backfill.',
-    thinkingEnabled: 'Enable Thinking',
-    thinkingEnabledDesc: 'Declare that this model supports thinking/reasoning mode',
     thinkingBackfill: 'Reasoning Backfill',
     thinkingBackfillDesc: 'Auto-fill reasoning_content in multi-turn conversations (prevents 400 errors)',
     thinkingLevels: 'Effort Levels',
