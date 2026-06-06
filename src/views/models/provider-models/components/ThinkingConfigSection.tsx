@@ -59,30 +59,6 @@ export function ThinkingConfigSection({
               )}
             </FormDescription>
 
-            {/* 启用开关 */}
-            <FormField
-              control={control}
-              name="thinking_config.enabled"
-              render={({ field }) => (
-                <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                  <FormLabel className="text-left text-muted-foreground">
-                    <span className="font-medium text-foreground">
-                      {t('modelsPage.providerModels.thinkingEnabled', '启用思考')}
-                    </span>
-                  </FormLabel>
-                  <div className="space-y-1.5">
-                    <FormControl>
-                      <Switch checked={field.value ?? false} onCheckedChange={field.onChange} />
-                    </FormControl>
-                    <FormDescription>
-                      {t('modelsPage.providerModels.thinkingEnabledDesc', '声明该模型支持思考推理模式')}
-                    </FormDescription>
-                    <FormMessage />
-                  </div>
-                </FormItem>
-              )}
-            />
-
             {/* reasoning_content 回填开关 */}
             <FormField
               control={control}
