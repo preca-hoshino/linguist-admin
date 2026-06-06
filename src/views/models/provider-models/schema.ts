@@ -38,6 +38,20 @@ export const formSchema = z.object({
       reasoning_content_backfill: z.boolean().optional(),
     })
     .optional(),
+  thinking_config: z
+    .object({
+      enabled: z.boolean().optional(),
+      reasoning_content_backfill: z.boolean().optional(),
+      levels: z
+        .array(
+          z.object({
+            name: z.string(),
+            ratio: z.number().min(0).max(1),
+          }),
+        )
+        .optional(),
+    })
+    .optional(),
 });
 
 export type FormValues = z.infer<typeof formSchema>;
