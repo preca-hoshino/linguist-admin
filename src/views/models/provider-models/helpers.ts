@@ -88,11 +88,10 @@ export function buildFormValuesFromRow(currentRow: ProviderModel): FormValues {
       : { reasoning_content_backfill: false },
     thinking_config: currentRow.thinking_config
       ? {
-          enabled: currentRow.thinking_config.enabled ?? false,
           reasoning_content_backfill: currentRow.thinking_config.reasoning_content_backfill ?? false,
           levels: currentRow.thinking_config.levels ?? [],
         }
-      : { enabled: false, reasoning_content_backfill: false, levels: [] },
+      : { reasoning_content_backfill: false, levels: [] },
     request_overrides_ui: buildOverridesUiFromRow(currentRow),
   };
 }
@@ -163,14 +162,16 @@ export function buildSubmitPayload(
 
   // thinking_config
   if (values.thinking_config) {
-    const tc: Record<string, unknown> = { enabled: values.thinking_config.enabled ?? false };
+    const tc: Record<string, unknown> = {};
     if (values.thinking_config.reasoning_content_backfill) {
       tc.reasoning_content_backfill = true;
     }
     if (values.thinking_config.levels && values.thinking_config.levels.length > 0) {
       tc.levels = values.thinking_config.levels;
     }
-    payload.thinking_config = tc;
+    if (Object.keys(tc).length > 0) {
+      payload.thinking_config = tc;
+    }
   }
 
   return payload;
