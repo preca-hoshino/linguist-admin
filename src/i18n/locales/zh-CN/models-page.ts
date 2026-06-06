@@ -144,8 +144,6 @@ export default {
     accordionProviderConfigDesc: '该提供商特有的高级配置项。',
     accordionThinkingConfig: '思考能力配置',
     accordionThinkingConfigDesc: '配置模型的思考推理能力，包括 reasoning effort 档位和 reasoning_content 自动回填。',
-    thinkingEnabled: '启用思考',
-    thinkingEnabledDesc: '声明该模型支持思考推理模式',
     thinkingBackfill: '推理内容回填',
     thinkingBackfillDesc: '多轮对话时自动补全 reasoning_content 字段（防止 400 错误）',
     thinkingLevels: '思考强度档位',
