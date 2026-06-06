@@ -41,7 +41,6 @@ const formSchema = z.object({
     .min(1),
   rpm_limit: z.number().nullable().optional(),
   tpm_limit: z.number().nullable().optional(),
-  thinking_enabled: z.boolean().optional(),
   thinking_backfill: z.boolean().optional(),
 });
 
@@ -82,7 +81,6 @@ export function VirtualModelsMutateDialog({
       backends: [],
       rpm_limit: null,
       tpm_limit: null,
-      thinking_enabled: false,
       thinking_backfill: false,
     },
   });
@@ -104,7 +102,6 @@ export function VirtualModelsMutateDialog({
           })),
           rpm_limit: currentRow.rpm_limit,
           tpm_limit: currentRow.tpm_limit,
-          thinking_enabled: currentRow.thinking_config?.enabled ?? false,
           thinking_backfill: currentRow.thinking_config?.reasoning_content_backfill ?? false,
         });
       } else {
@@ -116,7 +113,6 @@ export function VirtualModelsMutateDialog({
           backends: [],
           rpm_limit: null,
           tpm_limit: null,
-          thinking_enabled: false,
           thinking_backfill: false,
         });
       }
@@ -138,7 +134,6 @@ export function VirtualModelsMutateDialog({
           rpm_limit: values.rpm_limit,
           tpm_limit: values.tpm_limit,
           thinking_config: {
-            enabled: values.thinking_enabled ?? false,
             reasoning_content_backfill: values.thinking_backfill ?? false,
           },
         };
@@ -160,7 +155,6 @@ export function VirtualModelsMutateDialog({
           rpm_limit: values.rpm_limit,
           tpm_limit: values.tpm_limit,
           thinking_config: {
-            enabled: values.thinking_enabled ?? false,
             reasoning_content_backfill: values.thinking_backfill ?? false,
           },
         };
@@ -439,30 +433,6 @@ export function VirtualModelsMutateDialog({
                   />
 
                   {/* 思考能力配置 */}
-                  <FormField
-                    control={form.control}
-                    name="thinking_enabled"
-                    render={({ field }) => (
-                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                          <Brain className="h-3.5 w-3.5" />
-                          <span className="font-medium text-foreground">
-                            {t('modelsPage.providerModels.thinkingEnabled', '启用思考')}
-                          </span>
-                        </FormLabel>
-                        <div className="space-y-1.5">
-                          <FormControl>
-                            <Switch checked={field.value ?? false} onCheckedChange={field.onChange} />
-                          </FormControl>
-                          <FormDescription>
-                            {t('modelsPage.providerModels.thinkingEnabledDesc', '声明该模型支持思考推理模式')}
-                          </FormDescription>
-                          <FormMessage />
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-
                   <FormField
                     control={form.control}
                     name="thinking_backfill"
