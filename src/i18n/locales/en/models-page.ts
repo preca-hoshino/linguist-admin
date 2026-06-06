@@ -144,13 +144,15 @@ export default {
     accordionProviderConfig: 'Provider',
     accordionProviderConfigDesc: 'Advanced settings specific to this provider.',
     accordionThinkingConfig: 'Thinking Config',
-    accordionThinkingConfigDesc: 'Configure reasoning capabilities including effort levels and reasoning_content auto-backfill.',
+    accordionThinkingConfigDesc:
+      'Configure reasoning capabilities. When levels are empty, the model does not support effort control — only reasoning_content backfill is available.',
     thinkingBackfill: 'Reasoning Backfill',
     thinkingBackfillDesc: 'Auto-fill reasoning_content in multi-turn conversations (prevents 400 errors)',
     thinkingLevels: 'Effort Levels',
     thinkingLevelsAdd: 'Add Level',
-    thinkingLevelsDesc: 'Define reasoning_effort level names and budget_tokens ratio (ratio × max_tokens). Uses hardcoded defaults when unconfigured.',
-    thinkingLevelsEmpty: 'No levels configured, system defaults will be used.',
+    thinkingLevelsDesc:
+      'Define reasoning_effort level names and budget_tokens ratio (ratio × max_tokens). reasoning_effort is not set when no levels are configured.',
+    thinkingLevelsEmpty: 'No levels configured — this model does not support thinking effort control.',
     thinkingLevelName: 'Name',
     thinkingLevelRatio: 'Ratio (0~1)',
     rpmLimitHint: 'Blank or 0 = unlimited',
