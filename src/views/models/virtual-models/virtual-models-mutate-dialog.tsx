@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Activity, Fingerprint, GitMerge, Loader2, Type, X } from 'lucide-react';
+import { Activity, Brain, Fingerprint, GitMerge, Loader2, Type, X } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,8 @@ import { createVirtualModel, updateVirtualModel } from '@/api/model/virtual-mode
 import { UnitInput, UnitTabs, useUnitInput } from '@/components/UnitInput';
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
+import { Switch } from '@/components/ui/Switch';
 import { Input } from '@/components/ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { usePermission } from '@/stores/permission-store';
@@ -40,6 +41,8 @@ const formSchema = z.object({
     .min(1),
   rpm_limit: z.number().nullable().optional(),
   tpm_limit: z.number().nullable().optional(),
+  thinking_enabled: z.boolean().optional(),
+  thinking_backfill: z.boolean().optional(),
 });
 
 export type VirtualModelForm = z.infer<typeof formSchema>;
@@ -79,6 +82,8 @@ export function VirtualModelsMutateDialog({
       backends: [],
       rpm_limit: null,
       tpm_limit: null,
+      thinking_enabled: false,
+      thinking_backfill: false,
     },
   });
 
@@ -99,6 +104,8 @@ export function VirtualModelsMutateDialog({
           })),
           rpm_limit: currentRow.rpm_limit,
           tpm_limit: currentRow.tpm_limit,
+          thinking_enabled: currentRow.thinking_config?.enabled ?? false,
+          thinking_backfill: currentRow.thinking_config?.reasoning_content_backfill ?? false,
         });
       } else {
         form.reset({
@@ -109,6 +116,8 @@ export function VirtualModelsMutateDialog({
           backends: [],
           rpm_limit: null,
           tpm_limit: null,
+          thinking_enabled: false,
+          thinking_backfill: false,
         });
       }
     }
@@ -128,6 +137,10 @@ export function VirtualModelsMutateDialog({
           ...(values.description === undefined ? {} : { description: values.description }),
           rpm_limit: values.rpm_limit,
           tpm_limit: values.tpm_limit,
+          thinking_config: {
+            enabled: values.thinking_enabled ?? false,
+            reasoning_content_backfill: values.thinking_backfill ?? false,
+          },
         };
         const res = await updateVirtualModel(currentRow.id, payload);
         if (!res.ok) {
@@ -146,6 +159,10 @@ export function VirtualModelsMutateDialog({
           ...(values.description === undefined ? {} : { description: values.description }),
           rpm_limit: values.rpm_limit,
           tpm_limit: values.tpm_limit,
+          thinking_config: {
+            enabled: values.thinking_enabled ?? false,
+            reasoning_content_backfill: values.thinking_backfill ?? false,
+          },
         };
         const res = await createVirtualModel(payload);
         if (!res.ok) {
@@ -419,6 +436,58 @@ export function VirtualModelsMutateDialog({
                         </FormItem>
                       );
                     }}
+                  />
+
+                  {/* 思考能力配置 */}
+                  <FormField
+                    control={form.control}
+                    name="thinking_enabled"
+                    render={({ field }) => (
+                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                          <Brain className="h-3.5 w-3.5" />
+                          <span className="font-medium text-foreground">
+                            {t('modelsPage.providerModels.thinkingEnabled', '启用思考')}
+                          </span>
+                        </FormLabel>
+                        <div className="space-y-1.5">
+                          <FormControl>
+                            <Switch checked={field.value ?? false} onCheckedChange={field.onChange} />
+                          </FormControl>
+                          <FormDescription>
+                            {t('modelsPage.providerModels.thinkingEnabledDesc', '声明该模型支持思考推理模式')}
+                          </FormDescription>
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="thinking_backfill"
+                    render={({ field }) => (
+                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
+                          <Brain className="h-3.5 w-3.5" />
+                          <span className="font-medium text-foreground">
+                            {t('modelsPage.providerModels.thinkingBackfill', '推理内容回填')}
+                          </span>
+                        </FormLabel>
+                        <div className="space-y-1.5">
+                          <FormControl>
+                            <Switch checked={field.value ?? false} onCheckedChange={field.onChange} />
+                          </FormControl>
+                          <FormDescription>
+                            {t(
+                              'modelsPage.providerModels.thinkingBackfillDesc',
+                              '多轮对话时自动补全 reasoning_content 字段（防止 400 错误）',
+                            )}
+                          </FormDescription>
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
                   />
                 </div>
 
