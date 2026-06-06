@@ -9,6 +9,8 @@ export interface ProviderModel {
   supported_parameters?: string[];
   /** 提供商模型级专属配置（如 Copilot 端点覆盖、特殊 Header 等） */
   model_config?: Record<string, unknown>;
+  /** 模型思考能力配置（thinking effort levels、reasoning_content_backfill 等） */
+  thinking_config?: { enabled?: boolean; reasoning_content_backfill?: boolean; levels?: Array<{ name: string; ratio: number }> };
   /** 请求规则重写 */
   request_overrides?: {
     headers?: Record<string, string | null>;
