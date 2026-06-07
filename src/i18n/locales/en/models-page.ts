@@ -198,6 +198,8 @@ export default {
     routingStrategy: 'Routing Strategy',
     routingStrategyRequired: 'Routing Strategy is required',
     routingStrategyPlaceholder: 'Select a strategy',
+    accordionRouting: 'Routing Strategy',
+    accordionRoutingDesc: 'Choose how traffic is distributed across multiple backends.',
     status: 'Status',
     active: 'Active',
     inactive: 'Inactive',
