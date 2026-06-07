@@ -1,21 +1,23 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Activity, Brain, Fingerprint, GitMerge, Loader2, Type, X } from 'lucide-react';
+import { Activity, Fingerprint, Loader2, Route, Type, X } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { createVirtualModel, updateVirtualModel } from '@/api/model/virtual-models';
 import { UnitInput, UnitTabs, useUnitInput } from '@/components/UnitInput';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
-import { Switch } from '@/components/ui/Switch';
 import { Input } from '@/components/ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { usePermission } from '@/stores/permission-store';
 import type { VirtualModel } from '@/types';
 import { cn } from '@/utils/utils';
 import { MODEL_TYPE_OPTIONS } from '@/views/models/provider-models/constants';
+import { ThinkingConfigSection } from '@/views/models/provider-models/components/ThinkingConfigSection';
 import { type BackendModelInfo, SortableBackendList } from './components/SortableBackendList';
 
 interface VirtualModelsMutateDialogProps {
@@ -41,10 +43,39 @@ const formSchema = z.object({
     .min(1),
   rpm_limit: z.number().nullable().optional(),
   tpm_limit: z.number().nullable().optional(),
-  thinking_backfill: z.boolean().optional(),
+  thinking_config: z
+    .object({
+      reasoning_content_backfill: z.boolean().optional(),
+      levels: z
+        .array(
+          z.object({
+            name: z.string(),
+            ratio: z.number().min(0).max(1),
+          }),
+        )
+        .optional(),
+    })
+    .optional(),
 });
 
 export type VirtualModelForm = z.infer<typeof formSchema>;
+
+/** 构建 thinking_config payload，空配置时不发送 */
+function buildThinkingConfigPayload(
+  tc: VirtualModelForm['thinking_config'],
+): { reasoning_content_backfill?: boolean; levels?: Array<{ name: string; ratio: number }> } | undefined {
+  if (!tc) {
+    return undefined;
+  }
+  const payload: Record<string, unknown> = {};
+  if (tc.reasoning_content_backfill) {
+    payload.reasoning_content_backfill = true;
+  }
+  if (tc.levels && tc.levels.length > 0) {
+    payload.levels = tc.levels;
+  }
+  return Object.keys(payload).length > 0 ? (payload as ReturnType<typeof buildThinkingConfigPayload>) : undefined;
+}
 
 export function VirtualModelsMutateDialog({
   open,
@@ -81,7 +112,7 @@ export function VirtualModelsMutateDialog({
       backends: [],
       rpm_limit: null,
       tpm_limit: null,
-      thinking_backfill: false,
+      thinking_config: { reasoning_content_backfill: false, levels: [] },
     },
   });
 
@@ -102,7 +133,10 @@ export function VirtualModelsMutateDialog({
           })),
           rpm_limit: currentRow.rpm_limit,
           tpm_limit: currentRow.tpm_limit,
-          thinking_backfill: currentRow.thinking_config?.reasoning_content_backfill ?? false,
+          thinking_config: {
+            reasoning_content_backfill: currentRow.thinking_config?.reasoning_content_backfill ?? false,
+            levels: currentRow.thinking_config?.levels ?? [],
+          },
         });
       } else {
         form.reset({
@@ -113,7 +147,7 @@ export function VirtualModelsMutateDialog({
           backends: [],
           rpm_limit: null,
           tpm_limit: null,
-          thinking_backfill: false,
+          thinking_config: { reasoning_content_backfill: false, levels: [] },
         });
       }
     }
@@ -133,9 +167,7 @@ export function VirtualModelsMutateDialog({
           ...(values.description === undefined ? {} : { description: values.description }),
           rpm_limit: values.rpm_limit,
           tpm_limit: values.tpm_limit,
-          thinking_config: {
-            reasoning_content_backfill: values.thinking_backfill ?? false,
-          },
+          thinking_config: buildThinkingConfigPayload(values.thinking_config),
         };
         const res = await updateVirtualModel(currentRow.id, payload);
         if (!res.ok) {
@@ -154,9 +186,7 @@ export function VirtualModelsMutateDialog({
           ...(values.description === undefined ? {} : { description: values.description }),
           rpm_limit: values.rpm_limit,
           tpm_limit: values.tpm_limit,
-          thinking_config: {
-            reasoning_content_backfill: values.thinking_backfill ?? false,
-          },
+          thinking_config: buildThinkingConfigPayload(values.thinking_config),
         };
         const res = await createVirtualModel(payload);
         if (!res.ok) {
@@ -328,137 +358,168 @@ export function VirtualModelsMutateDialog({
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="routing_strategy"
-                    render={({ field }) => (
-                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                          <GitMerge className="h-3.5 w-3.5" />
-                          <span className="font-medium text-foreground">
-                            {t('modelsPage.virtualModels.routingStrategy', 'Routing Strategy')}
+                  {/* ── 手风琴面板 ── */}
+                  <Accordion type="multiple" className="w-full space-y-3">
+                    {/* 路由策略 */}
+                    <Card className="gap-0 py-0">
+                      <AccordionItem value="routing-strategy" className="border-b-0">
+                        <AccordionTrigger className="px-5 hover:no-underline">
+                          <span className="inline-flex items-center gap-2.5">
+                            <Route className="h-4 w-4 text-muted-foreground" />
+                            {t('modelsPage.virtualModels.accordionRouting', '路由策略')}
                           </span>
-                        </FormLabel>
-                        <div className="space-y-1.5">
-                          <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue
-                                  placeholder={t(
-                                    'modelsPage.virtualModels.routingStrategyPlaceholder',
-                                    'Select Strategy',
-                                  )}
-                                />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="load_balance">
-                                {t('modelsPage.virtualModels.strategyLoadBalance', 'Load Balance')}
-                              </SelectItem>
-                              <SelectItem value="failover">
-                                {t('modelsPage.virtualModels.strategyFailover', 'Failover')}
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </div>
-                      </FormItem>
-                    )}
-                  />
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-5 px-5 pt-1 pb-4">
+                            <FormDescription>
+                              {t('modelsPage.virtualModels.accordionRoutingDesc', '选择多后端之间的流量分配策略。')}
+                            </FormDescription>
 
-                  <FormField
-                    control={form.control}
-                    name="rpm_limit"
-                    render={({ field }) => (
-                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                          <Activity className="h-3.5 w-3.5" />
-                          <span className="font-medium text-foreground">
-                            {t('modelsPage.providerModels.rpmLimit', 'RPM 限制')}
-                          </span>
-                        </FormLabel>
-                        <div className="space-y-1.5">
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min={0}
-                              placeholder="0"
-                              value={field.value === null ? '' : field.value}
-                              onChange={(e) => {
-                                const val = e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
-                                field.onChange(val);
-                              }}
-                              className="h-9 w-40 font-mono"
+                            <FormField
+                              control={form.control}
+                              name="routing_strategy"
+                              render={({ field }) => (
+                                <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                                  <FormLabel className="text-left text-muted-foreground">
+                                    <span className="font-medium text-foreground">
+                                      {t('modelsPage.virtualModels.routingStrategy', 'Routing Strategy')}
+                                    </span>
+                                  </FormLabel>
+                                  <div className="space-y-1.5">
+                                    <Select
+                                      onValueChange={field.onChange}
+                                      defaultValue={field.value}
+                                      value={field.value}
+                                    >
+                                      <FormControl>
+                                        <SelectTrigger>
+                                          <SelectValue
+                                            placeholder={t(
+                                              'modelsPage.virtualModels.routingStrategyPlaceholder',
+                                              'Select Strategy',
+                                            )}
+                                          />
+                                        </SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent>
+                                        <SelectItem value="load_balance">
+                                          {t('modelsPage.virtualModels.strategyLoadBalance', 'Load Balance')}
+                                        </SelectItem>
+                                        <SelectItem value="failover">
+                                          {t('modelsPage.virtualModels.strategyFailover', 'Failover')}
+                                        </SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                  </div>
+                                </FormItem>
+                              )}
                             />
-                          </FormControl>
-                          <FormMessage />
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="tpm_limit"
-                    render={({ field }) => {
-                      const unit = useUnitInput({
-                        baseValue: field.value ?? null,
-                        onChange: field.onChange,
-                        min: 0,
-                      });
-                      return (
-                        <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                          <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                            <Activity className="h-3.5 w-3.5" />
-                            <span className="font-medium text-foreground">
-                              {t('modelsPage.providerModels.tpmLimit', 'TPM 限制')}
-                            </span>
-                          </FormLabel>
-                          <div className="space-y-1.5">
-                            <FormControl>
-                              <div className="flex items-center gap-2">
-                                <UnitInput
-                                  value={unit.displayValue}
-                                  onChange={unit.onInputChange}
-                                  placeholder={unit.placeholder}
-                                />
-                                <UnitTabs units={unit.units} selected={unit.unitLabel} onSelect={unit.onUnitChange} />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
                           </div>
-                        </FormItem>
-                      );
-                    }}
-                  />
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Card>
 
-                  {/* 思考能力配置 */}
-                  <FormField
-                    control={form.control}
-                    name="thinking_backfill"
-                    render={({ field }) => (
-                      <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
-                        <FormLabel className="flex items-center justify-start gap-2 text-left text-muted-foreground">
-                          <Brain className="h-3.5 w-3.5" />
-                          <span className="font-medium text-foreground">
-                            {t('modelsPage.providerModels.thinkingBackfill', '推理内容回填')}
+                    {/* 速率限制 */}
+                    <Card className="gap-0 py-0">
+                      <AccordionItem value="rate-limit" className="border-b-0">
+                        <AccordionTrigger className="px-5 hover:no-underline">
+                          <span className="inline-flex items-center gap-2.5">
+                            <Activity className="h-4 w-4 text-muted-foreground" />
+                            {t('modelsPage.providerModels.accordionRateLimit', '速率限制')}
                           </span>
-                        </FormLabel>
-                        <div className="space-y-1.5">
-                          <FormControl>
-                            <Switch checked={field.value ?? false} onCheckedChange={field.onChange} />
-                          </FormControl>
-                          <FormDescription>
-                            {t(
-                              'modelsPage.providerModels.thinkingBackfillDesc',
-                              '多轮对话时自动补全 reasoning_content 字段（防止 400 错误）',
-                            )}
-                          </FormDescription>
-                          <FormMessage />
-                        </div>
-                      </FormItem>
-                    )}
-                  />
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-5 px-5 pt-1 pb-4">
+                            <FormDescription>
+                              {t(
+                                'modelsPage.providerModels.accordionRateLimitDesc',
+                                '控制该模型的请求频率与单次调用超时上限。',
+                              )}
+                            </FormDescription>
+
+                            <FormField
+                              control={form.control}
+                              name="rpm_limit"
+                              render={({ field }) => (
+                                <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                                  <FormLabel className="text-left text-muted-foreground">
+                                    <span className="font-medium text-foreground">
+                                      {t('modelsPage.providerModels.rpmLimit', 'RPM 限制')}
+                                    </span>
+                                  </FormLabel>
+                                  <div className="space-y-1.5">
+                                    <FormControl>
+                                      <Input
+                                        type="number"
+                                        min={0}
+                                        placeholder="0"
+                                        value={field.value === null ? '' : field.value}
+                                        onChange={(e) => {
+                                          const val =
+                                            e.target.value === '' ? null : Number.parseInt(e.target.value, 10);
+                                          field.onChange(val);
+                                        }}
+                                        className="h-9 w-40 font-mono"
+                                      />
+                                    </FormControl>
+                                    <FormDescription>
+                                      {t('modelsPage.providerModels.rpmLimitHint', '留空或 0 = 无限制')}
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </div>
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name="tpm_limit"
+                              render={({ field }) => {
+                                const unit = useUnitInput({
+                                  baseValue: field.value ?? null,
+                                  onChange: field.onChange,
+                                  min: 0,
+                                });
+                                return (
+                                  <FormItem className="grid grid-cols-[140px_1fr] items-center gap-5 space-y-0">
+                                    <FormLabel className="text-left text-muted-foreground">
+                                      <span className="font-medium text-foreground">
+                                        {t('modelsPage.providerModels.tpmLimit', 'TPM 限制')}
+                                      </span>
+                                    </FormLabel>
+                                    <div className="space-y-1.5">
+                                      <FormControl>
+                                        <div className="flex items-center gap-2">
+                                          <UnitInput
+                                            value={unit.displayValue}
+                                            onChange={unit.onInputChange}
+                                            placeholder={unit.placeholder}
+                                          />
+                                          <UnitTabs
+                                            units={unit.units}
+                                            selected={unit.unitLabel}
+                                            onSelect={unit.onUnitChange}
+                                          />
+                                        </div>
+                                      </FormControl>
+                                      <FormDescription>
+                                        {t('modelsPage.providerModels.tpmLimitHint', '留空或 0 = 无限制')}
+                                      </FormDescription>
+                                      <FormMessage />
+                                    </div>
+                                  </FormItem>
+                                );
+                              }}
+                            />
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Card>
+
+                    {/* 思考能力配置 */}
+                    <ThinkingConfigSection control={form.control} watch={form.watch} setValue={form.setValue} />
+                  </Accordion>
                 </div>
 
                 {/* 后端模型绑定区 */}
