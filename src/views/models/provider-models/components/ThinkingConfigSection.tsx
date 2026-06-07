@@ -1,7 +1,7 @@
 // src/views/models/provider-models/components/ThinkingConfigSection.tsx — 思考能力配置面板
 
 import { Plus, Trash2, Brain } from 'lucide-react';
-import type { Control, UseFormSetValue, UseFormWatch } from 'react-hook-form';
+import type { Control, UseFormSetValue, UseFormWatch, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
@@ -9,22 +9,29 @@ import { Card } from '@/components/ui/Card';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
 import { Input } from '@/components/ui/Input';
 import { Switch } from '@/components/ui/Switch';
-import type { FormValues } from '../schema';
 
-interface ThinkingConfigSectionProps {
-  readonly control: Control<FormValues>;
-  readonly watch: UseFormWatch<FormValues>;
-  readonly setValue: UseFormSetValue<FormValues>;
+/** 表单中必须包含 thinking_config 结构的最小约束 */
+interface ThinkingConfigFormValues extends FieldValues {
+  thinking_config?: {
+    reasoning_content_backfill?: boolean;
+    levels?: Array<{ name: string; ratio: number }>;
+  };
+}
+
+interface ThinkingConfigSectionProps<T extends ThinkingConfigFormValues = ThinkingConfigFormValues> {
+  readonly control: Control<T>;
+  readonly watch: UseFormWatch<T>;
+  readonly setValue: UseFormSetValue<T>;
   /** 最大输出 token 数（K），用于显示 budget_tokens 提示 */
   readonly maxTokensK?: number;
 }
 
-export function ThinkingConfigSection({
+export function ThinkingConfigSection<T extends ThinkingConfigFormValues = ThinkingConfigFormValues>({
   control,
   watch,
   setValue,
   maxTokensK,
-}: ThinkingConfigSectionProps): React.JSX.Element {
+}: ThinkingConfigSectionProps<T>): React.JSX.Element {
   const { t } = useTranslation();
   const levels = watch('thinking_config.levels') ?? [];
 
