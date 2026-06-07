@@ -143,7 +143,8 @@ export default {
     accordionProviderConfig: '专属配置',
     accordionProviderConfigDesc: '该提供商特有的高级配置项。',
     accordionThinkingConfig: '思考能力配置',
-    accordionThinkingConfigDesc: '配置模型的思考推理能力。档位列表为空时模型不支持思考强度控制，仅保留推理内容回填功能。',
+    accordionThinkingConfigDesc:
+      '配置模型的思考推理能力。档位列表为空时模型不支持思考强度控制，仅保留推理内容回填功能。',
     thinkingBackfill: '推理内容回填',
     thinkingBackfillDesc: '多轮对话时自动补全 reasoning_content 字段（防止 400 错误）',
     thinkingLevels: '思考强度档位',
@@ -196,6 +197,8 @@ export default {
     routingStrategy: '路由策略',
     routingStrategyRequired: '路由策略为必填项',
     routingStrategyPlaceholder: '选择路由策略',
+    accordionRouting: '路由策略',
+    accordionRoutingDesc: '选择多后端之间的流量分配策略。',
     status: '状态',
     active: '已激活',
     inactive: '未激活',
