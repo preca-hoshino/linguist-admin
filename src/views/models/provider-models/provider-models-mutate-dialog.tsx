@@ -23,7 +23,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { usePermission } from '@/stores/permission-store';
 import { CapabilitiesSelector } from './components/CapabilitiesSelector';
 import { PricingTiersSection, usePricingTiersLogic } from './components/PricingTiersSection';
-import { ProviderConfigSection } from './components/ProviderConfigSection';
+import { ThinkingConfigSection } from './components/ThinkingConfigSection';
 import { ProviderSelector } from './components/ProviderSelector';
 import { RateLimitSection } from './components/RateLimitSection';
 import { RequestOverridesEditor } from './components/RequestOverridesEditor';
@@ -422,8 +422,13 @@ export function ProviderModelsMutateDialog({
                         </AccordionItem>
                       </Card>
 
-                      {/* 提供商专属配置 */}
-                      <ProviderConfigSection control={form.control} providerKind={selectedProvider?.kind} />
+                      {/* 思考能力配置 */}
+                      <ThinkingConfigSection
+                        control={form.control}
+                        watch={form.watch}
+                        setValue={form.setValue}
+                        maxTokensK={currentMaxTokens}
+                      />
                     </Accordion>
                   </div>
                 </form>

@@ -86,6 +86,12 @@ export function buildFormValuesFromRow(currentRow: ProviderModel): FormValues {
           reasoning_content_backfill: currentRow.model_config.reasoning_content_backfill === true,
         }
       : { reasoning_content_backfill: false },
+    thinking_config: currentRow.thinking_config
+      ? {
+          reasoning_content_backfill: currentRow.thinking_config.reasoning_content_backfill ?? false,
+          levels: currentRow.thinking_config.levels ?? [],
+        }
+      : { reasoning_content_backfill: false, levels: [] },
     request_overrides_ui: buildOverridesUiFromRow(currentRow),
   };
 }
@@ -143,7 +149,7 @@ export function buildSubmitPayload(
   const parsedOverrides = buildRequestOverridesPayload(values.request_overrides_ui);
   payload.request_overrides = parsedOverrides;
 
-  // model_config: reasoning_content_backfill
+  // model_config: reasoning_content_backfill (legacy, kept for backward compat)
   if (values.model_config) {
     const mc: Record<string, unknown> = {};
     if (values.model_config.reasoning_content_backfill) {
@@ -151,6 +157,20 @@ export function buildSubmitPayload(
     }
     if (Object.keys(mc).length > 0) {
       payload.model_config = mc;
+    }
+  }
+
+  // thinking_config
+  if (values.thinking_config) {
+    const tc: Record<string, unknown> = {};
+    if (values.thinking_config.reasoning_content_backfill) {
+      tc.reasoning_content_backfill = true;
+    }
+    if (values.thinking_config.levels && values.thinking_config.levels.length > 0) {
+      tc.levels = values.thinking_config.levels;
+    }
+    if (Object.keys(tc).length > 0) {
+      payload.thinking_config = tc;
     }
   }
 
